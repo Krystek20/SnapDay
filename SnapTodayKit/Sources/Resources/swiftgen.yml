@@ -1,0 +1,11 @@
+output_dir: ${DERIVED_SOURCES_DIR}
+
+fonts:
+  inputs:
+    - Quicksand.ttf
+  outputs:
+    templateName: swift5
+    output: Fonts.generated.swift
+    params:
+        enumName: Fonts
+        publicAccess: true
