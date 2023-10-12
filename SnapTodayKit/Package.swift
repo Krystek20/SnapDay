@@ -6,6 +6,7 @@ import PackageDescription
 
 let package = Package(
     name: "SnapTodayKit",
+    defaultLocalization: "en",
     platforms: [
       .iOS(.v16)
     ],
@@ -31,12 +32,12 @@ let package = Package(
         .details,
         .resources
       ])
-      .add(.dashboard, dependecies: [.composableArchitecture, .resources])
+      .add(.dashboard, dependecies: [.composableArchitecture, .uiComponents, .resources, .models])
       .add(.historyList, dependecies: [.composableArchitecture])
       .add(.details, dependecies: [.composableArchitecture])
       .add(.previews, dependecies: [.application], addTestTarget: false)
       .add(.models)
-      .add(.uiComponents, addTestTarget: false)
+      .add(.uiComponents, dependecies: [.resources], addTestTarget: false)
       .add(.resources, dependecies: [.swiftgen], addTestTarget: false)
 )
 

@@ -17,7 +17,7 @@ import Details
 #Preview("DashboardView") {
   DashboardView(
     store: Store(
-      initialState: DashboardFeature.State(),
+      initialState: DashboardFeature.State(userName: "John"),
       reducer: { DashboardFeature() }
     )
   )
