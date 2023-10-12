@@ -9,3 +9,13 @@ fonts:
     params:
         enumName: Fonts
         publicAccess: true
+
+xcassets:
+  inputs:
+    - Colors.xcassets
+  outputs:
+    templateName: swift5
+    output: Assets.generated.swift
+    params:
+        enumName: Colors
+        publicAccess: true

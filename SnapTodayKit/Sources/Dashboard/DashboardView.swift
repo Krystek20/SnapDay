@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
+import UiComponents
 import Resources
 
 public struct DashboardView: View {
@@ -18,32 +19,72 @@ public struct DashboardView: View {
 
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack(spacing: 25.0) {
-        VStack(alignment: .leading, spacing: 2.0) {
-          Text("Hi Krystian,")
-            .font(Fonts.Quicksand.regular.swiftUIFont(size: 12.0))
-          Text("Welcome back 👋")
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 10.0))
+      ZStack(alignment: .bottom) {
+        ScrollView {
+          headerView(userName: viewStore.userName)
+            .padding(.horizontal, 10.0)
+            .padding(.top, 15.0)
+          SummaryView(activities: viewStore.activities)
+            .padding(.top, 10.0)
+          activitiesSection(viewStore: viewStore)
+            .padding(.top, 10.0)
+            .padding(.horizontal, 10.0)
         }
-        
-        Button {
-          viewStore.send(.startGameTapped)
-        } label: {
-          Text("Start game")
-            .padding(
-              EdgeInsets(
-                top: 15.0,
-                leading: 35.0,
-                bottom: 15.0,
-                trailing: 35.0
-              )
-            )
-            .overlay {
-              RoundedRectangle(cornerRadius: 8.0)
-                .stroke(Color.gray, lineWidth: 2.0)
-            }
-        }
+        .scrollIndicators(.hidden)
+        .padding(.horizontal, 15.0)
+        addButton(viewStore: viewStore)
       }
+    }
+  }
+
+  private func headerView(userName: String) -> some View {
+    VStack(alignment: .leading, spacing: 2.0) {
+      if !userName.isEmpty {
+        Text("Hi \(userName),", bundle: .module)
+          .font(Fonts.Quicksand.regular.swiftUIFont(size: 30.0))
+          .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+      }
+      Text("Welcome back 👋", bundle: .module)
+        .font(Fonts.Quicksand.bold.swiftUIFont(size: 28.0))
+        .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+    }
+    .maxWidth()
+  }
+
+  private func activitiesSection(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    VStack(alignment: .leading, spacing: 10.0) {
+      Text("Activities", bundle: .module)
+        .font(Fonts.Quicksand.bold.swiftUIFont(size: 22.0))
+        .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+      OptionsView(
+        options: viewStore.options,
+        highlighted: viewStore.selectedOption,
+        selected: { option in
+          viewStore.send(.optionTapped(option))
+        }
+      )
+      activitiesList(viewStore: viewStore)
+        .padding(.vertical, 10.0)
+    }
+    .maxWidth()
+  }
+
+  private func activitiesList(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    LazyVStack(alignment: .leading, spacing: 15.0) {
+      ForEach(viewStore.activities, content: ActivityView.init)
+    }
+    .maxWidth()
+  }
+
+  private func addButton(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    Button {
+      viewStore.send(.startGameTapped)
+    } label: {
+      Image(systemName: "plus.circle.fill")
+        .resizable()
+        .fontWeight(.thin)
+        .frame(width: 50.0, height: 50.0)
+        .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
     }
   }
 }
