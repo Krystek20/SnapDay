@@ -26,7 +26,6 @@ public struct DashboardFeature: Reducer {
   // MARK: - State & Action
 
   public struct State: Equatable {
-
     let userName: String
     var activities: [Activity] = []
     var plans: [Plan] = []
@@ -94,15 +93,13 @@ public struct DashboardFeature: Reducer {
         )
         return .none
       case .view(.dayActivityTapped(var dayActivity)):
-        if !dayActivity.isDone {
-          dayActivity.isDone = true
-          return .run { [dayActivity] send in
-            try await dayActivityRepository.saveActivity(dayActivity)
-            await send(.internal(.loadPlans))
-            await send(.internal(.loadDay))
-          }
+        guard !dayActivity.isDone else { return .none }
+        dayActivity.isDone = true
+        return .run { [dayActivity] send in
+          try await dayActivityRepository.saveActivity(dayActivity)
+          await send(.internal(.loadPlans))
+          await send(.internal(.loadDay))
         }
-        return .none
       case .view(.dayActivityEditTapped(var dayActivity)):
         print("dayActivityEditTapped: \(dayActivity.activity.name)")
         return .none

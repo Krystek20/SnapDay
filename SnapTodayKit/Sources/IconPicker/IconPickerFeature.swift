@@ -1,7 +1,6 @@
 import Foundation
 import ComposableArchitecture
 import Common
-import SwiftUI
 
 public struct IconPickerFeature: Reducer {
 

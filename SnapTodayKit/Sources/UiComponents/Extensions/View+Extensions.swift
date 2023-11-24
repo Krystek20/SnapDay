@@ -21,12 +21,6 @@ extension View {
 }
 
 extension View {
-  public func eraseToAnyView() -> AnyView {
-    AnyView(self)
-  }
-}
-
-extension View {
   public func scrollOnAppear<ID>(_ id: ID, anchor: UnitPoint? = nil, reader: ScrollViewProxy) -> some View where ID : Hashable {
     onAppear {
       withAnimation {

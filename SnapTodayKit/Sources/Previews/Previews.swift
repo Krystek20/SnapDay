@@ -30,7 +30,7 @@ import Models
 #Preview("ActivityFormView") {
   ActivityFormView(
     store: Store(
-      initialState: ActivityFormFeature.State(activity: .mock),
+      initialState: ActivityFormFeature.State(activity: Activity(id: UUID())),
       reducer: { ActivityFormFeature() }
     )
   )
@@ -39,7 +39,7 @@ import Models
 #Preview("TagFormView") {
   TagFormView(
     store: Store(
-      initialState: TagFormFeature.State(tag: .mock),
+      initialState: TagFormFeature.State(tag: Tag(name: "")),
       reducer: { TagFormFeature() }
     )
   )

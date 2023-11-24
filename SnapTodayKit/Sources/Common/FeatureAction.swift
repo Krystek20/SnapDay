@@ -1,7 +1,6 @@
 import ComposableArchitecture
 
 public protocol FeatureAction {
-
   associatedtype ViewAction
   associatedtype DelegateAction
   associatedtype InternalAction
