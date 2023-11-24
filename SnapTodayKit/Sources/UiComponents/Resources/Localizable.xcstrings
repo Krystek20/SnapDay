@@ -1,0 +1,18 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld hours" : {
+
+    },
+    "%lld min" : {
+
+    }
+  },
+  "version" : "1.0"
+}

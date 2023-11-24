@@ -71,7 +71,7 @@ public struct ApplicationFeature: Reducer {
   // MARK: - Private
 
   private func handleDashboardDelegate(
-    action: DashboardFeature.Delegate,
+    action: DashboardFeature.Action.DelegateAction,
     state: inout ApplicationFeature.State
   ) -> EffectOf<Self> {
     switch action {

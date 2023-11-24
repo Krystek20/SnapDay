@@ -1,109 +1,46 @@
-import ComposableArchitecture
-import Models
 import Foundation
-
-#warning("Helper to remove")
-extension Date {
-  static func date(from string: String) -> Date {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
-    return dateFormatter.date(from: string) ?? Date()
-  }
-}
+import ComposableArchitecture
+import ActivityForm
+import Repositories
+import Utilities
+import Models
 
 public struct DashboardFeature: Reducer {
+
+  // MARK: - Dependencies
+
+  @Dependency(\.activityRepository.loadActivities) var loadActivities
+  @Dependency(\.dayRepository) var dayRepository
+  @Dependency(\.dayActivityRepository) var dayActivityRepository
+  @Dependency(\.planRepository) var planRepository
+  @Dependency(\.planEditor) var planEditor
+  @Dependency(\.dayEditor) var dayEditor
+  @Dependency(\.uuid) var uuid
+
+  private var today: Date {
+    @Dependency(\.calendar) var calendar
+    @Dependency(\.date.now) var now
+    return calendar.dayFormat(now)
+  }
 
   // MARK: - State & Action
 
   public struct State: Equatable {
 
-    let options = DashboardOption.allCases
-    var selectedOption = DashboardOption.toDo
     let userName: String
-
-    var activities = [
-      Activity(
-        id: UUID(),
-        name: "Siłownia",
-        emoji: "🏋️‍♀️",
-        category: ActivityCategory(
-          id: UUID(1),
-          name: "Sport",
-          emoji: "⚽️",
-          color: .blue
-        ),
-        state: .completed(
-          startDate: Date.date(from: "10.10.2021 07:31"),
-          endDate: Date.date(from: "10.10.2021 08:55")
-        )
-      ),
-      Activity(
-        id: UUID(),
-        name: "Joga",
-        emoji: "🧘",
-        category: ActivityCategory(
-          id: UUID(1),
-          name: "Sport",
-          emoji: "⚽️",
-          color: .blue
-        ),
-        state: .completed(
-          startDate: Date.date(from: "10.10.2021 17:34"),
-          endDate: Date.date(from: "10.10.2021 19:00")
-        )
-      ),
-      Activity(
-        id: UUID(),
-        name: "Czytanie",
-        emoji: "📚",
-        category: ActivityCategory(
-          id: UUID(2),
-          name: "Rozwój",
-          emoji: "📈",
-          color: .orange
-        ),
-        state: .toDo
-      ),
-      Activity(
-        id: UUID(),
-        name: "Praca",
-        emoji: "💼",
-        category: ActivityCategory(
-          id: UUID(3),
-          name: "Work",
-          emoji: "💼",
-          color: .red
-        ),
-        state: .toDo
-      ),
-      Activity(
-        id: UUID(),
-        name: "Sauna",
-        emoji: "🧖",
-        category: ActivityCategory(
-          id: UUID(4),
-          name: "Odpoczynek",
-          emoji: "🎈",
-          color: .yellow
-        ),
-        state: .completed(
-          startDate: Date.date(from: "10.10.2021 19:02"),
-          endDate: Date.date(from: "10.10.2021 21:03")
-        )
-      ),
-      Activity(
-        id: UUID(),
-        name: "Drzemka",
-        emoji: "🛏️",
-        category: ActivityCategory(
-          id: UUID(4),
-          name: "Odpoczynek",
-          emoji: "🎈",
-          color: .yellow
-        ),
-        state: .toDo
-      )
-    ]
+    var activities: [Activity] = []
+    var plans: [Plan] = []
+    var dayActivities: [DayActivity] {
+      guard let day else { return [] }
+      return day.activities.sorted(by: {
+        if $0.isDone == $1.isDone {
+          return $0.activity.name < $1.activity.name
+        }
+        return !$0.isDone && $1.isDone
+      })
+    }
+    @PresentationState var addActivity: ActivityFormFeature.State?
+    var day: Day?
 
     public init(userName: String = NSUserName()) {
       self.userName = userName
@@ -111,13 +48,32 @@ public struct DashboardFeature: Reducer {
   }
 
   public enum Action: Equatable {
-    case startGameTapped
-    case optionTapped(DashboardOption)
-    case delegate(Delegate)
-  }
+    public enum ViewAction: Equatable {
+      case appeared
+      case addButtonTapped
+      case dayActivityTapped(DayActivity)
+      case dayActivityEditTapped(DayActivity)
+      case dayActivityRemoveTapped(DayActivity)
+      case activityTapped(Activity)
+      case activityEditTapped(Activity)
+    }
+    public enum InternalAction: Equatable {
+      case loadActivities
+      case activitiesLoaded(_ activitiexs: [Activity])
+      case loadPlans
+      case plansLoaded(_ plans: [Plan])
+      case loadDay
+      case dayLoaded(_ day: Day?)
+    }
+    public enum DelegateAction: Equatable {
+      case startGameTapped
+    }
 
-  public enum Delegate: Equatable {
-    case startGameTapped
+    case addActivity(PresentationAction<ActivityFormFeature.Action>)
+
+    case view(ViewAction)
+    case `internal`(InternalAction)
+    case delegate(DelegateAction)
   }
 
   // MARK: - Body
@@ -125,16 +81,96 @@ public struct DashboardFeature: Reducer {
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
-      case .startGameTapped:
+      case .view(.appeared):
         return .run { send in
-          await send(.delegate(.startGameTapped))
+          try await planEditor.composePlans(today)
+          await send(.internal(.loadActivities))
+          await send(.internal(.loadPlans))
+          await send(.internal(.loadDay))
         }
-      case .optionTapped(let option):
-        state.selectedOption = option
+      case .view(.addButtonTapped):
+        state.addActivity = ActivityFormFeature.State(
+          activity: Activity(id: uuid())
+        )
+        return .none
+      case .view(.dayActivityTapped(var dayActivity)):
+        if !dayActivity.isDone {
+          dayActivity.isDone = true
+          return .run { [dayActivity] send in
+            try await dayActivityRepository.saveActivity(dayActivity)
+            await send(.internal(.loadPlans))
+            await send(.internal(.loadDay))
+          }
+        }
+        return .none
+      case .view(.dayActivityEditTapped(var dayActivity)):
+        print("dayActivityEditTapped: \(dayActivity.activity.name)")
+        return .none
+      case .view(.dayActivityRemoveTapped(let dayActivity)):
+        return .run { [dayActivity] send in
+          try await dayEditor.removeDayActivity(dayActivity, today)
+          await send(.internal(.loadPlans))
+          await send(.internal(.loadDay))
+        }
+      case .view(.activityTapped(let activity)):
+        return .run { send in
+          try await dayEditor.addActivity(activity, today)
+          await send(.internal(.loadPlans))
+          await send(.internal(.loadDay))
+        }
+      case .view(.activityEditTapped(let activity)):
+        state.addActivity = ActivityFormFeature.State(
+          activity: activity,
+          type: .edit
+        )
+        return .none
+      case .internal(.loadActivities):
+        return .run { send in
+          let activities = try await loadActivities()
+          await send(.internal(.activitiesLoaded(activities)))
+        }
+      case .internal(.activitiesLoaded(let activities)):
+        state.activities = activities
+        return .none
+      case .internal(.loadPlans):
+        return .run { send in
+          let plans = try await planRepository.loadPlans(today, nil)
+          await send(.internal(.plansLoaded(plans)))
+        }
+      case .internal(.plansLoaded(let plans)):
+        state.plans = plans.sorted(by: { $0.dateRange.upperBound < $1.dateRange.upperBound })
+        return .none
+      case .internal(.loadDay):
+        return .run { send in
+          let day = try await dayRepository.loadDay(today)
+          await send(.internal(.dayLoaded(day)))
+        }
+      case .internal(.dayLoaded(let day)):
+        state.day = day
+        return .none
+      case .addActivity(.presented(.delegate(.activityCreated(let activity)))):
+        return .run { [activity] send in
+          await send(.internal(.loadActivities))
+          guard activity.isRepeatable else { return }
+          try await dayEditor.updateDays(activity, today)
+          await send(.internal(.loadPlans))
+          await send(.internal(.loadDay))
+        }
+      case .addActivity(.presented(.delegate(.activityUpdated(let activity)))):
+        return .run { [activity] send in
+          await send(.internal(.loadActivities))
+          try await dayEditor.updateDayActivities(activity, today)
+          await send(.internal(.loadPlans))
+          await send(.internal(.loadDay))
+        }
+      case .addActivity:
         return .none
       case .delegate:
         return .none
       }
+    }
+    .ifLet(\.$addActivity, action: /Action.addActivity) {
+      ActivityFormFeature()
     }
   }
 

@@ -4,6 +4,10 @@ import Application
 import Dashboard
 import HistoryList
 import Details
+import ActivityForm
+import TagForm
+import IconPicker
+import Models
 
 #Preview("ApplicationView") {
   ApplicationView(
@@ -19,6 +23,33 @@ import Details
     store: Store(
       initialState: DashboardFeature.State(userName: "John"),
       reducer: { DashboardFeature() }
+    )
+  )
+}
+
+#Preview("ActivityFormView") {
+  ActivityFormView(
+    store: Store(
+      initialState: ActivityFormFeature.State(activity: .mock),
+      reducer: { ActivityFormFeature() }
+    )
+  )
+}
+
+#Preview("TagFormView") {
+  TagFormView(
+    store: Store(
+      initialState: TagFormFeature.State(tag: .mock),
+      reducer: { TagFormFeature() }
+    )
+  )
+}
+
+#Preview("IconPickerView") {
+  IconPickerView(
+    store: Store(
+      initialState: IconPickerFeature.State(),
+      reducer: { IconPickerFeature() }
     )
   )
 }

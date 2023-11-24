@@ -1,6 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld%%" : {
+
+    },
+    "%lldh %lldmin" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lldh %2$lldmin"
+          }
+        }
+      }
+    },
     "Activities" : {
       "localizations" : {
         "en" : {
@@ -17,21 +30,11 @@
         }
       }
     },
-    "Completed" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completed"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ukończone"
-          }
-        }
-      }
+    "Daily" : {
+
+    },
+    "Edit" : {
+
     },
     "Hi %@," : {
       "localizations" : {
@@ -49,56 +52,26 @@
         }
       }
     },
-    "In Progress" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In Progress"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W Trakcie"
-          }
-        }
-      }
-    },
-    "Last activity 2 days ago" : {
+    "Monthly" : {
 
     },
-    "To Do" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To Do"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kolejka"
-          }
-        }
-      }
+    "New" : {
+
     },
-    "Today" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Today"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dzisiaj"
-          }
-        }
-      }
+    "Plans" : {
+
+    },
+    "Quarterly" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Todays Activities" : {
+
+    },
+    "Weekly" : {
+
     },
     "Welcome back 👋" : {
       "localizations" : {

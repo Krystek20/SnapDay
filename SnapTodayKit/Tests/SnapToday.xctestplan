@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "B4E72651-56DE-4F95-A13A-5E4AFA5BAA07",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:SnapTodayKit",
+        "identifier" : "UtilitiesTests",
+        "name" : "UtilitiesTests"
+      }
+    }
+  ],
+  "version" : 1
+}

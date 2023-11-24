@@ -1,28 +1,32 @@
 import Foundation
 
-public struct Activity: Identifiable, Equatable {
+public struct Activity: Identifiable, Equatable, Hashable {
 
   // MARK: - Properties
 
   public let id: UUID
-  public let name: String
-  public let emoji: String?
-  public let category: ActivityCategory
-  public let state: ActivityState
-  
+  public var name: String
+  public var image: Data?
+  public var tags: [Tag]
+  public var frequency: ActivityFrequency?
+  public var defaultDuration: Int?
+
   // MARK: - Initialization
   
   public init(
     id: UUID,
-    name: String,
-    emoji: String?,
-    category: ActivityCategory,
-    state: ActivityState
+    name: String = "",
+    image: Data? = nil,
+    tags: [Tag] = [],
+    frequency: ActivityFrequency? = nil,
+    isDefaultDuration: Bool = false,
+    defaultDuration: Int? = nil
   ) {
     self.id = id
     self.name = name
-    self.emoji = emoji
-    self.category = category
-    self.state = state
+    self.image = image
+    self.tags = tags
+    self.frequency = frequency
+    self.defaultDuration = defaultDuration
   }
 }

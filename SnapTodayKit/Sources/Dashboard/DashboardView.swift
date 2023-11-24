@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
+import ActivityForm
 import UiComponents
 import Resources
 
@@ -13,26 +14,63 @@ public struct DashboardView: View {
 
   public init(store: StoreOf<DashboardFeature>) {
     self.store = store
+
+    #warning("Move it")
+    let appearance = UINavigationBarAppearance()
+    appearance.backgroundColor = Colors.lightGray.color
+
+    appearance.largeTitleTextAttributes = [
+      .font: Fonts.Quicksand.bold.font(size: 28.0),
+      .foregroundColor: Colors.deepSpaceBlue.color
+    ]
+    appearance.titleTextAttributes = [
+      .font: Fonts.Quicksand.bold.font(size: 18.0),
+      .foregroundColor: Colors.deepSpaceBlue.color
+    ]
+
+    let scrollEdgeAppearance = appearance.copy()
+    scrollEdgeAppearance.shadowImage = nil
+    scrollEdgeAppearance.shadowColor = nil
+
+    UINavigationBar.appearance().standardAppearance = appearance
+    UINavigationBar.appearance().compactAppearance = appearance
+    UINavigationBar.appearance().scrollEdgeAppearance = scrollEdgeAppearance
   }
 
   // MARK: - Views
 
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      ZStack(alignment: .bottom) {
-        ScrollView {
-          headerView(userName: viewStore.userName)
-            .padding(.horizontal, 10.0)
-            .padding(.top, 15.0)
-          SummaryView(activities: viewStore.activities)
-            .padding(.top, 10.0)
-          activitiesSection(viewStore: viewStore)
-            .padding(.top, 10.0)
-            .padding(.horizontal, 10.0)
+      ScrollView {
+        headerView(userName: viewStore.userName)
+          .padding(.horizontal, 15.0)
+          .padding(.top, 15.0)
+        dayView(viewStore: viewStore)
+          .padding(.horizontal, 15.0)
+          .padding(.top, 10.0)
+        plansView(viewStore: viewStore)
+          .padding(.horizontal, 15.0)
+          .padding(.top, 10.0)
+        activitiesSection(viewStore: viewStore)
+          .padding(.horizontal, 15.0)
+          .padding(.top, 10.0)
+      }
+      .scrollIndicators(.hidden)
+      .activityBackground
+      .sheet(
+        store: store.scope(
+          state: \.$addActivity,
+          action: { .addActivity($0) }
+        ),
+        content: { store in
+          NavigationStack {
+            ActivityFormView(store: store)
+          }
+          .presentationDetents([.large])
         }
-        .scrollIndicators(.hidden)
-        .padding(.horizontal, 15.0)
-        addButton(viewStore: viewStore)
+      )
+      .task {
+        viewStore.send(.view(.appeared))
       }
     }
   }
@@ -45,46 +83,84 @@ public struct DashboardView: View {
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       }
       Text("Welcome back 👋", bundle: .module)
-        .font(Fonts.Quicksand.bold.swiftUIFont(size: 28.0))
-        .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+        .titleTextStyle
     }
     .maxWidth()
+  }
+
+  @ViewBuilder
+  private func dayView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    section(
+      name: String(localized: "Todays Activities", bundle: .module),
+      buttonActionName: String(localized: "New", bundle: .module),
+      onTap: {
+
+      },
+      content: DayView(
+        activities: viewStore.dayActivities,
+        activityTapped: { activity in
+          viewStore.send(.view(.dayActivityTapped(activity)))
+        },
+        editTapped: { activity in
+          viewStore.send(.view(.dayActivityEditTapped(activity)))
+        },
+        removeTapped: { activity in
+          viewStore.send(.view(.dayActivityRemoveTapped(activity)))
+        }
+      )
+    )
+  }
+
+  private func plansView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    section(
+      name: String(localized: "Plans", bundle: .module),
+      buttonActionName: String(localized: "New", bundle: .module),
+      onTap: {
+
+      },
+      content: PlansView(plans: viewStore.plans)
+    )
   }
 
   private func activitiesSection(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    VStack(alignment: .leading, spacing: 10.0) {
-      Text("Activities", bundle: .module)
-        .font(Fonts.Quicksand.bold.swiftUIFont(size: 22.0))
-        .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
-      OptionsView(
-        options: viewStore.options,
-        highlighted: viewStore.selectedOption,
-        selected: { option in
-          viewStore.send(.optionTapped(option))
+    section(
+      name: String(localized: "Activities", bundle: .module),
+      buttonActionName: String(localized: "New", bundle: .module),
+      onTap: {
+        viewStore.send(.view(.addButtonTapped))
+      }, 
+      content: ActivitiesView(
+        activities: viewStore.activities,
+        activityTapped: { activity in
+          viewStore.send(.view(.activityTapped(activity)))
+        },
+        activityEditTapped: { activity in
+          viewStore.send(.view(.activityEditTapped(activity)))
         }
       )
-      activitiesList(viewStore: viewStore)
-        .padding(.vertical, 10.0)
-    }
-    .maxWidth()
+    )
   }
 
-  private func activitiesList(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    LazyVStack(alignment: .leading, spacing: 15.0) {
-      ForEach(viewStore.activities, content: ActivityView.init)
+  private func section(
+    name: String,
+    buttonActionName: String,
+    onTap: @escaping () -> Void,
+    content: some View
+  ) -> some View {
+    VStack(alignment: .leading, spacing: 15.0) {
+      HStack {
+        Text(name)
+          .font(Fonts.Quicksand.bold.swiftUIFont(size: 22.0))
+          .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+        Spacer()
+        Button(action: onTap) {
+          Text(buttonActionName)
+            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+            .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+        }
+      }
+      content
     }
     .maxWidth()
-  }
-
-  private func addButton(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    Button {
-      viewStore.send(.startGameTapped)
-    } label: {
-      Image(systemName: "plus.circle.fill")
-        .resizable()
-        .fontWeight(.thin)
-        .frame(width: 50.0, height: 50.0)
-        .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
-    }
   }
 }
