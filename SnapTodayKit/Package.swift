@@ -10,49 +10,110 @@ let package = Package(
     platforms: [
       .iOS(.v16)
     ],
-    products: .libraries(
-      .application,
+    products: products,
+    dependencies: packageDependencies,
+    targets: targets
+)
+
+@ProductsBuilder
+private var products: [Product] {
+  Module.application
+  Module.dashboard
+  Module.activityForm
+  Module.tagForm
+  Module.iconPicker
+  Module.historyList
+  Module.details
+  Module.repositories
+  Module.common
+  Module.models
+  Module.previews
+  Module.resources
+  Module.uiComponents
+}
+
+@PackageDependenciesBuilder
+private var packageDependencies: [Package.Dependency] {
+  Module.swiftgen
+  Module.composableArchitecture
+}
+
+@TargetsBuilder
+private var targets: [Target] {
+  TargetParamenters(
+    module: .application,
+    dependencies: [
+      .common,
       .dashboard,
+      .activityForm,
       .historyList,
       .details,
-      .previews,
-      .models,
-      .resources,
-      .uiComponents
-    ),
+      .resources
+    ]
+  )
+  TargetParamenters(
+    module: .dashboard,
     dependencies: [
-      .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.2.0"),
-      .package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0")
-    ],
-    targets: .targets
-      .add(.application, dependecies: [
-        .composableArchitecture,
-        .dashboard,
-        .historyList,
-        .details,
-        .resources
-      ])
-      .add(.dashboard, dependecies: [.composableArchitecture, .uiComponents, .resources, .models])
-      .add(.historyList, dependecies: [.composableArchitecture])
-      .add(.details, dependecies: [.composableArchitecture])
-      .add(.previews, dependecies: [.application], addTestTarget: false)
-      .add(.models)
-      .add(.uiComponents, dependecies: [.resources], addTestTarget: false)
-      .add(.resources, dependecies: [.swiftgen], addTestTarget: false)
-)
+      .utilities,
+      .common,
+      .activityForm,
+      .uiComponents,
+      .repositories,
+      .resources,
+      .models
+    ]
+  )
+  TargetParamenters(
+    module: .activityForm,
+    dependencies: [
+      .common,
+      .models,
+      .tagForm,
+      .iconPicker,
+      .uiComponents,
+      .resources
+    ]
+  )
+  TargetParamenters(
+    module: .tagForm,
+    dependencies: [
+      .common,
+      .models,
+      .repositories,
+      .uiComponents,
+      .resources
+    ]
+  )
+  TargetParamenters(module: .iconPicker, dependencies: [.common, .uiComponents, .resources])
+  TargetParamenters(module: .historyList, dependencies: [.composableArchitecture])
+  TargetParamenters(module: .details, dependencies: [.composableArchitecture])
+  TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
+  TargetParamenters(module: .repositories, dependencies: [.models, .composableArchitecture])
+  TargetParamenters(module: .common, dependencies: [.composableArchitecture])
+  TargetParamenters(module: .models)
+  TargetParamenters(module: .previews, dependencies: [.application])
+  TargetParamenters(module: .uiComponents, dependencies: [.resources, .composableArchitecture])
+  TargetParamenters(module: .resources, dependencies: [.swiftgen])
+}
 
 // MARK: - Library Name
 
-private enum LibraryName: String {
+private enum Module: String {
   case application
   case dashboard
+  case activityForm
+  case tagForm
+  case iconPicker
   case historyList
   case details
-  case composableArchitecture
-  case previews
+  case utilities
+  case repositories
+  case common
   case models
+  case previews
   case uiComponents
   case resources
+  case composableArchitecture
   case swiftgen
 
   var name: String {
@@ -62,64 +123,116 @@ private enum LibraryName: String {
   var dependency: Target.Dependency? {
     switch self {
     case .swiftgen:
-      return nil
+      nil
     case .composableArchitecture:
-      return .product(name: name, package: "swift-composable-architecture")
-    case .application, .dashboard, .historyList, .details, .previews, .models, .uiComponents, .resources:
-      return .byName(name: name)
+      .product(name: name, package: "swift-composable-architecture")
+    default:
+      .byName(name: name)
     }
   }
 
   var plugin: Target.PluginUsage? {
     switch self {
     case .swiftgen:
-      return .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin")
-    case .composableArchitecture, .application, .dashboard, .historyList, .details, .previews, .models, .uiComponents, .resources:
-      return nil
+      .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin")
+    default:
+      nil
     }
   }
 
   var resources: [Resource]? {
     switch self {
     case .resources:
-      return [.process("Quicksand.ttf")]
-    case .composableArchitecture, .application, .dashboard, .historyList, .details, .previews, .models, .uiComponents, .swiftgen:
-      return nil
+      [.process("Quicksand.ttf")]
+    case .iconPicker:
+      [.process("Resources/emoji.json")]
+    default:
+      nil
+    }
+  }
+
+  var products: [Product] {
+    let mainProduct = Product.library(
+      name: name,
+      targets: [name]
+    )
+    return [mainProduct]
+  }
+
+  var packageDependecies: [Package.Dependency]? {
+    switch self {
+    case .swiftgen:
+      [.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0")]
+    case .composableArchitecture:
+      [.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.2.0")]
+    default:
+      nil
+    }
+  }
+
+  var targetConfiguration: [ModuleTargetConfiguration] {
+    switch self {
+    case .swiftgen, .composableArchitecture:
+      []
+    case .previews, .uiComponents, .resources:
+      [.source]
+    default:
+      [.source, .tests]
     }
   }
 }
 
 // MARK: - Product
 
-private extension [Product] {
-  static func libraries(_ name: LibraryName...) -> [Product] {
-    name.map(Product.library)
+@resultBuilder
+private struct ProductsBuilder {
+  static func buildBlock(_ components: Module...) -> [Product] {
+    components.reduce(into: [Product](), { result, module in
+      result.append(contentsOf: module.products)
+    })
   }
 }
 
-private extension Product {
-  static func library(_ name: LibraryName) -> Product {
-    library(name: name.rawValue.capitalizingFirstLetter, targets: [name.rawValue.capitalizingFirstLetter])
+// MARK: - PackageDependencies
+
+@resultBuilder
+private struct PackageDependenciesBuilder {
+  static func buildBlock(_ components: Module...) -> [Package.Dependency] {
+    components.reduce(into: [Package.Dependency](), { result, module in
+      guard let packageDependecies = module.packageDependecies else { return }
+      result.append(contentsOf: packageDependecies)
+    })
   }
 }
 
-// MARK: - Target
+// MARK: - Targets
 
-private extension [Target] {
+private enum ModuleTargetConfiguration {
+  case source
+  case tests
+}
 
-  static let targets = [Target]()
+private struct TargetParamenters {
+  let module: Module
+  var dependencies: [Module] = []
+}
 
-  func add(_ name: LibraryName, dependecies: [LibraryName] = [], addTestTarget: Bool = true) -> [Target] {
-    var targets = self
-    targets.append(Target.target(name, dependencies: dependecies))
-    guard addTestTarget else { return targets }
-    targets.append(Target.testTarget(name, dependencies: dependecies))
-    return targets
+@resultBuilder
+private struct TargetsBuilder {
+  static func buildBlock(_ components: TargetParamenters...) -> [Target] {
+    components.reduce(into: [Target]()) { partialResult, paramenters in
+      if paramenters.module.targetConfiguration.contains(.source) {
+        partialResult.append(Target.target(paramenters.module, dependencies: paramenters.dependencies))
+      }
+      if paramenters.module.targetConfiguration.contains(.tests) {
+        partialResult.append(Target.testTarget(paramenters.module, dependencies: paramenters.dependencies))
+      }
+    }
   }
 }
 
 private extension Target {
-  static func target(_ name: LibraryName, dependencies: [LibraryName]) -> Target {
+  static func target(_ name: Module, dependencies: [Module]) -> Target {
     .target(
       name: name.name,
       dependencies: dependencies.compactMap(\.dependency),
@@ -128,7 +241,7 @@ private extension Target {
     )
   }
 
-  static func testTarget(_ name: LibraryName, dependencies: [LibraryName]) -> Target {
+  static func testTarget(_ name: Module, dependencies: [Module]) -> Target {
     .testTarget(
       name: name.name + "Tests",
       dependencies: (dependencies + [name]).compactMap(\.dependency)
