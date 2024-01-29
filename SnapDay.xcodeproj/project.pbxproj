@@ -1,0 +1,508 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D432465C2AD0820100D3E8F9 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = D432465B2AD0820100D3E8F9 /* Application */; };
+		D432465E2AD0821000D3E8F9 /* Previews in Frameworks */ = {isa = PBXBuildFile; productRef = D432465D2AD0821000D3E8F9 /* Previews */; };
+		D4779AC72B6043280067E3AC /* SnapDayKit in Resources */ = {isa = PBXBuildFile; fileRef = D4779ABD2B6043270067E3AC /* SnapDayKit */; };
+		D4779ACA2B6043280067E3AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4779AC22B6043280067E3AC /* Assets.xcassets */; };
+		D4779ACB2B6043280067E3AC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4779AC42B6043280067E3AC /* Preview Assets.xcassets */; };
+		D4779ACC2B6043280067E3AC /* SnapDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4779AC52B6043280067E3AC /* SnapDayApp.swift */; };
+		D4779ACE2B6043E30067E3AC /* SnapDayUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4779ABF2B6043270067E3AC /* SnapDayUITestsLaunchTests.swift */; };
+		D4779ACF2B6043E60067E3AC /* SnapDayUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4779AC02B6043270067E3AC /* SnapDayUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D443ED092AD0771D002225CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D443ECE62AD0771C002225CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D443ECED2AD0771C002225CF;
+			remoteInfo = SnapToday;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D443ECEE2AD0771C002225CF /* SnapDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D443ED082AD0771D002225CF /* SnapDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4779ABD2B6043270067E3AC /* SnapDayKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SnapDayKit; sourceTree = "<group>"; };
+		D4779ABF2B6043270067E3AC /* SnapDayUITestsLaunchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapDayUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		D4779AC02B6043270067E3AC /* SnapDayUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapDayUITests.swift; sourceTree = "<group>"; };
+		D4779AC22B6043280067E3AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D4779AC42B6043280067E3AC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		D4779AC52B6043280067E3AC /* SnapDayApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapDayApp.swift; sourceTree = "<group>"; };
+		D4779AC62B6043280067E3AC /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D443ECEB2AD0771C002225CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D432465C2AD0820100D3E8F9 /* Application in Frameworks */,
+				D432465E2AD0821000D3E8F9 /* Previews in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D443ED052AD0771D002225CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D432465A2AD0820100D3E8F9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D443ECE52AD0771C002225CF = {
+			isa = PBXGroup;
+			children = (
+				D4779ABD2B6043270067E3AC /* SnapDayKit */,
+				D4779AC12B6043280067E3AC /* SnapDay */,
+				D4779ABE2B6043270067E3AC /* SnapDayUITests */,
+				D443ECEF2AD0771C002225CF /* Products */,
+				D432465A2AD0820100D3E8F9 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		D443ECEF2AD0771C002225CF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D443ECEE2AD0771C002225CF /* SnapDay.app */,
+				D443ED082AD0771D002225CF /* SnapDayUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D4779ABE2B6043270067E3AC /* SnapDayUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D4779ABF2B6043270067E3AC /* SnapDayUITestsLaunchTests.swift */,
+				D4779AC02B6043270067E3AC /* SnapDayUITests.swift */,
+			);
+			path = SnapDayUITests;
+			sourceTree = "<group>";
+		};
+		D4779AC12B6043280067E3AC /* SnapDay */ = {
+			isa = PBXGroup;
+			children = (
+				D4779AC22B6043280067E3AC /* Assets.xcassets */,
+				D4779AC32B6043280067E3AC /* Preview Content */,
+				D4779AC52B6043280067E3AC /* SnapDayApp.swift */,
+				D4779AC62B6043280067E3AC /* Info.plist */,
+			);
+			path = SnapDay;
+			sourceTree = "<group>";
+		};
+		D4779AC32B6043280067E3AC /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				D4779AC42B6043280067E3AC /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D443ECED2AD0771C002225CF /* SnapDay */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D443ED122AD0771E002225CF /* Build configuration list for PBXNativeTarget "SnapDay" */;
+			buildPhases = (
+				D443ECEA2AD0771C002225CF /* Sources */,
+				D443ECEB2AD0771C002225CF /* Frameworks */,
+				D443ECEC2AD0771C002225CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SnapDay;
+			packageProductDependencies = (
+				D432465B2AD0820100D3E8F9 /* Application */,
+				D432465D2AD0821000D3E8F9 /* Previews */,
+			);
+			productName = SnapToday;
+			productReference = D443ECEE2AD0771C002225CF /* SnapDay.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D443ED072AD0771D002225CF /* SnapDayUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D443ED182AD0771E002225CF /* Build configuration list for PBXNativeTarget "SnapDayUITests" */;
+			buildPhases = (
+				D443ED042AD0771D002225CF /* Sources */,
+				D443ED052AD0771D002225CF /* Frameworks */,
+				D443ED062AD0771D002225CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D443ED0A2AD0771D002225CF /* PBXTargetDependency */,
+			);
+			name = SnapDayUITests;
+			productName = SnapTodayUITests;
+			productReference = D443ED082AD0771D002225CF /* SnapDayUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D443ECE62AD0771C002225CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					D443ECED2AD0771C002225CF = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					D443ED072AD0771D002225CF = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = D443ECED2AD0771C002225CF;
+					};
+				};
+			};
+			buildConfigurationList = D443ECE92AD0771C002225CF /* Build configuration list for PBXProject "SnapDay" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				pl,
+			);
+			mainGroup = D443ECE52AD0771C002225CF;
+			productRefGroup = D443ECEF2AD0771C002225CF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D443ECED2AD0771C002225CF /* SnapDay */,
+				D443ED072AD0771D002225CF /* SnapDayUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D443ECEC2AD0771C002225CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4779ACB2B6043280067E3AC /* Preview Assets.xcassets in Resources */,
+				D4779ACA2B6043280067E3AC /* Assets.xcassets in Resources */,
+				D4779AC72B6043280067E3AC /* SnapDayKit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D443ED062AD0771D002225CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D443ECEA2AD0771C002225CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4779ACC2B6043280067E3AC /* SnapDayApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D443ED042AD0771D002225CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4779ACF2B6043E60067E3AC /* SnapDayUITests.swift in Sources */,
+				D4779ACE2B6043E30067E3AC /* SnapDayUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D443ED0A2AD0771D002225CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D443ECED2AD0771C002225CF /* SnapDay */;
+			targetProxy = D443ED092AD0771D002225CF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		D443ED102AD0771D002225CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D443ED112AD0771D002225CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D443ED132AD0771E002225CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
+				DEVELOPMENT_TEAM = HQ63E3X3P6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SnapDay/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.mobilove.SnapDay;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D443ED142AD0771E002225CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
+				DEVELOPMENT_TEAM = HQ63E3X3P6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SnapDay/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.mobilove.SnapDay;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D443ED192AD0771E002225CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HQ63E3X3P6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.mobilove.SnapDayUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SnapDay;
+			};
+			name = Debug;
+		};
+		D443ED1A2AD0771E002225CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HQ63E3X3P6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.mobilove.SnapDayUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SnapDay;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D443ECE92AD0771C002225CF /* Build configuration list for PBXProject "SnapDay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D443ED102AD0771D002225CF /* Debug */,
+				D443ED112AD0771D002225CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D443ED122AD0771E002225CF /* Build configuration list for PBXNativeTarget "SnapDay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D443ED132AD0771E002225CF /* Debug */,
+				D443ED142AD0771E002225CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D443ED182AD0771E002225CF /* Build configuration list for PBXNativeTarget "SnapDayUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D443ED192AD0771E002225CF /* Debug */,
+				D443ED1A2AD0771E002225CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D432465B2AD0820100D3E8F9 /* Application */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Application;
+		};
+		D432465D2AD0821000D3E8F9 /* Previews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Previews;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D443ECE62AD0771C002225CF /* Project object */;
+}

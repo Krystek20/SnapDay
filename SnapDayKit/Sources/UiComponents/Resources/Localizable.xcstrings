@@ -1,0 +1,34 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld hours" : {
+
+    },
+    "%lld min" : {
+
+    },
+    "%lldh %lldmin" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lldh %2$lldmin"
+          }
+        }
+      }
+    },
+    "Edit" : {
+
+    },
+    "Remove" : {
+
+    }
+  },
+  "version" : "1.0"
+}

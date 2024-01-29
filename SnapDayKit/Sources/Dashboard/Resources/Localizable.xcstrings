@@ -1,0 +1,90 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld%%" : {
+
+    },
+    "Activities" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activities"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktywności"
+          }
+        }
+      }
+    },
+    "Activity list" : {
+
+    },
+    "Add" : {
+
+    },
+    "Daily" : {
+
+    },
+    "Dashboard" : {
+
+    },
+    "Hi %@," : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hi %@,"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cześć %@,"
+          }
+        }
+      }
+    },
+    "Monthly" : {
+
+    },
+    "One-time activity" : {
+
+    },
+    "Plans" : {
+
+    },
+    "Quarterly" : {
+
+    },
+    "Todays Activities" : {
+
+    },
+    "Weekly" : {
+
+    },
+    "Welcome back 👋" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome back 👋"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Witaj ponownie 👋"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

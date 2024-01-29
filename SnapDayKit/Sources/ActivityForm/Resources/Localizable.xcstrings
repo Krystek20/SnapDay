@@ -1,0 +1,105 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add Activity" : {
+
+    },
+    "Add tag" : {
+
+    },
+    "Add Tag" : {
+
+    },
+    "Biweekly" : {
+
+    },
+    "Change icon" : {
+
+    },
+    "Daily" : {
+
+    },
+    "Default duration" : {
+
+    },
+    "Edit Activity" : {
+
+    },
+    "Enter name" : {
+
+    },
+    "Enter tag" : {
+
+    },
+    "Existing tags" : {
+
+    },
+    "First" : {
+
+    },
+    "First day" : {
+
+    },
+    "Fourth" : {
+
+    },
+    "Last" : {
+
+    },
+    "Last day" : {
+
+    },
+    "Mid month" : {
+
+    },
+    "Monthly" : {
+
+    },
+    "Monthly specific date" : {
+
+    },
+    "Name" : {
+
+    },
+    "Pick Photo" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Repeatable" : {
+
+    },
+    "Save" : {
+
+    },
+    "Second" : {
+
+    },
+    "Second day" : {
+
+    },
+    "Second to last" : {
+
+    },
+    "Second to last day" : {
+
+    },
+    "Select Emoji" : {
+
+    },
+    "Specific weekday" : {
+
+    },
+    "Tags" : {
+
+    },
+    "Third" : {
+
+    },
+    "Weekly" : {
+
+    }
+  },
+  "version" : "1.0"
+}
