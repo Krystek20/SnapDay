@@ -13,7 +13,9 @@ public struct FormTagField: View {
   private let existingTags: [Tag]
   private let newTag: Binding<String>
   private let onSubmit: () -> Void
+  private let addedTagTapped: (Tag) -> Void
   private let existingTagTapped: (Tag) -> Void
+  private let removeTag: (Tag) -> Void
 
   // MARK: - Initialization
 
@@ -25,7 +27,9 @@ public struct FormTagField: View {
     existingTags: [Tag],
     newTag: Binding<String>,
     onSubmit: @escaping () -> Void,
-    existingTagTapped: @escaping (Tag) -> Void
+    addedTagTapped: @escaping (Tag) -> Void,
+    existingTagTapped: @escaping (Tag) -> Void,
+    removeTag: @escaping (Tag) -> Void
   ) {
     self.title = title
     self.placeholder = placeholder
@@ -34,7 +38,9 @@ public struct FormTagField: View {
     self.existingTags = existingTags
     self.newTag = newTag
     self.onSubmit = onSubmit
+    self.addedTagTapped = addedTagTapped
     self.existingTagTapped = existingTagTapped
+    self.removeTag = removeTag
   }
 
   // MARK: - Views
@@ -55,7 +61,12 @@ public struct FormTagField: View {
     if !tags.isEmpty {
       ScrollView(.horizontal) {
         LazyHStack {
-          ForEach(tags, content: tagView)
+          ForEach(tags) { tag in
+            TagView(tag: tag)
+              .onTapGesture {
+                addedTagTapped(tag)
+              }
+          }
         }
         .measureHeight
       }
@@ -63,32 +74,6 @@ public struct FormTagField: View {
       .adjustHeight(height: 20.0)
       .padding(.vertical, 10.0)
     }
-  }
-
-  private func tagView(_ tag: Tag) -> some View {
-    Text(tag.name)
-      .padding(
-        EdgeInsets(
-          top: 2.0,
-          leading: 5.0,
-          bottom: 2.0,
-          trailing: 5.0
-        )
-      )
-      .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
-      .foregroundStyle(tagForegroundStyle(tag))
-      .background(tagBackground(tag))
-  }
-
-  private func tagForegroundStyle(_ tag: Tag) -> some ShapeStyle {
-    tag.rgbColor.isLight()
-    ? Colors.slateHaze.swiftUIColor
-    : Colors.pureWhite.swiftUIColor
-  }
-
-  private func tagBackground(_ tag: Tag) -> some View {
-    tag.rgbColor.color
-      .clipShape(RoundedRectangle(cornerRadius: 3.0))
   }
 
   private var newTagField: some View {
@@ -115,9 +100,20 @@ public struct FormTagField: View {
     ScrollView(.horizontal) {
       LazyHStack {
         ForEach(existingTags) { tag in
-          tagView(tag)
+          TagView(tag: tag)
             .onTapGesture {
               existingTagTapped(tag)
+            }
+            .contextMenu {
+              Button(
+                action: {
+                  removeTag(tag)
+                },
+                label: {
+                  Text("Remove", bundle: .module)
+                  Image(systemName: "trash")
+                }
+              )
             }
         }
       }

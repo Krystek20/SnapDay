@@ -55,7 +55,8 @@ private var targets: [Target] {
     module: .dashboard,
     dependencies: sceneDependecies + [
       .activityList,
-      .dayActivityForm
+      .dayActivityForm,
+      .activityForm
     ]
   )
   TargetParamenters(

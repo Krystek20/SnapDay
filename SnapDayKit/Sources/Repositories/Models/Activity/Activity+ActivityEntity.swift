@@ -17,7 +17,8 @@ extension Activity {
       tags: tags.compactMap(Tag.init),
       frequency: frequency,
       isDefaultDuration: entity.isDefaultDuration,
-      defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil
+      defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
+      isVisible: entity.isVisible
     )
   }
 }

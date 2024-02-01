@@ -5,6 +5,7 @@ import Common
 import Resources
 import ActivityList
 import DayActivityForm
+import ActivityForm
 
 public struct DashboardView: View {
 
@@ -23,6 +24,9 @@ public struct DashboardView: View {
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       ScrollView {
+        summaryView(viewStore: viewStore)
+          .padding(.horizontal, 15.0)
+          .padding(.top, 15.0)
         dayView(viewStore: viewStore)
           .padding(.horizontal, 15.0)
           .padding(.top, 15.0)
@@ -57,6 +61,18 @@ public struct DashboardView: View {
           .presentationDetents([.medium])
         }
       )
+      .sheet(
+        store: store.scope(
+          state: \.$addActivity,
+          action: { .addActivity($0) }
+        ),
+        content: { store in
+          NavigationStack {
+            ActivityFormView(store: store)
+          }
+          .presentationDetents([.large])
+        }
+      )
       .task {
         viewStore.send(.view(.appeared))
       }
@@ -65,6 +81,18 @@ public struct DashboardView: View {
   }
 
   @ViewBuilder
+  private func summaryView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    if let daySummary = viewStore.daySummary {
+      SectionView(
+        name: String(localized: "Summary", bundle: .module),
+        rightContent: { },
+        content: {
+          TimeSummaryView(daySummary: daySummary)
+        }
+      )
+    }
+  }
+
   private func dayView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
     SectionView(
       name: String(localized: "Todays Activities", bundle: .module),

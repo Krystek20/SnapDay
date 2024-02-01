@@ -90,7 +90,7 @@ public struct ActivityFormView: View {
         imageField(viewStore: viewStore)
         nameTextField(viewStore: viewStore)
         tagsView(viewStore: viewStore)
-        recurrencyView(viewStore: viewStore)
+        recurrencyViewIfNeeded(viewStore: viewStore)
         durationView(viewStore: viewStore)
       }
       .padding(padding)
@@ -166,25 +166,34 @@ public struct ActivityFormView: View {
       onSubmit: {
         viewStore.send(.view(.submitTagTapped))
       },
+      addedTagTapped: { tag in
+        viewStore.send(.view(.addedTagTapped(tag)))
+      },
       existingTagTapped: { tag in
-        viewStore.send(.view(.tagTapped(tag)))
+        viewStore.send(.view(.existingTagTapped(tag)))
+      },
+      removeTag: { tag in
+        viewStore.send(.view(.removeTagTapped(tag)))
       }
     )
     .focused($focus, equals: .tag)
   }
 
-  private func recurrencyView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
-    ScrollViewReader { reader in
-      VStack(spacing: 10.0) {
-        toggleView(viewStore: viewStore)
-        frequencyOptionsIfNeeded(viewStore: viewStore, reader: reader)
-        weekdaysViewIfNeeded(viewStore: viewStore, reader: reader)
-        monthlyScheduleViewIfNeeded(viewStore: viewStore, reader: reader)
-        monthGridIfNeeded(viewStore: viewStore, reader: reader)
-        monthlyWeekdaysViewIfNeeded(viewStore: viewStore, reader: reader)
+  @ViewBuilder
+  private func recurrencyViewIfNeeded(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+    if viewStore.activity.isVisible {
+      ScrollViewReader { reader in
+        VStack(spacing: 10.0) {
+          toggleView(viewStore: viewStore)
+          frequencyOptionsIfNeeded(viewStore: viewStore, reader: reader)
+          weekdaysViewIfNeeded(viewStore: viewStore, reader: reader)
+          monthlyScheduleViewIfNeeded(viewStore: viewStore, reader: reader)
+          monthGridIfNeeded(viewStore: viewStore, reader: reader)
+          monthlyWeekdaysViewIfNeeded(viewStore: viewStore, reader: reader)
+        }
+        .formBackgroundModifier
+        .id("RecurrencyView")
       }
-      .formBackgroundModifier
-      .id("RecurrencyView")
     }
   }
 
@@ -286,7 +295,10 @@ public struct ActivityFormView: View {
             set: { viewStore.$activity.wrappedValue.setDefaultDuration($0) }
           )
         ) {
-          Text("Default duration", bundle: .module)
+          let durationText = viewStore.activity.isVisible
+          ? String(localized: "Default duration", bundle: .module)
+          : String(localized: "Duration", bundle: .module)
+          Text(durationText)
             .formTitleTextStyle
         }
         .toggleStyle(CheckToggleStyle())

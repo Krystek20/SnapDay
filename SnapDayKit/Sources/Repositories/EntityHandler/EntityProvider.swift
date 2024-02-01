@@ -76,4 +76,13 @@ public struct EntityHandler {
       try context.save()
     }
   }
+
+  public func delete<T: Entity>(_ entity: T) async throws {
+    let context = coreDataStack.backgroundContext
+    return try await context.perform {
+      let managedObject = try entity.managedObject(context)
+      context.delete(managedObject)
+      try context.save()
+    }
+  }
 }

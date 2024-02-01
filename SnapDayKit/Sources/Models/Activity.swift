@@ -10,6 +10,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
   public var tags: [Tag]
   public var frequency: ActivityFrequency?
   public var defaultDuration: Int?
+  public var isVisible: Bool
 
   // MARK: - Initialization
   
@@ -20,7 +21,8 @@ public struct Activity: Identifiable, Equatable, Hashable {
     tags: [Tag] = [],
     frequency: ActivityFrequency? = nil,
     isDefaultDuration: Bool = false,
-    defaultDuration: Int? = nil
+    defaultDuration: Int? = nil,
+    isVisible: Bool = true
   ) {
     self.id = id
     self.name = name
@@ -28,5 +30,6 @@ public struct Activity: Identifiable, Equatable, Hashable {
     self.tags = tags
     self.frequency = frequency
     self.defaultDuration = defaultDuration
+    self.isVisible = isVisible
   }
 }

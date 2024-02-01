@@ -6,29 +6,34 @@ import Repositories
 import Utilities
 import Models
 import Common
+import ActivityForm
 import Combine
 
 public struct DashboardFeature: Reducer, TodayProvidable {
 
   // MARK: - Dependencies
 
-  @Dependency(\.activityRepository.loadActivities) private var loadActivities
   @Dependency(\.dayRepository) private var dayRepository
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.planRepository) private var planRepository
   @Dependency(\.planEditor) private var planEditor
   @Dependency(\.dayEditor) private var dayEditor
+  @Dependency(\.uuid) private var uuid
 
   // MARK: - State & Action
 
   public struct State: Equatable {
-    var activities: [Activity] = []
     var plans: [Plan] = []
     var day: Day?
     var dayActivities: [DayActivity] { day?.sortedDayActivities ?? [] }
+    var daySummary: DaySummary? {
+      guard let day else { return nil }
+      return DaySummary(day: day)
+    }
     @PresentationState var activityList: ActivityListFeature.State?
     @PresentationState var editDayActivity: DayActivityFormFeature.State?
-    
+    @PresentationState var addActivity: ActivityFormFeature.State?
+
     public init() { }
   }
 
@@ -44,8 +49,6 @@ public struct DashboardFeature: Reducer, TodayProvidable {
     }
     public enum InternalAction: Equatable {
       case loadOnStart
-      case loadActivities
-      case activitiesLoaded(_ activities: [Activity])
       case loadPlans
       case plansLoaded(_ plans: [Plan])
       case loadDay
@@ -59,6 +62,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
 
     case activityList(PresentationAction<ActivityListFeature.Action>)
     case editDayActivity(PresentationAction<DayActivityFormFeature.Action>)
+    case addActivity(PresentationAction<ActivityFormFeature.Action>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
@@ -85,6 +89,12 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         state.activityList = ActivityListFeature.State()
         return .none
       case .view(.oneTimeActivityButtonTapped):
+        state.addActivity = ActivityFormFeature.State(
+          activity: Activity(
+            id: uuid(),
+            isVisible: false
+          )
+        )
         return .none
       case .view(.dayActivityTapped(var dayActivity)):
         dayActivity.isDone.toggle()
@@ -111,18 +121,9 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .internal(.loadOnStart):
         return .run { send in
           try await planEditor.composePlans(today)
-          await send(.internal(.loadActivities))
           await send(.internal(.loadPlans))
           await send(.internal(.loadDay))
         }
-      case .internal(.loadActivities):
-        return .run { send in
-          let activities = try await loadActivities()
-          await send(.internal(.activitiesLoaded(activities)))
-        }
-      case .internal(.activitiesLoaded(let activities)):
-        state.activities = activities
-        return .none
       case .internal(.loadPlans):
         return .run { send in
           let plans = try await planRepository.loadPlans(today, nil)
@@ -156,14 +157,12 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         }
       case .activityList(.presented(.delegate(.activityAdded(let activity)))):
         return .run { [activity] send in
-          await send(.internal(.loadActivities))
           try await dayEditor.updateDayActivities(activity, today)
           await send(.internal(.loadPlans))
           await send(.internal(.loadDay))
         }
       case .activityList(.presented(.delegate(.activityUpdated(let activity)))):
         return .run { [activity] send in
-          await send(.internal(.loadActivities))
           try await dayEditor.updateDayActivities(activity, today)
           await send(.internal(.loadPlans))
           await send(.internal(.loadDay))
@@ -176,9 +175,17 @@ public struct DashboardFeature: Reducer, TodayProvidable {
           await send(.internal(.loadPlans))
           await send(.internal(.loadDay))
         }
+      case .addActivity(.presented(.delegate(.activityCreated(let activity)))):
+        return .run { [activity] send in
+          try await dayEditor.addActivity(activity, today)
+          await send(.internal(.loadPlans))
+          await send(.internal(.loadDay))
+        }
       case .activityList:
         return .none
       case .editDayActivity:
+        return .none
+      case .addActivity:
         return .none
       case .delegate:
         return .none
@@ -189,6 +196,9 @@ public struct DashboardFeature: Reducer, TodayProvidable {
     }
     .ifLet(\.$editDayActivity, action: /Action.editDayActivity) {
       DayActivityFormFeature()
+    }
+    .ifLet(\.$addActivity, action: /Action.addActivity) {
+      ActivityFormFeature()
     }
   }
 

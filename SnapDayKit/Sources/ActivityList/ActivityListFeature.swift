@@ -11,7 +11,7 @@ public struct ActivityListFeature: Reducer {
   // MARK: - Dependencies
 
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
-  @Dependency(\.dismiss) var dismiss
+  @Dependency(\.dismiss) private var dismiss
   @Dependency(\.uuid) private var uuid
 
   // MARK: - State & Action

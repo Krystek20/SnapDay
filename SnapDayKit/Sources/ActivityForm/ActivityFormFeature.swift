@@ -22,6 +22,7 @@ public struct ActivityFormFeature: Reducer {
   // MARK: - Dependencies
 
   @Dependency(\.tagRepository.loadTags) var loadTags
+  @Dependency(\.tagRepository.deleteTag) var deleteTag
   @Dependency(\.activityRepository.saveActivity) var saveActivity
   @Dependency(\.dismiss) var dismiss
 
@@ -66,7 +67,9 @@ public struct ActivityFormFeature: Reducer {
       case appeared
       case submitTagTapped
       case addTagButtonTapped
-      case tagTapped(Tag)
+      case addedTagTapped(Tag)
+      case existingTagTapped(Tag)
+      case removeTagTapped(Tag)
       case iconTapped
       case pickPhotoTapped
       case removeImageTapped
@@ -111,9 +114,17 @@ public struct ActivityFormFeature: Reducer {
       case .view(.addTagButtonTapped):
         showNewTag(state: &state)
         return .none
-      case .view(.tagTapped(let tag)):
+      case .view(.addedTagTapped(let tag)):
+        removeTag(tag, state: &state)
+        return .send(.internal(.loadTags))
+      case .view(.existingTagTapped(let tag)):
         appendTag(tag, state: &state)
         return .send(.internal(.loadTags))
+      case .view(.removeTagTapped(let tag)):
+        return .run { send in
+          try await deleteTag(tag)
+          await send(.internal(.loadTags))
+        }
       case .view(.iconTapped):
         state.showEmojiPicker = EmojiPickerFeature.State()
         return .none
@@ -189,5 +200,10 @@ public struct ActivityFormFeature: Reducer {
   private func appendTag(_ tag: Tag, state: inout State) {
     guard !state.activity.tags.contains(where: { $0.name == tag.name }) else { return }
     state.activity.tags.append(tag)
+  }
+
+  private func removeTag(_ tag: Tag, state: inout State) {
+    guard state.activity.tags.contains(where: { $0.name == tag.name }) else { return }
+    state.activity.tags.removeAll(where: { $0.name == tag.name })
   }
 }
