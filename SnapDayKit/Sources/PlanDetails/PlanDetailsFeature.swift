@@ -6,6 +6,7 @@ import Utilities
 import Common
 import ActivityList
 import DayActivityForm
+import ActivityForm
 
 enum PresentationMode: String, Identifiable {
   case list
@@ -21,6 +22,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.planRepository) private var planRepository
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.uuid) private var uuid
 
   // MARK: - State & Action
 
@@ -32,6 +34,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
     @BindingState var presentationMode: PresentationMode = .list
     @PresentationState var activityList: ActivityListFeature.State?
     @PresentationState var editDayActivity: DayActivityFormFeature.State?
+    @PresentationState var addActivity: ActivityFormFeature.State?
 
     var summaryType: SummaryType {
       guard plan.type == .daily else {
@@ -67,7 +70,8 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
 
   public enum Action: BindableAction, FeatureAction, Equatable {
     public enum ViewAction: Equatable {
-      case addButtonTapped(Day)
+      case activityListButtonTapped(Day)
+      case oneTimeActivityButtonTapped(Day)
       case dayActivityTapped(DayActivity)
       case removeDayActivityTapped(DayActivity, Day)
       case dayActivityEditTapped(DayActivity, Day)
@@ -85,6 +89,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
 
     case activityList(PresentationAction<ActivityListFeature.Action>)
     case editDayActivity(PresentationAction<DayActivityFormFeature.Action>)
+    case addActivity(PresentationAction<ActivityFormFeature.Action>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
@@ -97,9 +102,18 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case .view(.addButtonTapped(let day)):
+      case .view(.activityListButtonTapped(let day)):
         state.dayToUpdate = day
         state.activityList = ActivityListFeature.State()
+        return .none
+      case .view(.oneTimeActivityButtonTapped(let day)):
+        state.dayToUpdate = day
+        state.addActivity = ActivityFormFeature.State(
+          activity: Activity(
+            id: uuid(),
+            isVisible: false
+          )
+        )
         return .none
       case .view(.dayActivityTapped(var dayActivity)):
         dayActivity.isDone.toggle()
@@ -158,6 +172,17 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
         return .none
       case .editDayActivity:
         return .none
+      case .addActivity(.presented(.delegate(.activityCreated(let activity)))):
+        guard let dayToUpdate = state.dayToUpdate else { return .none }
+        return .run { [activity, dayToUpdate] send in
+          try await dayEditor.addActivity(activity, dayToUpdate.date)
+          await send(.internal(.loadPlan))
+        }
+      case .addActivity(.dismiss):
+        state.dayToUpdate = nil
+        return .none
+      case .addActivity:
+        return .none
       case .binding:
         return .none
       case .delegate:
@@ -169,6 +194,9 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
     }
     .ifLet(\.$editDayActivity, action: /Action.editDayActivity) {
       DayActivityFormFeature()
+    }
+    .ifLet(\.$addActivity, action: /Action.addActivity) {
+      ActivityFormFeature()
     }
   }
 

@@ -5,6 +5,7 @@ import Models
 import Resources
 import ActivityList
 import DayActivityForm
+import ActivityForm
 
 @MainActor
 public struct PlanDetailsView: View {
@@ -54,6 +55,18 @@ public struct PlanDetailsView: View {
             DayActivityFormView(store: store)
           }
           .presentationDetents([.medium])
+        }
+      )
+      .sheet(
+        store: store.scope(
+          state: \.$addActivity,
+          action: { .addActivity($0) }
+        ),
+        content: { store in
+          NavigationStack {
+            ActivityFormView(store: store)
+          }
+          .presentationDetents([.large])
         }
       )
     }
@@ -121,15 +134,18 @@ public struct PlanDetailsView: View {
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       },
       rightContent: {
-        Button(
-          action: {
-            viewStore.send(.view(.addButtonTapped(day)))
-          }, label: {
-            Text(String(localized: "Add", bundle: .module))
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
-              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
-          }
-        )
+        Menu {
+          Button(String(localized: "One-time activity", bundle: .module), action: {
+            viewStore.send(.view(.oneTimeActivityButtonTapped(day)))
+          })
+          Button(String(localized: "Activity list", bundle: .module), action: {
+            viewStore.send(.view(.activityListButtonTapped(day)))
+          })
+        } label: {
+          Text(String(localized: "Add", bundle: .module))
+            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+            .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+        }
       },
       content: {
         if day.activities.isEmpty {

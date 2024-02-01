@@ -80,7 +80,10 @@ private var targets: [Target] {
   )
   TargetParamenters(
     module: .planDetails,
-    dependencies: sceneDependecies + [.activityList]
+    dependencies: sceneDependecies + [
+      .activityList,
+      .activityForm
+    ]
   )
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .details, dependencies: [.composableArchitecture])
