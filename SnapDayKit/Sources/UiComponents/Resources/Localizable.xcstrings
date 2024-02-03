@@ -13,6 +13,9 @@
     "%lld min" : {
 
     },
+    "%lld%%" : {
+
+    },
     "%lldh %lldmin" : {
       "localizations" : {
         "en" : {
@@ -23,10 +26,22 @@
         }
       }
     },
+    "Daily" : {
+
+    },
     "Edit" : {
 
     },
+    "Monthly" : {
+
+    },
+    "Quarterly" : {
+
+    },
     "Remove" : {
+
+    },
+    "Weekly" : {
 
     }
   },

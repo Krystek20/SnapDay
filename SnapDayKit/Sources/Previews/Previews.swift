@@ -2,7 +2,7 @@ import SwiftUI
 import ComposableArchitecture
 import Application
 import Dashboard
-import PlanDetails
+import TimePeriodDetails
 import Details
 import ActivityForm
 import TagForm
@@ -54,19 +54,19 @@ import Models
   )
 }
 
-#Preview("PlanDetailsView") {
-  PlanDetailsView(
+#Preview("TimePeriodDetailsView") {
+  TimePeriodDetailsView(
     store: Store(
-      initialState: PlanDetailsFeature.State(
-        plan: Plan(
+      initialState: TimePeriodDetailsFeature.State(
+        timePeriod: TimePeriod(
           id: UUID(),
           days: [],
           name: "",
-          type: .daily,
+          type: .day,
           dateRange: Date()...Date()
         )
       ),
-      reducer: { PlanDetailsFeature() }
+      reducer: { TimePeriodDetailsFeature() }
     )
   )
 }

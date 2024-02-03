@@ -32,11 +32,11 @@ public struct DayView: View {
 
   public var body: some View {
     LazyVStack(spacing: 5.0) {
-      ForEach(activities, content: planView)
+      ForEach(activities, content: dayActivityView)
     }
   }
 
-  private func planView(_ dayActivity: DayActivity) -> some View {
+  private func dayActivityView(_ dayActivity: DayActivity) -> some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
         data: dayActivity.activity.image,

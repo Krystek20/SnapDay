@@ -30,7 +30,7 @@ public struct DashboardView: View {
         dayView(viewStore: viewStore)
           .padding(.horizontal, 15.0)
           .padding(.top, 15.0)
-        plansView(viewStore: viewStore)
+        timePeriods(viewStore: viewStore)
           .padding(.horizontal, 15.0)
           .padding(.top, 10.0)
       }
@@ -128,15 +128,15 @@ public struct DashboardView: View {
     )
   }
 
-  private func plansView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+  private func timePeriods(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
     SectionView(
-      name: String(localized: "Plans", bundle: .module),
+      name: String(localized: "Time Periods", bundle: .module),
       rightContent: { EmptyView() },
       content: {
-        PlansView(
-          plans: viewStore.plans,
-          planTapped: { plan in
-            viewStore.send(.view(.planTapped(plan)))
+        TimePeriodsView(
+          timePeriods: viewStore.timePeriods,
+          timePeriodTapped: { timePeriod in
+            viewStore.send(.view(.timePeriodTapped(timePeriod)))
           }
         )
       }

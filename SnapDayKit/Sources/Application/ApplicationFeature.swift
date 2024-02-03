@@ -1,5 +1,5 @@
 import Dashboard
-import PlanDetails
+import TimePeriodDetails
 import Details
 import ComposableArchitecture
 
@@ -21,18 +21,18 @@ public struct ApplicationFeature: Reducer {
 
   public struct Path: Reducer {
     public enum State: Equatable {
-      case planDetails(PlanDetailsFeature.State)
+      case timePeriodDetails(TimePeriodDetailsFeature.State)
       case details(DetailsFeature.State)
     }
 
     public enum Action: Equatable {
-      case planDetails(PlanDetailsFeature.Action)
+      case timePeriodDetails(TimePeriodDetailsFeature.Action)
       case details(DetailsFeature.Action)
     }
 
     public var body: some ReducerOf<Self> {
-      Scope(state: /State.planDetails, action: /Action.planDetails) {
-        PlanDetailsFeature()
+      Scope(state: /State.timePeriodDetails, action: /Action.timePeriodDetails) {
+        TimePeriodDetailsFeature()
       }
       Scope(state: /State.details, action: /Action.details) {
         DetailsFeature()
@@ -57,8 +57,8 @@ public struct ApplicationFeature: Reducer {
         return handleDashboardDelegate(action: action, state: &state)
       case .dashboard:
         return .none
-      case .path(.element(_, action: .planDetails(.delegate(let action)))):
-        return handlePlanDetailsDelegate(action: action, state: &state)
+      case .path(.element(_, action: .timePeriodDetails(.delegate(let action)))):
+        return handleTimePeriodDetailsDelegate(action: action, state: &state)
       case .path:
         return .none
       }
@@ -75,16 +75,16 @@ public struct ApplicationFeature: Reducer {
     state: inout ApplicationFeature.State
   ) -> EffectOf<Self> {
     switch action {
-    case .planTapped(let plan):
+    case .timePeriodTapped(let timePeriod):
       state.path.append(
-        .planDetails(PlanDetailsFeature.State(plan: plan))
+        .timePeriodDetails(TimePeriodDetailsFeature.State(timePeriod: timePeriod))
       )
       return .none
     }
   }
 
-  private func handlePlanDetailsDelegate(
-    action: PlanDetailsFeature.Action.DelegateAction,
+  private func handleTimePeriodDetailsDelegate(
+    action: TimePeriodDetailsFeature.Action.DelegateAction,
     state: inout ApplicationFeature.State
   ) -> EffectOf<Self> {
     switch action {

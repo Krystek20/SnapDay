@@ -13,7 +13,6 @@ struct DayUpdater {
   // MARK: - Dependecies
 
   @Dependency(\.dayRepository) private var dayRepository
-  @Dependency(\.planRepository.loadPlans) private var loadPlans
   @Dependency(\.calendar) private var calendar
   @Dependency(\.uuid) private var uuid
 
@@ -97,11 +96,11 @@ struct DayUpdater {
   }
 
   private func dateRangeToUpdate(date: Date) async throws -> ClosedRange<Date> {
-    let plans = try await loadPlans(date, nil)
-    guard let max = plans.max(by: { $0.dateRange.upperBound < $1.dateRange.upperBound }) else {
+    let days = try await dayRepository.loadAllDays()
+    guard let max = days.max(by: { $0.date < $1.date }) else {
       throw DayUpdaterError.canNotCreateRange
     }
-    return date...max.dateRange.upperBound
+    return date...max.date
   }
 
   private func loadDay(_ date: Date) async throws -> Day {

@@ -1,58 +1,62 @@
 import SwiftUI
 import Resources
 import Models
-import UiComponents
 
-struct PlansView: View {
+public struct TimePeriodsView: View {
 
   // MARK: - Properties
 
-  let plans: [Plan]
-  let planTapped: (Plan) -> Void
+  private let timePeriods: [TimePeriod]
+  private let timePeriodTapped: (TimePeriod) -> Void
   private let columns: [GridItem] = [
     GridItem(.flexible(), spacing: 15.0, alignment: nil),
     GridItem(.flexible(), spacing: 15.0, alignment: nil)
   ]
 
+  // MARK: - Initialization
+
+  public init(timePeriods: [TimePeriod], timePeriodTapped: @escaping (TimePeriod) -> Void) {
+    self.timePeriods = timePeriods
+    self.timePeriodTapped = timePeriodTapped
+  }
+
   // MARK: - Views
 
-  var body: some View {
+  public var body: some View {
     LazyVGrid(columns: columns, spacing: 15.0) {
-      ForEach(plans, content: planView)
+      ForEach(timePeriods, content: timePeriodView)
     }
   }
 
-  private func planView(_ plan: Plan) -> some View {
+  private func timePeriodView(_ timePeriod: TimePeriod) -> some View {
     VStack(alignment: .leading, spacing: 10.0) {
-      Text(name(for: plan))
+      Text(name(for: timePeriod))
         .font(Fonts.Quicksand.bold.swiftUIFont(size: 16.0))
         .foregroundStyle(Colors.slateHaze.swiftUIColor)
-      ProgressView(value: plan.completedValue) {
-        Text("\(plan.percent)%")
+      ProgressView(value: timePeriod.completedValue) {
+        Text("\(timePeriod.percent)%")
           .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       }
     }
     .formBackgroundModifier
     .onTapGesture {
-      planTapped(plan)
+      timePeriodTapped(timePeriod)
     }
   }
 
   // MARK: - Private
 
-  private func name(for plan: Plan) -> String {
-    switch plan.type {
-    case .daily:
+  private func name(for timePeriod: TimePeriod) -> String {
+    switch timePeriod.type {
+    case .day:
       String(localized: "Daily", bundle: .module)
-    case .weekly:
+    case .week:
       String(localized: "Weekly", bundle: .module)
-    case .monthly:
+    case .month:
       String(localized: "Monthly", bundle: .module)
-    case .quarterly:
+    case .quarter:
       String(localized: "Quarterly", bundle: .module)
-    case .custom:
-      plan.name
     }
   }
 }

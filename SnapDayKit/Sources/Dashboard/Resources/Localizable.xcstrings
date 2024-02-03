@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld%%" : {
-
-    },
     "Activities" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -27,9 +24,6 @@
     "Add" : {
 
     },
-    "Daily" : {
-
-    },
     "Dashboard" : {
 
     },
@@ -50,16 +44,7 @@
         }
       }
     },
-    "Monthly" : {
-
-    },
     "One-time activity" : {
-
-    },
-    "Plans" : {
-
-    },
-    "Quarterly" : {
 
     },
     "Remaining Time" : {
@@ -68,13 +53,13 @@
     "Summary" : {
 
     },
+    "Time Periods" : {
+
+    },
     "Todays Activities" : {
 
     },
     "Total Task Time" : {
-
-    },
-    "Weekly" : {
 
     },
     "Welcome back 👋" : {

@@ -8,15 +8,15 @@ import DayActivityForm
 import ActivityForm
 
 @MainActor
-public struct PlanDetailsView: View {
+public struct TimePeriodDetailsView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<PlanDetailsFeature>
+  private let store: StoreOf<TimePeriodDetailsFeature>
 
   // MARK: - Initialization
 
-  public init(store: StoreOf<PlanDetailsFeature>) {
+  public init(store: StoreOf<TimePeriodDetailsFeature>) {
     self.store = store
   }
 
@@ -32,7 +32,10 @@ public struct PlanDetailsView: View {
       .maxWidth()
       .scrollIndicators(.hidden)
       .activityBackground
-      .navigationTitle(name(for: viewStore.plan))
+      .navigationTitle(name(for: viewStore.timePeriod))
+      .task {
+        viewStore.send(.view(.appear))
+      }
       .sheet(
         store: store.scope(
           state: \.$activityList,
@@ -72,7 +75,7 @@ public struct PlanDetailsView: View {
     }
   }
 
-  private func content(viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func content(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     VStack(spacing: 30.0) {
       SectionView(
         name: String(localized: "Summary", bundle: .module),
@@ -81,6 +84,22 @@ public struct PlanDetailsView: View {
           summaryView(viewStore: viewStore)
         }
       )
+      
+      switch viewStore.activitiesPresentationType {
+      case .monthlyGrid(let timePeriods):
+        TimePeriodsView(
+          timePeriods: timePeriods,
+          timePeriodTapped: { timePeriod in
+            print(timePeriod.dateRange)
+//            viewStore.send(.view(.planTapped(plan)))
+          }
+        )
+      case .unowned:
+        EmptyView()
+      case .none:
+        EmptyView()
+      }
+
       SectionView(
         name: String(localized: "Activities", bundle: .module),
         rightContent: { EmptyView() },
@@ -95,7 +114,7 @@ public struct PlanDetailsView: View {
   }
 
   @ViewBuilder
-  private func summaryView(viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func summaryView(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     switch viewStore.summaryType {
     case .chart(let points, let expectedPoints):
       LinearChartView(points: points, expectedPoints: expectedPoints)
@@ -106,7 +125,7 @@ public struct PlanDetailsView: View {
     }
   }
 
-  private func segmentView(viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func segmentView(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     Picker(
       selection: viewStore.$presentationMode,
       content: {
@@ -118,7 +137,7 @@ public struct PlanDetailsView: View {
     .pickerStyle(.segmented)
   }
 
-  private func daysView(viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func daysView(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     LazyVStack(spacing: 15.0) {
       ForEach(viewStore.days) { day in
         dayViewSection(day, viewStore: viewStore)
@@ -126,7 +145,7 @@ public struct PlanDetailsView: View {
     }
   }
 
-  private func dayViewSection(_ day: Day, viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func dayViewSection(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     SectionView(
       label: {
         Text(day.formattedDate)
@@ -164,7 +183,7 @@ public struct PlanDetailsView: View {
   }
 
   @ViewBuilder
-  private func dayView(_ day: Day, viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func dayView(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     switch viewStore.presentationMode {
     case .list:
       listDayView(day, viewStore: viewStore)
@@ -173,7 +192,7 @@ public struct PlanDetailsView: View {
     }
   }
 
-  private func listDayView(_ day: Day, viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func listDayView(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     DayView(
       isPastDay: day.isOlderThenToday ?? false,
       activities: day.activities.sortedByName,
@@ -189,7 +208,7 @@ public struct PlanDetailsView: View {
     )
   }
 
-  private func gridDayView(_ day: Day, viewStore: ViewStoreOf<PlanDetailsFeature>) -> some View {
+  private func gridDayView(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     DayGridView(
       isPastDay: day.isOlderThenToday ?? false,
       activities: day.activities.sortedByName,
@@ -217,18 +236,16 @@ public struct PlanDetailsView: View {
 
   // MARK: - Private
 
-  private func name(for plan: Plan) -> String {
-    switch plan.type {
-    case .daily:
+  private func name(for timePeriod: TimePeriod) -> String {
+    switch timePeriod.type {
+    case .day:
       String(localized: "Daily", bundle: .module)
-    case .weekly:
+    case .week:
       String(localized: "Weekly", bundle: .module)
-    case .monthly:
+    case .month:
       String(localized: "Monthly", bundle: .module)
-    case .quarterly:
+    case .quarter:
       String(localized: "Quarterly", bundle: .module)
-    case .custom:
-      plan.name
     }
   }
 }

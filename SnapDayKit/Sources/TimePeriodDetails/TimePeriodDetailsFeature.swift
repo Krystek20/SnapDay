@@ -15,21 +15,27 @@ enum PresentationMode: String, Identifiable {
   var id: Self { self }
 }
 
-public struct PlanDetailsFeature: Reducer, TodayProvidable {
+public enum ActivitiesPresentationType: Equatable {
+  case monthlyGrid([TimePeriod])
+  case unowned
+}
+
+public struct TimePeriodDetailsFeature: Reducer, TodayProvidable {
 
   // MARK: - Dependecies
 
   @Dependency(\.dayEditor) private var dayEditor
-  @Dependency(\.planRepository) private var planRepository
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.timePeriodsProvider) private var timePeriodsProvider
   @Dependency(\.uuid) private var uuid
 
   // MARK: - State & Action
 
   public struct State: Equatable, TodayProvidable {
 
-    var plan: Plan
+    var timePeriod: TimePeriod
 
+    var activitiesPresentationType: ActivitiesPresentationType?
     var dayToUpdate: Day?
     @BindingState var presentationMode: PresentationMode = .list
     @PresentationState var activityList: ActivityListFeature.State?
@@ -37,23 +43,23 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
     @PresentationState var addActivity: ActivityFormFeature.State?
 
     var summaryType: SummaryType {
-      guard plan.type == .daily else {
+      guard timePeriod.type == .day else {
         return .chart(
-          points: plan.completedDaysValues(until: today),
-          expectedPoints: plan.days.count
+          points: timePeriod.completedDaysValues(until: today),
+          expectedPoints: timePeriod.days.count
         )
       }
-      return .circle(progress: plan.completedDaysValues(until: today).first ?? .zero)
+      return .circle(progress: timePeriod.completedDaysValues(until: today).first ?? .zero)
     }
 
     var days: [Day] {
-      plan.days
+      timePeriod.days
         .map(updateDay)
         .sorted(by: { $0.date < $1.date })
     }
 
-    public init(plan: Plan) {
-      self.plan = plan
+    public init(timePeriod: TimePeriod) {
+      self.timePeriod = timePeriod
     }
 
     private func updateDay(_ day: Day) -> Day {
@@ -70,6 +76,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
 
   public enum Action: BindableAction, FeatureAction, Equatable {
     public enum ViewAction: Equatable {
+      case appear
       case activityListButtonTapped(Day)
       case oneTimeActivityButtonTapped(Day)
       case dayActivityTapped(DayActivity)
@@ -77,9 +84,10 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
       case dayActivityEditTapped(DayActivity, Day)
     }
     public enum InternalAction: Equatable { 
-      case loadPlan
-      case planLoaded(Plan)
+      case loadTimePeriod
+      case timePeriodLoaded(TimePeriod)
       case removeDayActivity(DayActivity, Day)
+      case setActivitiesPresentation(ActivitiesPresentationType)
     }
     public enum DelegateAction: Equatable {
       case startGameTapped
@@ -102,6 +110,17 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case .view(.appear):
+        return .run { [timePeriod = state.timePeriod] send in
+          switch timePeriod.type {
+          case .day: break
+          case .week: break
+          case .month: break
+          case .quarter: break
+//            let plans = try await planRepository.loadPlans(plan.dateRange.lowerBound, .monthly)
+//            await send(.internal(.setActivitiesPresentation(.monthlyGrid(plans))))
+          }
+        }
       case .view(.activityListButtonTapped(let day)):
         state.dayToUpdate = day
         state.activityList = ActivityListFeature.State()
@@ -119,7 +138,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
         dayActivity.isDone.toggle()
         return .run { [dayActivity] send in
           try await dayActivityRepository.saveActivity(dayActivity)
-          await send(.internal(.loadPlan))
+          await send(.internal(.loadTimePeriod))
         }
       case .view(.removeDayActivityTapped(let dayActivity, let day)):
         return .run { send in
@@ -129,19 +148,22 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
         state.dayToUpdate = day
         state.editDayActivity = DayActivityFormFeature.State(dayActivity: dayActivity)
         return .none
-      case .internal(.loadPlan):
-        return .run { [planType = state.plan.type] send in
-          let plans = try await planRepository.loadPlans(today, planType)
-          guard let plan = plans.first(where: { $0.type == planType && $0.dateRange.contains(today) }) else { return }
-          await send(.internal(.planLoaded(plan)))
+      case .internal(.loadTimePeriod):
+        return .run { [period = state.timePeriod.type] send in
+          let timePeriods = try await timePeriodsProvider.timePerdiods(today)
+          guard let timePeriod = timePeriods.first(where: { $0.type == period && $0.dateRange.contains(today) }) else { return }
+          await send(.internal(.timePeriodLoaded(timePeriod)))
         }
-      case .internal(.planLoaded(let plan)):
-        state.plan = plan
+      case .internal(.setActivitiesPresentation(let activitiesPresentationType)):
+        state.activitiesPresentationType = activitiesPresentationType
+        return .none
+      case .internal(.timePeriodLoaded(let timePeriod)):
+        state.timePeriod = timePeriod
         return .none
       case .internal(.removeDayActivity(let dayActivity, let day)):
         return .run { send in
           try await dayEditor.removeDayActivity(dayActivity, day.date)
-          await send(.internal(.loadPlan))
+          await send(.internal(.loadTimePeriod))
         }
       case .activityList(.presented(.delegate(.activitiesSelected(let activities)))):
         guard let dayToUpdate = state.dayToUpdate else { return .none }
@@ -149,7 +171,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
           for activity in activities {
             try await dayEditor.addActivity(activity, dayToUpdate.date)
           }
-          await send(.internal(.loadPlan))
+          await send(.internal(.loadTimePeriod))
         }
       case .activityList(.dismiss):
         state.dayToUpdate = nil
@@ -160,7 +182,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
         return .run { [day = state.dayToUpdate, dayActivity] send in
           guard let day else { return }
           try await dayEditor.updateDayActivity(dayActivity, day.date)
-          await send(.internal(.loadPlan))
+          await send(.internal(.loadTimePeriod))
         }
       case .editDayActivity(.presented(.delegate(.activityDeleted(let dayActivity)))):
         return .run { [day = state.dayToUpdate, dayActivity] send in
@@ -176,7 +198,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
         guard let dayToUpdate = state.dayToUpdate else { return .none }
         return .run { [activity, dayToUpdate] send in
           try await dayEditor.addActivity(activity, dayToUpdate.date)
-          await send(.internal(.loadPlan))
+          await send(.internal(.loadTimePeriod))
         }
       case .addActivity(.dismiss):
         state.dayToUpdate = nil
@@ -205,7 +227,7 @@ public struct PlanDetailsFeature: Reducer, TodayProvidable {
   public init() { }
 }
 
-extension Plan {
+extension TimePeriod {
   func completedDaysValues(until date: Date) -> [Double] {
     let total = plannedCount
     return days

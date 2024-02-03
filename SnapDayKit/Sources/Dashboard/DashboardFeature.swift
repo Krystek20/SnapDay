@@ -13,17 +13,16 @@ public struct DashboardFeature: Reducer, TodayProvidable {
 
   // MARK: - Dependencies
 
+  @Dependency(\.timePeriodsProvider) private var timePeriodsProvider
   @Dependency(\.dayRepository) private var dayRepository
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
-  @Dependency(\.planRepository) private var planRepository
-  @Dependency(\.planEditor) private var planEditor
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.uuid) private var uuid
 
   // MARK: - State & Action
 
   public struct State: Equatable {
-    var plans: [Plan] = []
+    var timePeriods: [TimePeriod] = []
     var day: Day?
     var dayActivities: [DayActivity] { day?.sortedDayActivities ?? [] }
     var daySummary: DaySummary? {
@@ -45,19 +44,19 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case dayActivityTapped(DayActivity)
       case dayActivityEditTapped(DayActivity)
       case dayActivityRemoveTapped(DayActivity)
-      case planTapped(Plan)
+      case timePeriodTapped(TimePeriod)
     }
     public enum InternalAction: Equatable {
       case loadOnStart
-      case loadPlans
-      case plansLoaded(_ plans: [Plan])
+      case loadTimePeriods
+      case timePeriodsLoaded(_ timePeriods: [TimePeriod])
       case loadDay
       case dayLoaded(_ day: Day?)
       case removeDayActivity(_ dayActivity: DayActivity)
       case calendarDayChanged
     }
     public enum DelegateAction: Equatable {
-      case planTapped(Plan)
+      case timePeriodTapped(TimePeriod)
     }
 
     case activityList(PresentationAction<ActivityListFeature.Action>)
@@ -100,7 +99,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         dayActivity.isDone.toggle()
         return .run { [dayActivity] send in
           try await dayActivityRepository.saveActivity(dayActivity)
-          await send(.internal(.loadPlans))
+          await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
       case .view(.dayActivityEditTapped(let dayActivity)):
@@ -110,9 +109,9 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         return .run { send in
           await send(.internal(.removeDayActivity(dayActivity)))
         }
-      case .view(.planTapped(let plan)):
+      case .view(.timePeriodTapped(let timePeriod)):
         return .run { send in
-          await send(.delegate(.planTapped(plan)))
+          await send(.delegate(.timePeriodTapped(timePeriod)))
         }
       case .internal(.calendarDayChanged):
         return .run { send in
@@ -120,17 +119,17 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         }
       case .internal(.loadOnStart):
         return .run { send in
-          try await planEditor.composePlans(today)
-          await send(.internal(.loadPlans))
+          try await dayEditor.createDays(today)
+          await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
-      case .internal(.loadPlans):
+      case .internal(.loadTimePeriods):
         return .run { send in
-          let plans = try await planRepository.loadPlans(today, nil)
-          await send(.internal(.plansLoaded(plans)))
+          let timePerdiods = try await timePeriodsProvider.timePerdiods(today)
+          await send(.internal(.timePeriodsLoaded(timePerdiods)))
         }
-      case .internal(.plansLoaded(let plans)):
-        state.plans = plans.sorted(by: { $0.dateRange.upperBound < $1.dateRange.upperBound })
+      case .internal(.timePeriodsLoaded(let timePeriods)):
+        state.timePeriods = timePeriods.sorted(by: { $0.dateRange.upperBound < $1.dateRange.upperBound })
         return .none
       case .internal(.loadDay):
         return .run { send in
@@ -143,7 +142,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .internal(.removeDayActivity(let dayActivity)):
         return .run { [dayActivity] send in
           try await dayEditor.removeDayActivity(dayActivity, today)
-          await send(.internal(.loadPlans))
+          await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
       case .editDayActivity(.presented(.delegate(.activityUpdated(let dayActivity)))):
@@ -158,13 +157,13 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .activityList(.presented(.delegate(.activityAdded(let activity)))):
         return .run { [activity] send in
           try await dayEditor.updateDayActivities(activity, today)
-          await send(.internal(.loadPlans))
+          await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
       case .activityList(.presented(.delegate(.activityUpdated(let activity)))):
         return .run { [activity] send in
           try await dayEditor.updateDayActivities(activity, today)
-          await send(.internal(.loadPlans))
+          await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
       case .activityList(.presented(.delegate(.activitiesSelected(let activities)))):
@@ -172,13 +171,13 @@ public struct DashboardFeature: Reducer, TodayProvidable {
           for activity in activities {
             try await dayEditor.addActivity(activity, today)
           }
-          await send(.internal(.loadPlans))
+          await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
       case .addActivity(.presented(.delegate(.activityCreated(let activity)))):
         return .run { [activity] send in
           try await dayEditor.addActivity(activity, today)
-          await send(.internal(.loadPlans))
+          await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
       case .activityList:

@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 import Dashboard
-import PlanDetails
+import TimePeriodDetails
 import Details
 import Resources
 
@@ -50,11 +50,11 @@ public struct ApplicationView: View {
       )
     } destination: { state in
       switch state {
-      case .planDetails:
+      case .timePeriodDetails:
         CaseLet(
-          /ApplicationFeature.Path.State.planDetails,
-           action: ApplicationFeature.Path.Action.planDetails,
-           then: PlanDetailsView.init
+          /ApplicationFeature.Path.State.timePeriodDetails,
+           action: ApplicationFeature.Path.Action.timePeriodDetails,
+           then: TimePeriodDetailsView.init
         )
       case .details:
         CaseLet(

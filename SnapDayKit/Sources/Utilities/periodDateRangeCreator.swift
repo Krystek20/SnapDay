@@ -1,7 +1,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct PlanDateRangeCreator {
+struct PeriodDateRangeCreator {
 
   // MARK: - Dependecies
 

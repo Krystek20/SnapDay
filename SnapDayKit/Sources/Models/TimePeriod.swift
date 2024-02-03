@@ -1,13 +1,13 @@
 import Foundation
 
-public struct Plan: Identifiable, Equatable, Hashable {
+public struct TimePeriod: Identifiable, Equatable, Hashable {
 
   // MARK: - Properties
 
   public let id: UUID
   public let days: [Day]
   public let name: String
-  public let type: PlanType
+  public let type: Period
   public let dateRange: ClosedRange<Date>
 
   // MARK: - Initialization
@@ -16,7 +16,7 @@ public struct Plan: Identifiable, Equatable, Hashable {
     id: UUID,
     days: [Day],
     name: String,
-    type: PlanType,
+    type: Period,
     dateRange: ClosedRange<Date>
   ) {
     self.id = id
@@ -27,7 +27,7 @@ public struct Plan: Identifiable, Equatable, Hashable {
   }
 }
 
-public extension Plan {
+public extension TimePeriod {
   var plannedCount: Int {
     days.reduce(into: Int.zero) { result, day in
       result += day.plannedCount

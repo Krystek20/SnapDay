@@ -33,23 +33,9 @@
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="activities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayActivityEntity" inverseName="day" inverseEntity="DayActivityEntity"/>
-        <relationship name="plans" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlanEntity" inverseName="days" inverseEntity="PlanEntity"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="date"/>
-                <constraint value="identifier"/>
-            </uniquenessConstraint>
-        </uniquenessConstraints>
-    </entity>
-    <entity name="PlanEntity" representedClassName="PlanEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="endDate" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="name" attributeType="String"/>
-        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="type" attributeType="String"/>
-        <relationship name="days" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayEntity" inverseName="plans" inverseEntity="DayEntity"/>
-        <uniquenessConstraints>
-            <uniquenessConstraint>
                 <constraint value="identifier"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
