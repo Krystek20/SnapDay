@@ -4,6 +4,7 @@ import Common
 import TagForm
 import Models
 import EmojiPicker
+import Utilities
 
 public struct ActivityFormFeature: Reducer {
 
@@ -52,6 +53,11 @@ public struct ActivityFormFeature: Reducer {
     var showMonthDays: Bool { activity.areMonthDaysRequried }
     var showMonthWeekdays: Bool { activity.areMonthWeekdaysRequried }
     var isSaveButtonDisabled: Bool { !activity.isActivityReadyToSave }
+
+    var weekdays: [Weekday] {
+      @Dependency(\.calendar) var calendar
+      return WeekdaysProvider(calendar: calendar).weekdays
+    }
 
     let type: ActivityFormType
 

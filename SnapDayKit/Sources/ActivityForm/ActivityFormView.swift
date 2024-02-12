@@ -230,7 +230,8 @@ public struct ActivityFormView: View {
         selectedWeekdays:  Binding(
           get: { viewStore.activity.weekdays },
           set: { value in viewStore.$activity.wrappedValue.setWeekdays(value) }
-        )
+        ),
+        weekdays: viewStore.weekdays
       )
       .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
     }
@@ -271,7 +272,8 @@ public struct ActivityFormView: View {
         weekdayOrdinal: Binding(
           get: { viewStore.activity.weekdayOrdinal },
           set: { value in viewStore.$activity.wrappedValue.setWeekdayOrdinal(value) }
-        )
+        ),
+        weekdays: viewStore.weekdays
       )
       .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
     }

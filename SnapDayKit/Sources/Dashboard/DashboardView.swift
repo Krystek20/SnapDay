@@ -135,6 +135,7 @@ public struct DashboardView: View {
       content: {
         TimePeriodsView(
           timePeriods: viewStore.timePeriods,
+          type: .grid,
           timePeriodTapped: { timePeriod in
             viewStore.send(.view(.timePeriodTapped(timePeriod)))
           }

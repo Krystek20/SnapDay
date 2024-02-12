@@ -1,32 +1,23 @@
 import SwiftUI
 import Resources
 import ComposableArchitecture
+import Models
 
 public struct WeekdaysView: View {
 
-  private struct Weekday: Identifiable {
-    var id: String { name }
-    let name: String
-    let index: Int
-  }
-
   // MARK: - Properties
 
-  @Dependency(\.calendar) private var calendar
   @Binding private var selectedWeekdays: [Int]
-
-  private var weekdays: [Weekday] {
-    let weekdays = calendar.shortWeekdaySymbols.enumerated().map { index, name in
-      Weekday(name: name, index: index + 1)
-    }
-    let adjustedFirstWeekday = max(calendar.firstWeekday, 1)
-    return Array(weekdays.suffix(from: adjustedFirstWeekday - 1) + weekdays.prefix(adjustedFirstWeekday - 1))
-  }
+  private let weekdays: [Weekday]
 
   // MARK: - Initialization
 
-  public init(selectedWeekdays: Binding<[Int]>) {
+  public init(
+    selectedWeekdays: Binding<[Int]>,
+    weekdays: [Weekday]
+  ) {
     self._selectedWeekdays = selectedWeekdays
+    self.weekdays = weekdays
   }
 
   // MARK: - Views

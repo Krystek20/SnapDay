@@ -8,11 +8,16 @@ public struct MonthlyWeekdaysView: View {
   // MARK: - Properties
 
   @Binding private var weekdayOrdinal: [WeekdayOrdinal]
+  private let weekdays: [Weekday]
 
   // MARK: - Initialization
 
-  public init(weekdayOrdinal: Binding<[WeekdayOrdinal]>) {
+  public init(
+    weekdayOrdinal: Binding<[WeekdayOrdinal]>,
+    weekdays: [Weekday]
+  ) {
     self._weekdayOrdinal = weekdayOrdinal
+    self.weekdays = weekdays
   }
 
   // MARK: - Views
@@ -37,7 +42,8 @@ public struct MonthlyWeekdaysView: View {
                   )
                 }
               }
-            )
+            ), 
+            weekdays: weekdays
           )
         }
       }

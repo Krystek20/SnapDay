@@ -77,36 +77,103 @@ public struct TimePeriodDetailsView: View {
 
   private func content(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
     VStack(spacing: 30.0) {
-      SectionView(
-        name: String(localized: "Summary", bundle: .module),
-        rightContent: { EmptyView() },
-        content: {
-          summaryView(viewStore: viewStore)
-        }
-      )
-      
-      switch viewStore.activitiesPresentationType {
-      case .monthlyGrid(let timePeriods):
-        TimePeriodsView(
-          timePeriods: timePeriods,
-          timePeriodTapped: { timePeriod in
-            print(timePeriod.dateRange)
-//            viewStore.send(.view(.planTapped(plan)))
-          }
-        )
-      case .unowned:
-        EmptyView()
-      case .none:
-        EmptyView()
-      }
+      summaryOnTheChart(viewStore: viewStore)
+      summaryByTag(viewStore: viewStore)
+      periods(viewStore: viewStore)
+    }
+  }
 
+  private func summaryOnTheChart(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
+    SectionView(
+      name: String(localized: "Summary", bundle: .module),
+      rightContent: { EmptyView() },
+      content: {
+        summaryView(viewStore: viewStore)
+      }
+    )
+  }
+
+  private func summaryByTag(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
+    SectionView(
+      label: {
+        Text("By Tags", bundle: .module)
+          .font(Fonts.Quicksand.bold.swiftUIFont(size: 18.0))
+          .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+      },
+      rightContent: { EmptyView() },
+      content: {
+        TimePeriodSummaryView(
+          selectedTag: viewStore.$selectedTag,
+          timePeriodActivitySections: viewStore.timePeriodActivitySections
+        )
+      }
+    )
+  }
+
+  @ViewBuilder
+  private func periods(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
+    if let activitiesPresentationType = viewStore.activitiesPresentationType {
       SectionView(
-        name: String(localized: "Activities", bundle: .module),
-        rightContent: { EmptyView() },
+        label: {
+          Text(activitiesPresentationType.title)
+            .font(Fonts.Quicksand.bold.swiftUIFont(size: 18.0))
+            .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+        },
+        rightContent: {
+          Menu {
+            Button(String(localized: "One-time activity", bundle: .module), action: {
+              guard let selectedDay = viewStore.selectedDay else { return }
+              viewStore.send(.view(.oneTimeActivityButtonTapped(selectedDay)))
+            })
+            Button(String(localized: "Activity list", bundle: .module), action: {
+              guard let selectedDay = viewStore.selectedDay else { return }
+              viewStore.send(.view(.activityListButtonTapped(selectedDay)))
+            })
+          } label: {
+            Text(String(localized: "Add", bundle: .module))
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+          }
+        },
         content: {
-          VStack(spacing: 20.0) {
-            segmentView(viewStore: viewStore)
-            daysView(viewStore: viewStore)
+          switch activitiesPresentationType {
+          case .months(let timePeriods):
+            TimePeriodsView(
+              timePeriods: timePeriods,
+              type: .list,
+              timePeriodTapped: { timePeriod in
+                print(timePeriod.dateRange)
+    //            viewStore.send(.view(.planTapped(plan)))
+              }
+            )
+          case .month(let monthName, let calendarItem):
+            CalendarView(
+              selectedDay: viewStore.$selectedDay,
+              calendarItems: calendarItem,
+              dayActivityTapped: { dayActivity in
+                viewStore.send(.view(.dayActivityTapped(dayActivity)))
+              },
+              dayActivityEditTapped: { dayActivity, day in
+                viewStore.send(.view(.dayActivityEditTapped(dayActivity, day)))
+              },
+              removeDayActivityTapped: { dayActivity, day in
+                viewStore.send(.view(.removeDayActivityTapped(dayActivity, day)))
+              }
+            )
+          case .days(let days):
+            DaysSelectorView(
+              selectedDay: viewStore.$selectedDay,
+              days: days,
+              dayActivityTapped: { dayActivity in
+                viewStore.send(.view(.dayActivityTapped(dayActivity)))
+              },
+              dayActivityEditTapped: { dayActivity, day in
+                viewStore.send(.view(.dayActivityEditTapped(dayActivity, day)))
+              },
+              removeDayActivityTapped: { dayActivity, day in
+                viewStore.send(.view(.removeDayActivityTapped(dayActivity, day)))
+              }
+            )
           }
         }
       )
@@ -122,115 +189,6 @@ public struct TimePeriodDetailsView: View {
     case .circle(let progress):
       CircularProgressView(progress: progress)
         .frame(height: 200.0)
-    }
-  }
-
-  private func segmentView(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
-    Picker(
-      selection: viewStore.$presentationMode,
-      content: {
-        Text("List", bundle: .module).tag(PresentationMode.list)
-        Text("Grid", bundle: .module).tag(PresentationMode.grid)
-      },
-      label: { EmptyView() }
-    )
-    .pickerStyle(.segmented)
-  }
-
-  private func daysView(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
-    LazyVStack(spacing: 15.0) {
-      ForEach(viewStore.days) { day in
-        dayViewSection(day, viewStore: viewStore)
-      }
-    }
-  }
-
-  private func dayViewSection(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
-    SectionView(
-      label: {
-        Text(day.formattedDate)
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 18.0))
-          .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
-      },
-      rightContent: {
-        Menu {
-          Button(String(localized: "One-time activity", bundle: .module), action: {
-            viewStore.send(.view(.oneTimeActivityButtonTapped(day)))
-          })
-          Button(String(localized: "Activity list", bundle: .module), action: {
-            viewStore.send(.view(.activityListButtonTapped(day)))
-          })
-        } label: {
-          Text(String(localized: "Add", bundle: .module))
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
-            .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
-        }
-      },
-      content: {
-        if day.activities.isEmpty {
-          noActivitiesInformation(isPastDay: day.isOlderThenToday ?? false)
-        } else {
-          dayView(day, viewStore: viewStore)
-        }
-      }
-    )
-  }
-
-  @ViewBuilder
-  private func noActivitiesInformation(isPastDay: Bool) -> some View {
-    let configuration: EmptyDayConfiguration = isPastDay ? .pastDay : .todayOrFuture
-    InformationView(configuration: configuration)
-  }
-
-  @ViewBuilder
-  private func dayView(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
-    switch viewStore.presentationMode {
-    case .list:
-      listDayView(day, viewStore: viewStore)
-    case .grid:
-      gridDayView(day, viewStore: viewStore)
-    }
-  }
-
-  private func listDayView(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
-    DayView(
-      isPastDay: day.isOlderThenToday ?? false,
-      activities: day.activities.sortedByName,
-      activityTapped: { dayActivity in
-        viewStore.send(.view(.dayActivityTapped(dayActivity)))
-      },
-      editTapped: { dayActivity in
-        viewStore.send(.view(.dayActivityEditTapped(dayActivity, day)))
-      },
-      removeTapped: { dayActivity in
-        viewStore.send(.view(.removeDayActivityTapped(dayActivity, day)))
-      }
-    )
-  }
-
-  private func gridDayView(_ day: Day, viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
-    DayGridView(
-      isPastDay: day.isOlderThenToday ?? false,
-      activities: day.activities.sortedByName,
-      activityTapped: { dayActivity in
-        viewStore.send(.view(.dayActivityTapped(dayActivity)))
-      },
-      editTapped: { dayActivity in
-        viewStore.send(.view(.dayActivityEditTapped(dayActivity, day)))
-      },
-      removeTapped: { dayActivity in
-        viewStore.send(.view(.removeDayActivityTapped(dayActivity, day)))
-      }
-    )
-  }
-
-
-  private func dayActivities(_ dayActivities: [DayActivity]) -> some View {
-    LazyVStack(spacing: .zero) {
-      ForEach(dayActivities) { dayActivity in
-        Text(dayActivity.activity.name)
-          .formBackgroundModifier
-      }
     }
   }
 
