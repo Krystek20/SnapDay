@@ -24,11 +24,20 @@ public struct DashboardFeature: Reducer, TodayProvidable {
   public struct State: Equatable {
     var timePeriods: [TimePeriod] = []
     var day: Day?
-    var dayActivities: [DayActivity] { day?.sortedDayActivities ?? [] }
+    var dayActivities: [DayActivity] {
+      let activities = day?.sortedDayActivities ?? []
+      switch activityListOption {
+      case .collapsed:
+        return activities.filter { !$0.isDone }
+      case .extended:
+        return activities
+      }
+    }
     var daySummary: DaySummary? {
       guard let day else { return nil }
       return DaySummary(day: day)
     }
+    var activityListOption: ActivityListOption = .extended
     @PresentationState var activityList: ActivityListFeature.State?
     @PresentationState var editDayActivity: DayActivityFormFeature.State?
     @PresentationState var addActivity: ActivityFormFeature.State?
@@ -45,6 +54,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case dayActivityEditTapped(DayActivity)
       case dayActivityRemoveTapped(DayActivity)
       case timePeriodTapped(TimePeriod)
+      case activityPresentationButtonTapped
     }
     public enum InternalAction: Equatable {
       case loadOnStart
@@ -54,6 +64,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case dayLoaded(_ day: Day?)
       case removeDayActivity(_ dayActivity: DayActivity)
       case calendarDayChanged
+      case setupActivityListOption(_ day: Day?)
     }
     public enum DelegateAction: Equatable {
       case timePeriodTapped(TimePeriod)
@@ -113,6 +124,18 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         return .run { send in
           await send(.delegate(.timePeriodTapped(timePeriod)))
         }
+      case .view(.activityPresentationButtonTapped):
+        switch state.activityListOption {
+        case .collapsed:
+          state.activityListOption = .extended
+        case .extended:
+          state.activityListOption = .collapsed(
+            doneCount: state.day?.completedCount ?? .zero,
+            totalCount: state.day?.plannedCount ?? .zero,
+            percent: state.day?.completedValue ?? .zero
+          )
+        }
+        return .none
       case .internal(.calendarDayChanged):
         return .run { send in
           await send(.internal(.loadOnStart))
@@ -121,7 +144,9 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         return .run { send in
           try await dayEditor.createDays(today)
           await send(.internal(.loadTimePeriods))
-          await send(.internal(.loadDay))
+          let day = try await dayRepository.loadDay(today)
+          await send(.internal(.dayLoaded(day)))
+          await send(.internal(.setupActivityListOption(day)))
         }
       case .internal(.loadTimePeriods):
         return .run { send in
@@ -138,6 +163,12 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         }
       case .internal(.dayLoaded(let day)):
         state.day = day
+        guard case .collapsed = state.activityListOption else { return .none }
+        state.activityListOption = .collapsed(
+          doneCount: day?.completedCount ?? .zero,
+          totalCount: day?.plannedCount ?? .zero,
+          percent: day?.completedValue ?? .zero
+        )
         return .none
       case .internal(.removeDayActivity(let dayActivity)):
         return .run { [dayActivity] send in
@@ -145,6 +176,13 @@ public struct DashboardFeature: Reducer, TodayProvidable {
           await send(.internal(.loadTimePeriods))
           await send(.internal(.loadDay))
         }
+      case .internal(.setupActivityListOption(let day)):
+        state.activityListOption = .collapsed(
+          doneCount: day?.completedCount ?? .zero,
+          totalCount: day?.plannedCount ?? .zero,
+          percent: day?.completedValue ?? .zero
+        )
+        return .none
       case .editDayActivity(.presented(.delegate(.activityUpdated(let dayActivity)))):
         return .run { [dayActivity] send in
           try await dayEditor.updateDayActivity(dayActivity, today)

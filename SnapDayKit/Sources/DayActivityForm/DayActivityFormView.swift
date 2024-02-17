@@ -51,7 +51,7 @@ public struct DayActivityFormView: View {
       durationView(viewStore: viewStore)
     }
     .maxWidth()
-    .formBackgroundModifier
+    .formBackgroundModifier()
     .padding(padding)
   }
 

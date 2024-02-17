@@ -48,6 +48,11 @@ public struct TimePeriodDetailsFeature: Reducer, TodayProvidable {
         .sorted(by: { $0.date < $1.date })
     }
 
+    var daySummary: DaySummary? {
+      guard let selectedDay else { return nil }
+      return DaySummary(day: selectedDay)
+    }
+
     public init(timePeriod: TimePeriod) {
       self.timePeriod = timePeriod
     }

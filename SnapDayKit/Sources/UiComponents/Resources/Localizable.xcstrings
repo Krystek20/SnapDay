@@ -7,6 +7,16 @@
     "%lld" : {
 
     },
+    "%lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
     "%lld hours" : {
 
     },
@@ -26,7 +36,13 @@
         }
       }
     },
+    "Completed activities" : {
+
+    },
     "Daily" : {
+
+    },
+    "Deselect" : {
 
     },
     "Edit" : {
@@ -38,7 +54,16 @@
     "Quarterly" : {
 
     },
+    "Remaining Time" : {
+
+    },
     "Remove" : {
+
+    },
+    "Select" : {
+
+    },
+    "Total Task Time" : {
 
     },
     "Weekly" : {

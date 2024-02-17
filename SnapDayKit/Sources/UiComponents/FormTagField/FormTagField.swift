@@ -53,7 +53,7 @@ public struct FormTagField: View {
       newTagField
       existingTagsViewIfNotEmpty
     }
-    .formBackgroundModifier
+    .formBackgroundModifier()
   }
 
   @ViewBuilder

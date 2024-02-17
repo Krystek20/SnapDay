@@ -57,7 +57,7 @@ public struct TimePeriodsView: View {
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       }
     }
-    .formBackgroundModifier
+    .formBackgroundModifier()
     .onTapGesture {
       timePeriodTapped(timePeriod)
     }

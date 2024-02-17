@@ -32,4 +32,9 @@ extension Day {
   public var completedCount: Int {
     activities.filter(\.isDone).count
   }
+
+  public var completedValue: Double {
+    guard plannedCount != .zero else { return .zero }
+    return min(Double(completedCount) / Double(plannedCount), 1.0)
+  }
 }

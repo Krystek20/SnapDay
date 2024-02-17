@@ -33,6 +33,6 @@ public struct FormTextField: View {
         .font(Fonts.Quicksand.medium.swiftUIFont(size: 16.0))
         .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
     }
-    .formBackgroundModifier
+    .formBackgroundModifier()
   }
 }

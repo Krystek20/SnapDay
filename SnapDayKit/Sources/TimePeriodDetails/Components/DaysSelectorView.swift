@@ -98,6 +98,7 @@ struct DaysSelectorView: View {
     DayView(
       isPastDay: day.isOlderThenToday ?? false,
       activities: day.activities.sortedByName,
+      activityListOption: .extended,
       activityTapped: { dayActivity in
         dayActivityTapped(dayActivity)
       },

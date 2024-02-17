@@ -6,6 +6,7 @@ import Resources
 import ActivityList
 import DayActivityForm
 import ActivityForm
+import Models
 
 public struct DashboardView: View {
 
@@ -97,23 +98,37 @@ public struct DashboardView: View {
     SectionView(
       name: String(localized: "Todays Activities", bundle: .module),
       rightContent: {
-        Menu {
-          Button(String(localized: "One-time activity", bundle: .module), action: {
-            viewStore.send(.view(.oneTimeActivityButtonTapped))
-          })
-          Button(String(localized: "Activity list", bundle: .module), action: {
-            viewStore.send(.view(.activityListButtonTapped))
-          })
-        } label: {
-          Text(String(localized: "Add", bundle: .module))
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
-            .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+        HStack(spacing: 5.0) {
+          Button(
+            action: {
+              viewStore.send(.view(.activityPresentationButtonTapped))
+            },
+            label: {
+              icon(for: viewStore.activityListOption)
+                .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+                .frame(width: 30.0, height: 30.0)
+            }
+          )
+          Menu {
+            Button(String(localized: "One-time activity", bundle: .module), action: {
+              viewStore.send(.view(.oneTimeActivityButtonTapped))
+            })
+            Button(String(localized: "Activity list", bundle: .module), action: {
+              viewStore.send(.view(.activityListButtonTapped))
+            })
+          } label: {
+            Image(systemName: "plus.app")
+              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+              .frame(width: 30.0, height: 30.0)
+              .padding(.trailing, 5.0)
+          }
         }
       },
       content: {
         DayView(
           isPastDay: false,
           activities: viewStore.dayActivities,
+          activityListOption: viewStore.activityListOption,
           activityTapped: { activity in
             viewStore.send(.view(.dayActivityTapped(activity)))
           },
@@ -142,5 +157,14 @@ public struct DashboardView: View {
         )
       }
     )
+  }
+
+  private func icon(for option: ActivityListOption) -> Image {
+    switch option {
+    case .collapsed:
+      Image(systemName: "arrow.up.left.and.arrow.down.right")
+    case .extended:
+      Image(systemName: "arrow.down.right.and.arrow.up.left")
+    }
   }
 }

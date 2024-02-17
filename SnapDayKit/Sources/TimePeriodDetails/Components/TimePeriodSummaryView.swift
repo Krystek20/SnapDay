@@ -95,6 +95,6 @@ struct TimePeriodSummaryView: View {
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       }
     }
-    .formBackgroundModifier
+    .formBackgroundModifier()
   }
 }

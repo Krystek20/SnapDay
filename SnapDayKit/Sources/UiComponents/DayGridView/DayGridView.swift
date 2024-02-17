@@ -38,7 +38,7 @@ public struct DayGridView: View {
     LazyVGrid(columns: columns, alignment: .leading, spacing: 10.0) {
       ForEach(activities, content: activityIcon)
     }
-    .formBackgroundModifier
+    .formBackgroundModifier()
   }
 
   private func activityIcon(dayActivity: DayActivity) -> some View {

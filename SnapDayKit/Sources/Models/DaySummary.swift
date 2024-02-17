@@ -1,28 +1,37 @@
-import Models
+public struct DaySummary {
 
-struct DaySummary {
-  let day: Day
-  
-  var duration: Int {
+  public struct SummaryRow: Identifiable {
+    public var id: Tag { tag }
+    public let tag: Tag
+    public var duration: Int
+  }
+
+  // MARK: - Properties
+
+  private let day: Day
+
+  // MARK: - Initialization
+
+  public init(day: Day) {
+    self.day = day
+  }
+
+  // MARK: - Public
+
+  public var duration: Int {
     day.activities.reduce(into: Int.zero, { result, dayActivity in
       result += dayActivity.duration
     })
   }
 
-  var remaingDuration: Int {
+  public var remaingDuration: Int {
     day.activities.reduce(into: Int.zero, { result, dayActivity in
       guard !dayActivity.isDone else { return }
       result += dayActivity.duration
     })
   }
 
-  struct SummaryRow: Identifiable {
-    var id: Tag { tag }
-    let tag: Tag
-    var duration: Int
-  }
-
-  var summaryRows: [SummaryRow] {
+  public var summaryRows: [SummaryRow] {
     day.activities
       .sortedByName
       .reduce(into: [SummaryRow](), applySummaryRow)

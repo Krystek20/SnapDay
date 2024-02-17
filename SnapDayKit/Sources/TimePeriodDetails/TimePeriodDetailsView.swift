@@ -79,6 +79,7 @@ public struct TimePeriodDetailsView: View {
     VStack(spacing: 30.0) {
       summaryOnTheChart(viewStore: viewStore)
       summaryByTag(viewStore: viewStore)
+      summaryByTime(viewStore: viewStore)
       periods(viewStore: viewStore)
     }
   }
@@ -108,6 +109,19 @@ public struct TimePeriodDetailsView: View {
         )
       }
     )
+  }
+
+  @ViewBuilder
+  private func summaryByTime(viewStore: ViewStoreOf<TimePeriodDetailsFeature>) -> some View {
+    if let daySummary = viewStore.daySummary {
+      SectionView(
+        name: String(localized: "Summary by time", bundle: .module),
+        rightContent: { },
+        content: {
+          TimeSummaryView(daySummary: daySummary)
+        }
+      )
+    }
   }
 
   @ViewBuilder
@@ -142,6 +156,7 @@ public struct TimePeriodDetailsView: View {
               timePeriods: timePeriods,
               type: .list,
               timePeriodTapped: { timePeriod in
+                #warning("Handle me")
                 print(timePeriod.dateRange)
     //            viewStore.send(.view(.planTapped(plan)))
               }
@@ -187,7 +202,11 @@ public struct TimePeriodDetailsView: View {
       LinearChartView(points: points, expectedPoints: expectedPoints)
         .frame(height: 200.0)
     case .circle(let progress):
-      CircularProgressView(progress: progress)
+      CircularProgressView(
+        progress: progress,
+        showPercent: true,
+        lineWidth: 20.0
+      )
         .frame(height: 200.0)
     }
   }

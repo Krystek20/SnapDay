@@ -31,6 +31,6 @@ public struct FormColorField: View {
         )
     }
     .maxWidth()
-    .formBackgroundModifier
+    .formBackgroundModifier()
   }
 }

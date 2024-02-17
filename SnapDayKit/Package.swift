@@ -92,7 +92,7 @@ private var targets: [Target] {
   TargetParamenters(module: .common, dependencies: [.composableArchitecture])
   TargetParamenters(module: .models)
   TargetParamenters(module: .previews, dependencies: [.application])
-  TargetParamenters(module: .uiComponents, dependencies: [.resources, .composableArchitecture])
+  TargetParamenters(module: .uiComponents, dependencies: [.resources, .composableArchitecture, .utilities])
   TargetParamenters(module: .resources, dependencies: [.swiftgen])
 }
 

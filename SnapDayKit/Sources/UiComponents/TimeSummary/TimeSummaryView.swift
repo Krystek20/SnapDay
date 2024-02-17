@@ -1,18 +1,24 @@
 import SwiftUI
-import UiComponents
 import Utilities
+import Models
 import Resources
 
-struct TimeSummaryView: View {
+public struct TimeSummaryView: View {
 
   // MARK: - Properties
 
-  let daySummary: DaySummary
+  private let daySummary: DaySummary
+
+  // MARK: - Initialization
+
+  public init(daySummary: DaySummary) {
+    self.daySummary = daySummary
+  }
 
   // MARK: - Views
 
-  var body: some View {
-    VStack(alignment: .leading, spacing: 10.0) {
+  public var body: some View {
+    LazyVStack(alignment: .leading, spacing: 10.0) {
       ForEach(daySummary.summaryRows) { summaryRow in
         HStack(spacing: 5.0) {
           TagView(tag: summaryRow.tag)
@@ -45,6 +51,6 @@ struct TimeSummaryView: View {
       }
     }
     .maxWidth()
-    .formBackgroundModifier
+    .formBackgroundModifier()
   }
 }

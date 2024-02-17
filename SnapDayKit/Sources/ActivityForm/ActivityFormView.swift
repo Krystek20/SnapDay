@@ -133,7 +133,7 @@ public struct ActivityFormView: View {
         Spacer()
       }
     }
-    .formBackgroundModifier
+    .formBackgroundModifier()
     .photosPicker(
       isPresented: viewStore.$isPhotoPickerPresented,
       selection: viewStore.binding(
@@ -191,7 +191,7 @@ public struct ActivityFormView: View {
           monthGridIfNeeded(viewStore: viewStore, reader: reader)
           monthlyWeekdaysViewIfNeeded(viewStore: viewStore, reader: reader)
         }
-        .formBackgroundModifier
+        .formBackgroundModifier()
         .id("RecurrencyView")
       }
     }
@@ -318,7 +318,7 @@ public struct ActivityFormView: View {
           .scrollOnAppear("DurationView", anchor: .bottom, reader: reader)
         }
       }
-      .formBackgroundModifier
+      .formBackgroundModifier()
       .id("DurationView")
     }
   }
