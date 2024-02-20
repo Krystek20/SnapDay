@@ -78,14 +78,27 @@ public struct DashboardView: View {
         viewStore.send(.view(.appeared))
       }
       .navigationTitle(String(localized: "Dashboard", bundle: .module))
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          Button(
+            action: { 
+              viewStore.send(.view(.reportButtonTapped))
+            },
+            label: {
+              Image(systemName: "text.badge.checkmark")
+                .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+            }
+          )
+        }
+      }
     }
   }
 
   @ViewBuilder
   private func summaryView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    if let daySummary = viewStore.daySummary {
+    if let daySummary = viewStore.daySummary, daySummary.remaingDuration > .zero {
       SectionView(
-        name: String(localized: "Summary", bundle: .module),
+        name: String(localized: "Time Summary", bundle: .module),
         rightContent: { },
         content: {
           TimeSummaryView(daySummary: daySummary)

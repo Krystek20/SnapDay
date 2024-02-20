@@ -10,6 +10,7 @@ struct DaysSelectorView: View {
 
   @Binding private var selectedDay: Day?
   private let days: [Day]
+  private let daySummary: DaySummary?
   private let dayActivityTapped: (DayActivity) -> Void
   private let dayActivityEditTapped: (DayActivity, Day) -> Void
   private let removeDayActivityTapped: (DayActivity, Day) -> Void
@@ -19,12 +20,14 @@ struct DaysSelectorView: View {
   init(
     selectedDay: Binding<Day?>,
     days: [Day],
+    daySummary: DaySummary?,
     dayActivityTapped: @escaping (DayActivity) -> Void,
     dayActivityEditTapped: @escaping (DayActivity, Day) -> Void,
     removeDayActivityTapped: @escaping (DayActivity, Day) -> Void
   ) {
     self._selectedDay = selectedDay
     self.days = days
+    self.daySummary = daySummary
     self.dayActivityTapped = dayActivityTapped
     self.dayActivityEditTapped = dayActivityEditTapped
     self.removeDayActivityTapped = removeDayActivityTapped
@@ -44,6 +47,7 @@ struct DaysSelectorView: View {
           }
         }
       }
+      timeSummary
       dayActivityList
     }
   }
@@ -70,6 +74,13 @@ struct DaysSelectorView: View {
     day == selectedDay
     ? Fonts.Quicksand.bold.swiftUIFont(size: 14.0)
     : Fonts.Quicksand.medium.swiftUIFont(size: 12.0)
+  }
+
+  @ViewBuilder
+  private var timeSummary: some View {
+    if let daySummary {
+      TimeSummaryView(daySummary: daySummary)
+    }
   }
 
   @ViewBuilder

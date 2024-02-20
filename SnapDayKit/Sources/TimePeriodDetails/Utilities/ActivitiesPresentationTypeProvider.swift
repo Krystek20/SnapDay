@@ -12,19 +12,19 @@ struct ActivitiesPresentationTypeProvider {
 
   // MARK: - Public
 
-  func presentationType(for timePeriod: TimePeriod) -> ActivitiesPresentationType? {
+  func presentationType(for timePeriod: TimePeriod) throws -> ActivitiesPresentationType? {
     switch timePeriod.type {
     case .day:
       return nil
     case .week:
-      return .days(
+      return .daysList(
         prepareTimePeriods(from: timePeriod, to: .day).compactMap { $0.days.first }
       )
     case .month:
-      let calendarItemsWithName = prepareCalendarItems(timePeriod: timePeriod)
-      return .month(monthName: calendarItemsWithName.name.capitalized, calendarItemsWithName.items)
+      let calendarItemsWithName = try prepareCalendarItems(timePeriod: timePeriod)
+      return .calendar(monthName: calendarItemsWithName.name.capitalized, calendarItemsWithName.items)
     case .quarter:
-      return .months(
+      return .monthsList(
         prepareTimePeriods(from: timePeriod, to: .month)
       )
     }
@@ -32,17 +32,11 @@ struct ActivitiesPresentationTypeProvider {
 
   // MARK: - Private
 
-  private func prepareCalendarItems(timePeriod: TimePeriod) -> (items: [CalendarItemType], name: String) {
+  private func prepareCalendarItems(timePeriod: TimePeriod) throws -> (items: [CalendarItemType], name: String) {
     guard let firstDay = timePeriod.days.first,
-          let dayOfWeek = calendar.dateComponents([.weekday], from: firstDay.date).weekday,
-          let month = calendar.dateComponents([.month], from: firstDay.date).month else { return ([], "") }
-    return (calendarItems(timePeriod: timePeriod, dayOfWeek: dayOfWeek), monthName(for: month))
-  }
-
-  private func monthName(for month: Int) -> String {
-    let dateFormatter = DateFormatter()
-    guard dateFormatter.standaloneMonthSymbols.indices.contains(month - 1) else { return "" }
-    return dateFormatter.standaloneMonthSymbols[month - 1]
+          let dayOfWeek = calendar.dateComponents([.weekday], from: firstDay.date).weekday else { return ([], "") }
+    let monthName = try calendar.monthName(firstDay.date)
+    return (calendarItems(timePeriod: timePeriod, dayOfWeek: dayOfWeek), monthName)
   }
 
   private func calendarItems(timePeriod: TimePeriod, dayOfWeek: Int) -> [CalendarItemType] {

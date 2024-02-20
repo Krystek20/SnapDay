@@ -2,19 +2,19 @@ import Foundation
 import Models
 
 enum ActivitiesPresentationType: Equatable {
-  case months([TimePeriod])
-  case month(monthName: String, [CalendarItemType])
-  case days([Day])
+  case monthsList([TimePeriod])
+  case calendar(monthName: String, [CalendarItemType])
+  case daysList([Day])
 }
 
 extension ActivitiesPresentationType {
   var title: String {
     switch self {
-    case .months:
+    case .monthsList:
       String(localized: "Months", bundle: .module)
-    case .month(let monthName, _):
+    case .calendar(let monthName, _):
       monthName
-    case .days:
+    case .daysList:
       String(localized: "Days", bundle: .module)
     }
   }

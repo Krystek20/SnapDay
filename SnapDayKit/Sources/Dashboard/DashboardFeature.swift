@@ -55,6 +55,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case dayActivityRemoveTapped(DayActivity)
       case timePeriodTapped(TimePeriod)
       case activityPresentationButtonTapped
+      case reportButtonTapped
     }
     public enum InternalAction: Equatable {
       case loadOnStart
@@ -68,6 +69,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
     }
     public enum DelegateAction: Equatable {
       case timePeriodTapped(TimePeriod)
+      case reportsTapped
     }
 
     case activityList(PresentationAction<ActivityListFeature.Action>)
@@ -136,6 +138,10 @@ public struct DashboardFeature: Reducer, TodayProvidable {
           )
         }
         return .none
+      case .view(.reportButtonTapped):
+        return .run { send in
+          await send(.delegate(.reportsTapped))
+        }
       case .internal(.calendarDayChanged):
         return .run { send in
           await send(.internal(.loadOnStart))

@@ -9,6 +9,7 @@ struct CalendarView: View {
 
   @Binding private var selectedDay: Day?
   private let calendarItems: [CalendarItemType]
+  private let daySummary: DaySummary?
   private let dayActivityTapped: (DayActivity) -> Void
   private let dayActivityEditTapped: (DayActivity, Day) -> Void
   private let removeDayActivityTapped: (DayActivity, Day) -> Void
@@ -19,12 +20,14 @@ struct CalendarView: View {
   init(
     selectedDay: Binding<Day?>,
     calendarItems: [CalendarItemType],
+    daySummary: DaySummary?,
     dayActivityTapped: @escaping (DayActivity) -> Void,
     dayActivityEditTapped: @escaping (DayActivity, Day) -> Void,
     removeDayActivityTapped: @escaping (DayActivity, Day) -> Void
   ) {
     self._selectedDay = selectedDay
     self.calendarItems = calendarItems
+    self.daySummary = daySummary
     self.dayActivityTapped = dayActivityTapped
     self.dayActivityEditTapped = dayActivityEditTapped
     self.removeDayActivityTapped = removeDayActivityTapped
@@ -42,6 +45,7 @@ struct CalendarView: View {
             }
         }
       }
+      timeSummary
       dayActivityList
     }
   }
@@ -78,6 +82,13 @@ struct CalendarView: View {
     day == selectedDay
     ? Fonts.Quicksand.bold.swiftUIFont(size: 14.0)
     : Fonts.Quicksand.medium.swiftUIFont(size: 12.0)
+  }
+
+  @ViewBuilder
+  private var timeSummary: some View {
+    if let daySummary {
+      TimeSummaryView(daySummary: daySummary)
+    }
   }
 
   @ViewBuilder

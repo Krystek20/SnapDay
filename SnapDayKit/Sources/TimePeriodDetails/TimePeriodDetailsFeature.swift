@@ -77,6 +77,7 @@ public struct TimePeriodDetailsFeature: Reducer, TodayProvidable {
       case dayActivityTapped(DayActivity)
       case removeDayActivityTapped(DayActivity, Day)
       case dayActivityEditTapped(DayActivity, Day)
+      case timePeriodTapped(TimePeriod)
     }
     public enum InternalAction: Equatable { 
       case loadTimePeriod
@@ -84,7 +85,7 @@ public struct TimePeriodDetailsFeature: Reducer, TodayProvidable {
       case removeDayActivity(DayActivity, Day)
     }
     public enum DelegateAction: Equatable {
-      case startGameTapped
+      case timePeriodTapped(TimePeriod)
     }
 
     case binding(BindingAction<State>)
@@ -134,6 +135,10 @@ public struct TimePeriodDetailsFeature: Reducer, TodayProvidable {
         state.dayToUpdate = day
         state.editDayActivity = DayActivityFormFeature.State(dayActivity: dayActivity)
         return .none
+      case .view(.timePeriodTapped(let timePeriod)):
+        return .run { send in
+          await send(.delegate(.timePeriodTapped(timePeriod)))
+        }
       case .internal(.loadTimePeriod):
         return .run { [period = state.timePeriod.type] send in
           let timePeriods = try await timePeriodsProvider.timePerdiods(today)
@@ -213,8 +218,12 @@ public struct TimePeriodDetailsFeature: Reducer, TodayProvidable {
   // MARK: - Private
 
   private func setupTimePeriodConfiguration(_ state: inout State) {
-    setupSectionsAndSelectedTag(&state)
-    setupPresentationTypeAndSelectedDay(&state)
+    do {
+      setupSectionsAndSelectedTag(&state)
+      try setupPresentationTypeAndSelectedDay(&state)
+    } catch {
+      print(error)
+    }
   }
 
   private func setupSectionsAndSelectedTag(_ state: inout State) {
@@ -224,20 +233,20 @@ public struct TimePeriodDetailsFeature: Reducer, TodayProvidable {
     state.selectedTag = sections.first?.tag
   }
 
-  private func setupPresentationTypeAndSelectedDay(_ state: inout State) {
+  private func setupPresentationTypeAndSelectedDay(_ state: inout State) throws {
     let presentationTypeProvider = ActivitiesPresentationTypeProvider()
-    let presentationType = presentationTypeProvider.presentationType(for: state.timePeriod)
+    let presentationType = try presentationTypeProvider.presentationType(for: state.timePeriod)
     state.activitiesPresentationType = presentationType
     state.selectedDay = findSelectedDay(for: presentationType, currentSelectedDay: state.selectedDay)
   }
 
   private func findSelectedDay(for presentationType: ActivitiesPresentationType?, currentSelectedDay: Day?) -> Day? {
     guard let presentationType else { return nil }
-    if case .days(let days) = presentationType {
+    if case .daysList(let days) = presentationType {
       return currentSelectedDay != nil
       ? days.first(where: { $0.date == currentSelectedDay?.date })
       : days.first(where: { $0.date == today })
-    } else if case .month(_, let calendarItems) = presentationType {
+    } else if case .calendar(_, let calendarItems) = presentationType {
       return currentSelectedDay != nil
       ? calendarItems.first(where: {
         guard case .day(let day) = $0 else { return false }

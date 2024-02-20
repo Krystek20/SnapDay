@@ -3,7 +3,6 @@ import ComposableArchitecture
 import Application
 import Dashboard
 import TimePeriodDetails
-import Details
 import ActivityForm
 import TagForm
 import EmojiPicker
@@ -67,15 +66,6 @@ import Models
         )
       ),
       reducer: { TimePeriodDetailsFeature() }
-    )
-  )
-}
-
-#Preview("DetailsView") {
-  DetailsView(
-    store: Store(
-      initialState: DetailsFeature.State(),
-      reducer: { DetailsFeature() }
     )
   )
 }

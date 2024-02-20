@@ -1,0 +1,42 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Custom" : {
+
+    },
+    "Day" : {
+
+    },
+    "End" : {
+
+    },
+    "Filter by activities" : {
+
+    },
+    "Filter by period" : {
+
+    },
+    "Filter by tags" : {
+
+    },
+    "Month" : {
+
+    },
+    "Quarter" : {
+
+    },
+    "Reports" : {
+
+    },
+    "Start" : {
+
+    },
+    "tags" : {
+
+    },
+    "Week" : {
+
+    }
+  },
+  "version" : "1.0"
+}

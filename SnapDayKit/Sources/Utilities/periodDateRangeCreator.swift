@@ -1,33 +1,37 @@
 import Foundation
 import ComposableArchitecture
 
-struct PeriodDateRangeCreator {
+public struct PeriodDateRangeCreator {
 
   // MARK: - Dependecies
 
   @Dependency(\.calendar) private var calendar
 
+  // MARK: - Initialization
+
+  public init() { }
+
   // MARK: - Public
 
-  func today(for date: Date) -> ClosedRange<Date>? {
+  public func today(for date: Date) -> ClosedRange<Date>? {
     calendar.dayFormat(date)...calendar.dayFormat(date)
   }
 
-  func weekRange(for date: Date) -> ClosedRange<Date>? {
+  public func weekRange(for date: Date) -> ClosedRange<Date>? {
     let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)
     guard let start = calendar.date(from: components) else { return nil }
     guard let end = calendar.date(byAdding: .day, value: 6, to: start) else { return nil }
     return calendar.dayFormat(start)...calendar.dayFormat(end)
   }
 
-  func mounthRange(for date: Date) -> ClosedRange<Date>? {
+  public func mounthRange(for date: Date) -> ClosedRange<Date>? {
     let components = calendar.dateComponents([.year, .month], from: date)
     guard let start = calendar.date(from: components) else { return nil }
     guard let end = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: start) else { return nil }
     return calendar.dayFormat(start)...calendar.dayFormat(end)
   }
 
-  func quarterlyRange(for date: Date) -> ClosedRange<Date>? {
+  public func quarterlyRange(for date: Date) -> ClosedRange<Date>? {
     guard let start = calendar.startQuarterDay(fromDate: date),
           let endMonth = calendar.date(byAdding: .month, value: 2, to: start) else { return nil }
     let endDateComponents = DateComponents(

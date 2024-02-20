@@ -1,6 +1,6 @@
 import Dashboard
+import Reports
 import TimePeriodDetails
-import Details
 import ComposableArchitecture
 
 public struct ApplicationFeature: Reducer {
@@ -22,20 +22,20 @@ public struct ApplicationFeature: Reducer {
   public struct Path: Reducer {
     public enum State: Equatable {
       case timePeriodDetails(TimePeriodDetailsFeature.State)
-      case details(DetailsFeature.State)
+      case reports(ReportsFeature.State)
     }
 
     public enum Action: Equatable {
       case timePeriodDetails(TimePeriodDetailsFeature.Action)
-      case details(DetailsFeature.Action)
+      case reports(ReportsFeature.Action)
     }
 
     public var body: some ReducerOf<Self> {
       Scope(state: /State.timePeriodDetails, action: /Action.timePeriodDetails) {
         TimePeriodDetailsFeature()
       }
-      Scope(state: /State.details, action: /Action.details) {
-        DetailsFeature()
+      Scope(state: /State.reports, action: /Action.reports) {
+        ReportsFeature()
       }
     }
   }
@@ -80,6 +80,11 @@ public struct ApplicationFeature: Reducer {
         .timePeriodDetails(TimePeriodDetailsFeature.State(timePeriod: timePeriod))
       )
       return .none
+    case .reportsTapped:
+      state.path.append(
+        .reports(ReportsFeature.State())
+      )
+      return .none
     }
   }
 
@@ -88,9 +93,9 @@ public struct ApplicationFeature: Reducer {
     state: inout ApplicationFeature.State
   ) -> EffectOf<Self> {
     switch action {
-    case .startGameTapped:
+    case .timePeriodTapped(let timePeriod):
       state.path.append(
-        .details(DetailsFeature.State())
+        .timePeriodDetails(TimePeriodDetailsFeature.State(timePeriod: timePeriod))
       )
       return .none
     }

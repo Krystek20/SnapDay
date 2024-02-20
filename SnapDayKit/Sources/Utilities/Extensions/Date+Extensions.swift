@@ -2,6 +2,7 @@ import Foundation
 
 enum DateError: Error {
   case dateNotExist
+  case monthNotExist
 }
 
 extension Date? {

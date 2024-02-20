@@ -5,6 +5,15 @@ extension Calendar {
     let components = dateComponents([.year, .month, .day], from: fromDate)
     return date(from: components) ?? fromDate
   }
+
+  public func monthName(_ fromDate: Date) throws -> String {
+    let dateFormatter = DateFormatter()
+    guard let month = dateComponents([.month], from: fromDate).month,
+          dateFormatter.standaloneMonthSymbols.indices.contains(month - 1) else {
+      throw DateError.monthNotExist
+    }
+    return dateFormatter.standaloneMonthSymbols[month - 1]
+  }
 }
 
 extension Calendar {

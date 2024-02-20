@@ -12,7 +12,7 @@ public struct OptionsView<Option: Optionable>: View {
   // MARK: - Properties
 
   private let options: [Option]
-  @Binding var selected: Option?
+  @Binding private var selected: Option?
   private let axis: OptionsAxis
 
   // MARK: - Initialization

@@ -2,9 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 import Dashboard
 import TimePeriodDetails
-import Details
+import Reports
 import Resources
 
+@MainActor
 public struct ApplicationView: View {
 
   // MARK: - Properties
@@ -56,11 +57,11 @@ public struct ApplicationView: View {
            action: ApplicationFeature.Path.Action.timePeriodDetails,
            then: TimePeriodDetailsView.init
         )
-      case .details:
+      case .reports:
         CaseLet(
-          /ApplicationFeature.Path.State.details,
-           action: ApplicationFeature.Path.Action.details,
-           then: DetailsView.init
+          /ApplicationFeature.Path.State.reports,
+           action: ApplicationFeature.Path.Action.reports,
+           then: ReportsView.init
         )
       }
     }
