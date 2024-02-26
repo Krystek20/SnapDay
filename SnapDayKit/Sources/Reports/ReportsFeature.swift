@@ -7,14 +7,28 @@ import Common
 import Combine
 
 struct ReportDay: Equatable, Identifiable {
-  var id: String { date.description }
-  let date: Date
+  let id: String
+  let title: String?
   let dayActivity: ReportDayActivity
 }
 
 enum ReportDayActivity: Equatable {
-  case tags([Tag])
-  case activities([Activity])
+  case tag(Bool)
+  case activity(Bool)
+  case notPlanned
+  case empty
+}
+
+struct ReportSummary: Equatable {
+  let doneCount: Int
+  let notDoneCount: Int
+  let duration: Int
+
+  var isZero: Bool {
+    doneCount == .zero && notDoneCount == .zero && duration == .zero
+  }
+
+  static let zero = ReportSummary(doneCount: .zero, notDoneCount: .zero, duration: .zero)
 }
 
 public struct ReportsFeature: Reducer, TodayProvidable {
@@ -23,24 +37,26 @@ public struct ReportsFeature: Reducer, TodayProvidable {
 
   @Dependency(\.calendar) private var calendar
   @Dependency(\.dayRepository) private var dayRepository
+  @Dependency(\.tagRepository) private var tagRepository
 
   // MARK: - State & Action
 
   public struct State: Equatable, TodayProvidable {
 
     var dateFilters = FilterPeriod.allCases
-    @BindingState var selectedFilterDate: FilterPeriod?
+    @BindingState var selectedFilterPeriod: FilterPeriod?
     @BindingState var startDate: Date = Date()
     @BindingState var endDate: Date = Date()
 
     var tags: [Tag] = []
-    @BindingState var selectedTag: [Tag] = []
+    @BindingState var selectedTag: Tag?
 
     var days: [Day] = []
-    var allActivities: [Activity] = []
     var activities: [Activity] = []
-    @BindingState var selectedActivities: [Activity] = []
+    @BindingState var selectedActivity: Activity?
     var reportDays: [ReportDay] = []
+    var summary: ReportSummary = .zero
+    var periodShift = Int.zero
 
     var filterDate: FilterDate? {
       didSet {
@@ -49,21 +65,26 @@ public struct ReportsFeature: Reducer, TodayProvidable {
       }
     }
     var showCustomDate: Bool {
-      selectedFilterDate == .custom
+      selectedFilterPeriod == .custom
     }
 
     public init(selectedFilterDate: FilterPeriod? = .week) {
-      self.selectedFilterDate = selectedFilterDate
+      self.selectedFilterPeriod = selectedFilterDate
     }
   }
 
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
+      case previousPeriodTapped
+      case nextPeriodTapped
     }
     public enum InternalAction: Equatable {
       case loadDays
       case daysLoaded([Day])
+      case tagsLoaded([Tag])
+      case loadSummary
+      case loadReportDays
     }
     public enum DelegateAction: Equatable {
 
@@ -83,10 +104,30 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     Reduce { state, action in
       switch action {
       case .view(.appeared):
-        state.filterDate = FilterDate(filter: state.selectedFilterDate, lowerBound: today, upperBound: nil)
+        state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: today, upperBound: nil)
+        return .run { send in
+          let tags = try await tagRepository.loadTags([])
+          await send(.internal(.tagsLoaded(tags)))
+          await send(.internal(.loadDays))
+        }
+      case .view(.previousPeriodTapped):
+        state.periodShift -= 1
+        let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
+        state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
         return .run { send in
           await send(.internal(.loadDays))
         }
+      case .view(.nextPeriodTapped):
+        state.periodShift += 1
+        let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
+        state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
+        return .run { send in
+          await send(.internal(.loadDays))
+        }
+      case .internal(.tagsLoaded(let tags)):
+        state.tags = tags.sorted(by: { $0.name < $1.name })
+        state.selectedTag = state.tags.first
+        return .none
       case .internal(.loadDays):
         guard let filterDate = state.filterDate else { return .none }
         return .run { [dateRange = filterDate.range] send in
@@ -95,18 +136,38 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         }
       case .internal(.daysLoaded(let days)):
         state.days = days
+        
         let activities = Array(Set((days.map { $0.activities.map(\.activity) }).joined()))
           .sorted(by: { $0.name < $1.name })
-        state.allActivities = activities
-        state.activities = activities
-        let tags = Array(Set(activities.map(\.tags).joined()))
-          .sorted(by: { $0.name < $1.name })
-        state.tags = tags
-        prepareReportDays(state: &state)
+
+        state.activities = activities.filter { $0.tags.contains(where: { $0 == state.selectedTag }) }
+        state.selectedActivity = nil
+
+        return .run { send in
+          await send(.internal(.loadSummary))
+          await send(.internal(.loadReportDays))
+        }
+      case .internal(.loadSummary):
+        let reportSummaryProvider = ReportSummaryProvider()
+        state.summary = reportSummaryProvider.prepareSummary(
+          days: state.days,
+          selectedActivity: state.selectedActivity,
+          selectedTag: state.selectedTag,
+          today: today
+        )
         return .none
-      case .binding(\.$selectedFilterDate):
-        let range = prepareDateRange(for: state.selectedFilterDate)
-        state.filterDate = FilterDate(filter: state.selectedFilterDate, lowerBound: range.lowerBound, upperBound: range.upperBound)
+      case .internal(.loadReportDays):
+        let reportDaysProvider = ReportDaysProvider()
+        state.reportDays = reportDaysProvider.prepareReportDays(
+          selectedFilterPeriod: state.selectedFilterPeriod,
+          selectedActivity: state.selectedActivity,
+          selectedTag: state.selectedTag,
+          days: state.days
+        )
+        return .none
+      case .binding(\.$selectedFilterPeriod):
+        let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
+        state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
         return .run { send in
           await send(.internal(.loadDays))
         }
@@ -120,22 +181,20 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .run { send in
           await send(.internal(.loadDays))
         }
-      case .binding(\.$selectedTags):
-        if state.selectedTags.isEmpty {
-          state.activities = state.allActivities
-          state.selectedActivities.removeAll()
-        } else {
-          state.activities = state.allActivities.filter {
-            let selectedSet = Set(state.selectedTags)
-            let activitiesTagsSet = Set($0.tags)
-            return selectedSet.intersection(activitiesTagsSet).count > .zero
-          }
-          let selectedSet = Set(state.selectedActivities)
-          let activitiesSet = Set(state.activities)
-          state.selectedActivities = Array(selectedSet.intersection(activitiesSet))
+      case .binding(\.$selectedTag):
+        state.activities = Array(Set((state.days.map { $0.activities.map(\.activity) }).joined()))
+          .filter { $0.tags.contains(where: { $0 == state.selectedTag }) }
+          .sorted(by: { $0.name < $1.name })
+        state.selectedActivity = nil
+        return .run { send in
+          await send(.internal(.loadSummary))
+          await send(.internal(.loadReportDays))
         }
-        prepareReportDays(state: &state)
-        return .none
+      case .binding(\.$selectedActivity):
+        return .run { send in
+          await send(.internal(.loadSummary))
+          await send(.internal(.loadReportDays))
+        }
       case .binding:
         return .none
       }
@@ -148,26 +207,27 @@ public struct ReportsFeature: Reducer, TodayProvidable {
 
   // MARK: - Private
 
-  private func prepareDateRange(for selectedFilter: FilterPeriod?) -> ClosedRange<Date> {
+  private func prepareDateRange(for selectedFilter: FilterPeriod?, shiftPeriod: Int) -> ClosedRange<Date> {
     guard let selectedFilter else { return today...today }
     var lowerBound = today
-    if case .custom = selectedFilter {
+    switch selectedFilter {
+    case .day:
+      lowerBound = calendar.date(byAdding: .day, value: shiftPeriod, to: lowerBound) ?? lowerBound
+      return lowerBound...lowerBound
+    case .week:
+      let shift = shiftPeriod != .zero ? shiftPeriod * 7 : .zero
+      lowerBound = calendar.date(byAdding: .day, value: shift, to: lowerBound) ?? lowerBound
+      return lowerBound...lowerBound
+    case .month:
+      lowerBound = calendar.date(byAdding: .month, value: shiftPeriod, to: lowerBound) ?? lowerBound
+      return lowerBound...lowerBound
+    case .quarter:
+      let shift = shiftPeriod != .zero ? shiftPeriod * 3 : .zero
+      lowerBound = calendar.date(byAdding: .month, value: shift, to: lowerBound) ?? lowerBound
+      return lowerBound...lowerBound
+    case .custom:
       lowerBound = calendar.date(byAdding: .month, value: -1, to: lowerBound) ?? today
-    }
-    return lowerBound...today
-  }
-
-  private func prepareReportDays(state: inout State) {
-    if state.selectedTags.isEmpty && state.selectedActivities.isEmpty {
-      state.reportDays = state.days.map { day in
-        let tags = Set(day.activities.map { activity in
-          activity.activity.tags
-        }.joined())
-        return ReportDay(
-          date: day.date,
-          dayActivity: .tags(Array(tags))
-        )
-      }
+      return lowerBound...today
     }
   }
 }

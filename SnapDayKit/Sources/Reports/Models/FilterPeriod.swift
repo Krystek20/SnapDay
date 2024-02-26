@@ -1,5 +1,6 @@
 import UiComponents
 import Models
+import Foundation
 
 public enum FilterPeriod: Equatable, CaseIterable {
   case day

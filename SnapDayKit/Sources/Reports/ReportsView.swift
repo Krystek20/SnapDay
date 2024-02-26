@@ -3,6 +3,7 @@ import ComposableArchitecture
 import UiComponents
 import Resources
 import Models
+import Utilities
 
 @MainActor
 public struct ReportsView: View {
@@ -44,6 +45,7 @@ public struct ReportsView: View {
         filterByActivitiesView(viewStore: viewStore)
       }
       .formBackgroundModifier()
+      summarySection(viewStore: viewStore)
       selectedPeriod(viewStore: viewStore)
     }
     .maxWidth()
@@ -55,7 +57,7 @@ public struct ReportsView: View {
         .formTitleTextStyle
       OptionsView(
         options: viewStore.dateFilters,
-        selected: viewStore.$selectedFilterDate,
+        selected: viewStore.$selectedFilterPeriod,
         axis: .horizontal(.center)
       )
       customDatePickers(viewStore: viewStore)
@@ -102,24 +104,23 @@ public struct ReportsView: View {
         ForEach(viewStore.tags) { tag in
           TagView(tag: tag)
             .onTapGesture {
-              if viewStore.selectedTags.contains(tag) {
-                viewStore.$selectedTags.wrappedValue.removeAll(where: { $0 == tag })
-              } else {
-                viewStore.$selectedTags.wrappedValue.append(tag)
-              }
+              viewStore.$selectedTag.wrappedValue = tag
             }
-            .opacity(viewStore.selectedTags.contains(tag) ? 1.0 : 0.3)
+            .opacity(viewStore.selectedTag == tag ? 1.0 : 0.3)
         }
       }
     }
     .scrollIndicators(.hidden)
   }
 
+  @ViewBuilder
   private func filterByActivitiesView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    VStack(alignment: .leading, spacing: 10.0) {
-      Text("Filter by activities", bundle: .module)
-        .formTitleTextStyle
-      activitiesList(viewStore: viewStore)
+    if !viewStore.activities.isEmpty {
+      VStack(alignment: .leading, spacing: 10.0) {
+        Text("Filter by activities", bundle: .module)
+          .formTitleTextStyle
+        activitiesList(viewStore: viewStore)
+      }
     }
   }
 
@@ -129,13 +130,13 @@ public struct ReportsView: View {
         ForEach(viewStore.activities) { activity in
           ActivityView(activity: activity)
             .onTapGesture {
-              if viewStore.selectedActivities.contains(activity) {
-                viewStore.$selectedActivities.wrappedValue.removeAll(where: { $0 == activity })
+              if viewStore.selectedActivity == activity {
+                viewStore.$selectedActivity.wrappedValue = nil
               } else {
-                viewStore.$selectedActivities.wrappedValue.append(activity)
+                viewStore.$selectedActivity.wrappedValue = activity
               }
             }
-            .opacity(viewStore.selectedActivities.contains(activity) ? 1.0 : 0.3)
+            .opacity(viewStore.selectedActivity == activity ? 1.0 : 0.3)
         }
       }
     }
@@ -143,10 +144,92 @@ public struct ReportsView: View {
   }
 
   @ViewBuilder
+  private func summarySection(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+    if !viewStore.summary.isZero {
+      SectionView(
+        name: String(localized: "Summary", bundle: .module),
+        rightContent: { },
+        content: {
+          summaryView(summary: viewStore.summary)
+        }
+      )
+    }
+  }
+
+  private func summaryView(summary: ReportSummary) -> some View {
+    LazyVStack(alignment: .leading, spacing: 10.0) {
+      VStack(spacing: 10.0) {
+        if summary.doneCount > .zero {
+          HStack(spacing: 5.0) {
+            Text("Done Count", bundle: .module)
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+            Spacer()
+            Text("\(summary.doneCount)")
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+          }
+        }
+        if summary.notDoneCount > .zero {
+          HStack(spacing: 5.0) {
+            Text("Not Done Count", bundle: .module)
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+            Spacer()
+            Text("\(summary.notDoneCount)")
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+          }
+        }
+        if summary.duration > .zero {
+          HStack(spacing: 5.0) {
+            Text("Total Time", bundle: .module)
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+            Spacer()
+            Text(TimeProvider.duration(from: summary.duration, bundle: .module) ?? "")
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+          }
+        }
+      }
+    }
+    .maxWidth()
+    .formBackgroundModifier()
+  }
+
+  @ViewBuilder
   private func selectedPeriod(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     if let filterDate = viewStore.filterDate {
       SectionView(
-        name: filterDate.title,
+        label: {
+          HStack(spacing: 10.0) {
+            Button(
+              action: { 
+                viewStore.send(.view(.previousPeriodTapped))
+              },
+              label: {
+                Image(systemName: "arrowshape.left")
+                  .foregroundStyle(Colors.actionBlue.swiftUIColor)
+                  .font(.system(size: 16.0))
+              }
+            )
+            Text(filterDate.title)
+              .font(Fonts.Quicksand.bold.swiftUIFont(size: 22.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+            Spacer()
+            Button(
+              action: {
+                viewStore.send(.view(.nextPeriodTapped))
+              },
+              label: {
+                Image(systemName: "arrowshape.right")
+                  .foregroundStyle(Colors.actionBlue.swiftUIColor)
+                  .font(.system(size: 16.0))
+              }
+            )
+          }
+        },
         rightContent: { },
         content: {
           reportDaysView(viewStore: viewStore)
@@ -158,28 +241,33 @@ public struct ReportsView: View {
   private func reportDaysView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     LazyVGrid(columns: columns, spacing: 10) {
       ForEach(viewStore.reportDays) { item in
-        reportDayActivityView(item)
-          .frame(height: 50.0)
-          .onTapGesture {
-
+        VStack(spacing: 2.0) {
+          if let title = item.title {
+            Text(title)
+              .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 12.0))
+              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
           }
+          reportDayActivityView(item, viewStore: viewStore)
+            .frame(height: 30.0)
+        }
       }
     }
   }
 
   @ViewBuilder
-  private func reportDayActivityView(_ reportDay: ReportDay) -> some View {
+  private func reportDayActivityView(_ reportDay: ReportDay, viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     switch reportDay.dayActivity {
-    case .tags(let tags):
-      VStack(spacing: .zero) {
-        ForEach(tags) { tag in
-          tag.rgbColor.color
-        }
+    case .tag(let isDone):
+      if let tag = viewStore.selectedTag {
+        tag.rgbColor.color.opacity(isDone ? 1.0 : 0.3)
       }
-    case .activities(let activities):
-      Text("tags")
-        .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
-        .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+    case .activity(let isDone):
+      if let activity = viewStore.selectedActivity {
+        ActivityImageView(data: activity.image, size: 30.0, cornerRadius: 15.0)
+          .opacity(isDone ? 1.0 : 0.3)
+      }
+    case .empty, .notPlanned:
+      Color.clear
     }
   }
 }

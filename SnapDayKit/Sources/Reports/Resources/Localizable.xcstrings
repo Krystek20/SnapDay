@@ -1,10 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld" : {
+
+    },
     "Custom" : {
 
     },
     "Day" : {
+
+    },
+    "Done Count" : {
 
     },
     "End" : {
@@ -22,6 +28,9 @@
     "Month" : {
 
     },
+    "Not Done Count" : {
+
+    },
     "Quarter" : {
 
     },
@@ -31,7 +40,10 @@
     "Start" : {
 
     },
-    "tags" : {
+    "Summary" : {
+
+    },
+    "Total Time" : {
 
     },
     "Week" : {
