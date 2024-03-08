@@ -13,16 +13,16 @@ public struct SecondaryButtonStyle: ButtonStyle {
     configuration
       .label
       .font(.system(size: 14.0, weight: .semibold))
-      .foregroundStyle(Colors.slateHaze.swiftUIColor)
+      .foregroundStyle(Color.slateHaze)
       .frame(height: 40.0)
       .maxWidth(alignment: .bottom)
       .background(
-        Colors.pureWhite.swiftUIColor
+        Color.pureWhite
           .clipShape(RoundedRectangle(cornerRadius: 10.0))
       )
       .overlay {
         RoundedRectangle(cornerRadius: 10.0)
-          .stroke(Colors.slateHaze.swiftUIColor.opacity(0.2), lineWidth: 1.0)
+          .stroke(Color.slateHaze.opacity(0.2), lineWidth: 1.0)
       }
   }
 }

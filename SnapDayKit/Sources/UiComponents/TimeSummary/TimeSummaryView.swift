@@ -24,21 +24,21 @@ public struct TimeSummaryView: View {
           HStack(spacing: 5.0) {
             Text("Remaining Time", bundle: .module)
               .font(.system(size: 12.0, weight: .regular))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
             Spacer()
             Text(TimeProvider.duration(from: daySummary.remaingDuration, bundle: .module) ?? "")
               .font(.system(size: 12.0, weight: .semibold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
           }
         }
         HStack(spacing: 5.0) {
           Text("Total Task Time", bundle: .module)
             .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+            .foregroundStyle(Color.deepSpaceBlue)
           Spacer()
           Text(TimeProvider.duration(from: daySummary.duration, bundle: .module) ?? "")
             .font(.system(size: 12.0, weight: .semibold))
-            .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+            .foregroundStyle(Color.deepSpaceBlue)
         }
       }
     }

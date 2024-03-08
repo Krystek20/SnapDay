@@ -125,11 +125,11 @@ public struct ActivityFormView: View {
           data: viewStore.activity.image,
           size: 30.0,
           cornerRadius: 5.0,
-          tintColor: Colors.lavenderBliss.swiftUIColor
+          tintColor: .lavenderBliss
         )
         Text("Change icon", bundle: .module)
           .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+          .foregroundStyle(Color.lavenderBliss)
         Spacer()
       }
     }

@@ -79,7 +79,7 @@ public struct FormTagField: View {
   private var newTagField: some View {
     TextField(placeholder, text: newTag)
       .font(.system(size: 16.0, weight: .medium))
-      .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+      .foregroundStyle(Color.deepSpaceBlue)
       .padding(.top, tags.isEmpty ? 2.0 : .zero)
       .onSubmit { onSubmit() }
   }

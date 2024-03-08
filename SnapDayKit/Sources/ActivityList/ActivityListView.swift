@@ -34,7 +34,7 @@ public struct ActivityListView: View {
               viewStore.send(.view(.newButtonTapped))
             }
             .font(.system(size: 12.0, weight: .bold))
-            .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+            .foregroundStyle(Color.lavenderBliss)
           }
         }
         .onAppear {
@@ -87,7 +87,7 @@ public struct ActivityListView: View {
       Text(activity.name)
         .multilineTextAlignment(.center)
         .font(.system(size: 16.0, weight: .bold))
-        .foregroundStyle(Colors.slateHaze.swiftUIColor)
+        .foregroundStyle(Color.slateHaze)
     }
     .padding(5.0)
     .contentShape(Rectangle())
@@ -111,10 +111,10 @@ public struct ActivityListView: View {
   private func activityBackground(_ activity: Activity, viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
     viewStore.selectedActivities.contains(activity)
     ? AnyView(
-      Colors.pureWhite.swiftUIColor
+      Color.pureWhite
         .clipShape(RoundedRectangle(cornerRadius: 10.0))
     )
-    : AnyView(Colors.lightGray.swiftUIColor)
+    : AnyView(Color.grayLight)
   }
 
   private func addButton(viewStore: ViewStoreOf<ActivityListFeature>) -> some View {

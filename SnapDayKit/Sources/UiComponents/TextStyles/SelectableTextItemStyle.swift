@@ -33,7 +33,7 @@ struct SelectableTextItemStyle: ViewModifier {
   @ViewBuilder
   private var background: some View {
     if isSelected {
-      Colors.lavenderBliss.swiftUIColor
+      Color.lavenderBliss
         .clipShape(RoundedRectangle(cornerRadius: 3.0))
     }
   }
@@ -41,7 +41,7 @@ struct SelectableTextItemStyle: ViewModifier {
   @ViewBuilder
   private var foregroundColor: some ShapeStyle {
     isSelected
-    ? Colors.pureWhite.swiftUIColor
-    : Colors.deepSpaceBlue.swiftUIColor
+    ? Color.pureWhite
+    : Color.deepSpaceBlue
   }
 }

@@ -18,11 +18,11 @@ public struct LinearChartView: View {
         ZStack {
           percentView(proxy: proxy)
           expectedPath(proxy: proxy)
-            .foregroundColor(Colors.actionBlue.swiftUIColor.opacity(0.3))
+            .foregroundColor(.actionBlue.opacity(0.3))
           progressPath(proxy: proxy)
-            .foregroundColor(Colors.actionBlue.swiftUIColor)
+            .foregroundColor(.actionBlue)
           Circle()
-            .fill(Colors.actionBlue.swiftUIColor)
+            .fill(Color.actionBlue)
             .frame(width: 10.0, height: 10.0)
             .position(position(for: points.last ?? .zero, index: points.count, proxy: proxy))
         }
@@ -37,7 +37,7 @@ public struct LinearChartView: View {
         horizontalLine(for: lastPosition.y, proxy: proxy)
         Text(String(Int(percent * 100)) + "%")
           .font(.system(size: 10.0, weight: .bold))
-          .foregroundStyle(Colors.charcoalGray.swiftUIColor)
+          .foregroundStyle(Color.charcoalGray)
           .offset(y: lastPosition.y)
       }
     }
@@ -69,7 +69,7 @@ public struct LinearChartView: View {
       path.addLine(to: CGPoint(x: proxy.size.width, y: yPosition))
     }
     .stroke(lineWidth: 1.0)
-    .foregroundColor(Colors.charcoalGray.swiftUIColor.opacity(0.2))
+    .foregroundColor(.charcoalGray.opacity(0.2))
   }
 
   private func position(for point: Double, index: Int, proxy: GeometryProxy) -> CGPoint {

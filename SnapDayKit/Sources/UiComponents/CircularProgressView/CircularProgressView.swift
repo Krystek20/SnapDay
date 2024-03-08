@@ -26,18 +26,18 @@ public struct CircularProgressView: View {
   public var body: some View {
     ZStack {
       Circle()
-        .stroke(Colors.actionBlue.swiftUIColor.opacity(0.3), lineWidth: lineWidth)
+        .stroke(Color.actionBlue.opacity(0.3), lineWidth: lineWidth)
       Circle()
         .trim(from: .zero, to: progress)
         .stroke(
-          Colors.actionBlue.swiftUIColor,
+          Color.actionBlue,
           style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
         )
         .rotationEffect(Angle(degrees: -90.0))
       if showPercent {
         Text(String(Int(progress * 100)) + "%")
           .font(.system(size: 45.0, weight: .bold))
-          .foregroundStyle(Colors.charcoalGray.swiftUIColor)
+          .foregroundStyle(Color.charcoalGray)
       }
     }
   }

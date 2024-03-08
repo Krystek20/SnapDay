@@ -19,7 +19,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
     configuration
       .label
       .font(.system(size: 14.0, weight: .semibold))
-      .foregroundStyle(Colors.pureWhite.swiftUIColor)
+      .foregroundStyle(Color.pureWhite)
       .frame(height: 40.0)
       .maxWidth(alignment: .bottom)
       .background(
@@ -30,7 +30,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
 
   private var backgroundColor: Color {
     disabled
-    ? Colors.fadedPurple.swiftUIColor
-    : Colors.lavenderBliss.swiftUIColor
+    ? .fadedPurple
+    : .lavenderBliss
   }
 }

@@ -18,15 +18,15 @@ public struct ApplicationView: View {
 
     #warning("Move it")
     let appearance = UINavigationBarAppearance()
-    appearance.backgroundColor = Colors.lightGray.color
+    appearance.backgroundColor = UIColor.grayLight
 
     appearance.largeTitleTextAttributes = [
       .font: UIFont.systemFont(ofSize: 28.0, weight: .bold),
-      .foregroundColor: Colors.deepSpaceBlue.color
+      .foregroundColor: UIColor.deepSpaceBlue
     ]
     appearance.titleTextAttributes = [
       .font: UIFont.systemFont(ofSize: 18.0, weight: .bold),
-      .foregroundColor: Colors.deepSpaceBlue.color
+      .foregroundColor: UIColor.deepSpaceBlue
     ]
 
     let scrollEdgeAppearance = appearance.copy()

@@ -35,7 +35,6 @@ private var products: [Product] {
 
 @PackageDependenciesBuilder
 private var packageDependencies: [Package.Dependency] {
-  Module.swiftgen
   Module.composableArchitecture
 }
 
@@ -84,7 +83,7 @@ private var targets: [Target] {
   TargetParamenters(module: .models)
   TargetParamenters(module: .previews, dependencies: [.application])
   TargetParamenters(module: .uiComponents, dependencies: [.resources, .composableArchitecture, .utilities])
-  TargetParamenters(module: .resources, dependencies: [.swiftgen])
+  TargetParamenters(module: .resources)
 }
 
 private var sceneDependecies: [Module] {
@@ -117,7 +116,6 @@ private enum Module: String {
   case uiComponents
   case resources
   case composableArchitecture
-  case swiftgen
 
   var name: String {
     rawValue.capitalizingFirstLetter
@@ -125,21 +123,10 @@ private enum Module: String {
 
   var dependency: Target.Dependency? {
     switch self {
-    case .swiftgen:
-      nil
     case .composableArchitecture:
       .product(name: name, package: "swift-composable-architecture")
     default:
       .byName(name: name)
-    }
-  }
-
-  var plugin: Target.PluginUsage? {
-    switch self {
-    case .swiftgen:
-      .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin")
-    default:
-      nil
     }
   }
 
@@ -153,8 +140,6 @@ private enum Module: String {
 
   var packageDependecies: [Package.Dependency]? {
     switch self {
-    case .swiftgen:
-      [.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0")]
     case .composableArchitecture:
       [.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.2.0")]
     default:
@@ -164,7 +149,7 @@ private enum Module: String {
 
   var targetConfiguration: [ModuleTargetConfiguration] {
     switch self {
-    case .swiftgen, .composableArchitecture:
+    case .composableArchitecture:
       []
     case .previews, .uiComponents, .resources:
       [.source]
@@ -227,8 +212,7 @@ private extension Target {
   static func target(_ name: Module, dependencies: [Module]) -> Target {
     .target(
       name: name.name,
-      dependencies: dependencies.compactMap(\.dependency),
-      plugins: dependencies.compactMap(\.plugin)
+      dependencies: dependencies.compactMap(\.dependency)
     )
   }
 

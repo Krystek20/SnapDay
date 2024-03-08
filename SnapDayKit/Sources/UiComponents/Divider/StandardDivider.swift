@@ -11,6 +11,6 @@ private struct StandardDivider: ViewModifier {
   func body(content: Content) -> some View {
     content
       .frame(height: 1.0)
-      .overlay(Colors.slateHaze.swiftUIColor.opacity(0.5))
+      .overlay(Color.slateHaze.opacity(0.5))
   }
 }

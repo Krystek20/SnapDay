@@ -16,7 +16,7 @@ public struct ActivityImageView: View {
     data: Data?,
     size: Double = 70.0,
     cornerRadius: Double = 15.0,
-    tintColor: Color = Colors.charcoalGray.swiftUIColor
+    tintColor: Color = .charcoalGray
   ) {
     self.data = data
     self.size = size

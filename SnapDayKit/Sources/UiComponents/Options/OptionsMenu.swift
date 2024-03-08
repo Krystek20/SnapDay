@@ -54,20 +54,20 @@ public struct OptionsView<Option: Optionable>: View {
   @ViewBuilder
   private func backgroundView(for option: Option) -> some View {
     if option.name == selected?.name {
-      Colors.lavenderBliss.swiftUIColor
+      Color.lavenderBliss
         .clipShape(RoundedRectangle(cornerRadius: 15.0))
     } else {
       RoundedRectangle(cornerRadius: 15.0)
-        .stroke(Colors.lavenderBliss.swiftUIColor, lineWidth: 1.0)
+        .stroke(Color.lavenderBliss, lineWidth: 1.0)
         .padding(1.0)
     }
   }
 
   private func foregroundColor(for option: Option) -> Color {
     guard option.name == selected?.name else {
-      return Colors.deepSpaceBlue.swiftUIColor
+      return .deepSpaceBlue
     }
-    return Colors.pureWhite.swiftUIColor
+    return .pureWhite
   }
 }
 

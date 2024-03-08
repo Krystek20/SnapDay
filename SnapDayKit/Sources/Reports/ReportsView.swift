@@ -163,33 +163,33 @@ public struct ReportsView: View {
           HStack(spacing: 5.0) {
             Text("Done Count", bundle: .module)
               .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
             Spacer()
             Text("\(summary.doneCount)")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
           }
         }
         if summary.notDoneCount > .zero {
           HStack(spacing: 5.0) {
             Text("Not Done Count", bundle: .module)
               .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
             Spacer()
             Text("\(summary.notDoneCount)")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
           }
         }
         if summary.duration > .zero {
           HStack(spacing: 5.0) {
             Text("Total Time", bundle: .module)
               .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
             Spacer()
             Text(TimeProvider.duration(from: summary.duration, bundle: .module) ?? "")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
           }
         }
       }
@@ -210,13 +210,13 @@ public struct ReportsView: View {
               },
               label: {
                 Image(systemName: "arrowshape.left")
-                  .foregroundStyle(Colors.actionBlue.swiftUIColor)
+                  .foregroundStyle(Color.actionBlue)
                   .font(.system(size: 16.0))
               }
             )
             Text(filterDate.title)
               .font(.system(size: 22.0, weight: .bold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
             Spacer()
             Button(
               action: {
@@ -224,7 +224,7 @@ public struct ReportsView: View {
               },
               label: {
                 Image(systemName: "arrowshape.right")
-                  .foregroundStyle(Colors.actionBlue.swiftUIColor)
+                  .foregroundStyle(Color.actionBlue)
                   .font(.system(size: 16.0))
               }
             )
@@ -245,7 +245,7 @@ public struct ReportsView: View {
           if let title = item.title {
             Text(title)
               .font(.system(size: 12.0, weight: .semibold))
-              .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+              .foregroundStyle(Color.deepSpaceBlue)
           }
           reportDayActivityView(item, viewStore: viewStore)
             .frame(height: 30.0)

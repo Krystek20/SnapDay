@@ -17,7 +17,7 @@ public struct CheckToggleStyle: ToggleStyle {
         configuration.label
         Spacer()
         Image(systemName: configuration.isOn ? "checkmark.circle.fill" : "circle")
-          .foregroundStyle(configuration.isOn ? Colors.lavenderBliss.swiftUIColor : Colors.slateHaze.swiftUIColor)
+          .foregroundStyle(configuration.isOn ? Color.lavenderBliss : Color.slateHaze)
           .imageScale(.medium)
       }
     }

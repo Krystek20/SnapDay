@@ -22,11 +22,11 @@ public struct ActivityView: View {
         data: activity.image,
         size: 20.0,
         cornerRadius: 5.0,
-        tintColor: Colors.deepSpaceBlue.swiftUIColor
+        tintColor: .deepSpaceBlue
       )
       Text(activity.name)
         .font(.system(size: 14.0, weight: .semibold))
-        .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+        .foregroundStyle(Color.deepSpaceBlue)
     }
     .padding(
       EdgeInsets(
@@ -43,7 +43,7 @@ public struct ActivityView: View {
 
   private var activityBackground: some View {
     RoundedRectangle(cornerRadius: 3.0)
-      .stroke(Colors.deepSpaceBlue.swiftUIColor, lineWidth: 1.0)
+      .stroke(Color.deepSpaceBlue, lineWidth: 1.0)
       .padding(1.0)
   }
 }

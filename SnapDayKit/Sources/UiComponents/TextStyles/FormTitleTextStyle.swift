@@ -11,6 +11,6 @@ struct FormTitleTextStyle: ViewModifier {
   func body(content: Content) -> some View {
     content
       .font(.system(size: 14.0, weight: .semibold))
-      .foregroundStyle(Colors.slateHaze.swiftUIColor)
+      .foregroundStyle(Color.slateHaze)
   }
 }

@@ -104,16 +104,14 @@ public struct DayView: View {
         .frame(width: 20.0, height: 20.0)
         Text("Completed activities", bundle: .module)
           .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Colors.slateHaze.swiftUIColor)
+          .foregroundStyle(Color.slateHaze)
         Spacer()
         Text("\(completedActivities.doneCount) / \(completedActivities.totalCount)", bundle: .module)
           .font(.system(size: 12.0, weight: .medium))
-          .foregroundStyle(Colors.slateHaze.swiftUIColor)
+          .foregroundStyle(Color.slateHaze)
       }
       .padding(.all, 14.0)
-      .background(
-        Colors.etherealLavender.swiftUIColor
-      )
+      .background(Color.etherealLavender)
     }
   }
 
@@ -149,12 +147,12 @@ public struct DayView: View {
           HStack(spacing: 12.5) {
             icon
               .resizable()
-              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+              .foregroundStyle(Color.lavenderBliss)
               .frame(width: 15.0, height: 15.0)
               .padding(.leading, 2.5)
             Text(title)
               .font(.system(size: 14.0, weight: .medium))
-              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+              .foregroundStyle(Color.lavenderBliss)
             Spacer()
           }
           .padding(.all, 14.0)
@@ -174,18 +172,18 @@ public struct DayView: View {
       VStack(alignment: .leading, spacing: 2.0) {
         Text(dayActivity.activity.name)
           .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Colors.slateHaze.swiftUIColor)
-          .strikethrough(dayActivity.isDone, color: Colors.slateHaze.swiftUIColor)
+          .foregroundStyle(Color.slateHaze)
+          .strikethrough(dayActivity.isDone, color: .slateHaze)
         if let textDuration = duration(for: dayActivity) {
           Text(textDuration)
             .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Colors.slateHaze.swiftUIColor)
-            .strikethrough(dayActivity.isDone, color: Colors.slateHaze.swiftUIColor)
+            .foregroundStyle(Color.slateHaze)
+            .strikethrough(dayActivity.isDone, color: .slateHaze)
         }
       }
       Spacer()
       Image(systemName: "ellipsis")
-        .foregroundStyle(Colors.slateHaze.swiftUIColor)
+        .foregroundStyle(Color.slateHaze)
         .imageScale(.medium)
     }
     .padding(.all, 10.0)

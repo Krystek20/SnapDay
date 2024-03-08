@@ -50,11 +50,11 @@ public struct TimePeriodsView: View {
     VStack(alignment: .leading, spacing: 10.0) {
       Text(name(for: timePeriod))
         .font(.system(size: 16.0, weight: .bold))
-        .foregroundStyle(Colors.slateHaze.swiftUIColor)
+        .foregroundStyle(Color.slateHaze)
       ProgressView(value: timePeriod.completedValue) {
         Text("\(timePeriod.percent)%")
           .font(.system(size: 14.0, weight: .bold))
-          .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+          .foregroundStyle(Color.deepSpaceBlue)
       }
     }
     .formBackgroundModifier()

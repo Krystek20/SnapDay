@@ -11,6 +11,6 @@ struct TitleTextModifier: ViewModifier {
   func body(content: Content) -> some View {
     content
       .font(.system(size: 28.0, weight: .bold))
-      .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
+      .foregroundStyle(Color.deepSpaceBlue)
   }
 }
