@@ -48,6 +48,9 @@
     "Edit" : {
 
     },
+    "Hide completed" : {
+
+    },
     "Monthly" : {
 
     },
@@ -63,7 +66,13 @@
     "Select" : {
 
     },
+    "Show completed" : {
+
+    },
     "Total Task Time" : {
+
+    },
+    "Total: %lld" : {
 
     },
     "Weekly" : {

@@ -33,3 +33,9 @@ public struct Activity: Identifiable, Equatable, Hashable {
     self.isVisible = isVisible
   }
 }
+
+extension Activity {
+  public var isRepeatable: Bool {
+    frequency != nil
+  }
+}

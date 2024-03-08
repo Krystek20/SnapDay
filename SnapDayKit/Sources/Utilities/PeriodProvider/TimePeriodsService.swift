@@ -4,6 +4,10 @@ import Models
 
 struct TimePeriodsService {
 
+  enum TimePeriodsServiceError: Error {
+    case canNotPrepareDateRange
+  }
+
   // MARK: - Dependecies
 
   @Dependency(\.dayRepository) var dayRepository
@@ -33,18 +37,35 @@ struct TimePeriodsService {
     return timePeriods
   }
 
+  func timePeriod(from period: Period, date: Date, shift: Int) async throws -> TimePeriod {
+    guard let dateRange = dateRange(for: period, date: date, shift: shift) else {
+      throw TimePeriodsServiceError.canNotPrepareDateRange
+    }
+    return TimePeriod(
+      id: uuid(),
+      days: try await dayRepository.loadDays(dateRange),
+      name: period.rawValue,
+      type: period,
+      dateRange: dateRange
+    )
+  }
+
   // MARK: - Private
 
-  private func dateRange(for type: Period, date: Date) -> ClosedRange<Date>? {
+  private func dateRange(for type: Period, date: Date, shift: Int = .zero) -> ClosedRange<Date>? {
     switch type {
     case .day:
-      periodDateRangeCreator.today(for: date)
+      let date = calendar.date(byAdding: .day, value: shift, to: date) ?? date
+      return periodDateRangeCreator.dayRange(for: date)
     case .week:
-      periodDateRangeCreator.weekRange(for: date)
+      let date = calendar.date(byAdding: .day, value: shift * 7, to: date) ?? date
+      return periodDateRangeCreator.weekRange(for: date)
     case .month:
-      periodDateRangeCreator.mounthRange(for: date)
+      let date = calendar.date(byAdding: .month, value: shift, to: date) ?? date
+      return periodDateRangeCreator.mounthRange(for: date)
     case .quarter:
-      periodDateRangeCreator.quarterlyRange(for: date)
+      let date = calendar.date(byAdding: .month, value: shift * 3, to: date) ?? date
+      return periodDateRangeCreator.quarterlyRange(for: date)
     }
   }
 }

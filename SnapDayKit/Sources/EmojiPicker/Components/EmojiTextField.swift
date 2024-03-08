@@ -26,7 +26,7 @@ struct EmojiTextField: UIViewRepresentable {
   func makeUIView(context: Context) -> UIEmojiTextField {
     let emojiTextField = UIEmojiTextField()
     emojiTextField.text = text
-    emojiTextField.font = Fonts.Quicksand.bold.font(size: 70.0)
+    emojiTextField.font = UIFont.systemFont(ofSize: 70.0, weight: .bold)
     emojiTextField.textAlignment = .center
     emojiTextField.delegate = context.coordinator
     return emojiTextField

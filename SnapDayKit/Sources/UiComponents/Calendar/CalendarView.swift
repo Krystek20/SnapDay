@@ -1,40 +1,51 @@
 import SwiftUI
 import Models
 import Resources
-import UiComponents
 
-struct CalendarView: View {
+public struct CalendarView: View {
 
   // MARK: - Properties
 
   @Binding private var selectedDay: Day?
+  private let dayActivities: [DayActivity]
   private let calendarItems: [CalendarItemType]
   private let daySummary: DaySummary?
+  private let dayViewShowButtonState: DayViewShowButtonState
   private let dayActivityTapped: (DayActivity) -> Void
-  private let dayActivityEditTapped: (DayActivity, Day) -> Void
-  private let removeDayActivityTapped: (DayActivity, Day) -> Void
+  private let dayActivityEditTapped: (DayActivity) -> Void
+  private let removeDayActivityTapped: (DayActivity) -> Void
+  private let showCompletedTapped: () -> Void
+  private let hideCompletedTapped: () -> Void
   private let columns = Array(repeating: GridItem(), count: 7)
 
   // MARK: - Initialization
 
-  init(
+  public init(
     selectedDay: Binding<Day?>,
+    dayActivities: [DayActivity],
     calendarItems: [CalendarItemType],
     daySummary: DaySummary?,
+    dayViewShowButtonState: DayViewShowButtonState,
     dayActivityTapped: @escaping (DayActivity) -> Void,
-    dayActivityEditTapped: @escaping (DayActivity, Day) -> Void,
-    removeDayActivityTapped: @escaping (DayActivity, Day) -> Void
+    dayActivityEditTapped: @escaping (DayActivity) -> Void,
+    removeDayActivityTapped: @escaping (DayActivity) -> Void,
+    showCompletedTapped: @escaping () -> Void,
+    hideCompletedTapped: @escaping () -> Void
   ) {
     self._selectedDay = selectedDay
+    self.dayActivities = dayActivities
     self.calendarItems = calendarItems
     self.daySummary = daySummary
+    self.dayViewShowButtonState = dayViewShowButtonState
     self.dayActivityTapped = dayActivityTapped
     self.dayActivityEditTapped = dayActivityEditTapped
     self.removeDayActivityTapped = removeDayActivityTapped
+    self.showCompletedTapped = showCompletedTapped
+    self.hideCompletedTapped = hideCompletedTapped
   }
 
-  var body: some View {
-    LazyVStack(alignment: .leading, spacing: 20.0) {
+  public var body: some View {
+    LazyVStack(alignment: .leading, spacing: .zero) {
       LazyVGrid(columns: columns, spacing: 20) {
         ForEach(calendarItems) { item in
           itemView(item)
@@ -45,8 +56,10 @@ struct CalendarView: View {
             }
         }
       }
-      timeSummary
+      .padding(.vertical, 10.0)
+      Divider()
       dayActivityList
+      timeSummary
     }
   }
 
@@ -55,7 +68,7 @@ struct CalendarView: View {
     switch calendarItem {
     case .dayOfWeek(let title):
       Text(title)
-        .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+        .font(.system(size: 12.0, weight: .semibold))
         .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
     case .day(let day):
       Text(dayNumber(day))
@@ -80,14 +93,15 @@ struct CalendarView: View {
 
   private func font(_ day: Day) -> SwiftUI.Font {
     day == selectedDay
-    ? Fonts.Quicksand.bold.swiftUIFont(size: 14.0)
-    : Fonts.Quicksand.medium.swiftUIFont(size: 12.0)
+    ? .system(size: 12.0, weight: .semibold)
+    : .system(size: 12.0, weight: .regular)
   }
 
   @ViewBuilder
   private var timeSummary: some View {
     if let daySummary {
       TimeSummaryView(daySummary: daySummary)
+        .padding(.all, 10.0)
     }
   }
 
@@ -109,24 +123,23 @@ struct CalendarView: View {
 
   @ViewBuilder
   private func noActivitiesInformation(isPastDay: Bool) -> some View {
-    let configuration: EmptyDayConfiguration = isPastDay ? .pastDay : .todayOrFuture
-    InformationView(configuration: configuration)
+    EmptyView()
+    #warning("Fix noActivitiesInformation")
+//    let configuration: EmptyDayConfiguration = isPastDay ? .pastDay : .todayOrFuture
+//    InformationView(configuration: configuration)
   }
 
   private func listDayView(_ day: Day) -> some View {
     DayView(
       isPastDay: day.isOlderThenToday ?? false,
-      activities: day.activities.sortedByName,
-      activityListOption: .extended,
-      activityTapped: { dayActivity in
-        dayActivityTapped(dayActivity)
-      },
-      editTapped: { dayActivity in
-        dayActivityEditTapped(dayActivity, day)
-      },
-      removeTapped: { dayActivity in
-        removeDayActivityTapped(dayActivity, day)
-      }
+      activities: dayActivities,
+      completedActivities: day.completedActivities,
+      dayViewShowButtonState: dayViewShowButtonState,
+      activityTapped: dayActivityTapped,
+      editTapped: dayActivityEditTapped,
+      removeTapped: removeDayActivityTapped,
+      showCompletedTapped: showCompletedTapped,
+      hideCompletedTapped: hideCompletedTapped
     )
   }
 }

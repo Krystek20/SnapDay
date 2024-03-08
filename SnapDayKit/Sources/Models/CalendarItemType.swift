@@ -1,14 +1,13 @@
 import Foundation
-import Models
 
-enum CalendarItemType: Equatable {
+public enum CalendarItemType: Equatable {
   case dayOfWeek(String)
   case day(Day)
   case empty(Int)
 }
 
 extension CalendarItemType: Identifiable {
-  var id: String {
+  public var id: String {
     switch self {
     case .dayOfWeek(let title):
       title
@@ -19,7 +18,7 @@ extension CalendarItemType: Identifiable {
     }
   }
 
-  var day: Day? {
+  public var day: Day? {
     guard case .day(let day) = self else { return nil }
     return day
   }

@@ -24,7 +24,6 @@ private var products: [Product] {
   Module.tagForm
   Module.dayActivityForm
   Module.emojiPicker
-  Module.timePeriodDetails
   Module.reports
   Module.repositories
   Module.common
@@ -47,7 +46,6 @@ private var targets: [Target] {
     dependencies: sceneDependecies + [
       .dashboard,
       .activityForm,
-      .timePeriodDetails,
       .reports
     ]
   )
@@ -77,13 +75,6 @@ private var targets: [Target] {
   TargetParamenters(
     module: .dayActivityForm,
     dependencies: sceneDependecies
-  )
-  TargetParamenters(
-    module: .timePeriodDetails,
-    dependencies: sceneDependecies + [
-      .activityList,
-      .activityForm
-    ]
   )
   TargetParamenters(module: .reports, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
@@ -117,7 +108,6 @@ private enum Module: String {
   case tagForm
   case dayActivityForm
   case emojiPicker
-  case timePeriodDetails
   case reports
   case utilities
   case repositories
@@ -148,15 +138,6 @@ private enum Module: String {
     switch self {
     case .swiftgen:
       .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin")
-    default:
-      nil
-    }
-  }
-
-  var resources: [Resource]? {
-    switch self {
-    case .resources:
-      [.process("Quicksand.ttf")]
     default:
       nil
     }
@@ -247,7 +228,6 @@ private extension Target {
     .target(
       name: name.name,
       dependencies: dependencies.compactMap(\.dependency),
-      resources: name.resources,
       plugins: dependencies.compactMap(\.plugin)
     )
   }

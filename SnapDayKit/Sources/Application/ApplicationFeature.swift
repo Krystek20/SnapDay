@@ -1,6 +1,5 @@
 import Dashboard
 import Reports
-import TimePeriodDetails
 import ComposableArchitecture
 
 public struct ApplicationFeature: Reducer {
@@ -21,19 +20,14 @@ public struct ApplicationFeature: Reducer {
 
   public struct Path: Reducer {
     public enum State: Equatable {
-      case timePeriodDetails(TimePeriodDetailsFeature.State)
       case reports(ReportsFeature.State)
     }
 
     public enum Action: Equatable {
-      case timePeriodDetails(TimePeriodDetailsFeature.Action)
       case reports(ReportsFeature.Action)
     }
 
     public var body: some ReducerOf<Self> {
-      Scope(state: /State.timePeriodDetails, action: /Action.timePeriodDetails) {
-        TimePeriodDetailsFeature()
-      }
       Scope(state: /State.reports, action: /Action.reports) {
         ReportsFeature()
       }
@@ -57,8 +51,6 @@ public struct ApplicationFeature: Reducer {
         return handleDashboardDelegate(action: action, state: &state)
       case .dashboard:
         return .none
-      case .path(.element(_, action: .timePeriodDetails(.delegate(let action)))):
-        return handleTimePeriodDetailsDelegate(action: action, state: &state)
       case .path:
         return .none
       }
@@ -75,27 +67,9 @@ public struct ApplicationFeature: Reducer {
     state: inout ApplicationFeature.State
   ) -> EffectOf<Self> {
     switch action {
-    case .timePeriodTapped(let timePeriod):
-      state.path.append(
-        .timePeriodDetails(TimePeriodDetailsFeature.State(timePeriod: timePeriod))
-      )
-      return .none
     case .reportsTapped:
       state.path.append(
         .reports(ReportsFeature.State())
-      )
-      return .none
-    }
-  }
-
-  private func handleTimePeriodDetailsDelegate(
-    action: TimePeriodDetailsFeature.Action.DelegateAction,
-    state: inout ApplicationFeature.State
-  ) -> EffectOf<Self> {
-    switch action {
-    case .timePeriodTapped(let timePeriod):
-      state.path.append(
-        .timePeriodDetails(TimePeriodDetailsFeature.State(timePeriod: timePeriod))
       )
       return .none
     }

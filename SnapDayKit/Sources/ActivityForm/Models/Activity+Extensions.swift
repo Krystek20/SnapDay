@@ -26,10 +26,6 @@ public extension Activity {
     return !name.isEmpty && isRepeatableSet
   }
 
-  var isRepeatable: Bool {
-    frequency != nil
-  }
-
   mutating func setIsRepeatable(_ isRepeatable: Bool) {
     frequency = isRepeatable ? .daily : nil
   }

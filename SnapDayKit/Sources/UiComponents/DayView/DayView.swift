@@ -8,35 +8,45 @@ public struct DayView: View {
 
   private let isPastDay: Bool
   private let activities: [DayActivity]
-  private let activityListOption: ActivityListOption
+  private let completedActivities: CompletedActivities
+  private let dayViewShowButtonState: DayViewShowButtonState
   private let activityTapped: (DayActivity) -> Void
   private let editTapped: (DayActivity) -> Void
   private let removeTapped: (DayActivity) -> Void
+  private let showCompletedTapped: () -> Void
+  private let hideCompletedTapped: () -> Void
 
   // MARK: - Initialization
 
   public init(
     isPastDay: Bool,
     activities: [DayActivity],
-    activityListOption: ActivityListOption,
+    completedActivities: CompletedActivities,
+    dayViewShowButtonState: DayViewShowButtonState,
     activityTapped: @escaping (DayActivity) -> Void,
     editTapped: @escaping (DayActivity) -> Void,
-    removeTapped: @escaping (DayActivity) -> Void
+    removeTapped: @escaping (DayActivity) -> Void,
+    showCompletedTapped: @escaping () -> Void,
+    hideCompletedTapped: @escaping () -> Void
   ) {
     self.isPastDay = isPastDay
     self.activities = activities
-    self.activityListOption = activityListOption
+    self.completedActivities = completedActivities
+    self.dayViewShowButtonState = dayViewShowButtonState
     self.activityTapped = activityTapped
     self.editTapped = editTapped
     self.removeTapped = removeTapped
+    self.showCompletedTapped = showCompletedTapped
+    self.hideCompletedTapped = hideCompletedTapped
   }
 
   // MARK: - Views
 
   public var body: some View {
-    LazyVStack(spacing: 5.0) {
+    LazyVStack(spacing: .zero) {
       ForEach(activities, content: menuActivityView)
-      doneRowViewIfCollapsed()
+      doneRowViewIfNeeded()
+      showOrHideDoneActivitiesViewIfNeeded()
     }
   }
 
@@ -75,29 +85,82 @@ public struct DayView: View {
         }
       )
     } label: {
-      dayActivityView(dayActivity)
+      VStack(spacing: .zero) {
+        dayActivityView(dayActivity)
+        Divider()
+      }
     }
   }
 
   @ViewBuilder
-  private func doneRowViewIfCollapsed() -> some View {
-    if case .collapsed(let doneCount, let totalCount, let progress) = activityListOption {
+  private func doneRowViewIfNeeded() -> some View {
+    if !activities.isEmpty {
       HStack(spacing: 10.0) {
         CircularProgressView(
-          progress: progress,
+          progress: completedActivities.percent,
           showPercent: false,
           lineWidth: 4.0
         )
         .frame(width: 20.0, height: 20.0)
         Text("Completed activities", bundle: .module)
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 16.0))
+          .font(.system(size: 14.0, weight: .medium))
           .foregroundStyle(Colors.slateHaze.swiftUIColor)
         Spacer()
-        Text("\(doneCount) / \(totalCount)", bundle: .module)
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 16.0))
+        Text("\(completedActivities.doneCount) / \(completedActivities.totalCount)", bundle: .module)
+          .font(.system(size: 12.0, weight: .medium))
           .foregroundStyle(Colors.slateHaze.swiftUIColor)
       }
-      .formBackgroundModifier(color: Colors.etherealLavender.swiftUIColor)
+      .padding(.all, 14.0)
+      .background(
+        Colors.etherealLavender.swiftUIColor
+      )
+    }
+  }
+
+  @ViewBuilder
+  private func showOrHideDoneActivitiesViewIfNeeded() -> some View {
+    switch dayViewShowButtonState {
+    case .show:
+      showOrHideDoneActivitiesView(
+        title: String(localized: "Show completed", bundle: .module),
+        icon: Image(systemName: "arrow.up.left.and.arrow.down.right"),
+        actionHandler: showCompletedTapped
+      )
+    case .hide:
+      showOrHideDoneActivitiesView(
+        title: String(localized: "Hide completed", bundle: .module),
+        icon: Image(systemName: "arrow.down.right.and.arrow.up.left"),
+        actionHandler: hideCompletedTapped
+      )
+    case .none:
+      EmptyView()
+    }
+  }
+
+  private func showOrHideDoneActivitiesView(
+    title: String,
+    icon: Image,
+    actionHandler: @escaping () -> Void
+  ) -> some View {
+    VStack(spacing: .zero) {
+      Button(
+        action: actionHandler,
+        label: {
+          HStack(spacing: 12.5) {
+            icon
+              .resizable()
+              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+              .frame(width: 15.0, height: 15.0)
+              .padding(.leading, 2.5)
+            Text(title)
+              .font(.system(size: 14.0, weight: .medium))
+              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+            Spacer()
+          }
+          .padding(.all, 14.0)
+        }
+      )
+      Divider()
     }
   }
 
@@ -105,25 +168,27 @@ public struct DayView: View {
     HStack(spacing: 5.0) {
       ActivityImageView(
         data: dayActivity.activity.image,
-        size: 20.0,
-        cornerRadius: 10.0
+        size: 30.0,
+        cornerRadius: 15.0
       )
-      Text(dayActivity.activity.name)
-        .font(Fonts.Quicksand.bold.swiftUIFont(size: 16.0))
-        .foregroundStyle(Colors.slateHaze.swiftUIColor)
-        .strikethrough(dayActivity.isDone, color: Colors.slateHaze.swiftUIColor)
-      if let textDuration = duration(for: dayActivity) {
-        Text(textDuration)
-          .font(Fonts.Quicksand.regular.swiftUIFont(size: 12.0))
+      VStack(alignment: .leading, spacing: 2.0) {
+        Text(dayActivity.activity.name)
+          .font(.system(size: 14.0, weight: .medium))
           .foregroundStyle(Colors.slateHaze.swiftUIColor)
           .strikethrough(dayActivity.isDone, color: Colors.slateHaze.swiftUIColor)
+        if let textDuration = duration(for: dayActivity) {
+          Text(textDuration)
+            .font(.system(size: 12.0, weight: .regular))
+            .foregroundStyle(Colors.slateHaze.swiftUIColor)
+            .strikethrough(dayActivity.isDone, color: Colors.slateHaze.swiftUIColor)
+        }
       }
       Spacer()
-      Image(systemName: dayActivity.isDone ? "checkmark.square.fill" : "square")
-        .foregroundStyle(dayActivity.isDone ? Colors.lavenderBliss.swiftUIColor : Colors.slateHaze.swiftUIColor)
+      Image(systemName: "ellipsis")
+        .foregroundStyle(Colors.slateHaze.swiftUIColor)
         .imageScale(.medium)
     }
-    .formBackgroundModifier()
+    .padding(.all, 10.0)
   }
 
   // MARK: - Helpers

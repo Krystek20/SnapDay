@@ -33,7 +33,7 @@ public struct ActivityListView: View {
             Button(String(localized: "New", bundle: .module)) {
               viewStore.send(.view(.newButtonTapped))
             }
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+            .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
           }
         }
@@ -86,7 +86,7 @@ public struct ActivityListView: View {
       ActivityImageView(data: activity.image, size: 50.0, cornerRadius: 25.0)
       Text(activity.name)
         .multilineTextAlignment(.center)
-        .font(Fonts.Quicksand.bold.swiftUIFont(size: 16.0))
+        .font(.system(size: 16.0, weight: .bold))
         .foregroundStyle(Colors.slateHaze.swiftUIColor)
     }
     .padding(5.0)

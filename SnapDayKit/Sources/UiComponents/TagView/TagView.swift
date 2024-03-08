@@ -26,7 +26,7 @@ public struct TagView: View {
           trailing: 5.0
         )
       )
-      .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
+      .font(.system(size: 14.0, weight: .semibold))
       .foregroundStyle(tagForegroundStyle)
       .background(tagBackground)
   }

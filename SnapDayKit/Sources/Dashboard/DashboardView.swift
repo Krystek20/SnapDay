@@ -25,15 +25,20 @@ public struct DashboardView: View {
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       ScrollView {
-        summaryView(viewStore: viewStore)
+        picker(viewStore: viewStore)
+          .padding(.horizontal, 15.0)
+
+        periods(viewStore: viewStore)
           .padding(.horizontal, 15.0)
           .padding(.top, 15.0)
-        dayView(viewStore: viewStore)
+
+        summaryOnTheChart(viewStore: viewStore)
           .padding(.horizontal, 15.0)
           .padding(.top, 15.0)
-        timePeriods(viewStore: viewStore)
+
+        activitiesByTag(viewStore: viewStore)
           .padding(.horizontal, 15.0)
-          .padding(.top, 10.0)
+          .padding(.top, 15.0)
       }
       .maxWidth()
       .scrollIndicators(.hidden)
@@ -80,104 +85,181 @@ public struct DashboardView: View {
       .navigationTitle(String(localized: "Dashboard", bundle: .module))
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
-          Button(
-            action: { 
-              viewStore.send(.view(.reportButtonTapped))
-            },
-            label: {
-              Image(systemName: "text.badge.checkmark")
+          HStack {
+            Button(
+              action: {
+                viewStore.send(.view(.reportButtonTapped))
+              },
+              label: {
+                Image(systemName: "text.badge.checkmark")
+                  .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
+              }
+            )
+            
+            Menu {
+              Button(String(localized: "One-time activity", bundle: .module), action: {
+                viewStore.send(.view(.oneTimeActivityButtonTapped))
+              })
+              Button(String(localized: "Activity list", bundle: .module), action: {
+                viewStore.send(.view(.activityListButtonTapped))
+              })
+            } label: {
+              Image(systemName: "plus.app")
                 .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
             }
-          )
+          }
         }
       }
     }
   }
 
+  @MainActor 
+  private func picker(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    Picker(
+      selection: viewStore.$selectedPeriod,
+      content: {
+        ForEach(viewStore.periods) { period in
+          Text(period.name).tag(period)
+        }
+      },
+      label: { EmptyView() }
+    )
+    .pickerStyle(.segmented)
+  }
+
   @ViewBuilder
-  private func summaryView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    if let daySummary = viewStore.daySummary, daySummary.remaingDuration > .zero {
+  private func summaryOnTheChart(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    if let linearChartValues = viewStore.linearChartValues {
       SectionView(
-        name: String(localized: "Time Summary", bundle: .module),
-        rightContent: { },
+        name: String(localized: "Summary", bundle: .module),
+        rightContent: { EmptyView() },
         content: {
-          TimeSummaryView(daySummary: daySummary)
+          LinearChartView(points: linearChartValues.points, expectedPoints: linearChartValues.expectedPoints)
+            .frame(height: 200.0)
+            .padding(.vertical, 15.0)
+            .formBackgroundModifier()
         }
       )
     }
   }
 
-  private func dayView(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    SectionView(
-      name: String(localized: "Todays Activities", bundle: .module),
-      rightContent: {
-        HStack(spacing: 5.0) {
-          Button(
-            action: {
-              viewStore.send(.view(.activityPresentationButtonTapped))
-            },
-            label: {
-              icon(for: viewStore.activityListOption)
-                .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
-                .frame(width: 30.0, height: 30.0)
-            }
-          )
-          Menu {
-            Button(String(localized: "One-time activity", bundle: .module), action: {
-              viewStore.send(.view(.oneTimeActivityButtonTapped))
-            })
-            Button(String(localized: "Activity list", bundle: .module), action: {
-              viewStore.send(.view(.activityListButtonTapped))
-            })
-          } label: {
-            Image(systemName: "plus.app")
-              .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
-              .frame(width: 30.0, height: 30.0)
-              .padding(.trailing, 5.0)
-          }
+  @ViewBuilder
+  @MainActor
+  private func periods(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    if let activitiesPresentationType = viewStore.activitiesPresentationType {
+      SectionView(
+        name: activitiesPresentationType.title,
+        rightContent: { },
+        content: {
+          periodsContent(viewStore: viewStore)
+            .formBackgroundModifier(padding: EdgeInsets(.zero))
         }
-      },
-      content: {
-        DayView(
-          isPastDay: false,
-          activities: viewStore.dayActivities,
-          activityListOption: viewStore.activityListOption,
-          activityTapped: { activity in
-            viewStore.send(.view(.dayActivityTapped(activity)))
-          },
-          editTapped: { activity in
-            viewStore.send(.view(.dayActivityEditTapped(activity)))
-          },
-          removeTapped: { activity in
-            viewStore.send(.view(.dayActivityRemoveTapped(activity)))
-          }
-        )
+      )
+    }
+  }
+
+  @ViewBuilder
+  @MainActor
+  private func periodsContent(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    if let activitiesPresentationType = viewStore.activitiesPresentationType {
+      switch activitiesPresentationType {
+      case .monthsList(let timePeriods):
+        monthsView(timePeriods: timePeriods, viewStore: viewStore)
+      case .calendar(_, let calendarItems):
+        calendarView(calendarItems: calendarItems, viewStore: viewStore)
+      case .daysList(let style):
+        dayList(daysSelectorStyle: style, viewStore: viewStore)
+      }
+    }
+  }
+
+  private func monthsView(timePeriods: [TimePeriod], viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    TimePeriodsView(
+      timePeriods: timePeriods,
+      type: .list,
+      timePeriodTapped: { timePeriod in
+//          viewStore.send(.view(.timePeriodTapped(timePeriod)))
       }
     )
   }
 
-  private func timePeriods(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+  @MainActor
+  private func calendarView(calendarItems: [CalendarItemType], viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    CalendarView(
+      selectedDay: viewStore.$selectedDay,
+      dayActivities: viewStore.activities,
+      calendarItems: calendarItems,
+      daySummary: viewStore.daySummary,
+      dayViewShowButtonState: viewStore.dayViewShowButtonState,
+      dayActivityTapped: { dayActivity in
+        viewStore.send(.view(.dayActivityTapped(dayActivity)))
+      },
+      dayActivityEditTapped: { dayActivity in
+        viewStore.send(.view(.dayActivityEditTapped(dayActivity)))
+      },
+      removeDayActivityTapped: { dayActivity in
+        viewStore.send(.view(.dayActivityRemoveTapped(dayActivity)))
+      },
+      showCompletedTapped: {
+        viewStore.send(.view(.showCompletedActivitiesTapped))
+      },
+      hideCompletedTapped: {
+        viewStore.send(.view(.hideCompletedActivitiesTapped))
+      }
+    )
+  }
+
+  @MainActor
+  private func dayList(daysSelectorStyle: DaysSelectorStyle, viewStore: ViewStoreOf<DashboardFeature>) -> some View {
+    DaysSelectorView(
+      selectedDay: viewStore.$selectedDay,
+      dayActivities: viewStore.activities,
+      daysSelectorStyle: daysSelectorStyle,
+      daySummary: viewStore.daySummary,
+      dayViewShowButtonState: viewStore.dayViewShowButtonState,
+      dayActivityTapped: { dayActivity in
+        viewStore.send(.view(.dayActivityTapped(dayActivity)))
+      },
+      dayActivityEditTapped: { dayActivity in
+        viewStore.send(.view(.dayActivityEditTapped(dayActivity)))
+      },
+      removeDayActivityTapped: { dayActivity in
+        viewStore.send(.view(.dayActivityRemoveTapped(dayActivity)))
+      },
+      showCompletedTapped: {
+        viewStore.send(.view(.showCompletedActivitiesTapped))
+      },
+      hideCompletedTapped: {
+        viewStore.send(.view(.hideCompletedActivitiesTapped))
+      }
+    )
+  }
+
+  @MainActor
+  private func activitiesByTag(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
     SectionView(
-      name: String(localized: "Time Periods", bundle: .module),
+      name: String(localized: "Activities By Tags", bundle: .module),
       rightContent: { EmptyView() },
       content: {
-        TimePeriodsView(
-          timePeriods: viewStore.timePeriods,
-          type: .grid,
-          timePeriodTapped: { timePeriod in
-            viewStore.send(.view(.timePeriodTapped(timePeriod)))
-          }
+        ActivitiesByTagView(
+          selectedTag: viewStore.$selectedTag,
+          timePeriodActivitySections: viewStore.timePeriodActivitySections
         )
+        .formBackgroundModifier()
       }
     )
   }
+}
 
-  private func icon(for option: ActivityListOption) -> Image {
-    switch option {
-    case .collapsed:
-      Image(systemName: "arrow.up.left.and.arrow.down.right")
-    case .extended:
-      Image(systemName: "arrow.down.right.and.arrow.up.left")
+extension ActivitiesPresentationType {
+  public var title: String {
+    switch self {
+    case .monthsList:
+      String(localized: "Months", bundle: .module)
+    case .calendar(let monthName, _):
+      monthName
+    case .daysList:
+      String(localized: "Days", bundle: .module)
     }
   }
 }

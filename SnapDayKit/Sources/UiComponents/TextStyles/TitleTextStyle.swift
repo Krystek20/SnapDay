@@ -10,7 +10,7 @@ public extension View {
 struct TitleTextModifier: ViewModifier {
   func body(content: Content) -> some View {
     content
-      .font(Fonts.Quicksand.bold.swiftUIFont(size: 28.0))
+      .font(.system(size: 28.0, weight: .bold))
       .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
   }
 }

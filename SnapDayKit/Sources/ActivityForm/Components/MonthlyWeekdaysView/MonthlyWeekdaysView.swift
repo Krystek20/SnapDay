@@ -27,7 +27,7 @@ public struct MonthlyWeekdaysView: View {
       ForEach(WeekdayOrdinal.Position.allCases) { position in
         VStack(alignment: .leading, spacing: 2.0) {
           Text(position.name)
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+            .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Colors.slateHaze.swiftUIColor)
             .offset(x: 5.0)
           WeekdaysView(

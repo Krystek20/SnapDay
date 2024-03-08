@@ -18,7 +18,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
   public func makeBody(configuration: Configuration) -> some View {
     configuration
       .label
-      .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
+      .font(.system(size: 14.0, weight: .semibold))
       .foregroundStyle(Colors.pureWhite.swiftUIColor)
       .frame(height: 40.0)
       .maxWidth(alignment: .bottom)

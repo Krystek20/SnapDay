@@ -1,13 +1,18 @@
 import SwiftUI
 import Resources
 
-struct LinearChartView: View {
+public struct LinearChartView: View {
 
-  let points: [Double]
-  let expectedPoints: Int
-  let verticalUnits = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+  private let points: [Double]
+  private let expectedPoints: Int
+  private let verticalUnits = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
 
-  var body: some View {
+  public init(points: [Double], expectedPoints: Int) {
+    self.points = points
+    self.expectedPoints = expectedPoints
+  }
+
+  public var body: some View {
     HStack(spacing: .zero) {
       GeometryReader { proxy in
         ZStack {
@@ -31,7 +36,7 @@ struct LinearChartView: View {
         let lastPosition = position(for: percent, index: points.count, proxy: proxy)
         horizontalLine(for: lastPosition.y, proxy: proxy)
         Text(String(Int(percent * 100)) + "%")
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 10.0))
+          .font(.system(size: 10.0, weight: .bold))
           .foregroundStyle(Colors.charcoalGray.swiftUIColor)
           .offset(y: lastPosition.y)
       }

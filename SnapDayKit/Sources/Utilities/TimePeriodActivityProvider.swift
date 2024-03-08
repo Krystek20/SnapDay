@@ -1,9 +1,11 @@
 import Foundation
 import Models
 
-struct TimePeriodActivitySectionProvider {
+public struct TimePeriodActivitySectionProvider {
 
-  func timePeriodActivitiesSections(for timePeriod: TimePeriod) -> [TimePeriodActivitySection] {
+  public init() { }
+
+  public func timePeriodActivitiesSections(for timePeriod: TimePeriod) -> [TimePeriodActivitySection] {
     timePeriod.days
       .reduce(into: [TimePeriodActivity](), reduceIntoTimePeriodActivity)
       .sorted(by: { $0.activity.name < $1.activity.name })

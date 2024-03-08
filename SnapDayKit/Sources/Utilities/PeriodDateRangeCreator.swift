@@ -13,7 +13,7 @@ public struct PeriodDateRangeCreator {
 
   // MARK: - Public
 
-  public func today(for date: Date) -> ClosedRange<Date>? {
+  public func dayRange(for date: Date) -> ClosedRange<Date>? {
     calendar.dayFormat(date)...calendar.dayFormat(date)
   }
 

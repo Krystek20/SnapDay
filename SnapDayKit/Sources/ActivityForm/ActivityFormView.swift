@@ -128,7 +128,7 @@ public struct ActivityFormView: View {
           tintColor: Colors.lavenderBliss.swiftUIColor
         )
         Text("Change icon", bundle: .module)
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+          .font(.system(size: 12.0, weight: .bold))
           .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
         Spacer()
       }

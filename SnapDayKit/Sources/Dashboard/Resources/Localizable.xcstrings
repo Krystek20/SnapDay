@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "A blank canvas awaits your plans or spontaneous joys." : {
+
+    },
+    "A Day of Unplanned Possibilities" : {
+
+    },
     "Activities" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -18,10 +24,19 @@
         }
       }
     },
+    "Activities By Tags" : {
+
+    },
     "Activity list" : {
 
     },
     "Dashboard" : {
+
+    },
+    "Day" : {
+
+    },
+    "Days" : {
 
     },
     "Hi %@," : {
@@ -41,16 +56,25 @@
         }
       }
     },
+    "Hope it was enjoyable!" : {
+
+    },
+    "Month" : {
+
+    },
+    "Months" : {
+
+    },
     "One-time activity" : {
 
     },
-    "Time Periods" : {
+    "Quarter" : {
 
     },
-    "Time Summary" : {
+    "Summary" : {
 
     },
-    "Todays Activities" : {
+    "Week" : {
 
     },
     "Welcome back 👋" : {
@@ -69,6 +93,9 @@
           }
         }
       }
+    },
+    "Your Day, Your Way!" : {
+
     }
   },
   "version" : "1.0"

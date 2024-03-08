@@ -36,7 +36,7 @@ public struct CircularProgressView: View {
         .rotationEffect(Angle(degrees: -90.0))
       if showPercent {
         Text(String(Int(progress * 100)) + "%")
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 45.0))
+          .font(.system(size: 45.0, weight: .bold))
           .foregroundStyle(Colors.charcoalGray.swiftUIColor)
       }
     }

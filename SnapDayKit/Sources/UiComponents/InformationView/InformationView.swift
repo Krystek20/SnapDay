@@ -23,10 +23,10 @@ public struct InformationView: View {
   public var body: some View {
     VStack(spacing: 5.0) {
       Text(configuration.title)
-        .font(Fonts.Quicksand.bold.swiftUIFont(size: 16.0))
+        .font(.system(size: 16.0, weight: .bold))
         .foregroundStyle(Colors.slateHaze.swiftUIColor)
       Text(configuration.subtitle)
-        .font(Fonts.Quicksand.medium.swiftUIFont(size: 14.0))
+        .font(.system(size: 14.0, weight: .medium))
         .foregroundStyle(Colors.slateHaze.swiftUIColor)
         .multilineTextAlignment(.center)
     }

@@ -26,12 +26,3 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     self.isGeneratedAutomatically = isGeneratedAutomatically
   }
 }
-
-public extension [DayActivity] {
-  var sortedByName: [DayActivity] {
-    sorted(by: {
-      if $0.activity.name == $1.activity.name { return $0.id.uuidString < $1.id.uuidString }
-      return $0.activity.name < $1.activity.name
-    })
-  }
-}

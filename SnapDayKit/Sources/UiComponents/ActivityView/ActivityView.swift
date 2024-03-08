@@ -25,7 +25,7 @@ public struct ActivityView: View {
         tintColor: Colors.deepSpaceBlue.swiftUIColor
       )
       Text(activity.name)
-        .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
+        .font(.system(size: 14.0, weight: .semibold))
         .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
     }
     .padding(

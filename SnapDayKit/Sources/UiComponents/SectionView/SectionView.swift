@@ -16,8 +16,8 @@ public struct SectionView<Content: View, RightContent: View>: View {
     @ViewBuilder rightContent: @escaping () -> RightContent?,
     @ViewBuilder content: @escaping () -> Content
   ) {
-    self.label = Text(name)
-      .font(Fonts.Quicksand.bold.swiftUIFont(size: 22.0))
+    self.label = Text(name.uppercased())
+      .font(.system(size: 14.0, weight: .regular))
       .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
     self.rightContent = rightContent
     self.content = content
@@ -36,9 +36,10 @@ public struct SectionView<Content: View, RightContent: View>: View {
   // MARK: - Views
 
   public var body: some View {
-    VStack(alignment: .center, spacing: 15.0) {
-      HStack {
+    VStack(alignment: .center, spacing: 5.0) {
+      HStack(alignment: .bottom) {
         AnyView(label)
+          .padding(.leading, 5.0)
         Spacer()
         if let rightContent = rightContent() {
           rightContent

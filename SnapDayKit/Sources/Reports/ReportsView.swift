@@ -162,33 +162,33 @@ public struct ReportsView: View {
         if summary.doneCount > .zero {
           HStack(spacing: 5.0) {
             Text("Done Count", bundle: .module)
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .font(.system(size: 14.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
             Spacer()
             Text("\(summary.doneCount)")
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .font(.system(size: 12.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
           }
         }
         if summary.notDoneCount > .zero {
           HStack(spacing: 5.0) {
             Text("Not Done Count", bundle: .module)
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .font(.system(size: 14.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
             Spacer()
             Text("\(summary.notDoneCount)")
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .font(.system(size: 12.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
           }
         }
         if summary.duration > .zero {
           HStack(spacing: 5.0) {
             Text("Total Time", bundle: .module)
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .font(.system(size: 14.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
             Spacer()
             Text(TimeProvider.duration(from: summary.duration, bundle: .module) ?? "")
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .font(.system(size: 12.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
           }
         }
@@ -215,7 +215,7 @@ public struct ReportsView: View {
               }
             )
             Text(filterDate.title)
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 22.0))
+              .font(.system(size: 22.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
             Spacer()
             Button(
@@ -244,7 +244,7 @@ public struct ReportsView: View {
         VStack(spacing: 2.0) {
           if let title = item.title {
             Text(title)
-              .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 12.0))
+              .font(.system(size: 12.0, weight: .semibold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
           }
           reportDayActivityView(item, viewStore: viewStore)

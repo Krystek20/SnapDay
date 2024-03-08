@@ -7,8 +7,12 @@ public enum Period: String, Equatable, Hashable, CaseIterable {
   case quarter
 }
 
-public extension Period {
-  var calendarComponent: Calendar.Component {
+extension Period: Identifiable {
+  public var id: Self { self }
+}
+
+extension Period {
+  public var calendarComponent: Calendar.Component {
     switch self {
     case .day:
         .day

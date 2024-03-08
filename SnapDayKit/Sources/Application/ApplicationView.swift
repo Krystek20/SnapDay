@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 import Dashboard
-import TimePeriodDetails
 import Reports
 import Resources
 
@@ -22,11 +21,11 @@ public struct ApplicationView: View {
     appearance.backgroundColor = Colors.lightGray.color
 
     appearance.largeTitleTextAttributes = [
-      .font: Fonts.Quicksand.bold.font(size: 28.0),
+      .font: UIFont.systemFont(ofSize: 28.0, weight: .bold),
       .foregroundColor: Colors.deepSpaceBlue.color
     ]
     appearance.titleTextAttributes = [
-      .font: Fonts.Quicksand.bold.font(size: 18.0),
+      .font: UIFont.systemFont(ofSize: 18.0, weight: .bold),
       .foregroundColor: Colors.deepSpaceBlue.color
     ]
 
@@ -51,12 +50,6 @@ public struct ApplicationView: View {
       )
     } destination: { state in
       switch state {
-      case .timePeriodDetails:
-        CaseLet(
-          /ApplicationFeature.Path.State.timePeriodDetails,
-           action: ApplicationFeature.Path.Action.timePeriodDetails,
-           then: TimePeriodDetailsView.init
-        )
       case .reports:
         CaseLet(
           /ApplicationFeature.Path.State.reports,

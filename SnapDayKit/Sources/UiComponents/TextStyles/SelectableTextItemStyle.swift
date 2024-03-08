@@ -25,7 +25,7 @@ struct SelectableTextItemStyle: ViewModifier {
   func body(content: Content) -> some View {
     content
       .padding(padding)
-      .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
+      .font(.system(size: 14.0, weight: .semibold))
       .foregroundStyle(foregroundColor)
       .background(background)
   }

@@ -44,7 +44,7 @@ public struct OptionsView<Option: Optionable>: View {
           guard selected?.name != option.name else { return }
           selected = option
         }
-        .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
+        .font(.system(size: 14.0, weight: .semibold))
         .foregroundStyle(foregroundColor(for: option))
         .background(backgroundView(for: option))
     }

@@ -1,24 +1,32 @@
 import Foundation
 import Models
 import Dependencies
-import Utilities
 
-struct ActivitiesPresentationTypeProvider {
+public struct ActivitiesPresentationTypeProvider {
 
   // MARK: - Dependecies
 
   @Dependency(\.calendar) var calendar
   @Dependency(\.uuid) var uuid
 
+  // MARK: - Initialization
+
+  public init() { }
+
   // MARK: - Public
 
-  func presentationType(for timePeriod: TimePeriod) throws -> ActivitiesPresentationType? {
+  public func presentationType(for timePeriod: TimePeriod) throws -> ActivitiesPresentationType? {
     switch timePeriod.type {
     case .day:
-      return nil
+      guard timePeriod.days.count == 1 else { return nil }
+      return .daysList(
+        .single(day: timePeriod.days[0])
+      )
     case .week:
       return .daysList(
-        prepareTimePeriods(from: timePeriod, to: .day).compactMap { $0.days.first }
+        .multi(
+          days: prepareTimePeriods(from: timePeriod, to: .day).compactMap { $0.days.first }
+        )
       )
     case .month:
       let calendarItemsWithName = try prepareCalendarItems(timePeriod: timePeriod)

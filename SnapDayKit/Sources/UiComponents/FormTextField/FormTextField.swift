@@ -30,7 +30,7 @@ public struct FormTextField: View {
           .formTitleTextStyle
       }
       TextField(placeholder, text: value)
-        .font(Fonts.Quicksand.medium.swiftUIFont(size: 16.0))
+        .font(.system(size: 16.0, weight: .medium))
         .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
     }
     .formBackgroundModifier()

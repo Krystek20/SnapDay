@@ -27,7 +27,7 @@ public struct DurationPickerView: View {
         } label: { }
       } label: {
         Text(String(localized: "\(selectedHours) hours", bundle: .module))
-          .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
+          .font(.system(size: 14.0, weight: .semibold))
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       }
       .id(String(selectedHours))
@@ -40,7 +40,7 @@ public struct DurationPickerView: View {
         } label: { }
       } label: {
         Text(String(localized: "\(selectedMinutes) min", bundle: .module))
-          .font(Fonts.Quicksand.semiBold.swiftUIFont(size: 14.0))
+          .font(.system(size: 14.0, weight: .semibold))
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       }
       .id(String(selectedMinutes))

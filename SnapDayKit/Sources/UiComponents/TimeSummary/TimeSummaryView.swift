@@ -23,26 +23,25 @@ public struct TimeSummaryView: View {
         if daySummary.remaingDuration > .zero {
           HStack(spacing: 5.0) {
             Text("Remaining Time", bundle: .module)
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .font(.system(size: 12.0, weight: .regular))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
             Spacer()
             Text(TimeProvider.duration(from: daySummary.remaingDuration, bundle: .module) ?? "")
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .font(.system(size: 12.0, weight: .semibold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
           }
         }
         HStack(spacing: 5.0) {
           Text("Total Task Time", bundle: .module)
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+            .font(.system(size: 12.0, weight: .regular))
             .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
           Spacer()
           Text(TimeProvider.duration(from: daySummary.duration, bundle: .module) ?? "")
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+            .font(.system(size: 12.0, weight: .semibold))
             .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
         }
       }
     }
     .maxWidth()
-    .formBackgroundModifier()
   }
 }

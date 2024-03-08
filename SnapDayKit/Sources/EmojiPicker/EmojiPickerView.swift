@@ -35,14 +35,14 @@ public struct EmojiPickerView: View {
           Button(String(localized: "Save", bundle: .module)) {
             viewStore.send(.view(.saveButtonTapped))
           }
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+          .font(.system(size: 12.0, weight: .bold))
           .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
         }
         ToolbarItem(placement: .topBarLeading) {
           Button(String(localized: "Cancel", bundle: .module)) {
             viewStore.send(.view(.cancelButtonTapped))
           }
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+          .font(.system(size: 12.0, weight: .bold))
           .foregroundStyle(Colors.lavenderBliss.swiftUIColor)
         }
       }
@@ -52,7 +52,7 @@ public struct EmojiPickerView: View {
   private var titleSection: some View {
     VStack(alignment: .leading, spacing: 5.0) {
       Text("Pick an emoji to make your activity uniquely yours.", bundle: .module)
-        .font(Fonts.Quicksand.regular.swiftUIFont(size: 12.0))
+        .font(.system(size: 12.0, weight: .regular))
         .foregroundStyle(Colors.slateHaze.swiftUIColor)
         .fixedSize(horizontal: false, vertical: true)
       Divider().standard.padding(.top, 10.0)

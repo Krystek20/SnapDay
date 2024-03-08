@@ -1,10 +1,9 @@
 import SwiftUI
 import Resources
 import Utilities
-import UiComponents
 import Models
 
-struct TimePeriodSummaryView: View {
+public struct ActivitiesByTagView: View {
 
   // MARK: - Properties
 
@@ -17,14 +16,14 @@ struct TimePeriodSummaryView: View {
 
   // MARK: - Initialization
 
-  init(selectedTag: Binding<Tag?>, timePeriodActivitySections: [TimePeriodActivitySection]) {
+  public init(selectedTag: Binding<Tag?>, timePeriodActivitySections: [TimePeriodActivitySection]) {
     self.timePeriodActivitySections = timePeriodActivitySections
     self._selectedTag = selectedTag
   }
 
   // MARK: - Views
 
-  var body: some View {
+  public var body: some View {
     VStack(alignment: .leading, spacing: 10.0) {
       ScrollView(.horizontal) {
         HStack(spacing: 10.0) {
@@ -61,7 +60,7 @@ struct TimePeriodSummaryView: View {
         )
         Text(timePeriodActivity.activity.name)
           .lineLimit(1)
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 16.0))
+          .font(.system(size: 16.0, weight: .bold))
           .foregroundStyle(Colors.slateHaze.swiftUIColor)
         Spacer()
       }
@@ -72,7 +71,7 @@ struct TimePeriodSummaryView: View {
             .foregroundStyle(Colors.slateHaze.swiftUIColor)
             .imageScale(.small)
           Text(TimeProvider.duration(from: timePeriodActivity.duration, bundle: .module) ?? "")
-            .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+            .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Colors.slateHaze.swiftUIColor)
         }
       }
@@ -81,20 +80,20 @@ struct TimePeriodSummaryView: View {
         ProgressView(value: timePeriodActivity.completedValue) {
           HStack(alignment: .bottom) {
             Text("\(timePeriodActivity.percent)%", bundle: .module)
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+              .font(.system(size: 14.0, weight: .bold))
               .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
             Spacer()
             Text("\(timePeriodActivity.doneCount) / \(timePeriodActivity.totalCount)", bundle: .module)
-              .font(Fonts.Quicksand.bold.swiftUIFont(size: 12.0))
+              .font(.system(size: 12.0, weight: .bold))
               .foregroundStyle(Colors.slateHaze.swiftUIColor)
           }
         }
       } else {
         Text("Total: \(timePeriodActivity.doneCount)", bundle: .module)
-          .font(Fonts.Quicksand.bold.swiftUIFont(size: 14.0))
+          .font(.system(size: 14.0, weight: .bold))
           .foregroundStyle(Colors.deepSpaceBlue.swiftUIColor)
       }
     }
-    .formBackgroundModifier()
+    .formBackgroundModifier(color: Colors.etherealLavender.swiftUIColor)
   }
 }
