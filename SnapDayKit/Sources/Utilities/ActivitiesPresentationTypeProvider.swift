@@ -15,24 +15,24 @@ public struct ActivitiesPresentationTypeProvider {
 
   // MARK: - Public
 
-  public func presentationType(for timePeriod: TimePeriod) throws -> ActivitiesPresentationType? {
+  public func presentationType(for timePeriod: TimePeriod) throws -> ActivitiesPresentationType {
     switch timePeriod.type {
     case .day:
-      guard timePeriod.days.count == 1 else { return nil }
-      return .daysList(
-        .single(day: timePeriod.days[0])
+      .daysList(
+        .single(day: try timePeriod.firstDay)
       )
     case .week:
-      return .daysList(
+      .daysList(
         .multi(
           days: prepareTimePeriods(from: timePeriod, to: .day).compactMap { $0.days.first }
         )
       )
     case .month:
-      let calendarItemsWithName = try prepareCalendarItems(timePeriod: timePeriod)
-      return .calendar(monthName: calendarItemsWithName.name.capitalized, calendarItemsWithName.items)
+      .calendar(
+        try prepareCalendarItems(timePeriod: timePeriod)
+      )
     case .quarter:
-      return .monthsList(
+      .monthsList(
         prepareTimePeriods(from: timePeriod, to: .month)
       )
     }
@@ -40,11 +40,10 @@ public struct ActivitiesPresentationTypeProvider {
 
   // MARK: - Private
 
-  private func prepareCalendarItems(timePeriod: TimePeriod) throws -> (items: [CalendarItemType], name: String) {
+  private func prepareCalendarItems(timePeriod: TimePeriod) throws -> [CalendarItemType] {
     guard let firstDay = timePeriod.days.first,
-          let dayOfWeek = calendar.dateComponents([.weekday], from: firstDay.date).weekday else { return ([], "") }
-    let monthName = try calendar.monthName(firstDay.date)
-    return (calendarItems(timePeriod: timePeriod, dayOfWeek: dayOfWeek), monthName)
+          let dayOfWeek = calendar.dateComponents([.weekday], from: firstDay.date).weekday else { return [] }
+    return calendarItems(timePeriod: timePeriod, dayOfWeek: dayOfWeek)
   }
 
   private func calendarItems(timePeriod: TimePeriod, dayOfWeek: Int) -> [CalendarItemType] {

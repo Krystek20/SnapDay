@@ -10,7 +10,7 @@ public extension View {
 struct FormTitleTextStyle: ViewModifier {
   func body(content: Content) -> some View {
     content
-      .font(.system(size: 14.0, weight: .semibold))
+      .font(.system(size: 14.0, weight: .regular))
       .foregroundStyle(Color.slateHaze)
   }
 }

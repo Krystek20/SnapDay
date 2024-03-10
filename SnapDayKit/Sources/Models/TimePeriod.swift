@@ -2,6 +2,8 @@ import Foundation
 
 public struct TimePeriod: Identifiable, Equatable, Hashable {
 
+  struct DaysEmptyError: Error { }
+
   // MARK: - Properties
 
   public let id: UUID
@@ -24,6 +26,15 @@ public struct TimePeriod: Identifiable, Equatable, Hashable {
     self.name = name
     self.type = type
     self.dateRange = dateRange
+  }
+}
+
+public extension TimePeriod {
+  var firstDay: Day {
+    get throws {
+      guard let first = days.first else { throw DaysEmptyError() }
+      return first
+    }
   }
 }
 

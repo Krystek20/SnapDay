@@ -14,5 +14,6 @@ extension ActivityEntity {
     isDefaultDuration = activity.defaultDuration != nil
     defaultDuration = Int32(activity.defaultDuration ?? .zero)
     isVisible = activity.isVisible
+    startDate = activity.startDate
   }
 }

@@ -10,9 +10,10 @@ struct TimePeriodsService {
 
   // MARK: - Dependecies
 
-  @Dependency(\.dayRepository) var dayRepository
   @Dependency(\.uuid) private var uuid
   @Dependency(\.calendar) private var calendar
+  @Dependency(\.activityRepository.loadActivities) var loadActivities
+  @Dependency(\.dayEditor.prepareDays) var prepareDays
 
   // MARK: - Properties
 
@@ -20,30 +21,14 @@ struct TimePeriodsService {
 
   // MARK: - Public
 
-  func timePerdiods(date: Date) async throws -> [TimePeriod] {
-    var timePeriods = [TimePeriod]()
-    for period in Period.allCases {
-      guard let dateRange = dateRange(for: period, date: date) else { continue }
-      let days = try await dayRepository.loadDays(dateRange)
-      let timePeriod = TimePeriod(
-        id: uuid(),
-        days: days,
-        name: period.rawValue,
-        type: period,
-        dateRange: dateRange
-      )
-      timePeriods.append(timePeriod)
-    }
-    return timePeriods
-  }
-
   func timePeriod(from period: Period, date: Date, shift: Int) async throws -> TimePeriod {
     guard let dateRange = dateRange(for: period, date: date, shift: shift) else {
       throw TimePeriodsServiceError.canNotPrepareDateRange
     }
+    let days = try await prepareDays(try await loadActivities(), dateRange)
     return TimePeriod(
       id: uuid(),
-      days: try await dayRepository.loadDays(dateRange),
+      days: days,
       name: period.rawValue,
       type: period,
       dateRange: dateRange

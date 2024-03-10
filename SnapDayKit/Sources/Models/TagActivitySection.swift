@@ -1,6 +1,6 @@
 import Foundation
 
-public struct TimePeriodActivitySection: Identifiable, Equatable {
+public struct TagActivitySection: Identifiable, Equatable {
   public var id: String { tag.name }
   public let tag: Tag
   public var timePeriodActivities: [TimePeriodActivity]

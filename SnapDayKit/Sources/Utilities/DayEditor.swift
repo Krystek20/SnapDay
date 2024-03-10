@@ -3,7 +3,7 @@ import Models
 import Dependencies
 
 public struct DayEditor {
-  public var createDays: @Sendable (_ date: Date) async throws -> ()
+  public var prepareDays: @Sendable (_ activities: [Activity], _ dateRange: ClosedRange<Date>) async throws -> ([Day])
   public var updateDays: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
   public var addActivity: @Sendable (_ activity: Activity, _ date: Date) async throws -> ()
   public var removeDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
@@ -21,8 +21,8 @@ extension DependencyValues {
 extension DayEditor: DependencyKey {
   public static var liveValue: DayEditor {
     DayEditor(
-      createDays: { date in
-        try await DaysCreater().create(from: date)
+      prepareDays: { activities, dateRange in
+        try await DayUpdater().prepareDays(for: activities, in: dateRange)
       },
       updateDays: { activity, date in
         try await DayUpdater().addActivity(activity, from: date)
@@ -44,7 +44,7 @@ extension DayEditor: DependencyKey {
 
   public static var previewValue: DayEditor {
     DayEditor(
-      createDays: { _ in },
+      prepareDays: { _, _ in [] },
       updateDays: { _, _ in },
       addActivity: { _, _ in },
       removeDayActivity: { _, _ in },

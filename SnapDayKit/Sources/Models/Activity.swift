@@ -11,6 +11,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
   public var frequency: ActivityFrequency?
   public var defaultDuration: Int?
   public var isVisible: Bool
+  public var startDate: Date?
 
   // MARK: - Initialization
   
@@ -22,7 +23,8 @@ public struct Activity: Identifiable, Equatable, Hashable {
     frequency: ActivityFrequency? = nil,
     isDefaultDuration: Bool = false,
     defaultDuration: Int? = nil,
-    isVisible: Bool = true
+    isVisible: Bool = true,
+    startDate: Date? = nil
   ) {
     self.id = id
     self.name = name
@@ -31,6 +33,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
     self.frequency = frequency
     self.defaultDuration = defaultDuration
     self.isVisible = isVisible
+    self.startDate = startDate
   }
 }
 

@@ -22,18 +22,21 @@ struct DayUpdater {
 
   // MARK: - Public
 
-  /// it creates days if not exists and adds activities to them, days are not saved to database
+  /// it creates days if not exists and adds activities to them, days are saved to database
   func prepareDays(for activities: [Activity], in dateRange: ClosedRange<Date>) async throws -> [Day] {
     guard let daysNumber = calendar.daysNumber(in: dateRange) else { return [] }
     let existingDays = try await dayRepository.loadDays(dateRange)
+    guard (daysNumber + 1) != existingDays.count else { return existingDays }
     let activitiesWithDates = try createDates(for: activities, dateRange: dateRange)
-    return try (0...daysNumber).compactMap {
+    let days = try (0...daysNumber).compactMap {
       try getDay(
         for: try calendar.date(byAdding: .day, value: $0, to: dateRange.lowerBound).unwrapped,
         days: existingDays,
         activitiesWithDates: activitiesWithDates
       )
     }
+    try await saveDays(days: days)
+    return days
   }
 
   /// it fetches existing days and adds activity to them
@@ -83,13 +86,21 @@ struct DayUpdater {
 
   private func createDates(for activities: [Activity], dateRange: ClosedRange<Date>) throws -> [Activity: [Date]] {
     try activities.reduce(into: [Activity: [Date]]()) { result, activity in
-      let dates = try activityDatesCreator.createsDates(for: activity, dateRange: dateRange)
+      guard let alignedDateRange = prepareAlignedDateRange(for: activity, dateRange: dateRange) else { return }
+      let dates = try activityDatesCreator.createsDates(for: activity, dateRange: alignedDateRange)
       result[activity] = dates
     }
   }
 
+  private func prepareAlignedDateRange(for activity: Activity, dateRange: ClosedRange<Date>) -> ClosedRange<Date>? {
+    guard let startDate = activity.startDate else { return dateRange }
+    let lowerBound = max(dateRange.lowerBound, startDate)
+    guard lowerBound <= dateRange.upperBound else { return nil }
+    return lowerBound...dateRange.upperBound
+  }
+
   private func getDay(for date: Date, days: [Day], activitiesWithDates: [Activity: [Date]]) throws -> Day? {
-    guard let day = days.first(where: { $0.date == date}) else {
+    guard let day = days.first(where: { $0.date == date }) else {
       return createPlannedDay(date: date, activitiesWithDates: activitiesWithDates)
     }
     return day
@@ -122,7 +133,8 @@ struct DayUpdater {
   }
 
   func updateDays(by activity: Activity, in dateRange: ClosedRange<Date>, days: inout [Day]) throws {
-    let dates = try activityDatesCreator.createsDates(for: activity, dateRange: dateRange)
+    guard let alignedDateRange = prepareAlignedDateRange(for: activity, dateRange: dateRange) else { return }
+    let dates = try activityDatesCreator.createsDates(for: activity, dateRange: alignedDateRange)
     days.indices.forEach { index in
       guard dates.contains(days[index].date),
             !days[index].activities.contains(where: { $0.activity.id == activity.id }) else { return }

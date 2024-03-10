@@ -23,12 +23,29 @@ public struct ReportsView: View {
 
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      ScrollView {
-        content(viewStore: viewStore)
-          .padding(.horizontal, 15.0)
+      ZStack(alignment: .top) {
+        ScrollView {
+          content(viewStore: viewStore)
+            .padding(.horizontal, 15.0)
+            .padding(.top, viewStore.isSwitcherDismissed ? 15.0: 65.0)
+        }
+        .maxWidth()
+        .scrollIndicators(.hidden)
+        
+        if viewStore.isSwitcherDismissed {
+          Divider()
+        } else {
+          Switcher(
+            title: viewStore.switcherTitle,
+            leftArrowAction: {
+              viewStore.send(.view(.decreaseButtonTapped))
+            },
+            rightArrowAction: {
+              viewStore.send(.view(.increaseButtonTapped))
+            }
+          )
+        }
       }
-      .maxWidth()
-      .scrollIndicators(.hidden)
       .activityBackground
       .task {
         viewStore.send(.view(.appeared))
@@ -39,29 +56,32 @@ public struct ReportsView: View {
 
   private func content(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     VStack(alignment: .leading, spacing: 10.0) {
+      picker(viewStore: viewStore)
+      customDatePickers(viewStore: viewStore)
       VStack(alignment: .leading, spacing: 10.0) {
-        filterByPeriodView(viewStore: viewStore)
         filterByTagsView(viewStore: viewStore)
         filterByActivitiesView(viewStore: viewStore)
       }
       .formBackgroundModifier()
       summarySection(viewStore: viewStore)
-      selectedPeriod(viewStore: viewStore)
+      reportDaysView(viewStore: viewStore)
+      activitiesByTag(viewStore: viewStore)
     }
     .maxWidth()
   }
 
-  private func filterByPeriodView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    VStack(alignment: .leading, spacing: 10.0) {
-      Text("Filter by period", bundle: .module)
-        .formTitleTextStyle
-      OptionsView(
-        options: viewStore.dateFilters,
-        selected: viewStore.$selectedFilterPeriod,
-        axis: .horizontal(.center)
-      )
-      customDatePickers(viewStore: viewStore)
-    }
+  @MainActor
+  private func picker(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+    Picker(
+      selection: viewStore.$selectedFilterPeriod,
+      content: {
+        ForEach(viewStore.dateFilters) { period in
+          Text(period.name).tag(period)
+        }
+      },
+      label: { EmptyView() }
+    )
+    .pickerStyle(.segmented)
   }
 
   @ViewBuilder
@@ -87,6 +107,7 @@ public struct ReportsView: View {
           }
         )
       }
+      .formBackgroundModifier()
     }
   }
 
@@ -198,46 +219,6 @@ public struct ReportsView: View {
     .formBackgroundModifier()
   }
 
-  @ViewBuilder
-  private func selectedPeriod(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if let filterDate = viewStore.filterDate {
-      SectionView(
-        label: {
-          HStack(spacing: 10.0) {
-            Button(
-              action: { 
-                viewStore.send(.view(.previousPeriodTapped))
-              },
-              label: {
-                Image(systemName: "arrowshape.left")
-                  .foregroundStyle(Color.actionBlue)
-                  .font(.system(size: 16.0))
-              }
-            )
-            Text(filterDate.title)
-              .font(.system(size: 22.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
-            Spacer()
-            Button(
-              action: {
-                viewStore.send(.view(.nextPeriodTapped))
-              },
-              label: {
-                Image(systemName: "arrowshape.right")
-                  .foregroundStyle(Color.actionBlue)
-                  .font(.system(size: 16.0))
-              }
-            )
-          }
-        },
-        rightContent: { },
-        content: {
-          reportDaysView(viewStore: viewStore)
-        }
-      )
-    }
-  }
-
   private func reportDaysView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     LazyVGrid(columns: columns, spacing: 10) {
       ForEach(viewStore.reportDays) { item in
@@ -268,6 +249,24 @@ public struct ReportsView: View {
       }
     case .empty, .notPlanned:
       Color.clear
+    }
+  }
+
+  @MainActor
+  @ViewBuilder
+  private func activitiesByTag(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+    if !viewStore.tagActivitySections.isEmpty {
+      SectionView(
+        name: String(localized: "Activities By Tags", bundle: .module),
+        rightContent: { EmptyView() },
+        content: {
+          ActivitiesByTagView(
+            selectedTag: viewStore.$selectedTagActivity,
+            tagActivitySections: viewStore.tagActivitySections
+          )
+          .formBackgroundModifier()
+        }
+      )
     }
   }
 }

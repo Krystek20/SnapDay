@@ -7,7 +7,7 @@ public struct ActivitiesByTagView: View {
 
   // MARK: - Properties
 
-  private let timePeriodActivitySections: [TimePeriodActivitySection]
+  private let tagActivitySections: [TagActivitySection]
   private let columns: [GridItem] = [
     GridItem(.flexible(), spacing: 15.0, alignment: nil),
     GridItem(.flexible(), spacing: 15.0, alignment: nil)
@@ -16,8 +16,8 @@ public struct ActivitiesByTagView: View {
 
   // MARK: - Initialization
 
-  public init(selectedTag: Binding<Tag?>, timePeriodActivitySections: [TimePeriodActivitySection]) {
-    self.timePeriodActivitySections = timePeriodActivitySections
+  public init(selectedTag: Binding<Tag?>, tagActivitySections: [TagActivitySection]) {
+    self.tagActivitySections = tagActivitySections
     self._selectedTag = selectedTag
   }
 
@@ -27,11 +27,11 @@ public struct ActivitiesByTagView: View {
     VStack(alignment: .leading, spacing: 10.0) {
       ScrollView(.horizontal) {
         HStack(spacing: 10.0) {
-          ForEach(timePeriodActivitySections.map(\.tag), content: tagView)
+          ForEach(tagActivitySections.map(\.tag), content: tagView)
         }
       }
-      if let timePeriodActivitySection = timePeriodActivitySections.first(where: { $0.tag == selectedTag }) {
-        activityDetailsSectionView(timePeriodActivitySection)
+      if let tagActivitySection = tagActivitySections.first(where: { $0.tag == selectedTag }) {
+        activityDetailsSectionView(tagActivitySection)
       }
     }
   }
@@ -44,9 +44,9 @@ public struct ActivitiesByTagView: View {
       }
   }
 
-  private func activityDetailsSectionView(_ timePeriodActivitySection: TimePeriodActivitySection) -> some View {
+  private func activityDetailsSectionView(_ section: TagActivitySection) -> some View {
     LazyVGrid(columns: columns, spacing: 15.0) {
-      ForEach(timePeriodActivitySection.timePeriodActivities, content: activityDetailsView)
+      ForEach(section.timePeriodActivities, content: activityDetailsView)
     }
   }
 

@@ -18,22 +18,25 @@ public struct DashboardFeature: Reducer, TodayProvidable {
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.uuid) private var uuid
+  private let periodTitleProvider = PeriodTitleProvider()
 
   // MARK: - State & Action
 
   public struct State: Equatable, TodayProvidable {
     
     var timePeriods: [TimePeriod] = []
-    var daySummary: DaySummary? {
-      guard let selectedDay else { return nil }
-      return DaySummary(day: selectedDay)
-    }
-    var timePeriodActivitySections: [TimePeriodActivitySection] = []
     var activitiesPresentationType: ActivitiesPresentationType?
     var activityListOption: ActivityListOption = .collapsed
     var periods = Period.allCases
     var timePeriod: TimePeriod?
     var shift: Int = .zero
+    var activitiesPresentationTitle = ""
+
+    var daySummary: DaySummary? {
+      guard let selectedDay else { return nil }
+      return DaySummary(day: selectedDay)
+    }
+
     var linearChartValues: (points: [Double], expectedPoints: Int)? {
       guard let timePeriod else { return nil }
       return (
@@ -41,6 +44,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         expectedPoints: timePeriod.days.count
       )
     }
+
     var activities: [DayActivity] {
       switch activityListOption {
       case .collapsed:
@@ -49,6 +53,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         selectedDay?.sortedDayActivities ?? []
       }
     }
+
     var dayViewShowButtonState: DayViewShowButtonState {
       guard let selectedDay,
             !selectedDay.activities.filter(\.isDone).isEmpty else { return .none }
@@ -61,7 +66,6 @@ public struct DashboardFeature: Reducer, TodayProvidable {
     }
 
     @BindingState var selectedPeriod: Period = .day
-    @BindingState var selectedTag: Tag?
     @BindingState var selectedDay: Day?
 
     @PresentationState var activityList: ActivityListFeature.State?
@@ -83,9 +87,10 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case hideCompletedActivitiesTapped
       case reportButtonTapped
       case selectedPeriod(Period)
+      case increaseButtonTapped
+      case decreaseButtonTapped
     }
     public enum InternalAction: Equatable {
-      case loadOnStart
       case loadTimePeriods
       case timePeriodLoaded(_ timePeriod: TimePeriod)
       case removeDayActivity(_ dayActivity: DayActivity)
@@ -115,7 +120,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .view(.appeared):
         return .concatenate(
           .run { send in
-            await send(.internal(.loadOnStart))
+            await send(.internal(.loadTimePeriods))
           },
           .run { send in
             for await _ in NotificationCenter.default.publisher(for: .NSCalendarDayChanged).values {
@@ -160,13 +165,18 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .view(.selectedPeriod(let period)):
         state.selectedPeriod = period
         return .none
+      case .view(.increaseButtonTapped):
+        state.shift += 1
+        return .run { send in
+          await send(.internal(.loadTimePeriods))
+        }
+      case .view(.decreaseButtonTapped):
+        state.shift -= 1
+        return .run { send in
+          await send(.internal(.loadTimePeriods))
+        }
       case .internal(.calendarDayChanged):
         return .run { send in
-          await send(.internal(.loadOnStart))
-        }
-      case .internal(.loadOnStart):
-        return .run { send in
-          try await dayEditor.createDays(today)
           await send(.internal(.loadTimePeriods))
         }
       case .internal(.loadTimePeriods):
@@ -223,6 +233,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .delegate:
         return .none
       case .binding(\.$selectedPeriod):
+        state.shift = .zero
         return .run { send in
           await send(.internal(.loadTimePeriods))
         }
@@ -249,49 +260,43 @@ public struct DashboardFeature: Reducer, TodayProvidable {
 
   private func setupTimePeriodConfiguration(_ state: inout State, timePeriod: TimePeriod) {
     do {
-      setupSectionsAndSelectedTag(&state, timePeriod: timePeriod)
-      try setupPresentationTypeAndSelectedDay(&state, timePeriod: timePeriod)
+      let presentationTypeProvider = ActivitiesPresentationTypeProvider()
+      let presentationType = try presentationTypeProvider.presentationType(for: timePeriod)
+      state.activitiesPresentationType = presentationType
+      state.selectedDay = findSelectedDay(for: presentationType, currentSelectedDay: state.selectedDay)
+      let filterDate = FilterDate(type: presentationType, dateRange: timePeriod.dateRange)
+      state.activitiesPresentationTitle = try periodTitleProvider.title(for: filterDate)
     } catch {
       print(error)
     }
   }
 
-  private func setupSectionsAndSelectedTag(_ state: inout State, timePeriod: TimePeriod) {
-    let timePeriodActivitySectionProvider = TimePeriodActivitySectionProvider()
-    let sections = timePeriodActivitySectionProvider.timePeriodActivitiesSections(for: timePeriod)
-    state.timePeriodActivitySections = sections
-    state.selectedTag = sections.first?.tag
-  }
-
-  private func setupPresentationTypeAndSelectedDay(_ state: inout State, timePeriod: TimePeriod) throws {
-    let presentationTypeProvider = ActivitiesPresentationTypeProvider()
-    let presentationType = try presentationTypeProvider.presentationType(for: timePeriod)
-    state.activitiesPresentationType = presentationType
-    state.selectedDay = findSelectedDay(for: presentationType, currentSelectedDay: state.selectedDay)
-  }
-
-  private func findSelectedDay(for presentationType: ActivitiesPresentationType?, currentSelectedDay: Day?) -> Day? {
-    guard let presentationType else { return nil }
-    if case .daysList(let style) = presentationType {
-      switch style {
-      case .single(let day):
-        return day
-      case .multi(let days):
-        return currentSelectedDay != nil
-        ? days.first(where: { $0.date == currentSelectedDay?.date })
-        : days.first(where: { $0.date == today })
-      }
-    } else if case .calendar(_, let calendarItems) = presentationType {
-      return currentSelectedDay != nil
+  private func findSelectedDay(for presentationType: ActivitiesPresentationType, currentSelectedDay: Day?) -> Day? {
+    switch presentationType {
+    case .monthsList:
+      return nil
+    case .calendar(let calendarItems):
+      let calendarDays = calendarItems.map(\.day)
+      let todayDay = calendarItems.first(where: {
+        guard case .day(let day) = $0 else { return false }
+        return day.date == today
+      })?.day
+      guard let currentSelectedDate = currentSelectedDay?.date else { return todayDay }
+      return calendarDays.contains(where: { $0?.date == currentSelectedDate })
       ? calendarItems.first(where: {
         guard case .day(let day) = $0 else { return false }
         return day.date == currentSelectedDay?.date
       })?.day
-      : calendarItems.first(where: {
-        guard case .day(let day) = $0 else { return false }
-        return day.date == today
-      })?.day
+      : todayDay
+    case .daysList(let style):
+      switch style {
+      case .single(let day):
+        return day
+      case .multi(let days):
+        return days.contains(where: { $0.date == currentSelectedDay?.date })
+        ? days.first(where: { $0.date == currentSelectedDay?.date })
+        : days.first(where: { $0.date == today })
+      }
     }
-    return nil
   }
 }

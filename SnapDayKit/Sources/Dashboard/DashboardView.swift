@@ -22,26 +22,36 @@ public struct DashboardView: View {
 
   // MARK: - Views
 
+
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      ScrollView {
-        picker(viewStore: viewStore)
-          .padding(.horizontal, 15.0)
+      ZStack(alignment: .top) {
+        ScrollView {
+          picker(viewStore: viewStore)
+            .padding(.horizontal, 15.0)
+            .padding(.top, 65.0)
 
-        periods(viewStore: viewStore)
-          .padding(.horizontal, 15.0)
-          .padding(.top, 15.0)
+          periods(viewStore: viewStore)
+            .padding(.horizontal, 15.0)
+            .padding(.top, 15.0)
 
-        summaryOnTheChart(viewStore: viewStore)
-          .padding(.horizontal, 15.0)
-          .padding(.top, 15.0)
+          summaryOnTheChart(viewStore: viewStore)
+            .padding(.horizontal, 15.0)
+            .padding(.top, 15.0)
+        }
+        .maxWidth()
+        .scrollIndicators(.hidden)
 
-        activitiesByTag(viewStore: viewStore)
-          .padding(.horizontal, 15.0)
-          .padding(.top, 15.0)
+        Switcher(
+          title: viewStore.activitiesPresentationTitle,
+          leftArrowAction: {
+            viewStore.send(.view(.decreaseButtonTapped))
+          },
+          rightArrowAction: {
+            viewStore.send(.view(.increaseButtonTapped))
+          }
+        )
       }
-      .maxWidth()
-      .scrollIndicators(.hidden)
       .activityBackground
       .sheet(
         store: store.scope(
@@ -83,6 +93,7 @@ public struct DashboardView: View {
         viewStore.send(.view(.appeared))
       }
       .navigationTitle(String(localized: "Dashboard", bundle: .module))
+      .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
           HStack {
@@ -95,7 +106,7 @@ public struct DashboardView: View {
                   .foregroundStyle(Color.lavenderBliss)
               }
             )
-            
+
             Menu {
               Button(String(localized: "One-time activity", bundle: .module), action: {
                 viewStore.send(.view(.oneTimeActivityButtonTapped))
@@ -112,8 +123,7 @@ public struct DashboardView: View {
       }
     }
   }
-
-  @MainActor 
+  @MainActor
   private func picker(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
     Picker(
       selection: viewStore.$selectedPeriod,
@@ -143,19 +153,16 @@ public struct DashboardView: View {
     }
   }
 
-  @ViewBuilder
   @MainActor
   private func periods(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    if let activitiesPresentationType = viewStore.activitiesPresentationType {
-      SectionView(
-        name: activitiesPresentationType.title,
-        rightContent: { },
-        content: {
-          periodsContent(viewStore: viewStore)
-            .formBackgroundModifier(padding: EdgeInsets(.zero))
-        }
-      )
-    }
+    SectionView(
+      name: viewStore.activitiesPresentationTitle,
+      rightContent: { },
+      content: {
+        periodsContent(viewStore: viewStore)
+          .formBackgroundModifier(padding: EdgeInsets(.zero))
+      }
+    )
   }
 
   @ViewBuilder
@@ -165,7 +172,7 @@ public struct DashboardView: View {
       switch activitiesPresentationType {
       case .monthsList(let timePeriods):
         monthsView(timePeriods: timePeriods, viewStore: viewStore)
-      case .calendar(_, let calendarItems):
+      case .calendar(let calendarItems):
         calendarView(calendarItems: calendarItems, viewStore: viewStore)
       case .daysList(let style):
         dayList(daysSelectorStyle: style, viewStore: viewStore)
@@ -176,7 +183,6 @@ public struct DashboardView: View {
   private func monthsView(timePeriods: [TimePeriod], viewStore: ViewStoreOf<DashboardFeature>) -> some View {
     TimePeriodsView(
       timePeriods: timePeriods,
-      type: .list,
       timePeriodTapped: { timePeriod in
 //          viewStore.send(.view(.timePeriodTapped(timePeriod)))
       }
@@ -233,33 +239,5 @@ public struct DashboardView: View {
         viewStore.send(.view(.hideCompletedActivitiesTapped))
       }
     )
-  }
-
-  @MainActor
-  private func activitiesByTag(viewStore: ViewStoreOf<DashboardFeature>) -> some View {
-    SectionView(
-      name: String(localized: "Activities By Tags", bundle: .module),
-      rightContent: { EmptyView() },
-      content: {
-        ActivitiesByTagView(
-          selectedTag: viewStore.$selectedTag,
-          timePeriodActivitySections: viewStore.timePeriodActivitySections
-        )
-        .formBackgroundModifier()
-      }
-    )
-  }
-}
-
-extension ActivitiesPresentationType {
-  public var title: String {
-    switch self {
-    case .monthsList:
-      String(localized: "Months", bundle: .module)
-    case .calendar(let monthName, _):
-      monthName
-    case .daysList:
-      String(localized: "Days", bundle: .module)
-    }
   }
 }

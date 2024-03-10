@@ -1,13 +1,6 @@
 import Foundation
-import Dependencies
 import Utilities
-
-enum FilterDate: Equatable {
-  case singleDay(Date)
-  case singleMonth(ClosedRange<Date>)
-  case dateRange(ClosedRange<Date>)
-  case monthsRange(ClosedRange<Date>)
-}
+import Models
 
 extension FilterDate {
   init?(filter: FilterPeriod?, lowerBound: Date, upperBound: Date?) {
@@ -33,31 +26,6 @@ extension FilterDate {
 }
 
 extension FilterDate {
-  var title: String {
-    let formatter = DateFormatter(filterDate: self)
-    @Dependency(\.calendar) var calendar
-    switch self {
-    case .singleDay(let date):
-      return formatter.string(from: date)
-    case .singleMonth(let range):
-      do {
-        return try calendar.monthName(range.lowerBound).capitalized + " " + formatter.string(from: range.lowerBound)
-      } catch {
-        return ""
-      }
-    case .dateRange(let range):
-      return formatter.string(from: range.lowerBound) + " - " + formatter.string(from: range.upperBound)
-    case .monthsRange(let range):
-      do {
-        let lowerBound = try calendar.monthName(range.lowerBound).capitalized + " " + formatter.string(from: range.lowerBound)
-        let upperBound = try calendar.monthName(range.upperBound).capitalized + " " + formatter.string(from: range.upperBound)
-        return lowerBound + " - " + upperBound
-      } catch {
-        return ""
-      }
-    }
-  }
-
   var range: ClosedRange<Date> {
     switch self {
     case .singleDay(let date):
@@ -90,20 +58,6 @@ extension FilterDate {
       .dateRange(closedRange.lowerBound...value)
     case .monthsRange(let closedRange):
       .monthsRange(closedRange.lowerBound...value)
-    }
-  }
-}
-
-private extension DateFormatter {
-  convenience init(filterDate: FilterDate) {
-    self.init()
-    switch filterDate {
-    case .singleDay:
-      dateFormat = "EEEE, d MMM yyyy"
-    case .dateRange:
-      dateFormat = "d MMM yyyy"
-    case .monthsRange, .singleMonth:
-      dateFormat = "yyyy"
     }
   }
 }

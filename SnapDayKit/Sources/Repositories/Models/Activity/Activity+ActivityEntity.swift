@@ -18,7 +18,8 @@ extension Activity {
       frequency: frequency,
       isDefaultDuration: entity.isDefaultDuration,
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
-      isVisible: entity.isVisible
+      isVisible: entity.isVisible,
+      startDate: entity.startDate
     )
   }
 }

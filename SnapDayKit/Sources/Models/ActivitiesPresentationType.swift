@@ -7,6 +7,6 @@ public enum DaysSelectorStyle: Equatable {
 
 public enum ActivitiesPresentationType: Equatable {
   case monthsList([TimePeriod])
-  case calendar(monthName: String, [CalendarItemType])
+  case calendar([CalendarItemType])
   case daysList(DaysSelectorStyle)
 }

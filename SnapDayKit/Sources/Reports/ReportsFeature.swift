@@ -44,9 +44,12 @@ public struct ReportsFeature: Reducer, TodayProvidable {
   public struct State: Equatable, TodayProvidable {
 
     var dateFilters = FilterPeriod.allCases
-    @BindingState var selectedFilterPeriod: FilterPeriod?
+    @BindingState var selectedFilterPeriod: FilterPeriod
     @BindingState var startDate: Date = Date()
     @BindingState var endDate: Date = Date()
+
+    var tagActivitySections: [TagActivitySection] = []
+    @BindingState var selectedTagActivity: Tag?
 
     var tags: [Tag] = []
     @BindingState var selectedTag: Tag?
@@ -57,18 +60,23 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     var reportDays: [ReportDay] = []
     var summary: ReportSummary = .zero
     var periodShift = Int.zero
+    var isSwitcherDismissed = false
+    var switcherTitle: String = ""
 
     var filterDate: FilterDate? {
       didSet {
         startDate = filterDate?.range.lowerBound ?? today
         endDate = filterDate?.range.upperBound ?? today
+        guard let filterDate, let title = try? PeriodTitleProvider().title(for: filterDate) else { return }
+        switcherTitle = title
       }
     }
+    
     var showCustomDate: Bool {
       selectedFilterPeriod == .custom
     }
 
-    public init(selectedFilterDate: FilterPeriod? = .week) {
+    public init(selectedFilterDate: FilterPeriod = .month) {
       self.selectedFilterPeriod = selectedFilterDate
     }
   }
@@ -76,8 +84,8 @@ public struct ReportsFeature: Reducer, TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
-      case previousPeriodTapped
-      case nextPeriodTapped
+      case decreaseButtonTapped
+      case increaseButtonTapped
     }
     public enum InternalAction: Equatable {
       case loadDays
@@ -110,14 +118,14 @@ public struct ReportsFeature: Reducer, TodayProvidable {
           await send(.internal(.tagsLoaded(tags)))
           await send(.internal(.loadDays))
         }
-      case .view(.previousPeriodTapped):
+      case .view(.decreaseButtonTapped):
         state.periodShift -= 1
         let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
         state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
         return .run { send in
           await send(.internal(.loadDays))
         }
-      case .view(.nextPeriodTapped):
+      case .view(.increaseButtonTapped):
         state.periodShift += 1
         let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
         state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
@@ -143,6 +151,8 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         state.activities = activities.filter { $0.tags.contains(where: { $0 == state.selectedTag }) }
         state.selectedActivity = nil
 
+        setupSectionsAndSelectedTag(&state, days: days)
+
         return .run { send in
           await send(.internal(.loadSummary))
           await send(.internal(.loadReportDays))
@@ -166,6 +176,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         )
         return .none
       case .binding(\.$selectedFilterPeriod):
+        state.isSwitcherDismissed = state.selectedFilterPeriod == .custom
         let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
         state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
         return .run { send in
@@ -229,5 +240,12 @@ public struct ReportsFeature: Reducer, TodayProvidable {
       lowerBound = calendar.date(byAdding: .month, value: -1, to: lowerBound) ?? today
       return lowerBound...today
     }
+  }
+
+  private func setupSectionsAndSelectedTag(_ state: inout State, days: [Day]) {
+    let tagSectionsProvider = TagSectionsProvider()
+    let sections = tagSectionsProvider.sections(for: days)
+    state.tagActivitySections = sections
+    state.selectedTagActivity = sections.first?.tag
   }
 }

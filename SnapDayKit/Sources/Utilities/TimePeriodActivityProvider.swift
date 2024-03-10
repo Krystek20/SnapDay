@@ -1,15 +1,15 @@
 import Foundation
 import Models
 
-public struct TimePeriodActivitySectionProvider {
+public struct TagSectionsProvider {
 
   public init() { }
 
-  public func timePeriodActivitiesSections(for timePeriod: TimePeriod) -> [TimePeriodActivitySection] {
-    timePeriod.days
+  public func sections(for days: [Day]) -> [TagActivitySection] {
+    days
       .reduce(into: [TimePeriodActivity](), reduceIntoTimePeriodActivity)
       .sorted(by: { $0.activity.name < $1.activity.name })
-      .reduce(into: [TimePeriodActivitySection](), reduceIntoTimePeriodActivitySections)
+      .reduce(into: [TagActivitySection](), reduceIntoTimePeriodActivitySections)
       .sorted(by: { $0.tag.name < $1.tag.name })
   }
 
@@ -34,13 +34,13 @@ public struct TimePeriodActivitySectionProvider {
     }
   }
 
-  private func reduceIntoTimePeriodActivitySections(_ result: inout [TimePeriodActivitySection], timePeriodActivity: TimePeriodActivity) {
+  private func reduceIntoTimePeriodActivitySections(_ result: inout [TagActivitySection], timePeriodActivity: TimePeriodActivity) {
     timePeriodActivity.activity.tags.forEach { tag in
       if let index = result.firstIndex(where: { $0.tag == tag }) {
         result[index].timePeriodActivities.append(timePeriodActivity)
       } else {
         result.append(
-          TimePeriodActivitySection(
+          TagActivitySection(
             tag: tag,
             timePeriodActivities: [timePeriodActivity]
           )

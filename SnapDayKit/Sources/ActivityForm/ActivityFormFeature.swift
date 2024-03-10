@@ -6,7 +6,7 @@ import Models
 import EmojiPicker
 import Utilities
 
-public struct ActivityFormFeature: Reducer {
+public struct ActivityFormFeature: Reducer, TodayProvidable {
 
   public enum ActivityFormType {
     case new
@@ -141,6 +141,7 @@ public struct ActivityFormFeature: Reducer {
         state.activity.image = nil
         return .none
       case .view(.saveButtonTapped):
+        state.activity.startDate = today
         return .run { [activity = state.activity, type = state.type] send in
           try await saveActivity(activity)
           switch type {

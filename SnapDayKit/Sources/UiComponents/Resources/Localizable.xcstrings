@@ -39,9 +39,6 @@
     "Completed activities" : {
 
     },
-    "Daily" : {
-
-    },
     "Deselect" : {
 
     },
@@ -49,12 +46,6 @@
 
     },
     "Hide completed" : {
-
-    },
-    "Monthly" : {
-
-    },
-    "Quarterly" : {
 
     },
     "Remaining Time" : {
@@ -73,9 +64,6 @@
 
     },
     "Total: %lld" : {
-
-    },
-    "Weekly" : {
 
     }
   },
