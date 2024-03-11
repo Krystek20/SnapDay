@@ -6,6 +6,7 @@ extension DayActivityEntity {
     identifier = dayActivity.id
     isDone = dayActivity.isDone
     duration = Int32(dayActivity.duration)
+    overview = dayActivity.overview
     isGeneratedAutomatically = dayActivity.isGeneratedAutomatically
   }
 }

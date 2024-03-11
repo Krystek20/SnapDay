@@ -33,8 +33,9 @@ public struct DayActivityFormView: View {
   }
 
   private func content(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
-    VStack(spacing: .zero) {
+    VStack(spacing: 15.0) {
       formView(viewStore: viewStore)
+      overviewTextField(viewStore: viewStore)
       Spacer()
       bottomView(viewStore: viewStore)
         .padding(.bottom, 15.0)
@@ -66,6 +67,20 @@ public struct DayActivityFormView: View {
         set: { viewStore.$dayActivity.wrappedValue.setDurationMinutes($0) }
       )
     )
+  }
+
+  @State private var name: String = ""
+
+  private func overviewTextField(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+    FormTextField(
+      title: String(localized: "Overview", bundle: .module),
+      placeholder: String(localized: "Enter overview", bundle: .module),
+      value: Binding(
+        get: { viewStore.dayActivity.overview ?? "" },
+        set: { viewStore.$dayActivity.wrappedValue.overview = $0 }
+      )
+    )
+    .padding(.horizontal, 15.0)
   }
 
   private func bottomView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {

@@ -159,6 +159,7 @@ struct DayUpdater {
       activity: activity,
       isDone: false,
       duration: activity.defaultDuration ?? .zero,
+      overview: nil,
       isGeneratedAutomatically: !createdByUser
     )
   }

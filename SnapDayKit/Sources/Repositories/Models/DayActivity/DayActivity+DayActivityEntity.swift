@@ -11,6 +11,7 @@ extension DayActivity {
       activity: activity,
       isDone: entity.isDone,
       duration: Int(entity.duration),
+      overview: entity.overview,
       isGeneratedAutomatically: entity.isGeneratedAutomatically
     )
   }

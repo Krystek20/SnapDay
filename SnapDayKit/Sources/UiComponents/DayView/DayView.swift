@@ -174,12 +174,7 @@ public struct DayView: View {
           .font(.system(size: 14.0, weight: .medium))
           .foregroundStyle(Color.slateHaze)
           .strikethrough(dayActivity.isDone, color: .slateHaze)
-        if let textDuration = duration(for: dayActivity) {
-          Text(textDuration)
-            .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.slateHaze)
-            .strikethrough(dayActivity.isDone, color: .slateHaze)
-        }
+        subtitleView(for: dayActivity)
       }
       Spacer()
       Image(systemName: "ellipsis")
@@ -189,12 +184,40 @@ public struct DayView: View {
     .padding(.all, 10.0)
   }
 
+  @ViewBuilder
+  private func subtitleView(for dayActivity: DayActivity) -> some View {
+    HStack(spacing: 5.0) {
+      if let overview = dayActivity.overview, !overview.isEmpty {
+        Text(overview)
+          .font(.system(size: 12.0, weight: .regular))
+          .lineLimit(1)
+          .foregroundStyle(Color.slateHaze)
+          .strikethrough(dayActivity.isDone, color: .slateHaze)
+      }
+
+      if let textDuration = duration(for: dayActivity) {
+        if dayActivity.overview != nil && dayActivity.overview?.isEmpty == false {
+          Text("-")
+            .font(.system(size: 12.0, weight: .regular))
+            .foregroundStyle(Color.slateHaze)
+        }
+
+        Text(textDuration)
+          .font(.system(size: 12.0, weight: .regular))
+          .foregroundStyle(Color.slateHaze)
+          .strikethrough(dayActivity.isDone, color: .slateHaze)
+      }
+    }
+  }
+
   // MARK: - Helpers
 
   private func duration(for dayActivity: DayActivity) -> String? {
     guard dayActivity.duration > .zero else { return nil }
     let minutes = dayActivity.duration % 60
     let hours = dayActivity.duration / 60
-    return String(localized: "\(hours)h \(minutes)min", bundle: .module)
+    return hours > .zero
+    ? String(localized: "\(hours)h \(minutes)min", bundle: .module)
+    : String(localized: "\(minutes)min", bundle: .module)
   }
 }
