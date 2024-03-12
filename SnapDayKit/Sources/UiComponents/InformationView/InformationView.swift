@@ -24,10 +24,10 @@ public struct InformationView: View {
     VStack(spacing: 5.0) {
       Text(configuration.title)
         .font(.system(size: 16.0, weight: .bold))
-        .foregroundStyle(Color.slateHaze)
+        .foregroundStyle(Color.sectionText)
       Text(configuration.subtitle)
         .font(.system(size: 14.0, weight: .medium))
-        .foregroundStyle(Color.slateHaze)
+        .foregroundStyle(Color.sectionText)
         .multilineTextAlignment(.center)
     }
     .maxWidth(alignment: .center)

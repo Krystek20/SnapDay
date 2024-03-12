@@ -28,7 +28,7 @@ public struct MonthlyWeekdaysView: View {
         VStack(alignment: .leading, spacing: 2.0) {
           Text(position.name)
             .font(.system(size: 12.0, weight: .bold))
-            .foregroundStyle(Color.slateHaze)
+            .foregroundStyle(Color.sectionText)
             .offset(x: 5.0)
           WeekdaysView(
             selectedWeekdays: Binding(

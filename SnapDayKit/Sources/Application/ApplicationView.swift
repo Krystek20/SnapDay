@@ -18,13 +18,13 @@ public struct ApplicationView: View {
 
     #warning("Move it")
     let appearance = UINavigationBarAppearance()
-    appearance.backgroundColor = UIColor.grayLight
+    appearance.backgroundColor = UIColor.background
     appearance.shadowImage = nil
     appearance.shadowColor = nil
 
     appearance.titleTextAttributes = [
       .font: UIFont.systemFont(ofSize: 16.0, weight: .medium),
-      .foregroundColor: UIColor.deepSpaceBlue
+      .foregroundColor: UIColor.standardText
     ]
 
     let scrollEdgeAppearance = appearance.copy()

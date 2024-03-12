@@ -98,20 +98,19 @@ public struct DayView: View {
       HStack(spacing: 10.0) {
         CircularProgressView(
           progress: completedActivities.percent,
-          showPercent: false,
           lineWidth: 4.0
         )
         .frame(width: 20.0, height: 20.0)
         Text("Completed activities", bundle: .module)
           .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.slateHaze)
+          .foregroundStyle(Color.standardText)
         Spacer()
         Text("\(completedActivities.doneCount) / \(completedActivities.totalCount)", bundle: .module)
-          .font(.system(size: 12.0, weight: .medium))
-          .foregroundStyle(Color.slateHaze)
+          .font(.system(size: 12.0, weight: .semibold))
+          .foregroundStyle(Color.standardText)
       }
       .padding(.all, 14.0)
-      .background(Color.etherealLavender)
+      .background(Color.selection)
     }
   }
 
@@ -147,12 +146,12 @@ public struct DayView: View {
           HStack(spacing: 12.5) {
             icon
               .resizable()
-              .foregroundStyle(Color.lavenderBliss)
+              .foregroundStyle(Color.actionBlue)
               .frame(width: 15.0, height: 15.0)
               .padding(.leading, 2.5)
             Text(title)
               .font(.system(size: 14.0, weight: .medium))
-              .foregroundStyle(Color.lavenderBliss)
+              .foregroundStyle(Color.actionBlue)
             Spacer()
           }
           .padding(.all, 14.0)
@@ -172,13 +171,13 @@ public struct DayView: View {
       VStack(alignment: .leading, spacing: 2.0) {
         Text(dayActivity.activity.name)
           .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.slateHaze)
-          .strikethrough(dayActivity.isDone, color: .slateHaze)
+          .foregroundStyle(Color.sectionText)
+          .strikethrough(dayActivity.isDone, color: .sectionText)
         subtitleView(for: dayActivity)
       }
       Spacer()
       Image(systemName: "ellipsis")
-        .foregroundStyle(Color.slateHaze)
+        .foregroundStyle(Color.sectionText)
         .imageScale(.medium)
     }
     .padding(.all, 10.0)
@@ -191,21 +190,21 @@ public struct DayView: View {
         Text(overview)
           .font(.system(size: 12.0, weight: .regular))
           .lineLimit(1)
-          .foregroundStyle(Color.slateHaze)
-          .strikethrough(dayActivity.isDone, color: .slateHaze)
+          .foregroundStyle(Color.sectionText)
+          .strikethrough(dayActivity.isDone, color: .sectionText)
       }
 
       if let textDuration = duration(for: dayActivity) {
         if dayActivity.overview != nil && dayActivity.overview?.isEmpty == false {
           Text("-")
             .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.slateHaze)
+            .foregroundStyle(Color.sectionText)
         }
 
         Text(textDuration)
           .font(.system(size: 12.0, weight: .regular))
-          .foregroundStyle(Color.slateHaze)
-          .strikethrough(dayActivity.isDone, color: .slateHaze)
+          .foregroundStyle(Color.sectionText)
+          .strikethrough(dayActivity.isDone, color: .sectionText)
       }
     }
   }

@@ -61,18 +61,18 @@ public struct ActivitiesByTagView: View {
         Text(timePeriodActivity.activity.name)
           .lineLimit(1)
           .font(.system(size: 16.0, weight: .bold))
-          .foregroundStyle(Color.slateHaze)
+          .foregroundStyle(Color.sectionText)
         Spacer()
       }
 
       if timePeriodActivity.duration > .zero {
         HStack {
           Image(systemName: "clock")
-            .foregroundStyle(Color.slateHaze)
+            .foregroundStyle(Color.sectionText)
             .imageScale(.small)
           Text(TimeProvider.duration(from: timePeriodActivity.duration, bundle: .module) ?? "")
             .font(.system(size: 12.0, weight: .bold))
-            .foregroundStyle(Color.slateHaze)
+            .foregroundStyle(Color.sectionText)
         }
       }
 
@@ -81,19 +81,19 @@ public struct ActivitiesByTagView: View {
           HStack(alignment: .bottom) {
             Text("\(timePeriodActivity.percent)%", bundle: .module)
               .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
             Spacer()
             Text("\(timePeriodActivity.doneCount) / \(timePeriodActivity.totalCount)", bundle: .module)
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.slateHaze)
+              .foregroundStyle(Color.sectionText)
           }
         }
       } else {
         Text("Total: \(timePeriodActivity.doneCount)", bundle: .module)
           .font(.system(size: 14.0, weight: .bold))
-          .foregroundStyle(Color.deepSpaceBlue)
+          .foregroundStyle(Color.standardText)
       }
     }
-    .formBackgroundModifier(color: .etherealLavender)
+    .formBackgroundModifier(color: .selection)
   }
 }

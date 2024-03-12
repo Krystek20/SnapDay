@@ -36,14 +36,14 @@ public struct EmojiPickerView: View {
             viewStore.send(.view(.saveButtonTapped))
           }
           .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.lavenderBliss)
+          .foregroundStyle(Color.actionBlue)
         }
         ToolbarItem(placement: .topBarLeading) {
           Button(String(localized: "Cancel", bundle: .module)) {
             viewStore.send(.view(.cancelButtonTapped))
           }
           .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.lavenderBliss)
+          .foregroundStyle(Color.actionBlue)
         }
       }
     }
@@ -53,7 +53,7 @@ public struct EmojiPickerView: View {
     VStack(alignment: .leading, spacing: 5.0) {
       Text("Pick an emoji to make your activity uniquely yours.", bundle: .module)
         .font(.system(size: 12.0, weight: .regular))
-        .foregroundStyle(Color.slateHaze)
+        .foregroundStyle(Color.sectionText)
         .fixedSize(horizontal: false, vertical: true)
       Divider().standard.padding(.top, 10.0)
     }

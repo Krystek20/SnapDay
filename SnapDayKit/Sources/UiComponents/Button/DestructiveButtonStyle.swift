@@ -13,7 +13,7 @@ public struct DestructiveButtonStyle: ButtonStyle {
     configuration
       .label
       .font(.system(size: 14.0, weight: .semibold))
-      .foregroundStyle(Color.crimson)
+      .foregroundStyle(Color.alertText)
       .frame(height: 40.0)
       .maxWidth(alignment: .bottom)
   }

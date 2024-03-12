@@ -78,8 +78,8 @@ public struct FormTagField: View {
 
   private var newTagField: some View {
     TextField(placeholder, text: newTag)
-      .font(.system(size: 16.0, weight: .medium))
-      .foregroundStyle(Color.deepSpaceBlue)
+      .font(.system(size: 16.0, weight: .regular))
+      .foregroundStyle(Color.standardText)
       .padding(.top, tags.isEmpty ? 2.0 : .zero)
       .onSubmit { onSubmit() }
   }

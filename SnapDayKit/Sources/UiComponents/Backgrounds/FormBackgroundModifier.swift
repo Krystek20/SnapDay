@@ -3,7 +3,7 @@ import Resources
 
 public extension View {
   func formBackgroundModifier(
-    color: Color = .pureWhite,
+    color: Color = .formBackground,
     padding: EdgeInsets = EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0)
   ) -> some View {
     modifier(FormBackgroundModifier(color: color, padding: padding))

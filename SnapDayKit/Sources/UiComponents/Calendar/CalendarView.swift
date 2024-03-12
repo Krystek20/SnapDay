@@ -69,7 +69,7 @@ public struct CalendarView: View {
     case .dayOfWeek(let title):
       Text(title)
         .font(.system(size: 12.0, weight: .semibold))
-        .foregroundStyle(Color.deepSpaceBlue)
+        .foregroundStyle(Color.standardText)
     case .day(let day):
       Text(dayNumber(day))
         .font(font(day))
@@ -87,8 +87,8 @@ public struct CalendarView: View {
 
   private func foregroundColor(_ day: Day) -> Color {
     day == selectedDay
-    ? .deepSpaceBlue
-    : .slateHaze
+    ? .standardText
+    : .sectionText
   }
 
   private func font(_ day: Day) -> SwiftUI.Font {

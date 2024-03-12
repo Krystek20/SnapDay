@@ -6,18 +6,15 @@ public struct CircularProgressView: View {
   // MARK: - Properties
 
   private let progress: Double
-  private let showPercent: Bool
   private let lineWidth: Double
 
   // MARK: - Initialization
 
   public init(
     progress: Double,
-    showPercent: Bool,
     lineWidth: Double
   ) {
     self.progress = progress
-    self.showPercent = showPercent
     self.lineWidth = lineWidth
   }
 
@@ -34,11 +31,6 @@ public struct CircularProgressView: View {
           style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
         )
         .rotationEffect(Angle(degrees: -90.0))
-      if showPercent {
-        Text(String(Int(progress * 100)) + "%")
-          .font(.system(size: 45.0, weight: .bold))
-          .foregroundStyle(Color.charcoalGray)
-      }
     }
   }
 }

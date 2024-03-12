@@ -23,14 +23,8 @@ public struct PrimaryButtonStyle: ButtonStyle {
       .frame(height: 40.0)
       .maxWidth(alignment: .bottom)
       .background(
-        backgroundColor
+        Color.actionBlue.opacity(disabled ? 0.3 : 1.0)
           .clipShape(RoundedRectangle(cornerRadius: 10.0))
       )
-  }
-
-  private var backgroundColor: Color {
-    disabled
-    ? .fadedPurple
-    : .lavenderBliss
   }
 }

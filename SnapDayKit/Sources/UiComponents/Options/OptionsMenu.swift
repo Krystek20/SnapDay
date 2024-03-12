@@ -44,7 +44,7 @@ public struct OptionsView<Option: Optionable>: View {
           guard selected?.name != option.name else { return }
           selected = option
         }
-        .font(.system(size: 14.0, weight: .semibold))
+        .font(.system(size: 14.0, weight: .medium))
         .foregroundStyle(foregroundColor(for: option))
         .background(backgroundView(for: option))
     }
@@ -54,18 +54,18 @@ public struct OptionsView<Option: Optionable>: View {
   @ViewBuilder
   private func backgroundView(for option: Option) -> some View {
     if option.name == selected?.name {
-      Color.lavenderBliss
+      Color.actionBlue
         .clipShape(RoundedRectangle(cornerRadius: 15.0))
     } else {
       RoundedRectangle(cornerRadius: 15.0)
-        .stroke(Color.lavenderBliss, lineWidth: 1.0)
+        .stroke(Color.actionBlue, lineWidth: 1.0)
         .padding(1.0)
     }
   }
 
   private func foregroundColor(for option: Option) -> Color {
     guard option.name == selected?.name else {
-      return .deepSpaceBlue
+      return .standardText
     }
     return .pureWhite
   }

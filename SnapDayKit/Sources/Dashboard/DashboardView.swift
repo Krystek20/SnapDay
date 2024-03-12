@@ -103,7 +103,7 @@ public struct DashboardView: View {
               },
               label: {
                 Image(systemName: "text.badge.checkmark")
-                  .foregroundStyle(Color.lavenderBliss)
+                  .foregroundStyle(Color.actionBlue)
               }
             )
 
@@ -116,7 +116,7 @@ public struct DashboardView: View {
               })
             } label: {
               Image(systemName: "plus.app")
-                .foregroundStyle(Color.lavenderBliss)
+                .foregroundStyle(Color.actionBlue)
             }
           }
         }

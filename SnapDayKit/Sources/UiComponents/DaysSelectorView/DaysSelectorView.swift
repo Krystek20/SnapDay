@@ -89,8 +89,8 @@ public struct DaysSelectorView: View {
 
   private func foregroundColor(_ day: Day) -> Color {
     day == selectedDay
-    ? .deepSpaceBlue
-    : .slateHaze
+    ? .standardText
+    : .sectionText
   }
 
   private func font(_ day: Day) -> SwiftUI.Font {

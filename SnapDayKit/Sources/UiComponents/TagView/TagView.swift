@@ -35,7 +35,7 @@ public struct TagView: View {
 
   private var tagForegroundStyle: some ShapeStyle {
     tag.rgbColor.isLight()
-    ? Color.slateHaze
+    ? Color.sectionText
     : Color.pureWhite
   }
 

@@ -31,7 +31,7 @@ public struct FormTextField: View {
       }
       TextField(placeholder, text: value)
         .font(.system(size: 16.0, weight: .regular))
-        .foregroundStyle(Color.deepSpaceBlue)
+        .foregroundStyle(Color.standardText)
     }
     .formBackgroundModifier()
   }

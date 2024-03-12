@@ -37,7 +37,7 @@ public struct LinearChartView: View {
         horizontalLine(for: lastPosition.y, proxy: proxy)
         Text(String(Int(percent * 100)) + "%")
           .font(.system(size: 10.0, weight: .bold))
-          .foregroundStyle(Color.charcoalGray)
+          .foregroundStyle(Color.sectionText)
           .offset(y: lastPosition.y)
       }
     }
@@ -69,7 +69,7 @@ public struct LinearChartView: View {
       path.addLine(to: CGPoint(x: proxy.size.width, y: yPosition))
     }
     .stroke(lineWidth: 1.0)
-    .foregroundColor(.charcoalGray.opacity(0.2))
+    .foregroundColor(.sectionText.opacity(0.2))
   }
 
   private func position(for point: Double, index: Int, proxy: GeometryProxy) -> CGPoint {

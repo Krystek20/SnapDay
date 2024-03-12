@@ -184,33 +184,33 @@ public struct ReportsView: View {
           HStack(spacing: 5.0) {
             Text("Done Count", bundle: .module)
               .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
             Spacer()
             Text("\(summary.doneCount)")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
           }
         }
         if summary.notDoneCount > .zero {
           HStack(spacing: 5.0) {
             Text("Not Done Count", bundle: .module)
               .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
             Spacer()
             Text("\(summary.notDoneCount)")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
           }
         }
         if summary.duration > .zero {
           HStack(spacing: 5.0) {
             Text("Total Time", bundle: .module)
               .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
             Spacer()
             Text(TimeProvider.duration(from: summary.duration, bundle: .module) ?? "")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
           }
         }
       }
@@ -226,7 +226,7 @@ public struct ReportsView: View {
           if let title = item.title {
             Text(title)
               .font(.system(size: 12.0, weight: .semibold))
-              .foregroundStyle(Color.deepSpaceBlue)
+              .foregroundStyle(Color.standardText)
           }
           reportDayActivityView(item, viewStore: viewStore)
             .frame(height: 30.0)

@@ -38,11 +38,11 @@ public struct TimePeriodsView: View {
     VStack(alignment: .leading, spacing: 10.0) {
       Text(name(for: timePeriod))
         .font(.system(size: 14.0, weight: .regular))
-        .foregroundStyle(Color.slateHaze)
+        .foregroundStyle(Color.sectionText)
       ProgressView(value: timePeriod.completedValue) {
         Text("\(timePeriod.percent)%")
           .font(.system(size: 14.0, weight: .semibold))
-          .foregroundStyle(Color.deepSpaceBlue)
+          .foregroundStyle(Color.standardText)
       }
     }
     .formBackgroundModifier()

@@ -18,7 +18,7 @@ public struct SectionView<Content: View, RightContent: View>: View {
   ) {
     self.label = Text(name.uppercased())
       .font(.system(size: 14.0, weight: .regular))
-      .foregroundStyle(Color.deepSpaceBlue)
+      .foregroundStyle(Color.sectionText)
     self.rightContent = rightContent
     self.content = content
   }
