@@ -31,14 +31,16 @@ public struct TimeSummaryView: View {
               .foregroundStyle(Color.standardText)
           }
         }
-        HStack(spacing: 5.0) {
-          Text("Total Task Time", bundle: .module)
-            .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.standardText)
-          Spacer()
-          Text(TimeProvider.duration(from: daySummary.duration, bundle: .module) ?? "")
-            .font(.system(size: 12.0, weight: .semibold))
-            .foregroundStyle(Color.standardText)
+        if daySummary.duration > .zero {
+          HStack(spacing: 5.0) {
+            Text("Total Task Time", bundle: .module)
+              .font(.system(size: 12.0, weight: .regular))
+              .foregroundStyle(Color.standardText)
+            Spacer()
+            Text(TimeProvider.duration(from: daySummary.duration, bundle: .module) ?? "")
+              .font(.system(size: 12.0, weight: .semibold))
+              .foregroundStyle(Color.standardText)
+          }
         }
       }
     }

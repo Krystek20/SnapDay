@@ -12,6 +12,7 @@ public struct DaysSelectorView: View {
   private let daysSelectorStyle: DaysSelectorStyle
   private let daySummary: DaySummary?
   private let dayViewShowButtonState: DayViewShowButtonState
+  private let informationConfiguration: InformationViewConfigurable?
   private let dayActivityTapped: (DayActivity) -> Void
   private let dayActivityEditTapped: (DayActivity) -> Void
   private let removeDayActivityTapped: (DayActivity) -> Void
@@ -26,6 +27,7 @@ public struct DaysSelectorView: View {
     daysSelectorStyle: DaysSelectorStyle,
     daySummary: DaySummary?,
     dayViewShowButtonState: DayViewShowButtonState,
+    informationConfiguration: InformationViewConfigurable?,
     dayActivityTapped: @escaping (DayActivity) -> Void,
     dayActivityEditTapped: @escaping (DayActivity) -> Void,
     removeDayActivityTapped: @escaping (DayActivity) -> Void,
@@ -37,6 +39,7 @@ public struct DaysSelectorView: View {
     self.daysSelectorStyle = daysSelectorStyle
     self.daySummary = daySummary
     self.dayViewShowButtonState = dayViewShowButtonState
+    self.informationConfiguration = informationConfiguration
     self.dayActivityTapped = dayActivityTapped
     self.dayActivityEditTapped = dayActivityEditTapped
     self.removeDayActivityTapped = removeDayActivityTapped
@@ -101,7 +104,7 @@ public struct DaysSelectorView: View {
 
   @ViewBuilder
   private var timeSummary: some View {
-    if let daySummary {
+    if let daySummary, daySummary.duration > .zero {
       TimeSummaryView(daySummary: daySummary)
         .padding(.all, 10.0)
     }
@@ -116,19 +119,11 @@ public struct DaysSelectorView: View {
 
   @ViewBuilder
   private func dayViewList(_ day: Day) -> some View {
-    if day.activities.isEmpty {
-      noActivitiesInformation(isPastDay: day.isOlderThenToday ?? false)
+    if let informationConfiguration {
+      InformationView(configuration: informationConfiguration)
     } else {
       listDayView(day)
     }
-  }
-
-  @ViewBuilder
-  private func noActivitiesInformation(isPastDay: Bool) -> some View {
-    EmptyView()
-    #warning("Fix noActivitiesInformation")
-//    let configuration: EmptyDayConfiguration = isPastDay ? .pastDay : .todayOrFuture
-//    InformationView(configuration: configuration)
   }
 
   private func listDayView(_ day: Day) -> some View {

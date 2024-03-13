@@ -9,6 +9,7 @@ import Common
 import ActivityForm
 import Combine
 import enum UiComponents.DayViewShowButtonState
+import protocol UiComponents.InformationViewConfigurable
 
 public struct DashboardFeature: Reducer, TodayProvidable {
 
@@ -63,6 +64,11 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .extended:
         return .hide
       }
+    }
+
+    var dayInformation: InformationViewConfigurable? {
+      let emptyDayConfiguration: EmptyDayConfiguration = selectedDay?.isOlderThenToday == true ? .pastDay : .todayOrFuture
+      return daySummary?.duration == .zero ? emptyDayConfiguration : nil
     }
 
     @BindingState var selectedPeriod: Period = .day

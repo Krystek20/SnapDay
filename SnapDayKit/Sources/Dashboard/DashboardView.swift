@@ -197,6 +197,7 @@ public struct DashboardView: View {
       calendarItems: calendarItems,
       daySummary: viewStore.daySummary,
       dayViewShowButtonState: viewStore.dayViewShowButtonState,
+      informationConfiguration: viewStore.dayInformation,
       dayActivityTapped: { dayActivity in
         viewStore.send(.view(.dayActivityTapped(dayActivity)))
       },
@@ -223,6 +224,7 @@ public struct DashboardView: View {
       daysSelectorStyle: daysSelectorStyle,
       daySummary: viewStore.daySummary,
       dayViewShowButtonState: viewStore.dayViewShowButtonState,
+      informationConfiguration: viewStore.dayInformation,
       dayActivityTapped: { dayActivity in
         viewStore.send(.view(.dayActivityTapped(dayActivity)))
       },
