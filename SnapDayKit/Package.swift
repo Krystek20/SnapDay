@@ -141,7 +141,7 @@ private enum Module: String {
   var packageDependecies: [Package.Dependency]? {
     switch self {
     case .composableArchitecture:
-      [.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.2.0")]
+      [.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.9.2")]
     default:
       nil
     }

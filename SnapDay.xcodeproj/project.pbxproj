@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		D432465C2AD0820100D3E8F9 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = D432465B2AD0820100D3E8F9 /* Application */; };
-		D432465E2AD0821000D3E8F9 /* Previews in Frameworks */ = {isa = PBXBuildFile; productRef = D432465D2AD0821000D3E8F9 /* Previews */; };
 		D4779AC72B6043280067E3AC /* SnapDayKit in Resources */ = {isa = PBXBuildFile; fileRef = D4779ABD2B6043270067E3AC /* SnapDayKit */; };
 		D4779ACA2B6043280067E3AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4779AC22B6043280067E3AC /* Assets.xcassets */; };
 		D4779ACB2B6043280067E3AC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4779AC42B6043280067E3AC /* Preview Assets.xcassets */; };
@@ -45,7 +44,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D432465C2AD0820100D3E8F9 /* Application in Frameworks */,
-				D432465E2AD0821000D3E8F9 /* Previews in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,7 +130,6 @@
 			name = SnapDay;
 			packageProductDependencies = (
 				D432465B2AD0820100D3E8F9 /* Application */,
-				D432465D2AD0821000D3E8F9 /* Previews */,
 			);
 			productName = SnapToday;
 			productReference = D443ECEE2AD0771C002225CF /* SnapDay.app */;
@@ -368,10 +365,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
-				DEVELOPMENT_TEAM = HQ63E3X3P6;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnapDay/Info.plist;
@@ -385,9 +384,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.mobilove.SnapDay;
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Development";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -399,10 +400,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
-				DEVELOPMENT_TEAM = HQ63E3X3P6;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnapDay/Info.plist;
@@ -416,9 +419,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.mobilove.SnapDay;
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Distribution";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -497,10 +502,6 @@
 		D432465B2AD0820100D3E8F9 /* Application */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Application;
-		};
-		D432465D2AD0821000D3E8F9 /* Previews */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Previews;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

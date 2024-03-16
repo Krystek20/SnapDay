@@ -72,8 +72,10 @@ public struct EntityHandler {
   public func save<T: Entity>(_ entities: [T]) async throws {
     let context = coreDataStack.backgroundContext
     return try await context.perform {
-      try entities.forEach { try $0.managedObject(context) }
-      try context.save()
+      try entities.forEach {
+        try $0.managedObject(context)
+        try context.save()
+      }
     }
   }
 
