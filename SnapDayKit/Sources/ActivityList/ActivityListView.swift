@@ -29,12 +29,10 @@ public struct ActivityListView: View {
       content(viewStore: viewStore)
         .navigationTitle(String(localized: "Activity list", bundle: .module))
         .toolbar {
-          ToolbarItem(placement: .topBarTrailing) {
-            Button(String(localized: "New", bundle: .module)) {
-              viewStore.send(.view(.newButtonTapped))
+          if viewStore.configuration.isActivityEditable {
+            ToolbarItem(placement: .topBarTrailing) {
+              newButton(viewStore: viewStore)
             }
-            .font(.system(size: 12.0, weight: .bold))
-            .foregroundStyle(Color.actionBlue)
           }
         }
         .onAppear {
@@ -55,13 +53,24 @@ public struct ActivityListView: View {
     }
   }
 
+  @ViewBuilder
+  private func newButton(viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
+    Button(String(localized: "New", bundle: .module)) {
+      viewStore.send(.view(.newButtonTapped))
+    }
+    .font(.system(size: 12.0, weight: .bold))
+    .foregroundStyle(Color.actionBlue)
+  }
+
   private func content(viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
     VStack(spacing: .zero) {
       activityList(viewStore: viewStore)
         .padding(.bottom, 15.0)
-      addButton(viewStore: viewStore)
-        .padding(.bottom, 15.0)
-        .padding(.horizontal, 15.0)
+      if viewStore.showButton {
+        addButton(viewStore: viewStore)
+          .padding(.bottom, 15.0)
+          .padding(.horizontal, 15.0)
+      }
     }
     .activityBackground
   }

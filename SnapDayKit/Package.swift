@@ -25,6 +25,7 @@ private var products: [Product] {
   Module.dayActivityForm
   Module.emojiPicker
   Module.reports
+  Module.tagList
   Module.repositories
   Module.common
   Module.models
@@ -67,15 +68,13 @@ private var targets: [Target] {
       .emojiPicker
     ]
   )
+  TargetParamenters(module: .tagForm, dependencies: sceneDependecies)
+  TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies)
   TargetParamenters(
-    module: .tagForm,
-    dependencies: sceneDependecies
+    module: .reports,
+    dependencies: sceneDependecies + [.tagList, .activityList]
   )
-  TargetParamenters(
-    module: .dayActivityForm,
-    dependencies: sceneDependecies
-  )
-  TargetParamenters(module: .reports, dependencies: sceneDependecies)
+  TargetParamenters(module: .tagList,dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
   TargetParamenters(module: .repositories, dependencies: [.models, .composableArchitecture])
@@ -108,6 +107,7 @@ private enum Module: String {
   case dayActivityForm
   case emojiPicker
   case reports
+  case tagList
   case utilities
   case repositories
   case common

@@ -19,10 +19,7 @@
     "End" : {
 
     },
-    "Filter by activities" : {
-
-    },
-    "Filter by tags" : {
+    "Filters" : {
 
     },
     "Month" : {
@@ -35,6 +32,15 @@
 
     },
     "Reports" : {
+
+    },
+    "Select" : {
+
+    },
+    "Selected activity" : {
+
+    },
+    "Selected tag" : {
 
     },
     "Start" : {

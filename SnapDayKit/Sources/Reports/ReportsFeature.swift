@@ -5,31 +5,8 @@ import Utilities
 import Models
 import Common
 import Combine
-
-struct ReportDay: Equatable, Identifiable {
-  let id: String
-  let title: String?
-  let dayActivity: ReportDayActivity
-}
-
-enum ReportDayActivity: Equatable {
-  case tag(Bool)
-  case activity(Bool)
-  case notPlanned
-  case empty
-}
-
-struct ReportSummary: Equatable {
-  let doneCount: Int
-  let notDoneCount: Int
-  let duration: Int
-
-  var isZero: Bool {
-    doneCount == .zero && notDoneCount == .zero && duration == .zero
-  }
-
-  static let zero = ReportSummary(doneCount: .zero, notDoneCount: .zero, duration: .zero)
-}
+import TagList
+import ActivityList
 
 public struct ReportsFeature: Reducer, TodayProvidable {
 
@@ -48,15 +25,25 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     @BindingState var startDate: Date = Date()
     @BindingState var endDate: Date = Date()
 
-    var tagActivitySections: [TagActivitySection] = []
-    @BindingState var selectedTagActivity: Tag?
+    @PresentationState var tagList: TagListFeature.State?
+    @PresentationState var activityList: ActivityListFeature.State?
 
-    var tags: [Tag] = []
-    @BindingState var selectedTag: Tag?
+    var tagActivitySections: [TagActivitySection] = []
+    var currectTagActivitySection: TagActivitySection? {
+      tagActivitySections.first(where: { $0.tag == selectedTag })
+    }
+
+    var availableTags: [Tag] {
+      allTags.filter { tag in
+        days.contains(where: { $0.activities.contains(where: { $0.activity.tags.contains(tag) }) })
+      }
+    }
+    var allTags: [Tag] = []
+    var selectedTag: Tag?
 
     var days: [Day] = []
     var activities: [Activity] = []
-    @BindingState var selectedActivity: Activity?
+    var selectedActivity: Activity?
     var reportDays: [ReportDay] = []
     var summary: ReportSummary = .zero
     var periodShift = Int.zero
@@ -86,6 +73,8 @@ public struct ReportsFeature: Reducer, TodayProvidable {
       case appeared
       case decreaseButtonTapped
       case increaseButtonTapped
+      case tagTapped
+      case selectActivityButtonTapped
     }
     public enum InternalAction: Equatable {
       case loadDays
@@ -94,9 +83,10 @@ public struct ReportsFeature: Reducer, TodayProvidable {
       case loadSummary
       case loadReportDays
     }
-    public enum DelegateAction: Equatable {
+    public enum DelegateAction: Equatable { }
 
-    }
+    case tagList(PresentationAction<TagListFeature.Action>)
+    case activityList(PresentationAction<ActivityListFeature.Action>)
 
     case binding(BindingAction<State>)
 
@@ -132,9 +122,26 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .run { send in
           await send(.internal(.loadDays))
         }
+      case .view(.tagTapped):
+        guard let selectedTag = state.selectedTag else { return .none }
+        state.tagList = TagListFeature.State(
+          tag: selectedTag,
+          tags: state.allTags,
+          days: state.days
+        )
+        return .none
+      case .view(.selectActivityButtonTapped):
+        state.activityList = ActivityListFeature.State(
+          configuration: ActivityListFeature.ActivityListConfiguration(
+            type: .singleSelection(selectedActivity: state.selectedActivity),
+            isActivityEditable: false,
+            fetchingOption: .prefetched(state.activities)
+          )
+        )
+        return .none
       case .internal(.tagsLoaded(let tags)):
-        state.tags = tags.sorted(by: { $0.name < $1.name })
-        state.selectedTag = state.tags.first
+        state.allTags = tags.sorted(by: { $0.name < $1.name })
+        state.selectedTag = state.allTags.first
         return .none
       case .internal(.loadDays):
         guard let filterDate = state.filterDate else { return .none }
@@ -192,23 +199,35 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .run { send in
           await send(.internal(.loadDays))
         }
-      case .binding(\.$selectedTag):
+      case .tagList(.presented(.delegate(.tagSelected(let tag)))):
+        state.selectedTag = tag
+        state.selectedActivity = nil
         state.activities = Array(Set((state.days.map { $0.activities.map(\.activity) }).joined()))
           .filter { $0.tags.contains(where: { $0 == state.selectedTag }) }
           .sorted(by: { $0.name < $1.name })
-        state.selectedActivity = nil
         return .run { send in
           await send(.internal(.loadSummary))
           await send(.internal(.loadReportDays))
         }
-      case .binding(\.$selectedActivity):
+      case .tagList:
+        return .none
+      case .activityList(.presented(.delegate(.activitiesSelected(let activities)))):
+        state.selectedActivity = activities.first
         return .run { send in
           await send(.internal(.loadSummary))
           await send(.internal(.loadReportDays))
         }
+      case .activityList:
+        return .none
       case .binding:
         return .none
       }
+    }
+    .ifLet(\.$tagList, action: /Action.tagList) {
+      TagListFeature()
+    }
+    .ifLet(\.$activityList, action: /Action.activityList) {
+      ActivityListFeature()
     }
   }
 
@@ -244,8 +263,6 @@ public struct ReportsFeature: Reducer, TodayProvidable {
 
   private func setupSectionsAndSelectedTag(_ state: inout State, days: [Day]) {
     let tagSectionsProvider = TagSectionsProvider()
-    let sections = tagSectionsProvider.sections(for: days)
-    state.tagActivitySections = sections
-    state.selectedTagActivity = sections.first?.tag
+    state.tagActivitySections = tagSectionsProvider.sections(for: days)
   }
 }

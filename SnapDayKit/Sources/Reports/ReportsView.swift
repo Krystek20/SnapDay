@@ -4,6 +4,8 @@ import UiComponents
 import Resources
 import Models
 import Utilities
+import TagList
+import ActivityList
 
 @MainActor
 public struct ReportsView: View {
@@ -51,6 +53,31 @@ public struct ReportsView: View {
         viewStore.send(.view(.appeared))
       }
       .navigationTitle(String(localized: "Reports", bundle: .module))
+      .sheet(
+        store: store.scope(
+          state: \.$tagList,
+          action: { .tagList($0) }
+        ),
+        content: { store in
+          NavigationStack {
+            TagListView(store: store)
+              .navigationBarTitleDisplayMode(.large)
+          }
+          .presentationDetents([.medium])
+        }
+      )
+      .sheet(
+        store: store.scope(
+          state: \.$activityList,
+          action: { .activityList($0) }
+        ),
+        content: { store in
+          NavigationStack {
+            ActivityListView(store: store)
+          }
+          .presentationDetents([.medium, .large])
+        }
+      )
     }
   }
 
@@ -58,13 +85,8 @@ public struct ReportsView: View {
     VStack(alignment: .leading, spacing: 10.0) {
       picker(viewStore: viewStore)
       customDatePickers(viewStore: viewStore)
-      VStack(alignment: .leading, spacing: 10.0) {
-        filterByTagsView(viewStore: viewStore)
-        filterByActivitiesView(viewStore: viewStore)
-      }
-      .formBackgroundModifier()
+      filtersSection(viewStore: viewStore)
       summarySection(viewStore: viewStore)
-      reportDaysView(viewStore: viewStore)
       activitiesByTag(viewStore: viewStore)
     }
     .maxWidth()
@@ -111,112 +133,113 @@ public struct ReportsView: View {
     }
   }
 
-  private func filterByTagsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    VStack(alignment: .leading, spacing: 10.0) {
-      Text("Filter by tags", bundle: .module)
-        .formTitleTextStyle
-      tagsList(viewStore: viewStore)
-    }
+  private func filtersSection(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+    SectionView(
+      name: String(localized: "Filters", bundle: .module),
+      rightContent: { EmptyView() },
+      content: {
+        VStack(spacing: 10.0) {
+          filterByTagsView(viewStore: viewStore)
+          filterByActivitiesView(viewStore: viewStore)
+        }
+        .formBackgroundModifier()
+      }
+    )
   }
 
-  private func tagsList(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    ScrollView(.horizontal) {
-      LazyHStack {
-        ForEach(viewStore.tags) { tag in
-          TagView(tag: tag)
-            .onTapGesture {
-              viewStore.$selectedTag.wrappedValue = tag
-            }
-            .opacity(viewStore.selectedTag == tag ? 1.0 : 0.3)
-        }
+  @ViewBuilder
+  private func filterByTagsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+    if let selectedTag = viewStore.selectedTag {
+      HStack(spacing: 10.0) {
+        Text("Selected tag", bundle: .module)
+          .formTitleTextStyle
+        Spacer()
+        TagView(tag: selectedTag)
+          .onTapGesture {
+            viewStore.send(.view(.tagTapped))
+          }
       }
     }
-    .scrollIndicators(.hidden)
   }
 
   @ViewBuilder
   private func filterByActivitiesView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     if !viewStore.activities.isEmpty {
-      VStack(alignment: .leading, spacing: 10.0) {
-        Text("Filter by activities", bundle: .module)
+      HStack(spacing: 10.0) {
+        Text("Selected activity", bundle: .module)
           .formTitleTextStyle
-        activitiesList(viewStore: viewStore)
-      }
-    }
-  }
-
-  private func activitiesList(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    ScrollView(.horizontal) {
-      LazyHStack {
-        ForEach(viewStore.activities) { activity in
-          ActivityView(activity: activity)
+        Spacer()
+        if let selectedActivity = viewStore.selectedActivity {
+          ActivityView(activity: selectedActivity)
             .onTapGesture {
-              if viewStore.selectedActivity == activity {
-                viewStore.$selectedActivity.wrappedValue = nil
-              } else {
-                viewStore.$selectedActivity.wrappedValue = activity
-              }
+              viewStore.send(.view(.selectActivityButtonTapped))
             }
-            .opacity(viewStore.selectedActivity == activity ? 1.0 : 0.3)
+        } else {
+          Button(String(localized: "Select", bundle: .module)) {
+            viewStore.send(.view(.selectActivityButtonTapped))
+          }
+          .foregroundStyle(Color.actionBlue)
+          .font(.system(size: 12.0, weight: .bold))
         }
       }
     }
-    .scrollIndicators(.hidden)
   }
 
   @ViewBuilder
   private func summarySection(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if !viewStore.summary.isZero {
+    if viewStore.reportDays.count > 1 {
       SectionView(
         name: String(localized: "Summary", bundle: .module),
         rightContent: { },
         content: {
-          summaryView(summary: viewStore.summary)
+          summaryView(viewStore: viewStore)
         }
       )
     }
   }
 
-  private func summaryView(summary: ReportSummary) -> some View {
+  private func summaryView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     LazyVStack(alignment: .leading, spacing: 10.0) {
-      VStack(spacing: 10.0) {
-        if summary.doneCount > .zero {
-          HStack(spacing: 5.0) {
-            Text("Done Count", bundle: .module)
-              .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
-            Spacer()
-            Text("\(summary.doneCount)")
-              .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
-          }
-        }
-        if summary.notDoneCount > .zero {
-          HStack(spacing: 5.0) {
-            Text("Not Done Count", bundle: .module)
-              .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
-            Spacer()
-            Text("\(summary.notDoneCount)")
-              .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
-          }
-        }
-        if summary.duration > .zero {
-          HStack(spacing: 5.0) {
-            Text("Total Time", bundle: .module)
-              .font(.system(size: 14.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
-            Spacer()
-            Text(TimeProvider.duration(from: summary.duration, bundle: .module) ?? "")
-              .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
-          }
-        }
-      }
+      reportDaysView(viewStore: viewStore)
+      statisticsView(viewStore: viewStore)
     }
     .maxWidth()
     .formBackgroundModifier()
+  }
+
+  private func statisticsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+    VStack(spacing: 10.0) {
+      if viewStore.summary.doneCount > .zero {
+        HStack(spacing: 5.0) {
+          Text("Done Count", bundle: .module)
+            .formTitleTextStyle
+          Spacer()
+          Text("\(viewStore.summary.doneCount)")
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.standardText)
+        }
+      }
+      if viewStore.summary.notDoneCount > .zero {
+        HStack(spacing: 5.0) {
+          Text("Not Done Count", bundle: .module)
+            .formTitleTextStyle
+          Spacer()
+          Text("\(viewStore.summary.notDoneCount)")
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.standardText)
+        }
+      }
+      if viewStore.summary.duration > .zero {
+        HStack(spacing: 5.0) {
+          Text("Total Time", bundle: .module)
+            .formTitleTextStyle
+          Spacer()
+          Text(TimeProvider.duration(from: viewStore.summary.duration, bundle: .module) ?? "")
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.standardText)
+        }
+      }
+    }
   }
 
   private func reportDaysView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
@@ -230,6 +253,7 @@ public struct ReportsView: View {
           }
           reportDayActivityView(item, viewStore: viewStore)
             .frame(height: 30.0)
+            .clipShape(RoundedRectangle(cornerRadius: 15.0))
         }
       }
     }
@@ -238,16 +262,30 @@ public struct ReportsView: View {
   @ViewBuilder
   private func reportDayActivityView(_ reportDay: ReportDay, viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     switch reportDay.dayActivity {
-    case .tag(let isDone):
+    case .tag(let state):
       if let tag = viewStore.selectedTag {
-        tag.rgbColor.color.opacity(isDone ? 1.0 : 0.3)
+        switch state {
+        case .done:
+          tag.rgbColor.color
+        case .notDone, .planned:
+          tag.rgbColor.color.opacity(0.2)
+        case .notPlanned:
+          Color.clear
+        }
       }
-    case .activity(let isDone):
+    case .activity(let state):
       if let activity = viewStore.selectedActivity {
-        ActivityImageView(data: activity.image, size: 30.0, cornerRadius: 15.0)
-          .opacity(isDone ? 1.0 : 0.3)
+        switch state {
+        case .done:
+          ActivityImageView(data: activity.image, size: 30.0, cornerRadius: 15.0)
+        case .notDone, .planned:
+          ActivityImageView(data: activity.image, size: 30.0, cornerRadius: 15.0)
+            .opacity(0.2)
+        case .notPlanned:
+          Color.clear
+        }
       }
-    case .empty, .notPlanned:
+    case .empty:
       Color.clear
     }
   }
@@ -255,16 +293,13 @@ public struct ReportsView: View {
   @MainActor
   @ViewBuilder
   private func activitiesByTag(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if !viewStore.tagActivitySections.isEmpty {
+    if let tagActivitySection = viewStore.currectTagActivitySection {
       SectionView(
         name: String(localized: "Activities By Tags", bundle: .module),
         rightContent: { EmptyView() },
         content: {
-          ActivitiesByTagView(
-            selectedTag: viewStore.$selectedTagActivity,
-            tagActivitySections: viewStore.tagActivitySections
-          )
-          .formBackgroundModifier()
+          ActivitiesByTagView(tagActivitySection: tagActivitySection)
+            .formBackgroundModifier()
         }
       )
     }

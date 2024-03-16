@@ -24,28 +24,4 @@ public struct DaySummary {
       result += dayActivity.duration
     })
   }
-//
-//  public var summaryRows: [SummaryRow] {
-//    day.activities
-//      .sortedByName
-//      .reduce(into: [SummaryRow](), applySummaryRow)
-//  }
-//
-//  private func applySummaryRow(result: inout [SummaryRow], dayActivity: DayActivity) {
-//    for tag in dayActivity.activity.tags {
-//      if let summaryRowIndex = result.firstIndex(where: { $0.tag == tag }) {
-//        result[summaryRowIndex] = SummaryRow(
-//          tag: tag,
-//          duration: result[summaryRowIndex].duration + dayActivity.duration
-//        )
-//      } else {
-//        result.append(
-//          SummaryRow(
-//            tag: tag,
-//            duration: dayActivity.duration
-//          )
-//        )
-//      }
-//    }
-//  }
 }

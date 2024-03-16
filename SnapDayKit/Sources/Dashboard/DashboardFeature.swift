@@ -135,7 +135,13 @@ public struct DashboardFeature: Reducer, TodayProvidable {
           }
         )
       case .view(.activityListButtonTapped):
-        state.activityList = ActivityListFeature.State()
+        state.activityList = ActivityListFeature.State(
+          configuration: ActivityListFeature.ActivityListConfiguration(
+            type: .singleSelection(selectedActivity: nil),
+            isActivityEditable: true,
+            fetchingOption: .fromCoreData
+          )
+        )
         return .none
       case .view(.oneTimeActivityButtonTapped):
         state.addActivity = ActivityFormFeature.State(

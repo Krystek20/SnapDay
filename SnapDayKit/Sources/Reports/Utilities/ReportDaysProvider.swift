@@ -3,7 +3,7 @@ import Models
 import Dependencies
 import Utilities
 
-struct ReportDaysProvider {
+struct ReportDaysProvider: TodayProvidable {
 
   @Dependency(\.calendar) private var calendar
 
@@ -27,9 +27,9 @@ struct ReportDaysProvider {
     reportDays += days.map { day in
       let dayActivity: ReportDayActivity
       if let selectedActivity {
-        dayActivity = prepareDayReportyActivity(selectedActivity: selectedActivity, dayActivities: day.activities)
+        dayActivity = prepareDayReportyActivity(selectedActivity: selectedActivity, day: day)
       } else {
-        dayActivity = prepareTagReportyActivity(selectedTag: selectedTag, dayActivities: day.activities)
+        dayActivity = prepareTagReportyActivity(selectedTag: selectedTag, day: day)
       }
       let title = dayNumber(day.date, selectedFilterPeriod: selectedFilterPeriod)
       return ReportDay(
@@ -55,17 +55,28 @@ struct ReportDaysProvider {
     }
   }
 
-  private func prepareDayReportyActivity(selectedActivity: Activity, dayActivities: [DayActivity]) -> ReportDayActivity {
-    let activities = dayActivities.filter { $0.activity == selectedActivity }
-    return activities.isEmpty
-    ? .notPlanned
-    : .activity(activities.contains(where: { $0.isDone }))
+  private func prepareDayReportyActivity(selectedActivity: Activity, day: Day) -> ReportDayActivity {
+    let activities = day.activities.filter { $0.activity == selectedActivity }
+    let state = prepareDayState(date: day.date, activities: activities)
+    return .activity(state)
   }
 
-  private func prepareTagReportyActivity(selectedTag: Tag?, dayActivities: [DayActivity]) -> ReportDayActivity {
-    let activities = dayActivities
-      .filter { $0.activity.tags.contains { $0 == selectedTag } && $0.isDone }
-    return .tag(!activities.isEmpty)
+  private func prepareTagReportyActivity(selectedTag: Tag?, day: Day) -> ReportDayActivity {
+    let activities = day.activities.filter { $0.activity.tags.contains { $0 == selectedTag } }
+    let state = prepareDayState(date: day.date, activities: activities)
+    return .tag(state)
+  }
+
+  private func prepareDayState(date: Date, activities: [DayActivity]) -> ReportDayState {
+    if activities.isEmpty {
+      .notPlanned
+    } else if date < today {
+      activities.filter { $0.isDone }.isEmpty
+      ? .notDone
+      : .done
+    } else {
+      .planned
+    }
   }
 
   private func dayNumber(_ date: Date, selectedFilterPeriod: FilterPeriod?) -> String {
