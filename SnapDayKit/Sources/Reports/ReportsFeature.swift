@@ -35,7 +35,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
 
     var availableTags: [Tag] {
       allTags.filter { tag in
-        days.contains(where: { $0.activities.contains(where: { $0.activity.tags.contains(tag) }) })
+        days.contains(where: { $0.activities.contains(where: { $0.tags.contains(tag) }) })
       }
     }
     var allTags: [Tag] = []
@@ -151,11 +151,14 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         }
       case .internal(.daysLoaded(let days)):
         state.days = days
-        
-        let activities = Array(Set((days.map { $0.activities.map(\.activity) }).joined()))
-          .sorted(by: { $0.name < $1.name })
-
-        state.activities = activities.filter { $0.tags.contains(where: { $0 == state.selectedTag }) }
+        state.activities = days.map { day in
+          day.activities.compactMap { dayActivity -> Activity? in
+            guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
+            return dayActivity.activity
+          }
+        }
+        .joined()
+        .sorted(by: { $0.name < $1.name })
         state.selectedActivity = nil
 
         setupSectionsAndSelectedTag(&state, days: days)
@@ -202,9 +205,14 @@ public struct ReportsFeature: Reducer, TodayProvidable {
       case .tagList(.presented(.delegate(.tagSelected(let tag)))):
         state.selectedTag = tag
         state.selectedActivity = nil
-        state.activities = Array(Set((state.days.map { $0.activities.map(\.activity) }).joined()))
-          .filter { $0.tags.contains(where: { $0 == state.selectedTag }) }
-          .sorted(by: { $0.name < $1.name })
+        state.activities = state.days.map { day in
+          day.activities.compactMap { dayActivity -> Activity? in
+            guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
+            return dayActivity.activity
+          }
+        }
+        .joined()
+        .sorted(by: { $0.name < $1.name })
         return .run { send in
           await send(.internal(.loadSummary))
           await send(.internal(.loadReportDays))
@@ -264,5 +272,9 @@ public struct ReportsFeature: Reducer, TodayProvidable {
   private func setupSectionsAndSelectedTag(_ state: inout State, days: [Day]) {
     let tagSectionsProvider = TagSectionsProvider()
     state.tagActivitySections = tagSectionsProvider.sections(for: days)
+  }
+
+  private func abc(days: [Day], selectedTag: Tag) {
+
   }
 }

@@ -16,6 +16,7 @@ struct ReportSummaryProvider {
         updatedReportSummary(
           result,
           for: selectedActivity,
+          for: selectedTag,
           day: day,
           today: today
         )
@@ -35,10 +36,13 @@ struct ReportSummaryProvider {
   private func updatedReportSummary(
     _ reportSummary: ReportSummary,
     for selectedActivity: Activity,
+    for selectedTag: Tag?,
     day: Day,
     today: Date
   ) -> ReportSummary {
-    let activities = day.activities.filter { $0.activity == selectedActivity }
+    let activities = day.activities.filter { dayActivity in
+      dayActivity.activity == selectedActivity && dayActivity.tags.contains(where: { $0 == selectedTag })
+    }
     let activitiesDone = activities.filter { $0.isDone }
     let notDoneCount = day.date < today
     ? activities.count - activitiesDone.count
@@ -56,7 +60,7 @@ struct ReportSummaryProvider {
     day: Day,
     today: Date
   ) -> ReportSummary {
-    let activities = day.activities.filter { $0.activity.tags.contains { $0 == selectedTag } }
+    let activities = day.activities.filter { $0.tags.contains { $0 == selectedTag } }
     let activitiesDone = activities.filter { $0.isDone }
     let notDoneCount = day.date < today
     ? activities.count - activitiesDone.count

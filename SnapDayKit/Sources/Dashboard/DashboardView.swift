@@ -74,7 +74,7 @@ public struct DashboardView: View {
           NavigationStack {
             DayActivityFormView(store: store)
           }
-          .presentationDetents([.medium])
+          .presentationDetents([.large])
         }
       )
       .sheet(

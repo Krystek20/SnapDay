@@ -27,9 +27,16 @@ struct ReportDaysProvider: TodayProvidable {
     reportDays += days.map { day in
       let dayActivity: ReportDayActivity
       if let selectedActivity {
-        dayActivity = prepareDayReportyActivity(selectedActivity: selectedActivity, day: day)
+        dayActivity = prepareDayReportyActivity(
+          selectedActivity: selectedActivity,
+          selectedTag: selectedTag,
+          day: day
+        )
       } else {
-        dayActivity = prepareTagReportyActivity(selectedTag: selectedTag, day: day)
+        dayActivity = prepareTagReportyActivity(
+          selectedTag: selectedTag,
+          day: day
+        )
       }
       let title = dayNumber(day.date, selectedFilterPeriod: selectedFilterPeriod)
       return ReportDay(
@@ -55,14 +62,16 @@ struct ReportDaysProvider: TodayProvidable {
     }
   }
 
-  private func prepareDayReportyActivity(selectedActivity: Activity, day: Day) -> ReportDayActivity {
-    let activities = day.activities.filter { $0.activity == selectedActivity }
+  private func prepareDayReportyActivity(selectedActivity: Activity, selectedTag: Tag?, day: Day) -> ReportDayActivity {
+    let activities = day.activities.filter { dayActivity in
+      dayActivity.activity == selectedActivity && dayActivity.tags.contains(where: { $0 == selectedTag })
+    }
     let state = prepareDayState(date: day.date, activities: activities)
     return .activity(state)
   }
 
   private func prepareTagReportyActivity(selectedTag: Tag?, day: Day) -> ReportDayActivity {
-    let activities = day.activities.filter { $0.activity.tags.contains { $0 == selectedTag } }
+    let activities = day.activities.filter { $0.tags.contains { $0 == selectedTag } }
     let state = prepareDayState(date: day.date, activities: activities)
     return .tag(state)
   }

@@ -25,6 +25,11 @@ extension DayActivity: Entity {
       fetchRequest: Activity.fetchRequest,
       context: context
     )
+    dayActivityEntity.tags = Set(
+      try tags.map { tag in
+        try tag.managedObject(context)
+      }
+    ) as NSSet
     return dayActivityEntity
   }
 }

@@ -25,6 +25,7 @@ public struct TagSectionsProvider {
         result.append(
           TimePeriodActivity(
             activity: dayActivity.activity,
+            tags: dayActivity.tags,
             totalCount: 1,
             doneCount: dayActivity.isDone ? 1 : .zero,
             duration: dayActivity.isDone ? dayActivity.duration : .zero

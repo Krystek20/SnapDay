@@ -3,12 +3,20 @@ import Foundation
 public struct TimePeriodActivity: Identifiable, Equatable {
   public var id: UUID { activity.id }
   public let activity: Activity
+  public let tags: [Tag]
   public let totalCount: Int
   public let doneCount: Int
   public let duration: Int
 
-  public init(activity: Activity, totalCount: Int, doneCount: Int, duration: Int) {
+  public init(
+    activity: Activity,
+    tags: [Tag],
+    totalCount: Int,
+    doneCount: Int,
+    duration: Int
+  ) {
     self.activity = activity
+    self.tags = tags
     self.totalCount = totalCount
     self.doneCount = doneCount
     self.duration = duration
@@ -19,6 +27,7 @@ extension TimePeriodActivity {
   public func increasedCount(_ isDone: Bool, duration: Int) -> TimePeriodActivity {
     TimePeriodActivity(
       activity: activity,
+      tags: tags,
       totalCount: totalCount + 1,
       doneCount: isDone
       ? doneCount + 1

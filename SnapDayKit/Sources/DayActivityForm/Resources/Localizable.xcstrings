@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add tag" : {
+
+    },
+    "Add Tag" : {
+
+    },
     "Delete" : {
 
     },
@@ -10,6 +16,12 @@
     "Enter overview" : {
 
     },
+    "Enter tag" : {
+
+    },
+    "Existing tags" : {
+
+    },
     "Overview" : {
 
     },
@@ -17,6 +29,9 @@
 
     },
     "Set duration" : {
+
+    },
+    "Tags" : {
 
     }
   },

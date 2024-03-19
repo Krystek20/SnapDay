@@ -160,7 +160,8 @@ struct DayUpdater {
       isDone: false,
       duration: activity.defaultDuration ?? .zero,
       overview: nil,
-      isGeneratedAutomatically: !createdByUser
+      isGeneratedAutomatically: !createdByUser,
+      tags: activity.tags
     )
   }
 

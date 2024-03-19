@@ -18,7 +18,7 @@ public struct TagListFeature: Reducer {
 
     var availableTags: [Tag] {
       tags.filter { tag in
-        days.contains(where: { $0.activities.contains(where: { $0.activity.tags.contains(tag) }) })
+        days.contains(where: { $0.activities.contains(where: { $0.tags.contains(tag) }) })
       }
     }
 
