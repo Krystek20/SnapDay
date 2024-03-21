@@ -3,7 +3,7 @@ import ComposableArchitecture
 import UiComponents
 import Resources
 import Models
-import TagForm
+import MarkerForm
 
 @MainActor
 public struct DayActivityFormView: View {
@@ -33,12 +33,12 @@ public struct DayActivityFormView: View {
     }
     .sheet(
       store: store.scope(
-        state: \.$addTag,
-        action: { .addTag($0) }
+        state: \.$addMarker,
+        action: { .addMarker($0) }
       ),
       content: { store in
         NavigationStack {
-          TagFormView(store: store)
+          MarkerFormView(store: store)
             .navigationTitle(String(localized: "Add Tag", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
         }
@@ -67,6 +67,7 @@ public struct DayActivityFormView: View {
         durationFormView(viewStore: viewStore)
         overviewTextField(viewStore: viewStore)
         tagsView(viewStore: viewStore)
+        labelsView(viewStore: viewStore)
       }
       .padding(padding)
       .maxWidth()
@@ -111,24 +112,47 @@ public struct DayActivityFormView: View {
   }
 
   private func tagsView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
-    FormTagField(
+    FormMarkerField(
       title: String(localized: "Tags", bundle: .module),
       placeholder: String(localized: "Enter tag", bundle: .module),
-      existingTagsTitle: String(localized: "Existing tags", bundle: .module),
-      tags: viewStore.dayActivity.tags,
-      existingTags: viewStore.existingTags,
-      newTag: viewStore.$newTag,
+      existingMarkersTitle: String(localized: "Existing tags", bundle: .module),
+      markers: viewStore.dayActivity.tags,
+      existingMarkers: viewStore.existingTags,
+      newMarker: viewStore.$newTag,
       onSubmit: {
         viewStore.send(.view(.submitTagTapped))
       },
-      addedTagTapped: { tag in
-        viewStore.send(.view(.addedTagTapped(tag)))
+      addedMarkerTapped: { marker in
+        viewStore.send(.view(.addedTagTapped(marker)))
       },
-      existingTagTapped: { tag in
-        viewStore.send(.view(.existingTagTapped(tag)))
+      existingMarkerTapped: { marker in
+        viewStore.send(.view(.existingTagTapped(marker)))
       },
-      removeTag: { tag in
-        viewStore.send(.view(.removeTagTapped(tag)))
+      removeMarker: { marker in
+        viewStore.send(.view(.removeTagTapped(marker)))
+      }
+    )
+  }
+
+  private func labelsView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+    FormMarkerField(
+      title: String(localized: "Labels", bundle: .module),
+      placeholder: String(localized: "Enter label", bundle: .module),
+      existingMarkersTitle: String(localized: "Existing labels", bundle: .module),
+      markers: viewStore.dayActivity.labels,
+      existingMarkers: viewStore.existingLabels,
+      newMarker: viewStore.$newLabel,
+      onSubmit: {
+        viewStore.send(.view(.submitLabelTapped))
+      },
+      addedMarkerTapped: { label in
+        viewStore.send(.view(.addedLabelTapped(label)))
+      },
+      existingMarkerTapped: { label in
+        viewStore.send(.view(.existingLabelTapped(label)))
+      },
+      removeMarker: { label in
+        viewStore.send(.view(.removeLabelTapped(label)))
       }
     )
   }
@@ -137,6 +161,8 @@ public struct DayActivityFormView: View {
   private func bottomView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
     if viewStore.showAddTagButton {
       addTagButton(viewStore: viewStore)
+    } else if viewStore.showAddLabelButton {
+      addLabelButton(viewStore: viewStore)
     } else {
       VStack(spacing: 10.0) {
         saveButton(viewStore: viewStore)
@@ -149,6 +175,14 @@ public struct DayActivityFormView: View {
     Button(
       action: { viewStore.send(.view(.addTagButtonTapped)) },
       label: { Text("Add tag", bundle: .module) }
+    )
+    .buttonStyle(PrimaryButtonStyle())
+  }
+
+  private func addLabelButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+    Button(
+      action: { viewStore.send(.view(.addLabelButtonTapped)) },
+      label: { Text("Add Label", bundle: .module) }
     )
     .buttonStyle(PrimaryButtonStyle())
   }

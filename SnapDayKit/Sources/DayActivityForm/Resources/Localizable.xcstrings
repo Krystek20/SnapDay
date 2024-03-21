@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add Label" : {
+
+    },
     "Add tag" : {
 
     },
@@ -13,13 +16,22 @@
     "Edit day activity" : {
 
     },
+    "Enter label" : {
+
+    },
     "Enter overview" : {
 
     },
     "Enter tag" : {
 
     },
+    "Existing labels" : {
+
+    },
     "Existing tags" : {
+
+    },
+    "Labels" : {
 
     },
     "Overview" : {

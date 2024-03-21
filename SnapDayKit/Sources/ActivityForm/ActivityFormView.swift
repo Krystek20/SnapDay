@@ -3,7 +3,7 @@ import ComposableArchitecture
 import UiComponents
 import Resources
 import Models
-import TagForm
+import MarkerForm
 import EmojiPicker
 import PhotosUI
 
@@ -44,12 +44,12 @@ public struct ActivityFormView: View {
     }
     .sheet(
       store: store.scope(
-        state: \.$addTag,
-        action: { .addTag($0) }
+        state: \.$addMarker,
+        action: { .addMarker($0) }
       ),
       content: { store in
         NavigationStack {
-          TagFormView(store: store)
+          MarkerFormView(store: store)
             .navigationTitle(String(localized: "Add Tag", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
         }
@@ -156,24 +156,24 @@ public struct ActivityFormView: View {
   }
 
   private func tagsView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
-    FormTagField(
+    FormMarkerField(
       title: String(localized: "Tags", bundle: .module),
       placeholder: String(localized: "Enter tag", bundle: .module),
-      existingTagsTitle: String(localized: "Existing tags", bundle: .module),
-      tags: viewStore.activity.tags,
-      existingTags: viewStore.existingTags,
-      newTag: viewStore.$newTag,
+      existingMarkersTitle: String(localized: "Existing tags", bundle: .module),
+      markers: viewStore.activity.tags,
+      existingMarkers: viewStore.existingTags,
+      newMarker: viewStore.$newTag,
       onSubmit: {
         viewStore.send(.view(.submitTagTapped))
       },
-      addedTagTapped: { tag in
-        viewStore.send(.view(.addedTagTapped(tag)))
+      addedMarkerTapped: { marker in
+        viewStore.send(.view(.addedTagTapped(marker)))
       },
-      existingTagTapped: { tag in
-        viewStore.send(.view(.existingTagTapped(tag)))
+      existingMarkerTapped: { marker in
+        viewStore.send(.view(.existingTagTapped(marker)))
       },
-      removeTag: { tag in
-        viewStore.send(.view(.removeTagTapped(tag)))
+      removeMarker: { marker in
+        viewStore.send(.view(.removeTagTapped(marker)))
       }
     )
     .focused($focus, equals: .tag)

@@ -19,17 +19,7 @@ extension DayActivity: Entity {
       fetchRequest: DayActivity.fetchRequest,
       context: context
     )
-    dayActivityEntity.setup(by: self)
-    dayActivityEntity.activity = try ActivityEntity.object(
-      identifier: activity.id.uuidString,
-      fetchRequest: Activity.fetchRequest,
-      context: context
-    )
-    dayActivityEntity.tags = Set(
-      try tags.map { tag in
-        try tag.managedObject(context)
-      }
-    ) as NSSet
+    try dayActivityEntity.setup(by: self, context: context)
     return dayActivityEntity
   }
 }

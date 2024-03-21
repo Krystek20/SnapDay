@@ -1,7 +1,7 @@
 import Foundation
 import ComposableArchitecture
 import Common
-import TagForm
+import MarkerForm
 import Models
 import EmojiPicker
 import Utilities
@@ -40,7 +40,7 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
     @BindingState var newTag = String.empty
     @BindingState var focus: Field?
     @BindingState var isPhotoPickerPresented: Bool = false
-    @PresentationState var addTag: TagFormFeature.State?
+    @PresentationState var addMarker: MarkerFormFeature.State?
     @PresentationState var showEmojiPicker: EmojiPickerFeature.State?
     var photoItem: PhotoItem?
     var existingTags = [Tag]()
@@ -92,7 +92,7 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
       case activityUpdated(Activity)
     }
 
-    case addTag(PresentationAction<TagFormFeature.Action>)
+    case addMarker(PresentationAction<MarkerFormFeature.Action>)
     case showEmojiPicker(PresentationAction<EmojiPickerFeature.Action>)
 
     case binding(BindingAction<State>)
@@ -170,12 +170,12 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
         return .none
       case .delegate:
         return .none
-      case .addTag(.presented(.delegate(.tagCreated(let tag)))):
+      case .addMarker(.presented(.delegate(.tagCreated(let tag)))):
         state.newTag = .empty
         state.focus = nil
         appendTag(tag, state: &state)
         return .none
-      case .addTag:
+      case .addMarker:
         return .none
       case .showEmojiPicker(.presented(.delegate(.dataSelected(let data)))):
         return .run { [data] send in
@@ -187,8 +187,8 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
         return .none
       }
     }
-    .ifLet(\.$addTag, action: /Action.addTag) {
-      TagFormFeature()
+    .ifLet(\.$addMarker, action: /Action.addMarker) {
+      MarkerFormFeature()
     }
     .ifLet(\.$showEmojiPicker, action: /Action.showEmojiPicker) {
       EmojiPickerFeature()
@@ -199,8 +199,9 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
 
   private func showNewTag(state: inout State) {
     guard !state.newTag.isEmpty else { return }
-    state.addTag = TagFormFeature.State(
-      tag: Tag(name: state.newTag)
+    state.addMarker = MarkerFormFeature.State(
+      markerType: .tag,
+      name: state.newTag
     )
   }
 

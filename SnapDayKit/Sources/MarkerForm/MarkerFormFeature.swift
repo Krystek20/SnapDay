@@ -3,20 +3,29 @@ import Repositories
 import Models
 import Common
 
-public struct TagFormFeature: Reducer {
+public struct MarkerFormFeature: Reducer {
+
+  public enum MarkerType: Equatable {
+    case tag
+    case label
+  }
 
   // MARK: - Dependencies
 
   @Dependency(\.tagRepository.saveTag) var saveTag
+  @Dependency(\.activityLabelRepository.saveLabel) var saveLabel
   @Dependency(\.dismiss) var dismiss
 
   // MARK: - State & Action
 
   public struct State: Equatable {
-    @BindingState var tag: Tag
+    var markerType: MarkerType
+    @BindingState var name: String
+    @BindingState var color: RGBColor = .random
 
-    public init(tag: Tag) {
-      self.tag = tag
+    public init(markerType: MarkerType, name: String = "") {
+      self.markerType = markerType
+      self.name = name
     }
   }
 
@@ -28,6 +37,7 @@ public struct TagFormFeature: Reducer {
     public enum InternalAction: Equatable { }
     public enum DelegateAction: Equatable {
       case tagCreated(Tag)
+      case labelCreated(ActivityLabel)
     }
 
     case binding(BindingAction<State>)
@@ -49,9 +59,17 @@ public struct TagFormFeature: Reducer {
       case .binding:
         return .none
       case .view(.saveButtonTapped):
-        return .run { [tag = state.tag] send in
-          try await saveTag(tag)
-          await send(.delegate(.tagCreated(tag)))
+        return .run { [markerType = state.markerType, name = state.name, color = state.color] send in
+          switch markerType {
+          case .tag:
+            let tag = Tag(name: name, color: color)
+            try await saveTag(tag)
+            await send(.delegate(.tagCreated(tag)))
+          case .label:
+            let label = ActivityLabel(name: name, color: color)
+            try await saveLabel(label)
+            await send(.delegate(.labelCreated(label)))
+          }
           await dismiss()
         }
       case .delegate:

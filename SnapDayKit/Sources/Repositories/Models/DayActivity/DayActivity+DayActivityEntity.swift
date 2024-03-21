@@ -6,7 +6,8 @@ extension DayActivity {
     guard let identifier = entity.identifier,
           let activityEntity = entity.activity,
           let activity = try Activity(activityEntity),
-          let tags = entity.tags?.allObjects as? [TagEntity] else { return nil }
+          let tags = entity.tags?.allObjects as? [TagEntity],
+          let labels = entity.labels?.allObjects as? [ActivityLabelEntity] else { return nil }
     self.init(
       id: identifier,
       activity: activity,
@@ -14,7 +15,8 @@ extension DayActivity {
       duration: Int(entity.duration),
       overview: entity.overview,
       isGeneratedAutomatically: entity.isGeneratedAutomatically,
-      tags: tags.compactMap(Tag.init)
+      tags: tags.compactMap(Tag.init),
+      labels: labels.compactMap(ActivityLabel.init)
     )
   }
 }

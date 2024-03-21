@@ -9,6 +9,7 @@ struct ReportSummaryProvider {
     days: [Day],
     selectedActivity: Activity?,
     selectedTag: Tag?,
+    selectedLabel: ActivityLabel?,
     today: Date
   ) -> ReportSummary {
     days.reduce(ReportSummary.zero, { result, day in
@@ -16,6 +17,7 @@ struct ReportSummaryProvider {
         updatedReportSummary(
           result,
           for: selectedActivity,
+          for: selectedLabel,
           for: selectedTag,
           day: day,
           today: today
@@ -36,12 +38,14 @@ struct ReportSummaryProvider {
   private func updatedReportSummary(
     _ reportSummary: ReportSummary,
     for selectedActivity: Activity,
+    for selectedLabel: ActivityLabel?,
     for selectedTag: Tag?,
     day: Day,
     today: Date
   ) -> ReportSummary {
     let activities = day.activities.filter { dayActivity in
-      dayActivity.activity == selectedActivity && dayActivity.tags.contains(where: { $0 == selectedTag })
+      let areMatchedActivityAndTag = dayActivity.activity == selectedActivity && dayActivity.tags.contains(where: { $0 == selectedTag })
+      return areMatchedActivityAndTag && (selectedLabel == nil || dayActivity.labels.contains { $0 == selectedLabel })
     }
     let activitiesDone = activities.filter { $0.isDone }
     let notDoneCount = day.date < today

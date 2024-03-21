@@ -161,7 +161,8 @@ struct DayUpdater {
       duration: activity.defaultDuration ?? .zero,
       overview: nil,
       isGeneratedAutomatically: !createdByUser,
-      tags: activity.tags
+      tags: activity.tags,
+      labels: []
     )
   }
 

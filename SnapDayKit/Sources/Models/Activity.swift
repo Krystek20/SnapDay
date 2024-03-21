@@ -12,6 +12,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
   public var defaultDuration: Int?
   public var isVisible: Bool
   public var startDate: Date?
+  public var labels: [ActivityLabel]
 
   // MARK: - Initialization
   
@@ -24,7 +25,8 @@ public struct Activity: Identifiable, Equatable, Hashable {
     isDefaultDuration: Bool = false,
     defaultDuration: Int? = nil,
     isVisible: Bool = true,
-    startDate: Date? = nil
+    startDate: Date? = nil,
+    labels: [ActivityLabel] = []
   ) {
     self.id = id
     self.name = name
@@ -34,6 +36,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
     self.defaultDuration = defaultDuration
     self.isVisible = isVisible
     self.startDate = startDate
+    self.labels = labels
   }
 }
 

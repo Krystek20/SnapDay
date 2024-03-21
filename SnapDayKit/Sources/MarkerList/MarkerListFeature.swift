@@ -3,7 +3,17 @@ import Repositories
 import Models
 import Common
 
-public struct TagListFeature: Reducer {
+public struct MarkerListFeature: Reducer {
+
+  public enum MarkerListType: Equatable {
+    case tag(selected: Tag?, available: [Tag])
+    case label(selected: ActivityLabel?, available: [ActivityLabel])
+  }
+  
+  public enum MarkerListSelection: Equatable {
+    case tag(selected: Tag)
+    case label(selected: ActivityLabel)
+  }
 
   // MARK: - Dependencies
 
@@ -12,31 +22,21 @@ public struct TagListFeature: Reducer {
   // MARK: - State & Action
 
   public struct State: Equatable {
-    var tag: Tag
-    var days: [Day]
-    var tags: [Tag]
+    let type: MarkerListType
 
-    var availableTags: [Tag] {
-      tags.filter { tag in
-        days.contains(where: { $0.activities.contains(where: { $0.tags.contains(tag) }) })
-      }
-    }
-
-    public init(tag: Tag, tags: [Tag], days: [Day]) {
-      self.tag = tag
-      self.tags = tags
-      self.days = days
+    public init(type: MarkerListType) {
+      self.type = type
     }
   }
 
   public enum Action: BindableAction, FeatureAction, Equatable {
 
     public enum ViewAction: Equatable {
-      case tagSelected(Tag)
+      case markerSelected(MarkerListSelection)
     }
     public enum InternalAction: Equatable { }
     public enum DelegateAction: Equatable {
-      case tagSelected(Tag)
+      case markerSelected(MarkerListSelection)
     }
 
     case binding(BindingAction<State>)
@@ -55,9 +55,9 @@ public struct TagListFeature: Reducer {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case .view(.tagSelected(let tag)):
+      case .view(.markerSelected(let marker)):
         return .run { send in
-          await send(.delegate(.tagSelected(tag)))
+          await send(.delegate(.markerSelected(marker)))
           await dismiss()
         }
       case .binding:

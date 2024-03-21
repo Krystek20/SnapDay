@@ -21,11 +21,11 @@ private var products: [Product] {
   Module.dashboard
   Module.activityList
   Module.activityForm
-  Module.tagForm
+  Module.markerForm
   Module.dayActivityForm
   Module.emojiPicker
   Module.reports
-  Module.tagList
+  Module.markerList
   Module.repositories
   Module.common
   Module.models
@@ -64,17 +64,20 @@ private var targets: [Target] {
   TargetParamenters(
     module: .activityForm,
     dependencies: sceneDependecies + [
-      .tagForm,
+      .markerForm,
       .emojiPicker
     ]
   )
-  TargetParamenters(module: .tagForm, dependencies: sceneDependecies)
-  TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies)
+  TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
+  TargetParamenters(
+    module: .dayActivityForm,
+    dependencies: sceneDependecies + [.markerForm]
+  )
   TargetParamenters(
     module: .reports,
-    dependencies: sceneDependecies + [.tagList, .activityList]
+    dependencies: sceneDependecies + [.markerList, .activityList]
   )
-  TargetParamenters(module: .tagList,dependencies: sceneDependecies)
+  TargetParamenters(module: .markerList,dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
   TargetParamenters(module: .repositories, dependencies: [.models, .composableArchitecture])
@@ -103,11 +106,11 @@ private enum Module: String {
   case dashboard
   case activityList
   case activityForm
-  case tagForm
+  case markerForm
   case dayActivityForm
   case emojiPicker
   case reports
-  case tagList
+  case markerList
   case utilities
   case repositories
   case common

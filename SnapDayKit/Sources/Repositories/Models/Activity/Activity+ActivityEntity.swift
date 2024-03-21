@@ -5,7 +5,8 @@ extension Activity {
   init?(_ entity: ActivityEntity) throws {
     guard let identifier = entity.identifier,
           let name = entity.name,
-          let tags = entity.tags?.allObjects as? [TagEntity] else { return nil }
+          let tags = entity.tags?.allObjects as? [TagEntity],
+          let labels = entity.labels?.allObjects as? [ActivityLabelEntity] else { return nil }
     var frequency: ActivityFrequency? = nil
     if let frequencyJson = entity.frequencyJson {
       frequency = try JSONDecoder().decode(ActivityFrequency.self, from: frequencyJson)
@@ -19,7 +20,8 @@ extension Activity {
       isDefaultDuration: entity.isDefaultDuration,
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
       isVisible: entity.isVisible,
-      startDate: entity.startDate
+      startDate: entity.startDate,
+      labels: labels.compactMap(ActivityLabel.init)
     )
   }
 }

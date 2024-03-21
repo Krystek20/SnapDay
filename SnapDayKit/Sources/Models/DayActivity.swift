@@ -5,12 +5,13 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   // MARK: - Properties
 
   public let id: UUID
-  public let activity: Activity
+  public var activity: Activity
   public var isDone: Bool
   public var duration: Int
   public var overview: String?
   public let isGeneratedAutomatically: Bool
   public var tags: [Tag]
+  public var labels: [ActivityLabel]
 
   // MARK: - Initialization
 
@@ -21,7 +22,8 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     duration: Int,
     overview: String?,
     isGeneratedAutomatically: Bool,
-    tags: [Tag]
+    tags: [Tag],
+    labels: [ActivityLabel]
   ) {
     self.id = id
     self.activity = activity
@@ -30,5 +32,6 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     self.overview = overview
     self.isGeneratedAutomatically = isGeneratedAutomatically
     self.tags = tags
+    self.labels = labels
   }
 }

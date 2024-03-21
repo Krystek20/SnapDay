@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Common
 import Models
-import TagForm
+import MarkerForm
 
 public struct DayActivityFormFeature: Reducer {
 
@@ -9,16 +9,22 @@ public struct DayActivityFormFeature: Reducer {
 
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.tagRepository) var tagRepository
+  @Dependency(\.activityLabelRepository) var activityLabelRepository
+  @Dependency(\.activityRepository) var activityRepository
 
   // MARK: - State & Action
 
   public struct State: Equatable {
 
-    var existingTags = [Tag]()
+    var existingTags: [Tag] = []
+    var existingLabels: [ActivityLabel] = []
+
     var showAddTagButton: Bool { !newTag.isEmpty }
+    var showAddLabelButton: Bool { !newLabel.isEmpty }
     @BindingState var dayActivity: DayActivity
     @BindingState var newTag = String.empty
-    @PresentationState var addTag: TagFormFeature.State?
+    @BindingState var newLabel = String.empty
+    @PresentationState var addMarker: MarkerFormFeature.State?
 
     public init(dayActivity: DayActivity) {
       self.dayActivity = dayActivity
@@ -30,22 +36,31 @@ public struct DayActivityFormFeature: Reducer {
       case appeared
       case saveButtonTapped
       case deleteButtonTapped
+      
       case submitTagTapped
       case addTagButtonTapped
       case addedTagTapped(Tag)
       case existingTagTapped(Tag)
       case removeTagTapped(Tag)
+
+      case submitLabelTapped
+      case addLabelButtonTapped
+      case addedLabelTapped(ActivityLabel)
+      case existingLabelTapped(ActivityLabel)
+      case removeLabelTapped(ActivityLabel)
     }
     public enum InternalAction: Equatable { 
       case setExistingTags([Tag])
       case loadTags
+      case setExistingLabels([ActivityLabel])
+      case loadLabels
     }
     public enum DelegateAction: Equatable {
       case activityDeleted(DayActivity)
       case activityUpdated(DayActivity)
     }
 
-    case addTag(PresentationAction<TagFormFeature.Action>)
+    case addMarker(PresentationAction<MarkerFormFeature.Action>)
 
     case binding(BindingAction<State>)
 
@@ -65,7 +80,10 @@ public struct DayActivityFormFeature: Reducer {
     Reduce { state, action in
       switch action {
       case .view(.appeared):
-        return .send(.internal(.loadTags))
+        return .run(operation: { send in
+          await send(.internal(.loadTags))
+          await send(.internal(.loadLabels))
+        })
       case .view(.saveButtonTapped):
         return .run { [activity = state.dayActivity] send in
           await send(.delegate(.activityUpdated(activity)))
@@ -101,11 +119,43 @@ public struct DayActivityFormFeature: Reducer {
           let existingTags = try await tagRepository.loadTags(enteredTags)
           await send(.internal(.setExistingTags(existingTags)))
         }
-      case .addTag(.presented(.delegate(.tagCreated(let tag)))):
+      case .view(.submitLabelTapped):
+        showNewLabel(state: &state)
+        return .none
+      case .view(.addLabelButtonTapped):
+        showNewLabel(state: &state)
+        return .none
+      case .view(.addedLabelTapped(let label)):
+        removeLabel(label, state: &state)
+        return .send(.internal(.loadLabels))
+      case .view(.existingLabelTapped(let label)):
+        appendLabel(label, state: &state)
+        return .send(.internal(.loadLabels))
+      case .view(.removeLabelTapped(let label)):
+        return .run { send in
+          try await activityLabelRepository.deleteLabel(label)
+          await send(.internal(.loadLabels))
+        }
+      case .internal(.setExistingLabels(let labels)):
+        state.existingLabels = labels
+        return .none
+      case .internal(.loadLabels):
+        return .run { [activity = state.dayActivity.activity, enteredLabels = state.dayActivity.labels] send in
+          let existingLabels = try await activityLabelRepository.loadLabels(activity, enteredLabels)
+          await send(.internal(.setExistingLabels(existingLabels)))
+        }
+      case .addMarker(.presented(.delegate(.tagCreated(let tag)))):
         state.newTag = .empty
         appendTag(tag, state: &state)
         return .none
-      case .addTag:
+      case .addMarker(.presented(.delegate(.labelCreated(let label)))):
+        state.newLabel = .empty
+        appendLabel(label, state: &state)
+        state.dayActivity.activity.labels.append(label)
+        return .run { [activity = state.dayActivity.activity] send in
+          try await activityRepository.saveActivity(activity)
+        }
+      case .addMarker:
         return .none
       case .delegate:
         return .none
@@ -113,8 +163,8 @@ public struct DayActivityFormFeature: Reducer {
         return .none
       }
     }
-    .ifLet(\.$addTag, action: /Action.addTag) {
-      TagFormFeature()
+    .ifLet(\.$addMarker, action: /Action.addMarker) {
+      MarkerFormFeature()
     }
   }
 
@@ -122,8 +172,9 @@ public struct DayActivityFormFeature: Reducer {
 
   private func showNewTag(state: inout State) {
     guard !state.newTag.isEmpty else { return }
-    state.addTag = TagFormFeature.State(
-      tag: Tag(name: state.newTag)
+    state.addMarker = MarkerFormFeature.State(
+      markerType: .tag,
+      name: state.newTag
     )
   }
 
@@ -135,5 +186,23 @@ public struct DayActivityFormFeature: Reducer {
   private func removeTag(_ tag: Tag, state: inout State) {
     guard state.dayActivity.tags.contains(where: { $0.name == tag.name }) else { return }
     state.dayActivity.tags.removeAll(where: { $0.name == tag.name })
+  }
+
+  private func showNewLabel(state: inout State) {
+    guard !state.newLabel.isEmpty else { return }
+    state.addMarker = MarkerFormFeature.State(
+      markerType: .label,
+      name: state.newLabel
+    )
+  }
+
+  private func appendLabel(_ label: ActivityLabel, state: inout State) {
+    guard !state.dayActivity.labels.contains(where: { $0.name == label.name }) else { return }
+    state.dayActivity.labels.append(label)
+  }
+
+  private func removeLabel(_ label: ActivityLabel, state: inout State) {
+    guard state.dayActivity.labels.contains(where: { $0.name == label.name }) else { return }
+    state.dayActivity.labels.removeAll(where: { $0.name == label.name })
   }
 }

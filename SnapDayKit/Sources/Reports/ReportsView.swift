@@ -4,7 +4,7 @@ import UiComponents
 import Resources
 import Models
 import Utilities
-import TagList
+import MarkerList
 import ActivityList
 
 @MainActor
@@ -55,12 +55,12 @@ public struct ReportsView: View {
       .navigationTitle(String(localized: "Reports", bundle: .module))
       .sheet(
         store: store.scope(
-          state: \.$tagList,
-          action: { .tagList($0) }
+          state: \.$markerList,
+          action: { .markerList($0) }
         ),
         content: { store in
           NavigationStack {
-            TagListView(store: store)
+            MarkerListView(store: store)
               .navigationBarTitleDisplayMode(.large)
           }
           .presentationDetents([.medium])
@@ -141,6 +141,7 @@ public struct ReportsView: View {
         VStack(spacing: 10.0) {
           filterByTagsView(viewStore: viewStore)
           filterByActivitiesView(viewStore: viewStore)
+          filterByLabelsView(viewStore: viewStore)
         }
         .formBackgroundModifier()
       }
@@ -151,10 +152,10 @@ public struct ReportsView: View {
   private func filterByTagsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     if let selectedTag = viewStore.selectedTag {
       HStack(spacing: 10.0) {
-        Text("Selected tag", bundle: .module)
+        Text("Tag", bundle: .module)
           .formTitleTextStyle
         Spacer()
-        TagView(tag: selectedTag)
+        MarkerView(marker: selectedTag)
           .onTapGesture {
             viewStore.send(.view(.tagTapped))
           }
@@ -166,7 +167,7 @@ public struct ReportsView: View {
   private func filterByActivitiesView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
     if !viewStore.activities.isEmpty {
       HStack(spacing: 10.0) {
-        Text("Selected activity", bundle: .module)
+        Text("Activity", bundle: .module)
           .formTitleTextStyle
         Spacer()
         if let selectedActivity = viewStore.selectedActivity {
@@ -177,6 +178,29 @@ public struct ReportsView: View {
         } else {
           Button(String(localized: "Select", bundle: .module)) {
             viewStore.send(.view(.selectActivityButtonTapped))
+          }
+          .foregroundStyle(Color.actionBlue)
+          .font(.system(size: 12.0, weight: .bold))
+        }
+      }
+    }
+  }
+  
+  @ViewBuilder
+  private func filterByLabelsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+    if viewStore.selectedActivity != nil {
+      HStack(spacing: 10.0) {
+        Text("Label", bundle: .module)
+          .formTitleTextStyle
+        Spacer()
+        if let selectedLabel = viewStore.selectedLabel {
+          MarkerView(marker: selectedLabel)
+            .onTapGesture {
+              viewStore.send(.view(.labelTapped))
+            }
+        } else {
+          Button(String(localized: "Select", bundle: .module)) {
+            viewStore.send(.view(.labelTapped))
           }
           .foregroundStyle(Color.actionBlue)
           .font(.system(size: 12.0, weight: .bold))

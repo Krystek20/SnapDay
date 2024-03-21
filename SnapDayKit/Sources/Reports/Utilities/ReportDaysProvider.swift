@@ -12,6 +12,7 @@ struct ReportDaysProvider: TodayProvidable {
   func prepareReportDays(
     selectedFilterPeriod: FilterPeriod?,
     selectedActivity: Activity?,
+    selectedLabel: ActivityLabel?,
     selectedTag: Tag?,
     days: [Day]
   ) -> [ReportDay] {
@@ -29,6 +30,7 @@ struct ReportDaysProvider: TodayProvidable {
       if let selectedActivity {
         dayActivity = prepareDayReportyActivity(
           selectedActivity: selectedActivity,
+          selectedLabel: selectedLabel,
           selectedTag: selectedTag,
           day: day
         )
@@ -62,15 +64,24 @@ struct ReportDaysProvider: TodayProvidable {
     }
   }
 
-  private func prepareDayReportyActivity(selectedActivity: Activity, selectedTag: Tag?, day: Day) -> ReportDayActivity {
+  private func prepareDayReportyActivity(
+    selectedActivity: Activity,
+    selectedLabel: ActivityLabel?,
+    selectedTag: Tag?,
+    day: Day
+  ) -> ReportDayActivity {
     let activities = day.activities.filter { dayActivity in
-      dayActivity.activity == selectedActivity && dayActivity.tags.contains(where: { $0 == selectedTag })
+      let areMatchedActivityAndTag = dayActivity.activity == selectedActivity && dayActivity.tags.contains(where: { $0 == selectedTag })
+      return areMatchedActivityAndTag && (selectedLabel == nil || dayActivity.labels.contains { $0 == selectedLabel })
     }
     let state = prepareDayState(date: day.date, activities: activities)
     return .activity(state)
   }
 
-  private func prepareTagReportyActivity(selectedTag: Tag?, day: Day) -> ReportDayActivity {
+  private func prepareTagReportyActivity(
+    selectedTag: Tag?,
+    day: Day
+  ) -> ReportDayActivity {
     let activities = day.activities.filter { $0.tags.contains { $0 == selectedTag } }
     let state = prepareDayState(date: day.date, activities: activities)
     return .tag(state)

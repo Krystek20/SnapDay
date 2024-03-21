@@ -5,7 +5,7 @@ import Utilities
 import Models
 import Common
 import Combine
-import TagList
+import MarkerList
 import ActivityList
 
 public struct ReportsFeature: Reducer, TodayProvidable {
@@ -25,7 +25,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     @BindingState var startDate: Date = Date()
     @BindingState var endDate: Date = Date()
 
-    @PresentationState var tagList: TagListFeature.State?
+    @PresentationState var markerList: MarkerListFeature.State?
     @PresentationState var activityList: ActivityListFeature.State?
 
     var tagActivitySections: [TagActivitySection] = []
@@ -40,6 +40,9 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     }
     var allTags: [Tag] = []
     var selectedTag: Tag?
+
+    var allLabels: [ActivityLabel] = []
+    var selectedLabel: ActivityLabel?
 
     var days: [Day] = []
     var activities: [Activity] = []
@@ -74,6 +77,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
       case decreaseButtonTapped
       case increaseButtonTapped
       case tagTapped
+      case labelTapped
       case selectActivityButtonTapped
     }
     public enum InternalAction: Equatable {
@@ -85,7 +89,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     }
     public enum DelegateAction: Equatable { }
 
-    case tagList(PresentationAction<TagListFeature.Action>)
+    case markerList(PresentationAction<MarkerListFeature.Action>)
     case activityList(PresentationAction<ActivityListFeature.Action>)
 
     case binding(BindingAction<State>)
@@ -124,10 +128,17 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         }
       case .view(.tagTapped):
         guard let selectedTag = state.selectedTag else { return .none }
-        state.tagList = TagListFeature.State(
-          tag: selectedTag,
-          tags: state.allTags,
-          days: state.days
+        let availableTags = state.allTags.filter { tag in
+          state.days.contains(where: { $0.activities.contains(where: { $0.tags.contains(tag) }) })
+        }
+        state.markerList = MarkerListFeature.State(
+          type: .tag(selected: selectedTag, available: availableTags)
+        )
+        return .none
+      case .view(.labelTapped):
+        let availableLabels = state.selectedActivity?.labels ?? []
+        state.markerList = MarkerListFeature.State(
+          type: .label(selected: state.selectedLabel, available: availableLabels)
         )
         return .none
       case .view(.selectActivityButtonTapped):
@@ -173,6 +184,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
           days: state.days,
           selectedActivity: state.selectedActivity,
           selectedTag: state.selectedTag,
+          selectedLabel: state.selectedLabel,
           today: today
         )
         return .none
@@ -181,6 +193,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         state.reportDays = reportDaysProvider.prepareReportDays(
           selectedFilterPeriod: state.selectedFilterPeriod,
           selectedActivity: state.selectedActivity,
+          selectedLabel: state.selectedLabel,
           selectedTag: state.selectedTag,
           days: state.days
         )
@@ -202,22 +215,29 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .run { send in
           await send(.internal(.loadDays))
         }
-      case .tagList(.presented(.delegate(.tagSelected(let tag)))):
-        state.selectedTag = tag
-        state.selectedActivity = nil
-        state.activities = state.days.map { day in
-          day.activities.compactMap { dayActivity -> Activity? in
-            guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
-            return dayActivity.activity
+      case .markerList(.presented(.delegate(.markerSelected(let markerSelection)))):
+        switch markerSelection {
+        case .tag(let tag):
+          state.selectedTag = tag
+          state.selectedActivity = nil
+          state.selectedLabel = nil
+          let activities = state.days.map { day in
+            day.activities.compactMap { dayActivity -> Activity? in
+              guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
+              return dayActivity.activity
+            }
           }
+          .joined()
+          state.activities = Array(Set(activities))
+            .sorted(by: { $0.name < $1.name })
+        case .label(let label):
+          state.selectedLabel = label
         }
-        .joined()
-        .sorted(by: { $0.name < $1.name })
         return .run { send in
           await send(.internal(.loadSummary))
           await send(.internal(.loadReportDays))
         }
-      case .tagList:
+      case .markerList:
         return .none
       case .activityList(.presented(.delegate(.activitiesSelected(let activities)))):
         state.selectedActivity = activities.first
@@ -231,8 +251,8 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .none
       }
     }
-    .ifLet(\.$tagList, action: /Action.tagList) {
-      TagListFeature()
+    .ifLet(\.$markerList, action: /Action.markerList) {
+      MarkerListFeature()
     }
     .ifLet(\.$activityList, action: /Action.activityList) {
       ActivityListFeature()
@@ -272,9 +292,5 @@ public struct ReportsFeature: Reducer, TodayProvidable {
   private func setupSectionsAndSelectedTag(_ state: inout State, days: [Day]) {
     let tagSectionsProvider = TagSectionsProvider()
     state.tagActivitySections = tagSectionsProvider.sections(for: days)
-  }
-
-  private func abc(days: [Day], selectedTag: Tag) {
-
   }
 }

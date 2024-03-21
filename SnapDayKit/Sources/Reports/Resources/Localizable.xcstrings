@@ -7,6 +7,9 @@
     "Activities By Tags" : {
 
     },
+    "Activity" : {
+
+    },
     "Custom" : {
 
     },
@@ -20,6 +23,9 @@
 
     },
     "Filters" : {
+
+    },
+    "Label" : {
 
     },
     "Month" : {
@@ -37,16 +43,13 @@
     "Select" : {
 
     },
-    "Selected activity" : {
-
-    },
-    "Selected tag" : {
-
-    },
     "Start" : {
 
     },
     "Summary" : {
+
+    },
+    "Tag" : {
 
     },
     "Total Time" : {

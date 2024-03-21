@@ -19,12 +19,7 @@ extension Activity: Entity {
       fetchRequest: Activity.fetchRequest,
       context: context
     )
-    try activityEntity.setup(by: self)
-    activityEntity.tags = Set(
-      try tags.map { tag in
-        try tag.managedObject(context)
-      }
-    ) as NSSet
+    try activityEntity.setup(by: self, context: context)
     return activityEntity
   }
 }

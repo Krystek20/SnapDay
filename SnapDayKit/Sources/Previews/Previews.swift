@@ -3,7 +3,7 @@ import ComposableArchitecture
 import Application
 import Dashboard
 import ActivityForm
-import TagForm
+import MarkerForm
 import EmojiPicker
 import Models
 
@@ -34,11 +34,11 @@ import Models
   )
 }
 
-#Preview("TagFormView") {
-  TagFormView(
+#Preview("MarkerFormView") {
+  MarkerFormView(
     store: Store(
-      initialState: TagFormFeature.State(tag: Tag(name: "")),
-      reducer: { TagFormFeature() }
+      initialState: MarkerFormFeature.State(markerType: .tag),
+      reducer: { MarkerFormFeature() }
     )
   )
 }

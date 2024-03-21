@@ -2,22 +2,22 @@ import SwiftUI
 import Models
 import Resources
 
-public struct TagView: View {
+public struct MarkerView<Marker: MarkerProtocol>: View {
 
   // MARK: - Properties
 
-  private let tag: Tag
+  private let marker: Marker
 
   // MARK: - Initialization
 
-  public init(tag: Tag) {
-    self.tag = tag
+  public init(marker: Marker) {
+    self.marker = marker
   }
 
   // MARK: - Views
 
   public var body: some View {
-    Text(tag.name)
+    Text(marker.name)
       .padding(
         EdgeInsets(
           top: 2.0,
@@ -34,13 +34,13 @@ public struct TagView: View {
   // MARK: - Private
 
   private var tagForegroundStyle: some ShapeStyle {
-    tag.rgbColor.isLight()
+    marker.rgbColor.isLight()
     ? Color.sectionText
     : Color.pureWhite
   }
 
   private var tagBackground: some View {
-    tag.rgbColor.color
+    marker.rgbColor.color
       .clipShape(RoundedRectangle(cornerRadius: 3.0))
   }
 }
