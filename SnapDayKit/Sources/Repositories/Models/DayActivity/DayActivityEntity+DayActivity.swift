@@ -5,10 +5,10 @@ import CoreData
 extension DayActivityEntity {
   func setup(by dayActivity: DayActivity, context: NSManagedObjectContext) throws {
     identifier = dayActivity.id
-    isDone = dayActivity.isDone
     duration = Int32(dayActivity.duration)
     overview = dayActivity.overview
     isGeneratedAutomatically = dayActivity.isGeneratedAutomatically
+    doneDate = dayActivity.doneDate
     activity = try ActivityEntity.object(
       identifier: dayActivity.activity.id.uuidString,
       fetchRequest: Activity.fetchRequest,

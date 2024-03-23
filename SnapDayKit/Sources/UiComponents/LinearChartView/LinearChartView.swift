@@ -5,11 +5,17 @@ public struct LinearChartView: View {
 
   private let points: [Double]
   private let expectedPoints: Int
+  private let currentPoint: Int
   private let verticalUnits = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
 
-  public init(points: [Double], expectedPoints: Int) {
+  public init(
+    points: [Double],
+    expectedPoints: Int,
+    currentPoint: Int
+  ) {
     self.points = points
     self.expectedPoints = expectedPoints
+    self.currentPoint = currentPoint
   }
 
   public var body: some View {
@@ -21,10 +27,12 @@ public struct LinearChartView: View {
             .foregroundColor(.actionBlue.opacity(0.3))
           progressPath(proxy: proxy)
             .foregroundColor(.actionBlue)
-          Circle()
-            .fill(Color.actionBlue)
-            .frame(width: 10.0, height: 10.0)
-            .position(position(for: points.last ?? .zero, index: points.count, proxy: proxy))
+          if points.indices.contains(currentPoint) {
+            Circle()
+              .fill(Color.actionBlue)
+              .frame(width: 10.0, height: 10.0)
+              .position(position(for: points[currentPoint], index: currentPoint + 1, proxy: proxy))
+          }
         }
       }
     }

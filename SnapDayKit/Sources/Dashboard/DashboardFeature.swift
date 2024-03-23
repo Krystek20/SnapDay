@@ -19,6 +19,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.uuid) private var uuid
+  @Dependency(\.date) private var date
   private let periodTitleProvider = PeriodTitleProvider()
 
   // MARK: - State & Action
@@ -38,12 +39,15 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       return DaySummary(day: selectedDay)
     }
 
-    var linearChartValues: (points: [Double], expectedPoints: Int)? {
-      guard let timePeriod else { return nil }
-      return (
-        points: timePeriod.completedDaysValues(until: today),
-        expectedPoints: timePeriod.days.count
-      )
+    var linearChartValues: LinearChartValues? {
+      guard let timePeriod, let selectedDay else { return nil }
+      let linearChartValuesProvider = LinearChartValuesProvider()
+      switch timePeriod.type {
+      case .day:
+        return linearChartValuesProvider.prepareValues(for: selectedDay)
+      case .week, .month, .quarter:
+        return linearChartValuesProvider.prepareValues(for: timePeriod, selectedDay: selectedDay, until: today)
+      }
     }
 
     var activities: [DayActivity] {
@@ -152,7 +156,11 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         )
         return .none
       case .view(.dayActivityTapped(var dayActivity)):
-        dayActivity.isDone.toggle()
+        if dayActivity.doneDate == nil {
+          dayActivity.doneDate = date()
+        } else {
+          dayActivity.doneDate = nil
+        }
         return .run { [dayActivity] send in
           try await dayActivityRepository.saveActivity(dayActivity)
           await send(.internal(.loadTimePeriods))

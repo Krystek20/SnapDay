@@ -11,7 +11,7 @@ extension DayActivity {
     self.init(
       id: identifier,
       activity: activity,
-      isDone: entity.isDone,
+      doneDate: entity.doneDate,
       duration: Int(entity.duration),
       overview: entity.overview,
       isGeneratedAutomatically: entity.isGeneratedAutomatically,

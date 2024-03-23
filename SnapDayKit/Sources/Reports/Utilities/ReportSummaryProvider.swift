@@ -47,7 +47,7 @@ struct ReportSummaryProvider {
       let areMatchedActivityAndTag = dayActivity.activity == selectedActivity && dayActivity.tags.contains(where: { $0 == selectedTag })
       return areMatchedActivityAndTag && (selectedLabel == nil || dayActivity.labels.contains { $0 == selectedLabel })
     }
-    let activitiesDone = activities.filter { $0.isDone }
+    let activitiesDone = activities.filter(\.isDone)
     let notDoneCount = day.date < today
     ? activities.count - activitiesDone.count
     : .zero
@@ -65,7 +65,7 @@ struct ReportSummaryProvider {
     today: Date
   ) -> ReportSummary {
     let activities = day.activities.filter { $0.tags.contains { $0 == selectedTag } }
-    let activitiesDone = activities.filter { $0.isDone }
+    let activitiesDone = activities.filter(\.isDone)
     let notDoneCount = day.date < today
     ? activities.count - activitiesDone.count
     : .zero

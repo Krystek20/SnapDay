@@ -90,8 +90,8 @@ struct ReportDaysProvider: TodayProvidable {
   private func prepareDayState(date: Date, activities: [DayActivity]) -> ReportDayState {
     if activities.isEmpty {
       .notPlanned
-    } else if date < today {
-      activities.filter { $0.isDone }.isEmpty
+    } else if date <= today {
+      activities.filter(\.isDone).isEmpty
       ? .notDone
       : .done
     } else {

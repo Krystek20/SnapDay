@@ -26,9 +26,9 @@
         <relationship name="dayActivities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayActivityEntity" inverseName="labels" inverseEntity="DayActivityEntity"/>
     </entity>
     <entity name="DayActivityEntity" representedClassName="DayActivityEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="doneDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="duration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="isDone" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="isGeneratedAutomatically" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="overview" optional="YES" attributeType="String"/>
         <relationship name="activity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ActivityEntity" inverseName="dayActivities" inverseEntity="ActivityEntity"/>

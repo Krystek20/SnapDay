@@ -144,10 +144,14 @@ public struct DashboardView: View {
         name: String(localized: "Summary", bundle: .module),
         rightContent: { EmptyView() },
         content: {
-          LinearChartView(points: linearChartValues.points, expectedPoints: linearChartValues.expectedPoints)
-            .frame(height: 200.0)
-            .padding(.vertical, 15.0)
-            .formBackgroundModifier()
+          LinearChartView(
+            points: linearChartValues.points,
+            expectedPoints: linearChartValues.expectedPoints,
+            currentPoint: linearChartValues.currentPoint
+          )
+          .frame(height: 200.0)
+          .padding(.vertical, 15.0)
+          .formBackgroundModifier()
         }
       )
     }

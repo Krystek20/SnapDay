@@ -157,7 +157,7 @@ struct DayUpdater {
     DayActivity(
       id: uuid(),
       activity: activity,
-      isDone: false,
+      doneDate: nil,
       duration: activity.defaultDuration ?? .zero,
       overview: nil,
       isGeneratedAutomatically: !createdByUser,

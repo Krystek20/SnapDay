@@ -241,6 +241,7 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .none
       case .activityList(.presented(.delegate(.activitiesSelected(let activities)))):
         state.selectedActivity = activities.first
+        state.selectedLabel = nil
         return .run { send in
           await send(.internal(.loadSummary))
           await send(.internal(.loadReportDays))
