@@ -11,6 +11,7 @@ public struct DayActivityFormFeature: Reducer {
   @Dependency(\.tagRepository) var tagRepository
   @Dependency(\.activityLabelRepository) var activityLabelRepository
   @Dependency(\.activityRepository) var activityRepository
+  @Dependency(\.date) var date
 
   // MARK: - State & Action
 
@@ -48,6 +49,8 @@ public struct DayActivityFormFeature: Reducer {
       case addedLabelTapped(ActivityLabel)
       case existingLabelTapped(ActivityLabel)
       case removeLabelTapped(ActivityLabel)
+
+      case isDoneToggleChanged(Bool)
     }
     public enum InternalAction: Equatable { 
       case setExistingTags([Tag])
@@ -111,6 +114,9 @@ public struct DayActivityFormFeature: Reducer {
           try await tagRepository.deleteTag(tag)
           await send(.internal(.loadTags))
         }
+      case .view(.isDoneToggleChanged(let value)):
+        state.dayActivity.doneDate = value ? date() : nil
+        return .none
       case .internal(.setExistingTags(let tags)):
         state.existingTags = tags
         return .none

@@ -64,6 +64,7 @@ public struct DayActivityFormView: View {
   private func formView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
     ScrollView {
       VStack(spacing: 15.0) {
+        isDoneToggleView(viewStore: viewStore)
         durationFormView(viewStore: viewStore)
         overviewTextField(viewStore: viewStore)
         tagsView(viewStore: viewStore)
@@ -73,6 +74,21 @@ public struct DayActivityFormView: View {
       .maxWidth()
     }
     .scrollIndicators(.hidden)
+  }
+
+  @ViewBuilder
+  private func isDoneToggleView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+    Toggle(
+      isOn: Binding(
+        get: { viewStore.dayActivity.isDone },
+        set: { value in viewStore.send(.view(.isDoneToggleChanged(value))) }
+      )
+    ) {
+      Text("Completed", bundle: .module)
+        .formTitleTextStyle
+    }
+    .toggleStyle(CheckToggleStyle())
+    .formBackgroundModifier()
   }
 
   private func durationFormView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
