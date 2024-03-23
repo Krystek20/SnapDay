@@ -72,7 +72,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
 
     var dayInformation: InformationViewConfigurable? {
       let emptyDayConfiguration: EmptyDayConfiguration = selectedDay?.isOlderThenToday == true ? .pastDay : .todayOrFuture
-      return daySummary?.duration == .zero ? emptyDayConfiguration : nil
+      return selectedDay?.activities.isEmpty == true ? emptyDayConfiguration : nil
     }
 
     @BindingState var selectedPeriod: Period = .day
@@ -141,7 +141,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .view(.activityListButtonTapped):
         state.activityList = ActivityListFeature.State(
           configuration: ActivityListFeature.ActivityListConfiguration(
-            type: .singleSelection(selectedActivity: nil),
+            type: .multiSelection(selectedActivities: []),
             isActivityEditable: true,
             fetchingOption: .fromCoreData
           )
