@@ -10,7 +10,7 @@ extension Tag: Entity {
 
   public init?(object: TagEntity?) throws {
     guard let object else { return nil }
-    self.init(object)
+    try self.init(object)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> TagEntity {

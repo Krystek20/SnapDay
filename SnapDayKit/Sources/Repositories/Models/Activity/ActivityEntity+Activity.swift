@@ -6,7 +6,7 @@ extension ActivityEntity {
   func setup(by activity: Activity, context: NSManagedObjectContext) throws {
     identifier = activity.id
     name = activity.name
-    image = activity.image
+    icon = try activity.icon?.managedObject(context)
     if let frequency = activity.frequency {
       frequencyJson = try JSONEncoder().encode(frequency)
     } else {
@@ -24,6 +24,11 @@ extension ActivityEntity {
     labels = Set(
       try activity.labels.map { label in
         try label.managedObject(context)
+      }
+    ) as NSSet
+    activityTasks = Set(
+      try activity.tasks.map { task in
+        try task.managedObject(context)
       }
     ) as NSSet
   }

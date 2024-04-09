@@ -43,7 +43,7 @@ public struct DayGridView: View {
 
   private func activityIcon(dayActivity: DayActivity) -> some View {
     ActivityImageView(
-      data: dayActivity.activity.image,
+      data: dayActivity.icon?.data,
       size: 40.0,
       cornerRadius: 20.0
     )

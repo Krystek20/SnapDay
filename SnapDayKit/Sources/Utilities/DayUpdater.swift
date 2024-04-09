@@ -157,12 +157,25 @@ struct DayUpdater {
     DayActivity(
       id: uuid(),
       activity: activity,
+      name: activity.name,
+      icon: activity.icon,
       doneDate: nil,
       duration: activity.defaultDuration ?? .zero,
       overview: nil,
       isGeneratedAutomatically: !createdByUser,
       tags: activity.tags,
-      labels: []
+      labels: [],
+      dayActivityTasks: activity.tasks.map {
+        DayActivityTask(
+          id: uuid(),
+          activityTask: $0,
+          name: $0.name,
+          icon: $0.icon,
+          doneDate: nil,
+          duration: $0.defaultDuration ?? .zero,
+          overview: nil
+        )
+      }
     )
   }
 

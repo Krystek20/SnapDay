@@ -1,0 +1,48 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Change icon" : {
+
+    },
+    "Completed" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Edit task" : {
+
+    },
+    "Enter name" : {
+
+    },
+    "Enter overview" : {
+
+    },
+    "Name" : {
+
+    },
+    "New task" : {
+
+    },
+    "Overview" : {
+
+    },
+    "Pick Photo" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Save" : {
+
+    },
+    "Select Emoji" : {
+
+    },
+    "Set duration" : {
+
+    }
+  },
+  "version" : "1.0"
+}

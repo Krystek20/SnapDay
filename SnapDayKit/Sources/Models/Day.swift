@@ -50,7 +50,7 @@ extension Day {
 extension Day {
   public var sortedDayActivities: [DayActivity] {
     activities.sorted(by: {
-      if $0.isDone == $1.isDone { return $0.activity.name < $1.activity.name }
+      if $0.isDone == $1.isDone { return $0.name < $1.name }
       return !$0.isDone && $1.isDone
     })
   }

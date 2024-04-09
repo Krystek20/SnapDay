@@ -14,7 +14,7 @@ public struct DaySummary {
 
   public var duration: Int {
     day.activities.reduce(into: Int.zero, { result, dayActivity in
-      result += dayActivity.duration
+      result += dayActivity.totalDuration
     })
   }
 
@@ -22,6 +22,10 @@ public struct DaySummary {
     day.activities.reduce(into: Int.zero, { result, dayActivity in
       guard !dayActivity.isDone else { return }
       result += dayActivity.duration
+      result += dayActivity.dayActivityTasks.reduce(into: Int.zero, { result, dayActivityTask in
+        guard !dayActivityTask.isDone else { return }
+        result += dayActivityTask.duration
+      })
     })
   }
 }

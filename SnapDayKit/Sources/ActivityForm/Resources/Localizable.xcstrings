@@ -1,6 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lldh %lldmin" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lldh %2$lldmin"
+          }
+        }
+      }
+    },
+    "%lldmin" : {
+
+    },
     "Add Activity" : {
 
     },
@@ -8,6 +21,12 @@
 
     },
     "Add Tag" : {
+
+    },
+    "Add task" : {
+
+    },
+    "Add Task" : {
 
     },
     "Biweekly" : {
@@ -23,6 +42,9 @@
 
     },
     "Duration" : {
+
+    },
+    "Edit" : {
 
     },
     "Edit Activity" : {
@@ -95,6 +117,9 @@
 
     },
     "Tags" : {
+
+    },
+    "Tasks" : {
 
     },
     "Third" : {

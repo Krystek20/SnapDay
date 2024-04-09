@@ -5,6 +5,7 @@ import MarkerForm
 import Models
 import EmojiPicker
 import Utilities
+import ActivityTaskForm
 
 public struct ActivityFormFeature: Reducer, TodayProvidable {
 
@@ -26,6 +27,7 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
   @Dependency(\.tagRepository.deleteTag) var deleteTag
   @Dependency(\.activityRepository.saveActivity) var saveActivity
   @Dependency(\.dismiss) var dismiss
+  @Dependency(\.uuid) var uuid
 
   // MARK: - State & Action
 
@@ -40,8 +42,9 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
     @BindingState var newTag = String.empty
     @BindingState var focus: Field?
     @BindingState var isPhotoPickerPresented: Bool = false
-    @PresentationState var addMarker: MarkerFormFeature.State?
-    @PresentationState var showEmojiPicker: EmojiPickerFeature.State?
+    @PresentationState var markerForm: MarkerFormFeature.State?
+    @PresentationState var emojiPicker: EmojiPickerFeature.State?
+    @PresentationState var activityTaskForm: ActivityTaskFormFeature.State?
     var photoItem: PhotoItem?
     var existingTags = [Tag]()
     var showAddTagButton: Bool { !newTag.isEmpty }
@@ -81,6 +84,9 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
       case removeImageTapped
       case saveButtonTapped
       case imageSelected(PhotoItem)
+      case addTaskButtonTapped
+      case editButtonTapped(ActivityTask)
+      case removeButtonTapped(ActivityTask)
     }
     public enum InternalAction: Equatable {
       case setExistingTags([Tag])
@@ -92,8 +98,9 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
       case activityUpdated(Activity)
     }
 
-    case addMarker(PresentationAction<MarkerFormFeature.Action>)
-    case showEmojiPicker(PresentationAction<EmojiPickerFeature.Action>)
+    case markerForm(PresentationAction<MarkerFormFeature.Action>)
+    case emojiPicker(PresentationAction<EmojiPickerFeature.Action>)
+    case activityTaskForm(PresentationAction<ActivityTaskFormFeature.Action>)
 
     case binding(BindingAction<State>)
     
@@ -132,13 +139,13 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
           await send(.internal(.loadTags))
         }
       case .view(.iconTapped):
-        state.showEmojiPicker = EmojiPickerFeature.State()
+        state.emojiPicker = EmojiPickerFeature.State()
         return .none
       case .view(.pickPhotoTapped):
         state.isPhotoPickerPresented = true
         return .none
       case .view(.removeImageTapped):
-        state.activity.image = nil
+        state.activity.icon = nil
         return .none
       case .view(.saveButtonTapped):
         state.activity.startDate = today
@@ -157,6 +164,21 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
           let data = try await item.loadImageData(size: 140.0)
           await send(.internal(.setImageDate(data)))
         }
+      case .view(.addTaskButtonTapped):
+        state.activityTaskForm = ActivityTaskFormFeature.State(
+          activityTask: ActivityTask(
+            id: uuid()
+          )
+        )
+        return .none
+      case .view(.editButtonTapped(let activityTask)):
+        state.activityTaskForm = ActivityTaskFormFeature.State(
+          activityTask: activityTask
+        )
+        return .none
+      case .view(.removeButtonTapped(let activityTask)):
+        state.activity.tasks.removeAll(where: { $0.id == activityTask.id })
+        return .none
       case .internal(.setExistingTags(let tags)):
         state.existingTags = tags
         return .none
@@ -166,32 +188,47 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
           await send(.internal(.setExistingTags(existingTags)))
         }
       case .internal(.setImageDate(let imageData)):
-        state.activity.image = imageData
+        state.activity.icon = Icon(
+          id: uuid(),
+          data: imageData
+        )
         return .none
       case .delegate:
         return .none
-      case .addMarker(.presented(.delegate(.tagCreated(let tag)))):
+      case .markerForm(.presented(.delegate(.tagCreated(let tag)))):
         state.newTag = .empty
         state.focus = nil
         appendTag(tag, state: &state)
         return .none
-      case .addMarker:
+      case .markerForm:
         return .none
-      case .showEmojiPicker(.presented(.delegate(.dataSelected(let data)))):
+      case .emojiPicker(.presented(.delegate(.dataSelected(let data)))):
         return .run { [data] send in
           await send(.internal(.setImageDate(data)))
         }
-      case .showEmojiPicker:
+      case .emojiPicker:
+        return .none
+      case .activityTaskForm(.presented(.delegate(.activityTask(let activityTask)))):
+        if let index = state.activity.tasks.firstIndex(where: { $0.id == activityTask.id }) {
+          state.activity.tasks[index] = activityTask
+        } else {
+          state.activity.tasks.append(activityTask)
+        }
+        return .none
+      case .activityTaskForm:
         return .none
       case .binding:
         return .none
       }
     }
-    .ifLet(\.$addMarker, action: /Action.addMarker) {
+    .ifLet(\.$markerForm, action: /Action.markerForm) {
       MarkerFormFeature()
     }
-    .ifLet(\.$showEmojiPicker, action: /Action.showEmojiPicker) {
+    .ifLet(\.$emojiPicker, action: /Action.emojiPicker) {
       EmojiPickerFeature()
+    }
+    .ifLet(\.$activityTaskForm, action: /Action.activityTaskForm) {
+      ActivityTaskFormFeature()
     }
   }
 
@@ -199,7 +236,7 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
 
   private func showNewTag(state: inout State) {
     guard !state.newTag.isEmpty else { return }
-    state.addMarker = MarkerFormFeature.State(
+    state.markerForm = MarkerFormFeature.State(
       markerType: .tag,
       name: state.newTag
     )

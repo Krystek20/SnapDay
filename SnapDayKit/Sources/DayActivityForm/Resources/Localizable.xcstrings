@@ -1,6 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lldh %lldmin" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lldh %2$lldmin"
+          }
+        }
+      }
+    },
+    "%lldmin" : {
+
+    },
     "Add Label" : {
 
     },
@@ -10,10 +23,19 @@
     "Add Tag" : {
 
     },
+    "Add task" : {
+
+    },
     "Completed" : {
 
     },
     "Delete" : {
+
+    },
+    "Deselect" : {
+
+    },
+    "Edit" : {
 
     },
     "Edit day activity" : {
@@ -40,13 +62,22 @@
     "Overview" : {
 
     },
+    "Remove" : {
+
+    },
     "Save" : {
+
+    },
+    "Select" : {
 
     },
     "Set duration" : {
 
     },
     "Tags" : {
+
+    },
+    "Tasks" : {
 
     }
   },

@@ -4,6 +4,7 @@ import UiComponents
 import Resources
 import Models
 import MarkerForm
+import DayActivityTaskForm
 
 @MainActor
 public struct DayActivityFormView: View {
@@ -45,6 +46,18 @@ public struct DayActivityFormView: View {
         .presentationDetents([.medium])
       }
     )
+    .sheet(
+      store: store.scope(
+        state: \.$dayActivityTaskForm,
+        action: { .dayActivityTaskForm($0) }
+      ),
+      content: { store in
+        NavigationStack {
+          DayActivityTaskFormView(store: store)
+        }
+        .presentationDetents([.large])
+      }
+    )
   }
 
   private func content(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
@@ -69,6 +82,7 @@ public struct DayActivityFormView: View {
         overviewTextField(viewStore: viewStore)
         tagsView(viewStore: viewStore)
         labelsView(viewStore: viewStore)
+        tasksView(viewStore: viewStore)
       }
       .padding(padding)
       .maxWidth()
@@ -114,8 +128,6 @@ public struct DayActivityFormView: View {
     )
   }
 
-  @State private var name: String = ""
-
   private func overviewTextField(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
     FormTextField(
       title: String(localized: "Overview", bundle: .module),
@@ -136,16 +148,16 @@ public struct DayActivityFormView: View {
       existingMarkers: viewStore.existingTags,
       newMarker: viewStore.$newTag,
       onSubmit: {
-        viewStore.send(.view(.submitTagTapped))
+        viewStore.send(.view(.tag(.submitTapped)))
       },
       addedMarkerTapped: { marker in
-        viewStore.send(.view(.addedTagTapped(marker)))
+        viewStore.send(.view(.tag(.addedTapped(marker))))
       },
       existingMarkerTapped: { marker in
-        viewStore.send(.view(.existingTagTapped(marker)))
+        viewStore.send(.view(.tag(.existingTapped(marker))))
       },
       removeMarker: { marker in
-        viewStore.send(.view(.removeTagTapped(marker)))
+        viewStore.send(.view(.tag(.removeTapped(marker))))
       }
     )
   }
@@ -159,18 +171,65 @@ public struct DayActivityFormView: View {
       existingMarkers: viewStore.existingLabels,
       newMarker: viewStore.$newLabel,
       onSubmit: {
-        viewStore.send(.view(.submitLabelTapped))
+        viewStore.send(.view(.label(.submitTapped)))
       },
       addedMarkerTapped: { label in
-        viewStore.send(.view(.addedLabelTapped(label)))
+        viewStore.send(.view(.label(.addedTapped(label))))
       },
       existingMarkerTapped: { label in
-        viewStore.send(.view(.existingLabelTapped(label)))
+        viewStore.send(.view(.label(.existingTapped(label))))
       },
       removeMarker: { label in
-        viewStore.send(.view(.removeLabelTapped(label)))
+        viewStore.send(.view(.label(.removeTapped(label))))
       }
     )
+  }
+
+  private func tasksView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+    SectionView(
+      name: String(localized: "Tasks", bundle: .module),
+      rightContent: { },
+      content: {
+        taskContentView(viewStore: viewStore)
+          .formBackgroundModifier()
+      }
+    )
+  }
+
+  @ViewBuilder
+  private func taskContentView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+    LazyVStack(spacing: 10.0) {
+      ForEach(viewStore.dayActivity.dayActivityTasks) { task in
+        DayActivityTaskView(
+          dayActivityTask: task,
+          selectTapped: { task in
+            viewStore.send(.view(.task(.selectButtonTapped(task))))
+          },
+          editTapped: { task in
+            viewStore.send(.view(.task(.editButtonTapped(task))))
+          },
+          removeTapped: { task in
+            viewStore.send(.view(.task(.removeButtonTapped(task))))
+          }
+        )
+        Divider()
+      }
+      addTaskButton(viewStore: viewStore)
+    }
+  }
+
+  private func addTaskButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+    Button(
+      action: {
+        viewStore.send(.view(.task(.addButtonTapped)))
+      },
+      label: {
+        Text("Add task", bundle: .module)
+          .foregroundStyle(Color.actionBlue)
+          .font(.system(size: 12.0, weight: .bold))
+      }
+    )
+    .maxFrame()
   }
 
   @ViewBuilder
@@ -189,7 +248,7 @@ public struct DayActivityFormView: View {
 
   private func addTagButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
     Button(
-      action: { viewStore.send(.view(.addTagButtonTapped)) },
+      action: { viewStore.send(.view(.tag(.addButtonTapped))) },
       label: { Text("Add tag", bundle: .module) }
     )
     .buttonStyle(PrimaryButtonStyle())
@@ -197,7 +256,7 @@ public struct DayActivityFormView: View {
 
   private func addLabelButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
     Button(
-      action: { viewStore.send(.view(.addLabelButtonTapped)) },
+      action: { viewStore.send(.view(.label(.addButtonTapped))) },
       label: { Text("Add Label", bundle: .module) }
     )
     .buttonStyle(PrimaryButtonStyle())

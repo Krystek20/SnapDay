@@ -42,7 +42,7 @@ public struct ActivitiesByTagView: View {
     VStack(alignment: .leading, spacing: 5.0) {
       HStack(spacing: 5.0) {
         ActivityImageView(
-          data: timePeriodActivity.activity.image,
+          data: timePeriodActivity.activity.icon?.data,
           size: 30.0,
           cornerRadius: 15.0
         )

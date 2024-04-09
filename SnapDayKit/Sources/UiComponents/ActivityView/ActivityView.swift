@@ -19,7 +19,7 @@ public struct ActivityView: View {
   public var body: some View {
     HStack(spacing: 2.0) {
       ActivityImageView(
-        data: activity.image,
+        data: activity.icon?.data,
         size: 20.0,
         cornerRadius: 5.0,
         tintColor: .standardText

@@ -4,11 +4,17 @@ public struct PhotoItem: Equatable {
 
   // MARK: - Properties
 
-  let photosPickerItem: PhotosPickerItem?
+  public let photosPickerItem: PhotosPickerItem?
+
+  // MARK: - Initialization
+
+  public init(photosPickerItem: PhotosPickerItem?) {
+    self.photosPickerItem = photosPickerItem
+  }
 
   // MARK: - Public
 
-  func loadImageData(size: Double) async throws -> Data? {
+  public func loadImageData(size: Double) async throws -> Data? {
     guard let data = try await photosPickerItem?.loadTransferable(type: Data.self),
           let image = UIImage(data: data) else { return nil }
     return scaleImageBy(image: image, size: size)?.pngData() ?? data

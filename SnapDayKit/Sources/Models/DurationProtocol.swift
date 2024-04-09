@@ -1,11 +1,15 @@
-import Models
+import Foundation
 
-extension DayActivity {
-  var minutes: Int {
+public protocol DurationProtocol {
+  var duration: Int { get set }
+}
+
+extension DurationProtocol {
+  public var minutes: Int {
     duration % 60
   }
 
-  mutating func setDurationMinutes(_ minutes: Int) {
+  public mutating func setDurationMinutes(_ minutes: Int) {
     if duration == .zero {
       duration = minutes
     } else {
@@ -14,11 +18,11 @@ extension DayActivity {
     }
   }
 
-  var hours: Int {
+  public var hours: Int {
     duration / 60
   }
 
-  mutating func setDurationHours(_ hours: Int) {
+  public mutating func setDurationHours(_ hours: Int) {
     if duration == .zero {
       duration = hours * 60
     } else {

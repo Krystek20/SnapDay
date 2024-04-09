@@ -1,0 +1,36 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add Activity Task" : {
+
+    },
+    "Change icon" : {
+
+    },
+    "Default duration" : {
+
+    },
+    "Edit Activity Task" : {
+
+    },
+    "Enter name" : {
+
+    },
+    "Name" : {
+
+    },
+    "Pick Photo" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Save" : {
+
+    },
+    "Select Emoji" : {
+
+    }
+  },
+  "version" : "1.0"
+}

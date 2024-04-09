@@ -6,6 +6,7 @@ import Models
 import MarkerForm
 import EmojiPicker
 import PhotosUI
+import ActivityTaskForm
 
 @MainActor
 public struct ActivityFormView: View {
@@ -44,8 +45,8 @@ public struct ActivityFormView: View {
     }
     .sheet(
       store: store.scope(
-        state: \.$addMarker,
-        action: { .addMarker($0) }
+        state: \.$markerForm,
+        action: { .markerForm($0) }
       ),
       content: { store in
         NavigationStack {
@@ -56,10 +57,24 @@ public struct ActivityFormView: View {
         .presentationDetents([.medium])
       }
     )
+    .sheet(
+      store: store.scope(
+        state: \.$activityTaskForm,
+        action: { .activityTaskForm($0) }
+      ),
+      content: { store in
+        NavigationStack {
+          ActivityTaskFormView(store: store)
+            .navigationTitle(String(localized: "Add Task", bundle: .module))
+            .navigationBarTitleDisplayMode(.large)
+        }
+        .presentationDetents([.medium])
+      }
+    )
     .fullScreenCover(
       store: store.scope(
-        state: \.$showEmojiPicker,
-        action: { .showEmojiPicker($0) }
+        state: \.$emojiPicker,
+        action: { .emojiPicker($0) }
       ),
       content: { store in
         NavigationStack {
@@ -92,6 +107,7 @@ public struct ActivityFormView: View {
         tagsView(viewStore: viewStore)
         recurrencyViewIfNeeded(viewStore: viewStore)
         durationView(viewStore: viewStore)
+        tasksView(viewStore: viewStore)
       }
       .padding(padding)
       .maxWidth()
@@ -122,7 +138,7 @@ public struct ActivityFormView: View {
     } label: {
       HStack(spacing: 10.0) {
         ActivityImageView(
-          data: viewStore.activity.image,
+          data: viewStore.activity.icon?.data,
           size: 30.0,
           cornerRadius: 5.0,
           tintColor: .actionBlue
@@ -321,6 +337,52 @@ public struct ActivityFormView: View {
       .formBackgroundModifier()
       .id("DurationView")
     }
+  }
+
+  private func tasksView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+    SectionView(
+      name: String(localized: "Tasks", bundle: .module),
+      rightContent: { },
+      content: {
+        taskContentView(viewStore: viewStore)
+          .formBackgroundModifier()
+      }
+    )
+  }
+
+  @ViewBuilder
+  private func taskContentView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+    if viewStore.activity.tasks.isEmpty {
+      addTaskButton(viewStore: viewStore)
+    } else {
+      LazyVStack(spacing: 10.0) {
+        ForEach(viewStore.activity.tasks) { task in
+          ActivityTaskView(
+            activityTask: task,
+            editTapped: { task in
+              viewStore.send(.view(.editButtonTapped(task)))
+            },
+            removeTapped: { task in
+              viewStore.send(.view(.removeButtonTapped(task)))
+            }
+          )
+          Divider()
+        }
+        addTaskButton(viewStore: viewStore)
+      }
+    }
+  }
+
+  private func addTaskButton(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+    Button(
+      action: { viewStore.send(.view(.addTaskButtonTapped)) },
+      label: {
+        Text("Add task", bundle: .module)
+          .foregroundStyle(Color.actionBlue)
+          .font(.system(size: 12.0, weight: .bold))
+      }
+    )
+    .maxFrame()
   }
 
   private func addTagButton(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {

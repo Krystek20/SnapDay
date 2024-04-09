@@ -2,14 +2,16 @@ import Foundation
 import Models
 
 extension Day {
-  init?(_ entity: DayEntity) throws {
+  init(_ entity: DayEntity) throws {
     guard let id = entity.identifier,
           let date = entity.date,
-          let activities = entity.activities?.allObjects as? [DayActivityEntity]  else { return nil }
+          let activities = entity.activities?.allObjects as? [DayActivityEntity]  else {
+      throw EntityError.attributeNil()
+    }
     self.init(
       id: id,
       date: date,
-      activities: try activities.compactMap(DayActivity.init)
+      activities: try activities.map(DayActivity.init)
     )
   }
 }

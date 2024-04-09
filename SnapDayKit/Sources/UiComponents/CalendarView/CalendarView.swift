@@ -15,6 +15,9 @@ public struct CalendarView: View {
   private let dayActivityTapped: (DayActivity) -> Void
   private let dayActivityEditTapped: (DayActivity) -> Void
   private let removeDayActivityTapped: (DayActivity) -> Void
+  private let dayActivityTaskTapped: (DayActivity, DayActivityTask) -> Void
+  private let dayActivityEditTaskTapped: (DayActivity, DayActivityTask) -> Void
+  private let removeDayActivityTaskTapped: (DayActivity, DayActivityTask) -> Void
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
   private let columns = Array(repeating: GridItem(), count: 7)
@@ -31,6 +34,9 @@ public struct CalendarView: View {
     dayActivityTapped: @escaping (DayActivity) -> Void,
     dayActivityEditTapped: @escaping (DayActivity) -> Void,
     removeDayActivityTapped: @escaping (DayActivity) -> Void,
+    dayActivityTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
+    dayActivityEditTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
+    removeDayActivityTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
     showCompletedTapped: @escaping () -> Void,
     hideCompletedTapped: @escaping () -> Void
   ) {
@@ -43,6 +49,9 @@ public struct CalendarView: View {
     self.dayActivityTapped = dayActivityTapped
     self.dayActivityEditTapped = dayActivityEditTapped
     self.removeDayActivityTapped = removeDayActivityTapped
+    self.dayActivityTaskTapped = dayActivityTaskTapped
+    self.dayActivityEditTaskTapped = dayActivityEditTaskTapped
+    self.removeDayActivityTaskTapped = removeDayActivityTaskTapped
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
   }
@@ -133,6 +142,9 @@ public struct CalendarView: View {
       activityTapped: dayActivityTapped,
       editTapped: dayActivityEditTapped,
       removeTapped: removeDayActivityTapped,
+      activityTaskTapped: dayActivityTaskTapped,
+      editTaskTapped: dayActivityEditTaskTapped,
+      removeTaskTapped: removeDayActivityTaskTapped,
       showCompletedTapped: showCompletedTapped,
       hideCompletedTapped: hideCompletedTapped
     )

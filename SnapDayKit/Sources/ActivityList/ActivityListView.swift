@@ -93,7 +93,7 @@ public struct ActivityListView: View {
   private func activityView(_ activity: Activity, viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
     VStack(spacing: 5.0) {
       ActivityImageView(
-        data: activity.image,
+        data: activity.icon?.data,
         size: 50.0,
         cornerRadius: 25.0
       )

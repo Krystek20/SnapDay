@@ -301,9 +301,9 @@ public struct ReportsView: View {
       if let activity = viewStore.selectedActivity {
         switch state {
         case .done:
-          ActivityImageView(data: activity.image, size: 30.0, cornerRadius: 15.0)
+          ActivityImageView(data: activity.icon?.data, size: 30.0, cornerRadius: 15.0)
         case .notDone, .planned:
-          ActivityImageView(data: activity.image, size: 30.0, cornerRadius: 15.0)
+          ActivityImageView(data: activity.icon?.data, size: 30.0, cornerRadius: 15.0)
             .opacity(0.2)
         case .notPlanned:
           Color.clear

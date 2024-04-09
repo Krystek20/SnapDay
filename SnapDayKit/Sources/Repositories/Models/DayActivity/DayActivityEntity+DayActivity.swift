@@ -14,6 +14,8 @@ extension DayActivityEntity {
       fetchRequest: Activity.fetchRequest,
       context: context
     )
+    name = dayActivity.name
+    icon = try dayActivity.icon?.managedObject(context)
     tags = Set(
       try dayActivity.tags.map { tag in
         try tag.managedObject(context)
@@ -22,6 +24,11 @@ extension DayActivityEntity {
     labels = Set(
       try dayActivity.labels.map { label in
         try label.managedObject(context)
+      }
+    ) as NSSet
+    dayActivityTasks = Set(
+      try dayActivity.dayActivityTasks.map { task in
+        try task.managedObject(context)
       }
     ) as NSSet
   }
