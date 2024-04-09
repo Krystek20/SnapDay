@@ -395,18 +395,18 @@ public struct DashboardFeature: Reducer, TodayProvidable {
     case .monthsList:
       return nil
     case .calendar(let calendarItems):
-      let calendarDays = calendarItems.map(\.day)
+      let calendarDays = calendarItems.compactMap(\.day)
       let todayDay = calendarItems.first(where: {
         guard case .day(let day) = $0 else { return false }
         return day.date == today
       })?.day
       guard let currentSelectedDate = currentSelectedDay?.date else { return todayDay }
-      return calendarDays.contains(where: { $0?.date == currentSelectedDate })
+      return calendarDays.contains(where: { $0.date == currentSelectedDate })
       ? calendarItems.first(where: {
         guard case .day(let day) = $0 else { return false }
         return day.date == currentSelectedDay?.date
       })?.day
-      : todayDay
+      : todayDay ?? calendarDays.first
     case .daysList(let style):
       switch style {
       case .single(let day):
@@ -414,7 +414,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .multi(let days):
         return days.contains(where: { $0.date == currentSelectedDay?.date })
         ? days.first(where: { $0.date == currentSelectedDay?.date })
-        : days.first(where: { $0.date == today })
+        : days.first(where: { $0.date == today }) ?? days.first
       }
     }
   }
