@@ -11,7 +11,7 @@ public struct DayActivityFormView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<DayActivityFormFeature>
+  @Perception.Bindable private var store: StoreOf<DayActivityFormFeature>
   private let padding = EdgeInsets(
     top: 10.0,
     leading: 15.0,
@@ -28,16 +28,9 @@ public struct DayActivityFormView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      content(viewStore: viewStore)
-        .navigationTitle(String(localized: "Edit day activity", bundle: .module))
-    }
-    .sheet(
-      store: store.scope(
-        state: \.$addMarker,
-        action: { .addMarker($0) }
-      ),
-      content: { store in
+    content
+      .navigationTitle(String(localized: "Edit day activity", bundle: .module))
+      .sheet(item: $store.scope(state: \.addMarker, action: \.addMarker)) { store in
         NavigationStack {
           MarkerFormView(store: store)
             .navigationTitle(String(localized: "Add Tag", bundle: .module))
@@ -45,44 +38,37 @@ public struct DayActivityFormView: View {
         }
         .presentationDetents([.medium])
       }
-    )
-    .sheet(
-      store: store.scope(
-        state: \.$dayActivityTaskForm,
-        action: { .dayActivityTaskForm($0) }
-      ),
-      content: { store in
+      .sheet(item: $store.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
         NavigationStack {
           DayActivityTaskFormView(store: store)
         }
         .presentationDetents([.large])
       }
-    )
   }
 
-  private func content(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var content: some View {
     VStack(spacing: .zero) {
-      formView(viewStore: viewStore)
+      formView
         .padding(.bottom, 15.0)
-      bottomView(viewStore: viewStore)
+      bottomView
         .padding(.bottom, 15.0)
         .padding(.horizontal, 15.0)
     }
     .activityBackground
     .onAppear {
-      viewStore.send(.view(.appeared))
+      store.send(.view(.appeared))
     }
   }
 
-  private func formView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var formView: some View {
     ScrollView {
       VStack(spacing: 15.0) {
-        isDoneToggleView(viewStore: viewStore)
-        durationFormView(viewStore: viewStore)
-        overviewTextField(viewStore: viewStore)
-        tagsView(viewStore: viewStore)
-        labelsView(viewStore: viewStore)
-        tasksView(viewStore: viewStore)
+        isDoneToggleView
+        durationFormView
+        overviewTextField
+        tagsView
+        labelsView
+        tasksView
       }
       .padding(padding)
       .maxWidth()
@@ -91,11 +77,15 @@ public struct DayActivityFormView: View {
   }
 
   @ViewBuilder
-  private func isDoneToggleView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var isDoneToggleView: some View {
     Toggle(
       isOn: Binding(
-        get: { viewStore.dayActivity.isDone },
-        set: { value in viewStore.send(.view(.isDoneToggleChanged(value))) }
+        get: {
+          store.dayActivity.isDone
+        },
+        set: { value in
+          store.send(.view(.isDoneToggleChanged(value)))
+        }
       )
     ) {
       Text("Completed", bundle: .module)
@@ -105,123 +95,135 @@ public struct DayActivityFormView: View {
     .formBackgroundModifier()
   }
 
-  private func durationFormView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var durationFormView: some View {
     HStack(spacing: 10.0) {
       Text("Set duration", bundle: .module)
         .formTitleTextStyle
       Spacer()
-      durationView(viewStore: viewStore)
+      durationView
     }
     .formBackgroundModifier()
   }
 
-  private func durationView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var durationView: some View {
     DurationPickerView(
       selectedHours: Binding(
-        get: { viewStore.dayActivity.hours },
-        set: { viewStore.$dayActivity.wrappedValue.setDurationHours($0) }
+        get: {
+          store.dayActivity.hours
+        },
+        set: {
+          $store.dayActivity.wrappedValue.setDurationHours($0)
+        }
       ),
       selectedMinutes: Binding(
-        get: { viewStore.dayActivity.minutes },
-        set: { viewStore.$dayActivity.wrappedValue.setDurationMinutes($0) }
+        get: {
+          store.dayActivity.minutes
+        },
+        set: {
+          $store.dayActivity.wrappedValue.setDurationMinutes($0)
+        }
       )
     )
   }
 
-  private func overviewTextField(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var overviewTextField: some View {
     FormTextField(
       title: String(localized: "Overview", bundle: .module),
       placeholder: String(localized: "Enter overview", bundle: .module),
       value: Binding(
-        get: { viewStore.dayActivity.overview ?? "" },
-        set: { viewStore.$dayActivity.wrappedValue.overview = $0 }
+        get: {
+          store.dayActivity.overview ?? ""
+        },
+        set: {
+          $store.dayActivity.wrappedValue.overview = $0
+        }
       )
     )
   }
 
-  private func tagsView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var tagsView: some View {
     FormMarkerField(
       title: String(localized: "Tags", bundle: .module),
       placeholder: String(localized: "Enter tag", bundle: .module),
       existingMarkersTitle: String(localized: "Existing tags", bundle: .module),
-      markers: viewStore.dayActivity.tags,
-      existingMarkers: viewStore.existingTags,
-      newMarker: viewStore.$newTag,
+      markers: store.dayActivity.tags,
+      existingMarkers: store.existingTags,
+      newMarker: $store.newTag,
       onSubmit: {
-        viewStore.send(.view(.tag(.submitTapped)))
+        store.send(.view(.tag(.submitTapped)))
       },
       addedMarkerTapped: { marker in
-        viewStore.send(.view(.tag(.addedTapped(marker))))
+        store.send(.view(.tag(.addedTapped(marker))))
       },
       existingMarkerTapped: { marker in
-        viewStore.send(.view(.tag(.existingTapped(marker))))
+        store.send(.view(.tag(.existingTapped(marker))))
       },
       removeMarker: { marker in
-        viewStore.send(.view(.tag(.removeTapped(marker))))
+        store.send(.view(.tag(.removeTapped(marker))))
       }
     )
   }
 
-  private func labelsView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var labelsView: some View {
     FormMarkerField(
       title: String(localized: "Labels", bundle: .module),
       placeholder: String(localized: "Enter label", bundle: .module),
       existingMarkersTitle: String(localized: "Existing labels", bundle: .module),
-      markers: viewStore.dayActivity.labels,
-      existingMarkers: viewStore.existingLabels,
-      newMarker: viewStore.$newLabel,
+      markers: store.dayActivity.labels,
+      existingMarkers: store.existingLabels,
+      newMarker: $store.newLabel,
       onSubmit: {
-        viewStore.send(.view(.label(.submitTapped)))
+        store.send(.view(.label(.submitTapped)))
       },
       addedMarkerTapped: { label in
-        viewStore.send(.view(.label(.addedTapped(label))))
+        store.send(.view(.label(.addedTapped(label))))
       },
       existingMarkerTapped: { label in
-        viewStore.send(.view(.label(.existingTapped(label))))
+        store.send(.view(.label(.existingTapped(label))))
       },
       removeMarker: { label in
-        viewStore.send(.view(.label(.removeTapped(label))))
+        store.send(.view(.label(.removeTapped(label))))
       }
     )
   }
 
-  private func tasksView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var tasksView: some View {
     SectionView(
       name: String(localized: "Tasks", bundle: .module),
       rightContent: { },
       content: {
-        taskContentView(viewStore: viewStore)
+        taskContentView
           .formBackgroundModifier()
       }
     )
   }
 
   @ViewBuilder
-  private func taskContentView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var taskContentView: some View {
     LazyVStack(spacing: 10.0) {
-      ForEach(viewStore.dayActivity.dayActivityTasks) { task in
+      ForEach(store.dayActivity.dayActivityTasks) { task in
         DayActivityTaskView(
           dayActivityTask: task,
           selectTapped: { task in
-            viewStore.send(.view(.task(.selectButtonTapped(task))))
+            store.send(.view(.task(.selectButtonTapped(task))))
           },
           editTapped: { task in
-            viewStore.send(.view(.task(.editButtonTapped(task))))
+            store.send(.view(.task(.editButtonTapped(task))))
           },
           removeTapped: { task in
-            viewStore.send(.view(.task(.removeButtonTapped(task))))
+            store.send(.view(.task(.removeButtonTapped(task))))
           }
         )
         Divider()
       }
-      addTaskButton(viewStore: viewStore)
+      addTaskButton
     }
   }
 
-  private func addTaskButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var addTaskButton: some View {
     Button(
       action: {
-        viewStore.send(.view(.task(.addButtonTapped)))
+        store.send(.view(.task(.addButtonTapped)))
       },
       label: {
         Text("Add task", bundle: .module)
@@ -233,47 +235,63 @@ public struct DayActivityFormView: View {
   }
 
   @ViewBuilder
-  private func bottomView(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
-    if viewStore.showAddTagButton {
-      addTagButton(viewStore: viewStore)
-    } else if viewStore.showAddLabelButton {
-      addLabelButton(viewStore: viewStore)
+  private var bottomView: some View {
+    if store.showAddTagButton {
+      addTagButton
+    } else if store.showAddLabelButton {
+      addLabelButton
     } else {
       VStack(spacing: 10.0) {
-        saveButton(viewStore: viewStore)
-        deleteButton(viewStore: viewStore)
+        saveButton
+        deleteButton
       }
     }
   }
 
-  private func addTagButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var addTagButton: some View {
     Button(
-      action: { viewStore.send(.view(.tag(.addButtonTapped))) },
-      label: { Text("Add tag", bundle: .module) }
+      action: {
+        store.send(.view(.tag(.addButtonTapped)))
+      },
+      label: {
+        Text("Add tag", bundle: .module)
+      }
     )
     .buttonStyle(PrimaryButtonStyle())
   }
 
-  private func addLabelButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var addLabelButton: some View {
     Button(
-      action: { viewStore.send(.view(.label(.addButtonTapped))) },
-      label: { Text("Add Label", bundle: .module) }
+      action: {
+        store.send(.view(.label(.addButtonTapped)))
+      },
+      label: {
+        Text("Add Label", bundle: .module)
+      }
     )
     .buttonStyle(PrimaryButtonStyle())
   }
 
-  private func saveButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var saveButton: some View {
     Button(
-      action: { viewStore.send(.view(.saveButtonTapped)) },
-      label: { Text("Save", bundle: .module) }
+      action: {
+        store.send(.view(.saveButtonTapped))
+      },
+      label: {
+        Text("Save", bundle: .module)
+      }
     )
     .buttonStyle(PrimaryButtonStyle())
   }
 
-  private func deleteButton(viewStore: ViewStoreOf<DayActivityFormFeature>) -> some View {
+  private var deleteButton: some View {
     Button(
-      action: { viewStore.send(.view(.deleteButtonTapped)) },
-      label: { Text("Delete", bundle: .module) }
+      action: {
+        store.send(.view(.deleteButtonTapped))
+      },
+      label: {
+        Text("Delete", bundle: .module)
+      }
     )
     .buttonStyle(DestructiveButtonStyle())
   }

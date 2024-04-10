@@ -6,6 +6,7 @@ import Utilities
 import Models
 import Common
 
+@Reducer
 public struct ActivityListFeature: Reducer {
 
   public struct ActivityListConfiguration: Equatable {
@@ -38,6 +39,7 @@ public struct ActivityListFeature: Reducer {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
 
     var activities: [Activity] = []
@@ -49,7 +51,7 @@ public struct ActivityListFeature: Reducer {
       return true
     }
 
-    @PresentationState var addActivity: ActivityFormFeature.State?
+    @Presents var addActivity: ActivityFormFeature.State?
 
     public init(configuration: ActivityListConfiguration) {
       self.configuration = configuration
@@ -166,7 +168,7 @@ public struct ActivityListFeature: Reducer {
         return .none
       }
     }
-    .ifLet(\.$addActivity, action: /Action.addActivity) {
+    .ifLet(\.$addActivity, action: \.addActivity) {
       ActivityFormFeature()
     }
   }

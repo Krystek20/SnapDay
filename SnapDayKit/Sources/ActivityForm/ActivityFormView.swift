@@ -13,7 +13,7 @@ public struct ActivityFormView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<ActivityFormFeature>
+  @Perception.Bindable private var store: StoreOf<ActivityFormFeature>
   @FocusState private var focus: ActivityFormFeature.State.Field?
   private let padding = EdgeInsets(
     top: 10.0,
@@ -39,16 +39,9 @@ public struct ActivityFormView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      content(viewStore: viewStore)
-        .navigationTitle(title(type: viewStore.type))
-    }
-    .sheet(
-      store: store.scope(
-        state: \.$markerForm,
-        action: { .markerForm($0) }
-      ),
-      content: { store in
+    content
+      .navigationTitle(title(type: store.type))
+      .sheet(item: $store.scope(state: \.markerForm, action: \.markerForm)) { store in
         NavigationStack {
           MarkerFormView(store: store)
             .navigationTitle(String(localized: "Add Tag", bundle: .module))
@@ -56,13 +49,7 @@ public struct ActivityFormView: View {
         }
         .presentationDetents([.medium])
       }
-    )
-    .sheet(
-      store: store.scope(
-        state: \.$activityTaskForm,
-        action: { .activityTaskForm($0) }
-      ),
-      content: { store in
+      .sheet(item: $store.scope(state: \.activityTaskForm, action: \.activityTaskForm)) { store in
         NavigationStack {
           ActivityTaskFormView(store: store)
             .navigationTitle(String(localized: "Add Task", bundle: .module))
@@ -70,44 +57,37 @@ public struct ActivityFormView: View {
         }
         .presentationDetents([.medium])
       }
-    )
-    .fullScreenCover(
-      store: store.scope(
-        state: \.$emojiPicker,
-        action: { .emojiPicker($0) }
-      ),
-      content: { store in
+      .fullScreenCover(item: $store.scope(state: \.emojiPicker, action: \.emojiPicker)) { store in
         NavigationStack {
           EmojiPickerView(store: store)
         }
       }
-    )
   }
 
-  private func content(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var content: some View {
     VStack(spacing: .zero) {
-      formView(viewStore: viewStore)
+      formView
         .padding(.bottom, 15.0)
-      bottomView(viewStore: viewStore)
+      bottomView
         .padding(.bottom, 15.0)
         .padding(.horizontal, 15.0)
     }
     .activityBackground
     .onAppear {
-      viewStore.send(.view(.appeared))
+      store.send(.view(.appeared))
     }
-    .bind(viewStore.$focus, to: $focus)
+    .bind($store.focus, to: $focus)
   }
 
-  private func formView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var formView: some View {
     ScrollView {
       VStack(spacing: 15.0) {
-        imageField(viewStore: viewStore)
-        nameTextField(viewStore: viewStore)
-        tagsView(viewStore: viewStore)
-        recurrencyViewIfNeeded(viewStore: viewStore)
-        durationView(viewStore: viewStore)
-        tasksView(viewStore: viewStore)
+        imageField
+        nameTextField
+        tagsView
+        recurrencyViewIfNeeded
+        durationView
+        tasksView
       }
       .padding(padding)
       .maxWidth()
@@ -115,30 +95,30 @@ public struct ActivityFormView: View {
     .scrollIndicators(.hidden)
   }
 
-  private func imageField(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var imageField: some View {
     Menu {
       Button(
         String(localized: "Select Emoji", bundle: .module),
         action: {
-          viewStore.send(.view(.iconTapped))
+          store.send(.view(.iconTapped))
         }
       )
       Button(
         String(localized: "Pick Photo", bundle: .module),
         action: {
-          viewStore.send(.view(.pickPhotoTapped))
+          store.send(.view(.pickPhotoTapped))
         }
       )
       Button(
         String(localized: "Remove", bundle: .module),
         action: {
-          viewStore.send(.view(.removeImageTapped))
+          store.send(.view(.removeImageTapped))
         }
       )
     } label: {
       HStack(spacing: 10.0) {
         ActivityImageView(
-          data: viewStore.activity.icon?.data,
+          data: store.activity.icon?.data,
           size: 30.0,
           cornerRadius: 5.0,
           tintColor: .actionBlue
@@ -151,10 +131,14 @@ public struct ActivityFormView: View {
     }
     .formBackgroundModifier()
     .photosPicker(
-      isPresented: viewStore.$isPhotoPickerPresented,
-      selection: viewStore.binding(
-        get: { state in state.photoItem?.photosPickerItem },
-        send: { value in .view(.imageSelected(PhotoItem(photosPickerItem: value))) }
+      isPresented: $store.isPhotoPickerPresented,
+      selection: Binding(
+        get: {
+          store.photoItem?.photosPickerItem
+        },
+        set: { value in
+          store.send(.view(.imageSelected(PhotoItem(photosPickerItem: value))))
+        }
       ),
       matching: .images,
       preferredItemEncoding: .current,
@@ -162,50 +146,50 @@ public struct ActivityFormView: View {
     )
   }
 
-  private func nameTextField(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var nameTextField: some View {
     FormTextField(
       title: String(localized: "Name", bundle: .module),
       placeholder: String(localized: "Enter name", bundle: .module),
-      value: viewStore.$activity.name
+      value: $store.activity.name
     )
     .focused($focus, equals: .name)
   }
 
-  private func tagsView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var tagsView: some View {
     FormMarkerField(
       title: String(localized: "Tags", bundle: .module),
       placeholder: String(localized: "Enter tag", bundle: .module),
       existingMarkersTitle: String(localized: "Existing tags", bundle: .module),
-      markers: viewStore.activity.tags,
-      existingMarkers: viewStore.existingTags,
-      newMarker: viewStore.$newTag,
+      markers: store.activity.tags,
+      existingMarkers: store.existingTags,
+      newMarker: $store.newTag,
       onSubmit: {
-        viewStore.send(.view(.submitTagTapped))
+        store.send(.view(.submitTagTapped))
       },
       addedMarkerTapped: { marker in
-        viewStore.send(.view(.addedTagTapped(marker)))
+        store.send(.view(.addedTagTapped(marker)))
       },
       existingMarkerTapped: { marker in
-        viewStore.send(.view(.existingTagTapped(marker)))
+        store.send(.view(.existingTagTapped(marker)))
       },
       removeMarker: { marker in
-        viewStore.send(.view(.removeTagTapped(marker)))
+        store.send(.view(.removeTagTapped(marker)))
       }
     )
     .focused($focus, equals: .tag)
   }
 
   @ViewBuilder
-  private func recurrencyViewIfNeeded(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
-    if viewStore.activity.isVisible {
+  private var recurrencyViewIfNeeded: some View {
+    if store.activity.isVisible {
       ScrollViewReader { reader in
         VStack(spacing: 10.0) {
-          toggleView(viewStore: viewStore)
-          frequencyOptionsIfNeeded(viewStore: viewStore, reader: reader)
-          weekdaysViewIfNeeded(viewStore: viewStore, reader: reader)
-          monthlyScheduleViewIfNeeded(viewStore: viewStore, reader: reader)
-          monthGridIfNeeded(viewStore: viewStore, reader: reader)
-          monthlyWeekdaysViewIfNeeded(viewStore: viewStore, reader: reader)
+          toggleView
+          frequencyOptionsIfNeeded(reader: reader)
+          weekdaysViewIfNeeded(reader: reader)
+          monthlyScheduleViewIfNeeded(reader: reader)
+          monthGridIfNeeded(reader: reader)
+          monthlyWeekdaysViewIfNeeded(reader: reader)
         }
         .formBackgroundModifier()
         .id("RecurrencyView")
@@ -214,11 +198,11 @@ public struct ActivityFormView: View {
   }
 
   @ViewBuilder
-  private func toggleView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var toggleView: some View {
     Toggle(
       isOn: Binding(
-        get: { viewStore.activity.isRepeatable },
-        set: { value in viewStore.$activity.wrappedValue.setIsRepeatable(value) }
+        get: { store.activity.isRepeatable },
+        set: { value in $store.activity.wrappedValue.setIsRepeatable(value) }
       )
     ) {
       Text("Repeatable", bundle: .module)
@@ -228,11 +212,11 @@ public struct ActivityFormView: View {
   }
 
   @ViewBuilder
-  private func frequencyOptionsIfNeeded(viewStore: ViewStoreOf<ActivityFormFeature>, reader: ScrollViewProxy) -> some View {
-    if viewStore.showFrequencyOptions {
+  private func frequencyOptionsIfNeeded(reader: ScrollViewProxy) -> some View {
+    if store.showFrequencyOptions {
       OptionsView(
-        options: viewStore.options,
-        selected: viewStore.$activity.frequency,
+        options: store.options,
+        selected: $store.activity.frequency,
         axis: .horizontal(.center)
       )
       .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
@@ -240,27 +224,27 @@ public struct ActivityFormView: View {
   }
 
   @ViewBuilder
-  private func weekdaysViewIfNeeded(viewStore: ViewStoreOf<ActivityFormFeature>, reader: ScrollViewProxy) -> some View {
-    if viewStore.showWeekdaysView {
+  private func weekdaysViewIfNeeded(reader: ScrollViewProxy) -> some View {
+    if store.showWeekdaysView {
       WeekdaysView(
         selectedWeekdays:  Binding(
-          get: { viewStore.activity.weekdays },
-          set: { value in viewStore.$activity.wrappedValue.setWeekdays(value) }
+          get: { store.activity.weekdays },
+          set: { value in $store.activity.wrappedValue.setWeekdays(value) }
         ),
-        weekdays: viewStore.weekdays
+        weekdays: store.weekdays
       )
       .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
     }
   }
 
   @ViewBuilder
-  private func monthlyScheduleViewIfNeeded(viewStore: ViewStoreOf<ActivityFormFeature>, reader: ScrollViewProxy) -> some View {
-    if viewStore.showMonthlyView {
+  private func monthlyScheduleViewIfNeeded(reader: ScrollViewProxy) -> some View {
+    if store.showMonthlyView {
       OptionsView(
         options: MonthlySchedule.allCases,
         selected: Binding(
-          get: { viewStore.activity.monthlySchedule },
-          set: { value in viewStore.$activity.wrappedValue.setMonthlySchedule(value) }
+          get: { store.activity.monthlySchedule },
+          set: { value in $store.activity.wrappedValue.setMonthlySchedule(value) }
         ),
         axis: .horizontal(.center)
       )
@@ -269,12 +253,12 @@ public struct ActivityFormView: View {
   }
 
   @ViewBuilder
-  private func monthGridIfNeeded(viewStore: ViewStoreOf<ActivityFormFeature>, reader: ScrollViewProxy) -> some View {
-    if viewStore.showMonthDays {
+  private func monthGridIfNeeded(reader: ScrollViewProxy) -> some View {
+    if store.showMonthDays {
       MonthGrid(
         selectedDays: Binding(
-          get: { viewStore.activity.mounthDays },
-          set: { value in viewStore.$activity.wrappedValue.setMounthDays(value) }
+          get: { store.activity.mounthDays },
+          set: { value in $store.activity.wrappedValue.setMounthDays(value) }
         )
       )
       .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
@@ -282,53 +266,53 @@ public struct ActivityFormView: View {
   }
 
   @ViewBuilder
-  private func monthlyWeekdaysViewIfNeeded(viewStore: ViewStoreOf<ActivityFormFeature>, reader: ScrollViewProxy) -> some View {
-    if viewStore.showMonthWeekdays {
+  private func monthlyWeekdaysViewIfNeeded(reader: ScrollViewProxy) -> some View {
+    if store.showMonthWeekdays {
       MonthlyWeekdaysView(
         weekdayOrdinal: Binding(
-          get: { viewStore.activity.weekdayOrdinal },
-          set: { value in viewStore.$activity.wrappedValue.setWeekdayOrdinal(value) }
+          get: { store.activity.weekdayOrdinal },
+          set: { value in $store.activity.wrappedValue.setWeekdayOrdinal(value) }
         ),
-        weekdays: viewStore.weekdays
+        weekdays: store.weekdays
       )
       .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
     }
   }
 
   @ViewBuilder
-  private func bottomView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
-    if viewStore.showAddTagButton {
-      addTagButton(viewStore: viewStore)
+  private var bottomView: some View {
+    if store.showAddTagButton {
+      addTagButton
     } else {
-      saveButton(viewStore: viewStore)
+      saveButton
     }
   }
 
-  private func durationView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var durationView: some View {
     ScrollViewReader { reader in
       VStack(alignment: .leading, spacing: 10.0) {
         Toggle(
           isOn: Binding(
-            get: { viewStore.activity.isDefaultDuration },
-            set: { viewStore.$activity.wrappedValue.setDefaultDuration($0) }
+            get: { store.activity.isDefaultDuration },
+            set: { $store.activity.wrappedValue.setDefaultDuration($0) }
           )
         ) {
-          let durationText = viewStore.activity.isVisible
+          let durationText = store.activity.isVisible
           ? String(localized: "Default duration", bundle: .module)
           : String(localized: "Duration", bundle: .module)
           Text(durationText)
             .formTitleTextStyle
         }
         .toggleStyle(CheckToggleStyle())
-        if viewStore.activity.isDefaultDuration {
+        if store.activity.isDefaultDuration {
           DurationPickerView(
             selectedHours: Binding(
-              get: { viewStore.activity.hours },
-              set: { viewStore.$activity.wrappedValue.setDurationHours($0) }
+              get: { store.activity.hours },
+              set: { $store.activity.wrappedValue.setDurationHours($0) }
             ),
             selectedMinutes: Binding(
-              get: { viewStore.activity.minutes },
-              set: { viewStore.$activity.wrappedValue.setDurationMinutes($0) }
+              get: { store.activity.minutes },
+              set: { $store.activity.wrappedValue.setDurationMinutes($0) }
             )
           )
           .scrollOnAppear("DurationView", anchor: .bottom, reader: reader)
@@ -339,43 +323,39 @@ public struct ActivityFormView: View {
     }
   }
 
-  private func tasksView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var tasksView: some View {
     SectionView(
       name: String(localized: "Tasks", bundle: .module),
       rightContent: { },
       content: {
-        taskContentView(viewStore: viewStore)
+        taskContentView
           .formBackgroundModifier()
       }
     )
   }
 
   @ViewBuilder
-  private func taskContentView(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
-    if viewStore.activity.tasks.isEmpty {
-      addTaskButton(viewStore: viewStore)
-    } else {
-      LazyVStack(spacing: 10.0) {
-        ForEach(viewStore.activity.tasks) { task in
-          ActivityTaskView(
-            activityTask: task,
-            editTapped: { task in
-              viewStore.send(.view(.editButtonTapped(task)))
-            },
-            removeTapped: { task in
-              viewStore.send(.view(.removeButtonTapped(task)))
-            }
-          )
-          Divider()
-        }
-        addTaskButton(viewStore: viewStore)
+  private var taskContentView: some View {
+    LazyVStack(spacing: 10.0) {
+      ForEach(store.activity.tasks) { task in
+        ActivityTaskView(
+          activityTask: task,
+          editTapped: { task in
+            store.send(.view(.editButtonTapped(task)))
+          },
+          removeTapped: { task in
+            store.send(.view(.removeButtonTapped(task)))
+          }
+        )
+        Divider()
       }
+      addTaskButton
     }
   }
 
-  private func addTaskButton(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var addTaskButton: some View {
     Button(
-      action: { viewStore.send(.view(.addTaskButtonTapped)) },
+      action: { store.send(.view(.addTaskButtonTapped)) },
       label: {
         Text("Add task", bundle: .module)
           .foregroundStyle(Color.actionBlue)
@@ -385,20 +365,20 @@ public struct ActivityFormView: View {
     .maxFrame()
   }
 
-  private func addTagButton(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var addTagButton: some View {
     Button(
-      action: { viewStore.send(.view(.addTagButtonTapped)) },
+      action: { store.send(.view(.addTagButtonTapped)) },
       label: { Text("Add tag", bundle: .module) }
     )
     .buttonStyle(PrimaryButtonStyle())
   }
 
-  private func saveButton(viewStore: ViewStoreOf<ActivityFormFeature>) -> some View {
+  private var saveButton: some View {
     Button(
-      action: { viewStore.send(.view(.saveButtonTapped)) },
+      action: { store.send(.view(.saveButtonTapped)) },
       label: { Text("Save", bundle: .module) }
     )
-    .disabled(viewStore.isSaveButtonDisabled)
-    .buttonStyle(PrimaryButtonStyle(disabled: viewStore.isSaveButtonDisabled))
+    .disabled(store.isSaveButtonDisabled)
+    .buttonStyle(PrimaryButtonStyle(disabled: store.isSaveButtonDisabled))
   }
 }

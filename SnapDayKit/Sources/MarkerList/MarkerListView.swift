@@ -21,28 +21,26 @@ public struct MarkerListView: View {
   }
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      ScrollView {
-        LazyVGrid(columns: columns, spacing: 15.0) {
-          markersView(viewStore: viewStore)
-        }
-        .padding(.horizontal, 15.0)
-        .padding(.top, 15.0)
+    ScrollView {
+      LazyVGrid(columns: columns, spacing: 15.0) {
+        markersView
       }
-      .scrollIndicators(.hidden)
-      .activityBackground
-      .navigationTitle(String(localized: "Tag list", bundle: .module))
+      .padding(.horizontal, 15.0)
+      .padding(.top, 15.0)
     }
+    .scrollIndicators(.hidden)
+    .activityBackground
+    .navigationTitle(String(localized: "Tag list", bundle: .module))
   }
 
   @ViewBuilder
-  private func markersView(viewStore: ViewStoreOf<MarkerListFeature>) -> some View {
-    switch viewStore.type {
+  private var markersView: some View {
+    switch store.type {
     case .tag(let selected, let available):
       ForEach(available) { marker in
         MarkerView(marker: marker)
           .onTapGesture {
-            viewStore.send(.view(.markerSelected(.tag(selected: marker))))
+            store.send(.view(.markerSelected(.tag(selected: marker))))
           }
           .opacity(selected == marker ? 1.0 : 0.3)
       }
@@ -50,7 +48,7 @@ public struct MarkerListView: View {
       ForEach(available) { marker in
         MarkerView(marker: marker)
           .onTapGesture {
-            viewStore.send(.view(.markerSelected(.label(selected: marker))))
+            store.send(.view(.markerSelected(.label(selected: marker))))
           }
           .opacity(selected == marker ? 1.0 : 0.3)
       }

@@ -11,7 +11,7 @@ public struct ActivityTaskFormView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<ActivityTaskFormFeature>
+  @Perception.Bindable private var store: StoreOf<ActivityTaskFormFeature>
   @FocusState private var focus: ActivityTaskFormFeature.State.Field?
   private let padding = EdgeInsets(
     top: 10.0,
@@ -19,8 +19,8 @@ public struct ActivityTaskFormView: View {
     bottom:  .zero,
     trailing: 15.0
   )
-  private func title(type: ActivityTaskFormFeature.ActivityTaskFormType) -> String {
-    switch type {
+  private var title: String {
+    switch store.type {
     case .new:
       String(localized: "Add Activity Task", bundle: .module)
     case .edit:
@@ -37,41 +37,33 @@ public struct ActivityTaskFormView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      content(viewStore: viewStore)
-        .navigationTitle(title(type: viewStore.type))
-    }
-    .fullScreenCover(
-      store: store.scope(
-        state: \.$showEmojiPicker,
-        action: { .showEmojiPicker($0) }
-      ),
-      content: { store in
+    content
+      .navigationTitle(title)
+      .fullScreenCover(item: $store.scope(state: \.showEmojiPicker, action: \.showEmojiPicker)) { store in
         NavigationStack {
           EmojiPickerView(store: store)
         }
       }
-    )
   }
 
-  private func content(viewStore: ViewStoreOf<ActivityTaskFormFeature>) -> some View {
+  private var content: some View {
     VStack(spacing: .zero) {
-      formView(viewStore: viewStore)
+      formView
         .padding(.bottom, 15.0)
-      saveButton(viewStore: viewStore)
+      saveButton
         .padding(.bottom, 15.0)
         .padding(.horizontal, 15.0)
     }
     .activityBackground
-    .bind(viewStore.$focus, to: $focus)
+    .bind($store.focus, to: $focus)
   }
 
-  private func formView(viewStore: ViewStoreOf<ActivityTaskFormFeature>) -> some View {
+  private var formView: some View {
     ScrollView {
       VStack(spacing: 15.0) {
-        imageField(viewStore: viewStore)
-        nameTextField(viewStore: viewStore)
-        durationView(viewStore: viewStore)
+        imageField
+        nameTextField
+        durationView
       }
       .padding(padding)
       .maxWidth()
@@ -79,30 +71,30 @@ public struct ActivityTaskFormView: View {
     .scrollIndicators(.hidden)
   }
 
-  private func imageField(viewStore: ViewStoreOf<ActivityTaskFormFeature>) -> some View {
+  private var imageField: some View {
     Menu {
       Button(
         String(localized: "Select Emoji", bundle: .module),
         action: {
-          viewStore.send(.view(.iconTapped))
+          store.send(.view(.iconTapped))
         }
       )
       Button(
         String(localized: "Pick Photo", bundle: .module),
         action: {
-          viewStore.send(.view(.pickPhotoTapped))
+          store.send(.view(.pickPhotoTapped))
         }
       )
       Button(
         String(localized: "Remove", bundle: .module),
         action: {
-          viewStore.send(.view(.removeImageTapped))
+          store.send(.view(.removeImageTapped))
         }
       )
     } label: {
       HStack(spacing: 10.0) {
         ActivityImageView(
-          data: viewStore.activityTask.icon?.data,
+          data: store.activityTask.icon?.data,
           size: 30.0,
           cornerRadius: 5.0,
           tintColor: .actionBlue
@@ -115,10 +107,14 @@ public struct ActivityTaskFormView: View {
     }
     .formBackgroundModifier()
     .photosPicker(
-      isPresented: viewStore.$isPhotoPickerPresented,
-      selection: viewStore.binding(
-        get: { state in state.photoItem?.photosPickerItem },
-        send: { value in .view(.imageSelected(PhotoItem(photosPickerItem: value))) }
+      isPresented: $store.isPhotoPickerPresented,
+      selection: Binding(
+        get: { 
+          store.photoItem?.photosPickerItem
+        },
+        set: { value in
+          store.send(.view(.imageSelected(PhotoItem(photosPickerItem: value))))
+        }
       ),
       matching: .images,
       preferredItemEncoding: .current,
@@ -126,37 +122,49 @@ public struct ActivityTaskFormView: View {
     )
   }
 
-  private func nameTextField(viewStore: ViewStoreOf<ActivityTaskFormFeature>) -> some View {
+  private var nameTextField: some View {
     FormTextField(
       title: String(localized: "Name", bundle: .module),
       placeholder: String(localized: "Enter name", bundle: .module),
-      value: viewStore.$activityTask.name
+      value: $store.activityTask.name
     )
     .focused($focus, equals: .name)
   }
 
-  private func durationView(viewStore: ViewStoreOf<ActivityTaskFormFeature>) -> some View {
+  private var durationView: some View {
     ScrollViewReader { reader in
       VStack(alignment: .leading, spacing: 10.0) {
         Toggle(
           isOn: Binding(
-            get: { viewStore.activityTask.isDefaultDuration },
-            set: { viewStore.$activityTask.wrappedValue.setDefaultDuration($0) }
+            get: {
+              store.activityTask.isDefaultDuration
+            },
+            set: {
+              $store.activityTask.wrappedValue.setDefaultDuration($0)
+            }
           )
         ) {
           Text(String(localized: "Default duration", bundle: .module))
             .formTitleTextStyle
         }
         .toggleStyle(CheckToggleStyle())
-        if viewStore.activityTask.isDefaultDuration {
+        if store.activityTask.isDefaultDuration {
           DurationPickerView(
             selectedHours: Binding(
-              get: { viewStore.activityTask.hours },
-              set: { viewStore.$activityTask.wrappedValue.setDurationHours($0) }
+              get: {
+                store.activityTask.hours
+              },
+              set: {
+                $store.activityTask.wrappedValue.setDurationHours($0)
+              }
             ),
             selectedMinutes: Binding(
-              get: { viewStore.activityTask.minutes },
-              set: { viewStore.$activityTask.wrappedValue.setDurationMinutes($0) }
+              get: {
+                store.activityTask.minutes
+              },
+              set: {
+                $store.activityTask.wrappedValue.setDurationMinutes($0)
+              }
             )
           )
           .scrollOnAppear("DurationView", anchor: .bottom, reader: reader)
@@ -167,12 +175,16 @@ public struct ActivityTaskFormView: View {
     }
   }
 
-  private func saveButton(viewStore: ViewStoreOf<ActivityTaskFormFeature>) -> some View {
+  private var saveButton: some View {
     Button(
-      action: { viewStore.send(.view(.saveButtonTapped)) },
-      label: { Text("Save", bundle: .module) }
+      action: {
+        store.send(.view(.saveButtonTapped))
+      },
+      label: {
+        Text("Save", bundle: .module)
+      }
     )
-    .disabled(viewStore.isSaveButtonDisabled)
-    .buttonStyle(PrimaryButtonStyle(disabled: viewStore.isSaveButtonDisabled))
+    .disabled(store.isSaveButtonDisabled)
+    .buttonStyle(PrimaryButtonStyle(disabled: store.isSaveButtonDisabled))
   }
 }

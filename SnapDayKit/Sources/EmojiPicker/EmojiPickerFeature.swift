@@ -2,6 +2,7 @@ import Foundation
 import ComposableArchitecture
 import Common
 
+@Reducer
 public struct EmojiPickerFeature: Reducer {
 
   // MARK: - Dependecies
@@ -10,14 +11,15 @@ public struct EmojiPickerFeature: Reducer {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
 
     public enum Field: Hashable {
       case searchEmoji
     }
 
-    @BindingState var focus: Field?
-    @BindingState var emoji: String = ""
+    var focus: Field?
+    var emoji: String = ""
 
     public init(focus: Field? = .searchEmoji) {
       self.focus = focus

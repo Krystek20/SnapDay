@@ -12,6 +12,7 @@ import Combine
 import enum UiComponents.DayViewShowButtonState
 import protocol UiComponents.InformationViewConfigurable
 
+@Reducer
 public struct DashboardFeature: Reducer, TodayProvidable {
 
   // MARK: - Dependencies
@@ -25,6 +26,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable, TodayProvidable {
 
     var activitiesPresentationType: ActivitiesPresentationType?
@@ -76,13 +78,13 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       return selectedDay?.activities.isEmpty == true ? emptyDayConfiguration : nil
     }
 
-    @BindingState var selectedPeriod: Period = .day
-    @BindingState var selectedDay: Day?
+    var selectedPeriod: Period = .day
+    var selectedDay: Day?
 
-    @PresentationState var activityList: ActivityListFeature.State?
-    @PresentationState var editDayActivity: DayActivityFormFeature.State?
-    @PresentationState var addActivity: ActivityFormFeature.State?
-    @PresentationState var dayActivityTaskForm: DayActivityTaskFormFeature.State?
+    @Presents var activityList: ActivityListFeature.State?
+    @Presents var editDayActivity: DayActivityFormFeature.State?
+    @Presents var addActivity: ActivityFormFeature.State?
+    @Presents var dayActivityTaskForm: DayActivityTaskFormFeature.State?
 
     public init() { }
   }
@@ -147,7 +149,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         return handleDayActivityTaskFormAction(action, state: &state)
       case .delegate:
         return .none
-      case .binding(\.$selectedPeriod):
+      case .binding(\.selectedPeriod):
         state.shift = .zero
         return .run { send in
           await send(.internal(.loadTimePeriods))
@@ -156,16 +158,16 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         return .none
       }
     }
-    .ifLet(\.$activityList, action: /Action.activityList) {
+    .ifLet(\.$activityList, action: \.activityList) {
       ActivityListFeature()
     }
-    .ifLet(\.$editDayActivity, action: /Action.editDayActivity) {
+    .ifLet(\.$editDayActivity, action: \.editDayActivity) {
       DayActivityFormFeature()
     }
-    .ifLet(\.$addActivity, action: /Action.addActivity) {
+    .ifLet(\.$addActivity, action: \.addActivity) {
       ActivityFormFeature()
     }
-    .ifLet(\.$dayActivityTaskForm, action: /Action.dayActivityTaskForm) {
+    .ifLet(\.$dayActivityTaskForm, action: \.dayActivityTaskForm) {
       DayActivityTaskFormFeature()
     }
   }

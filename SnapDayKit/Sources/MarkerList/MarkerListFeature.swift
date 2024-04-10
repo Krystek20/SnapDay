@@ -3,6 +3,7 @@ import Repositories
 import Models
 import Common
 
+@Reducer
 public struct MarkerListFeature: Reducer {
 
   public enum MarkerListType: Equatable {
@@ -21,6 +22,7 @@ public struct MarkerListFeature: Reducer {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
     let type: MarkerListType
 

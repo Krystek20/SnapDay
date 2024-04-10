@@ -8,7 +8,7 @@ public struct EmojiPickerView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<EmojiPickerFeature>
+  @Perception.Bindable private var store: StoreOf<EmojiPickerFeature>
   @FocusState private var focus: EmojiPickerFeature.State.Field?
 
   // MARK: - Initialization
@@ -20,31 +20,29 @@ public struct EmojiPickerView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack(alignment: .leading, spacing: 20.0) {
-        titleSection
-          .padding(.top, 5.0)
-        emojiTextField(viewStore: viewStore)
+    VStack(alignment: .leading, spacing: 20.0) {
+      titleSection
+        .padding(.top, 5.0)
+      emojiTextField
+    }
+    .padding(.horizontal, 15.0)
+    .activityBackground
+    .bind($store.focus, to: $focus)
+    .navigationTitle(String(localized: "Set Your Activity Emoji", bundle: .module))
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button(String(localized: "Save", bundle: .module)) {
+          store.send(.view(.saveButtonTapped))
+        }
+        .font(.system(size: 12.0, weight: .bold))
+        .foregroundStyle(Color.actionBlue)
       }
-      .padding(.horizontal, 15.0)
-      .activityBackground
-      .bind(viewStore.$focus, to: $focus)
-      .navigationTitle(String(localized: "Set Your Activity Emoji", bundle: .module))
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button(String(localized: "Save", bundle: .module)) {
-            viewStore.send(.view(.saveButtonTapped))
-          }
-          .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.actionBlue)
+      ToolbarItem(placement: .topBarLeading) {
+        Button(String(localized: "Cancel", bundle: .module)) {
+          store.send(.view(.cancelButtonTapped))
         }
-        ToolbarItem(placement: .topBarLeading) {
-          Button(String(localized: "Cancel", bundle: .module)) {
-            viewStore.send(.view(.cancelButtonTapped))
-          }
-          .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.actionBlue)
-        }
+        .font(.system(size: 12.0, weight: .bold))
+        .foregroundStyle(Color.actionBlue)
       }
     }
   }
@@ -59,8 +57,8 @@ public struct EmojiPickerView: View {
     }
   }
 
-  private func emojiTextField(viewStore: ViewStoreOf<EmojiPickerFeature>) -> some View {
-    EmojiTextField(text: viewStore.$emoji)
+  private var emojiTextField: some View {
+    EmojiTextField(text: $store.emoji)
       .focused($focus, equals: .searchEmoji)
   }
 }

@@ -7,6 +7,7 @@ import EmojiPicker
 import Utilities
 import ActivityTaskForm
 
+@Reducer
 public struct ActivityFormFeature: Reducer, TodayProvidable {
 
   public enum ActivityFormType {
@@ -31,6 +32,7 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
 
     public enum Field: Hashable {
@@ -38,13 +40,13 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
       case tag
     }
 
-    @BindingState var activity: Activity
-    @BindingState var newTag = String.empty
-    @BindingState var focus: Field?
-    @BindingState var isPhotoPickerPresented: Bool = false
-    @PresentationState var markerForm: MarkerFormFeature.State?
-    @PresentationState var emojiPicker: EmojiPickerFeature.State?
-    @PresentationState var activityTaskForm: ActivityTaskFormFeature.State?
+    var activity: Activity
+    var newTag = String.empty
+    var focus: Field?
+    var isPhotoPickerPresented: Bool = false
+    @Presents var markerForm: MarkerFormFeature.State?
+    @Presents var emojiPicker: EmojiPickerFeature.State?
+    @Presents var activityTaskForm: ActivityTaskFormFeature.State?
     var photoItem: PhotoItem?
     var existingTags = [Tag]()
     var showAddTagButton: Bool { !newTag.isEmpty }
@@ -221,13 +223,13 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
         return .none
       }
     }
-    .ifLet(\.$markerForm, action: /Action.markerForm) {
+    .ifLet(\.$markerForm, action: \.markerForm) {
       MarkerFormFeature()
     }
-    .ifLet(\.$emojiPicker, action: /Action.emojiPicker) {
+    .ifLet(\.$emojiPicker, action: \.emojiPicker) {
       EmojiPickerFeature()
     }
-    .ifLet(\.$activityTaskForm, action: /Action.activityTaskForm) {
+    .ifLet(\.$activityTaskForm, action: \.activityTaskForm) {
       ActivityTaskFormFeature()
     }
   }

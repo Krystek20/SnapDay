@@ -12,7 +12,7 @@ public struct ReportsView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<ReportsFeature>
+  @Perception.Bindable private var store: StoreOf<ReportsFeature>
   private let columns = Array(repeating: GridItem(), count: 7)
 
   // MARK: - Initialization
@@ -24,80 +24,66 @@ public struct ReportsView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      ZStack(alignment: .top) {
-        ScrollView {
-          content(viewStore: viewStore)
-            .padding(.horizontal, 15.0)
-            .padding(.top, viewStore.isSwitcherDismissed ? 15.0: 65.0)
-        }
-        .maxWidth()
-        .scrollIndicators(.hidden)
-        
-        if viewStore.isSwitcherDismissed {
-          Divider()
-        } else {
-          Switcher(
-            title: viewStore.switcherTitle,
-            leftArrowAction: {
-              viewStore.send(.view(.decreaseButtonTapped))
-            },
-            rightArrowAction: {
-              viewStore.send(.view(.increaseButtonTapped))
-            }
-          )
-        }
+    ZStack(alignment: .top) {
+      ScrollView {
+        content
+          .padding(.horizontal, 15.0)
+          .padding(.top, store.isSwitcherDismissed ? 15.0: 65.0)
       }
-      .activityBackground
-      .task {
-        viewStore.send(.view(.appeared))
+      .maxWidth()
+      .scrollIndicators(.hidden)
+
+      if store.isSwitcherDismissed {
+        Divider()
+      } else {
+        Switcher(
+          title: store.switcherTitle,
+          leftArrowAction: {
+            store.send(.view(.decreaseButtonTapped))
+          },
+          rightArrowAction: {
+            store.send(.view(.increaseButtonTapped))
+          }
+        )
       }
-      .navigationTitle(String(localized: "Reports", bundle: .module))
-      .sheet(
-        store: store.scope(
-          state: \.$markerList,
-          action: { .markerList($0) }
-        ),
-        content: { store in
-          NavigationStack {
-            MarkerListView(store: store)
-              .navigationBarTitleDisplayMode(.large)
-          }
-          .presentationDetents([.medium])
-        }
-      )
-      .sheet(
-        store: store.scope(
-          state: \.$activityList,
-          action: { .activityList($0) }
-        ),
-        content: { store in
-          NavigationStack {
-            ActivityListView(store: store)
-          }
-          .presentationDetents([.medium, .large])
-        }
-      )
+    }
+    .activityBackground
+    .task {
+      store.send(.view(.appeared))
+    }
+    .navigationTitle(String(localized: "Reports", bundle: .module))
+    .sheet(item: $store.scope(state: \.markerList, action: \.markerList)) { store in
+      NavigationStack {
+        MarkerListView(store: store)
+          .navigationBarTitleDisplayMode(.large)
+      }
+      .presentationDetents([.medium])
+    }
+    .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
+      NavigationStack {
+        ActivityListView(store: store)
+      }
+      .presentationDetents([.medium, .large])
     }
   }
 
-  private func content(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+  private var content: some View {
     VStack(alignment: .leading, spacing: 10.0) {
-      picker(viewStore: viewStore)
-      customDatePickers(viewStore: viewStore)
-      filtersSection(viewStore: viewStore)
-      summarySection(viewStore: viewStore)
-      activitiesByTag(viewStore: viewStore)
+      picker
+      customDatePickers
+      filtersSection
+      summarySection
+      activitiesByTag
     }
     .maxWidth()
   }
 
   @MainActor
-  private func picker(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+  private var picker: some View {
     Picker(
-      selection: viewStore.$selectedFilterPeriod,
+      selection: $store.selectedFilterPeriod,
       content: {
-        ForEach(viewStore.dateFilters) { period in
+        ForEach(store.dateFilters) { period in
           Text(period.name).tag(period)
         }
       },
@@ -107,12 +93,12 @@ public struct ReportsView: View {
   }
 
   @ViewBuilder
-  private func customDatePickers(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if viewStore.showCustomDate {
+  private var customDatePickers: some View {
+    if store.showCustomDate {
       VStack {
         DatePicker(
-          selection: viewStore.$startDate,
-          in: ...viewStore.endDate,
+          selection: $store.startDate,
+          in: ...store.endDate,
           displayedComponents: [.date],
           label: {
             Text("Start", bundle: .module)
@@ -120,8 +106,8 @@ public struct ReportsView: View {
           }
         )
         DatePicker(
-          selection: viewStore.$endDate,
-          in: viewStore.startDate...,
+          selection: $store.endDate,
+          in: store.startDate...,
           displayedComponents: [.date],
           label: {
             Text("End", bundle: .module)
@@ -133,15 +119,15 @@ public struct ReportsView: View {
     }
   }
 
-  private func filtersSection(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+  private var filtersSection: some View {
     SectionView(
       name: String(localized: "Filters", bundle: .module),
       rightContent: { EmptyView() },
       content: {
         VStack(spacing: 10.0) {
-          filterByTagsView(viewStore: viewStore)
-          filterByActivitiesView(viewStore: viewStore)
-          filterByLabelsView(viewStore: viewStore)
+          filterByTagsView
+          filterByActivitiesView
+          filterByLabelsView
         }
         .formBackgroundModifier()
       }
@@ -149,35 +135,35 @@ public struct ReportsView: View {
   }
 
   @ViewBuilder
-  private func filterByTagsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if let selectedTag = viewStore.selectedTag {
+  private var filterByTagsView: some View {
+    if let selectedTag = store.selectedTag {
       HStack(spacing: 10.0) {
         Text("Tag", bundle: .module)
           .formTitleTextStyle
         Spacer()
         MarkerView(marker: selectedTag)
           .onTapGesture {
-            viewStore.send(.view(.tagTapped))
+            store.send(.view(.tagTapped))
           }
       }
     }
   }
 
   @ViewBuilder
-  private func filterByActivitiesView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if !viewStore.activities.isEmpty {
+  private var filterByActivitiesView: some View {
+    if !store.activities.isEmpty {
       HStack(spacing: 10.0) {
         Text("Activity", bundle: .module)
           .formTitleTextStyle
         Spacer()
-        if let selectedActivity = viewStore.selectedActivity {
+        if let selectedActivity = store.selectedActivity {
           ActivityView(activity: selectedActivity)
             .onTapGesture {
-              viewStore.send(.view(.selectActivityButtonTapped))
+              store.send(.view(.selectActivityButtonTapped))
             }
         } else {
           Button(String(localized: "Select", bundle: .module)) {
-            viewStore.send(.view(.selectActivityButtonTapped))
+            store.send(.view(.selectActivityButtonTapped))
           }
           .foregroundStyle(Color.actionBlue)
           .font(.system(size: 12.0, weight: .bold))
@@ -187,20 +173,20 @@ public struct ReportsView: View {
   }
   
   @ViewBuilder
-  private func filterByLabelsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if viewStore.selectedActivity != nil {
+  private var filterByLabelsView: some View {
+    if store.selectedActivity != nil {
       HStack(spacing: 10.0) {
         Text("Label", bundle: .module)
           .formTitleTextStyle
         Spacer()
-        if let selectedLabel = viewStore.selectedLabel {
+        if let selectedLabel = store.selectedLabel {
           MarkerView(marker: selectedLabel)
             .onTapGesture {
-              viewStore.send(.view(.labelTapped))
+              store.send(.view(.labelTapped))
             }
         } else {
           Button(String(localized: "Select", bundle: .module)) {
-            viewStore.send(.view(.labelTapped))
+            store.send(.view(.labelTapped))
           }
           .foregroundStyle(Color.actionBlue)
           .font(.system(size: 12.0, weight: .bold))
@@ -210,55 +196,55 @@ public struct ReportsView: View {
   }
 
   @ViewBuilder
-  private func summarySection(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if viewStore.reportDays.count > 1 {
+  private var summarySection: some View {
+    if store.reportDays.count > 1 {
       SectionView(
         name: String(localized: "Summary", bundle: .module),
         rightContent: { },
         content: {
-          summaryView(viewStore: viewStore)
+          summaryView
         }
       )
     }
   }
 
-  private func summaryView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+  private var summaryView: some View {
     LazyVStack(alignment: .leading, spacing: 10.0) {
-      reportDaysView(viewStore: viewStore)
-      statisticsView(viewStore: viewStore)
+      reportDaysView
+      statisticsView
     }
     .maxWidth()
     .formBackgroundModifier()
   }
 
-  private func statisticsView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+  private var statisticsView: some View {
     VStack(spacing: 10.0) {
-      if viewStore.summary.doneCount > .zero {
+      if store.summary.doneCount > .zero {
         HStack(spacing: 5.0) {
           Text("Done Count", bundle: .module)
             .formTitleTextStyle
           Spacer()
-          Text("\(viewStore.summary.doneCount)")
+          Text("\(store.summary.doneCount)")
             .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Color.standardText)
         }
       }
-      if viewStore.summary.notDoneCount > .zero {
+      if store.summary.notDoneCount > .zero {
         HStack(spacing: 5.0) {
           Text("Not Done Count", bundle: .module)
             .formTitleTextStyle
           Spacer()
-          Text("\(viewStore.summary.notDoneCount)")
+          Text("\(store.summary.notDoneCount)")
             .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Color.standardText)
         }
       }
-      if viewStore.summary.duration > .zero {
+      if store.summary.duration > .zero {
         HStack(spacing: 5.0) {
           Text("Total Time", bundle: .module)
             .formTitleTextStyle
           Spacer()
-          Text(TimeProvider.duration(from: viewStore.summary.duration, bundle: .module) ?? "")
+          Text(TimeProvider.duration(from: store.summary.duration, bundle: .module) ?? "")
             .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Color.standardText)
         }
@@ -266,16 +252,16 @@ public struct ReportsView: View {
     }
   }
 
-  private func reportDaysView(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+  private var reportDaysView: some View {
     LazyVGrid(columns: columns, spacing: 10) {
-      ForEach(viewStore.reportDays) { item in
+      ForEach(store.reportDays) { item in
         VStack(spacing: 2.0) {
           if let title = item.title {
             Text(title)
               .font(.system(size: 12.0, weight: .semibold))
               .foregroundStyle(Color.standardText)
           }
-          reportDayActivityView(item, viewStore: viewStore)
+          reportDayActivityView(item)
             .frame(height: 30.0)
             .clipShape(RoundedRectangle(cornerRadius: 15.0))
         }
@@ -284,10 +270,10 @@ public struct ReportsView: View {
   }
 
   @ViewBuilder
-  private func reportDayActivityView(_ reportDay: ReportDay, viewStore: ViewStoreOf<ReportsFeature>) -> some View {
+  private func reportDayActivityView(_ reportDay: ReportDay) -> some View {
     switch reportDay.dayActivity {
     case .tag(let state):
-      if let tag = viewStore.selectedTag {
+      if let tag = store.selectedTag {
         switch state {
         case .done:
           tag.rgbColor.color
@@ -298,7 +284,7 @@ public struct ReportsView: View {
         }
       }
     case .activity(let state):
-      if let activity = viewStore.selectedActivity {
+      if let activity = store.selectedActivity {
         switch state {
         case .done:
           ActivityImageView(data: activity.icon?.data, size: 30.0, cornerRadius: 15.0)
@@ -316,8 +302,8 @@ public struct ReportsView: View {
 
   @MainActor
   @ViewBuilder
-  private func activitiesByTag(viewStore: ViewStoreOf<ReportsFeature>) -> some View {
-    if let tagActivitySection = viewStore.currectTagActivitySection {
+  private var activitiesByTag: some View {
+    if let tagActivitySection = store.currectTagActivitySection {
       SectionView(
         name: String(localized: "Activities By Tags", bundle: .module),
         rightContent: { EmptyView() },

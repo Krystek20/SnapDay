@@ -39,11 +39,11 @@ public struct ApplicationView: View {
   // MARK: - Views
 
   public var body: some View {
-    NavigationStackStore(store.scope(state: \.path, action: { .path($0) })) {
+    NavigationStackStore(store.scope(state: \.path, action: \.path)) {
       DashboardView(
         store: store.scope(
           state: \.dashboard,
-          action: { .dashboard($0) }
+          action: \.dashboard
         )
       )
     } destination: { state in

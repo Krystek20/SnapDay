@@ -3,6 +3,7 @@ import Repositories
 import Models
 import Common
 
+@Reducer
 public struct MarkerFormFeature: Reducer {
 
   public enum MarkerType: Equatable {
@@ -18,10 +19,11 @@ public struct MarkerFormFeature: Reducer {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
     var markerType: MarkerType
-    @BindingState var name: String
-    @BindingState var color: RGBColor = .random
+    var name: String
+    var color: RGBColor = .random
 
     public init(markerType: MarkerType, name: String = "") {
       self.markerType = markerType

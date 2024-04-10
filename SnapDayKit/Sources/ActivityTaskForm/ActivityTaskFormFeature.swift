@@ -5,6 +5,7 @@ import Models
 import EmojiPicker
 import Utilities
 
+@Reducer
 public struct ActivityTaskFormFeature: Reducer, TodayProvidable {
 
   public enum ActivityTaskFormType {
@@ -26,6 +27,7 @@ public struct ActivityTaskFormFeature: Reducer, TodayProvidable {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
 
     public enum Field: Hashable {
@@ -33,10 +35,10 @@ public struct ActivityTaskFormFeature: Reducer, TodayProvidable {
       case tag
     }
 
-    @BindingState var activityTask: ActivityTask
-    @BindingState var focus: Field?
-    @BindingState var isPhotoPickerPresented: Bool = false
-    @PresentationState var showEmojiPicker: EmojiPickerFeature.State?
+    var activityTask: ActivityTask
+    var focus: Field?
+    var isPhotoPickerPresented: Bool = false
+    @Presents var showEmojiPicker: EmojiPickerFeature.State?
     var photoItem: PhotoItem?
     var isSaveButtonDisabled: Bool { activityTask.name.isEmpty }
 
@@ -121,7 +123,7 @@ public struct ActivityTaskFormFeature: Reducer, TodayProvidable {
         return .none
       }
     }
-    .ifLet(\.$showEmojiPicker, action: /Action.showEmojiPicker) {
+    .ifLet(\.$showEmojiPicker, action: \.showEmojiPicker) {
       EmojiPickerFeature()
     }
   }

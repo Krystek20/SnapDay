@@ -9,7 +9,7 @@ public struct ActivityListView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<ActivityListFeature>
+  @Perception.Bindable private var store: StoreOf<ActivityListFeature>
   private let columns: [GridItem] = [
     GridItem(.flexible(), spacing: 15.0, alignment: nil),
     GridItem(.flexible(), spacing: 15.0, alignment: nil),
@@ -25,49 +25,32 @@ public struct ActivityListView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      content(viewStore: viewStore)
-        .navigationTitle(String(localized: "Activity list", bundle: .module))
-        .toolbar {
-          if viewStore.configuration.isActivityEditable {
-            ToolbarItem(placement: .topBarTrailing) {
-              newButton(viewStore: viewStore)
-            }
+    content
+      .navigationTitle(String(localized: "Activity list", bundle: .module))
+      .toolbar {
+        if store.configuration.isActivityEditable {
+          ToolbarItem(placement: .topBarTrailing) {
+            newButton
           }
         }
-        .onAppear {
-          viewStore.send(.view(.appeared))
+      }
+      .onAppear {
+        store.send(.view(.appeared))
+      }
+      .sheet(item: $store.scope(state: \.addActivity, action: \.addActivity)) { store in
+        NavigationStack {
+          ActivityFormView(store: store)
         }
-        .sheet(
-          store: store.scope(
-            state: \.$addActivity,
-            action: { .addActivity($0) }
-          ),
-          content: { store in
-            NavigationStack {
-              ActivityFormView(store: store)
-            }
-            .presentationDetents([.large])
-          }
-        )
-    }
+        .presentationDetents([.large])
+      }
   }
 
-  @ViewBuilder
-  private func newButton(viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
-    Button(String(localized: "New", bundle: .module)) {
-      viewStore.send(.view(.newButtonTapped))
-    }
-    .font(.system(size: 12.0, weight: .bold))
-    .foregroundStyle(Color.actionBlue)
-  }
-
-  private func content(viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
+  private var content: some View {
     VStack(spacing: .zero) {
-      activityList(viewStore: viewStore)
+      activityList
         .padding(.bottom, 15.0)
-      if viewStore.showButton {
-        addButton(viewStore: viewStore)
+      if store.showButton {
+        addButton
           .padding(.bottom, 15.0)
           .padding(.horizontal, 15.0)
       }
@@ -75,13 +58,13 @@ public struct ActivityListView: View {
     .activityBackground
   }
 
-  private func activityList(viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
+  private var activityList: some View {
     ScrollView {
       LazyVGrid(columns: columns, spacing: 15.0) {
-        ForEach(viewStore.activities) { activity in
+        ForEach(store.activities) { activity in
           ZStack {
-            activityBackground(activity, viewStore: viewStore)
-            activityView(activity, viewStore: viewStore)
+            activityBackground(activity)
+            activityView(activity)
           }
         }
       }
@@ -90,7 +73,17 @@ public struct ActivityListView: View {
     .scrollIndicators(.hidden)
   }
 
-  private func activityView(_ activity: Activity, viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
+  @ViewBuilder
+  private func activityBackground(_ activity: Activity) -> some View {
+    if store.selectedActivities.contains(activity) {
+      Color.formBackground
+        .clipShape(RoundedRectangle(cornerRadius: 10.0))
+    } else {
+      Color.background
+    }
+  }
+
+  private func activityView(_ activity: Activity) -> some View {
     VStack(spacing: 5.0) {
       ActivityImageView(
         data: activity.icon?.data,
@@ -105,39 +98,41 @@ public struct ActivityListView: View {
     .padding(5.0)
     .contentShape(Rectangle())
     .onTapGesture {
-      viewStore.send(.view(.activityTapped(activity)))
+      store.send(.view(.activityTapped(activity)))
     }
     .contextMenu {
-      Button(
-        action: {
-          viewStore.send(.view(.activityEditTapped(activity)))
-        },
-        label: {
-          Text("Edit", bundle: .module)
-          Image(systemName: "pencil.circle")
-        }
-      )
+      editButton(activity: activity)
     }
   }
 
-  @ViewBuilder
-  private func activityBackground(_ activity: Activity, viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
-    viewStore.selectedActivities.contains(activity)
-    ? AnyView(
-      Color.formBackground
-        .clipShape(RoundedRectangle(cornerRadius: 10.0))
-    )
-    : AnyView(Color.background)
-  }
-
-  private func addButton(viewStore: ViewStoreOf<ActivityListFeature>) -> some View {
+  private func editButton(activity: Activity) -> some View {
     Button(
-      action: { viewStore.send(.view(.addButtonTapped)) },
+      action: {
+        store.send(.view(.activityEditTapped(activity)))
+      },
       label: {
-        Text("Add (\(viewStore.selectedActivities.count))", bundle: .module)
+        Text("Edit", bundle: .module)
+        Image(systemName: "pencil.circle")
       }
     )
-    .disabled(viewStore.selectedActivities.isEmpty)
-    .buttonStyle(PrimaryButtonStyle(disabled: viewStore.selectedActivities.isEmpty))
+  }
+
+  private var addButton: some View {
+    Button(
+      action: { store.send(.view(.addButtonTapped)) },
+      label: {
+        Text("Add (\(store.selectedActivities.count))", bundle: .module)
+      }
+    )
+    .disabled(store.selectedActivities.isEmpty)
+    .buttonStyle(PrimaryButtonStyle(disabled: store.selectedActivities.isEmpty))
+  }
+
+  private var newButton: some View {
+    Button(String(localized: "New", bundle: .module)) {
+      store.send(.view(.newButtonTapped))
+    }
+    .font(.system(size: 12.0, weight: .bold))
+    .foregroundStyle(Color.actionBlue)
   }
 }

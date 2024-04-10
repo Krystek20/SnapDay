@@ -4,6 +4,7 @@ import Models
 import MarkerForm
 import DayActivityTaskForm
 
+@Reducer
 public struct DayActivityFormFeature: Reducer {
 
   // MARK: - Dependencies
@@ -17,6 +18,7 @@ public struct DayActivityFormFeature: Reducer {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
 
     var existingTags: [Tag] = []
@@ -25,12 +27,12 @@ public struct DayActivityFormFeature: Reducer {
     var showAddTagButton: Bool { !newTag.isEmpty }
     var showAddLabelButton: Bool { !newLabel.isEmpty }
     
-    @BindingState var dayActivity: DayActivity
-    @BindingState var newTag = String.empty
-    @BindingState var newLabel = String.empty
+    var dayActivity: DayActivity
+    var newTag = String.empty
+    var newLabel = String.empty
     
-    @PresentationState var addMarker: MarkerFormFeature.State?
-    @PresentationState var dayActivityTaskForm: DayActivityTaskFormFeature.State?
+    @Presents var addMarker: MarkerFormFeature.State?
+    @Presents var dayActivityTaskForm: DayActivityTaskFormFeature.State?
 
     public init(dayActivity: DayActivity) {
       self.dayActivity = dayActivity
@@ -115,10 +117,10 @@ public struct DayActivityFormFeature: Reducer {
         .none
       }
     }
-    .ifLet(\.$addMarker, action: /Action.addMarker) {
+    .ifLet(\.$addMarker, action: \.addMarker) {
       MarkerFormFeature()
     }
-    .ifLet(\.$dayActivityTaskForm, action: /Action.dayActivityTaskForm) {
+    .ifLet(\.$dayActivityTaskForm, action: \.dayActivityTaskForm) {
       DayActivityTaskFormFeature()
     }
   }

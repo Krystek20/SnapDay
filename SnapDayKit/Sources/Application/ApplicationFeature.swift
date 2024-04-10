@@ -2,6 +2,7 @@ import Dashboard
 import Reports
 import ComposableArchitecture
 
+@Reducer
 public struct ApplicationFeature: Reducer {
 
   // MARK: - State & Action
@@ -41,7 +42,7 @@ public struct ApplicationFeature: Reducer {
   // MARK: - Body
 
   public var body: some ReducerOf<Self> {
-    Scope(state: \.dashboard, action: /Action.dashboard) {
+    Scope(state: \.dashboard, action: \.dashboard) {
       DashboardFeature()
     }
 
@@ -55,7 +56,7 @@ public struct ApplicationFeature: Reducer {
         return .none
       }
     }
-    .forEach(\.path, action: /Action.path) {
+    .forEach(\.path, action: \.path) {
       Path()
     }
   }

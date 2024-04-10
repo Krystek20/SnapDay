@@ -8,6 +8,7 @@ import Combine
 import MarkerList
 import ActivityList
 
+@Reducer
 public struct ReportsFeature: Reducer, TodayProvidable {
 
   // MARK: - Dependencies
@@ -18,15 +19,16 @@ public struct ReportsFeature: Reducer, TodayProvidable {
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable, TodayProvidable {
 
     var dateFilters = FilterPeriod.allCases
-    @BindingState var selectedFilterPeriod: FilterPeriod
-    @BindingState var startDate: Date = Date()
-    @BindingState var endDate: Date = Date()
+    var selectedFilterPeriod: FilterPeriod
+    var startDate: Date = Date()
+    var endDate: Date = Date()
 
-    @PresentationState var markerList: MarkerListFeature.State?
-    @PresentationState var activityList: ActivityListFeature.State?
+    @Presents var markerList: MarkerListFeature.State?
+    @Presents var activityList: ActivityListFeature.State?
 
     var tagActivitySections: [TagActivitySection] = []
     var currectTagActivitySection: TagActivitySection? {
@@ -198,19 +200,19 @@ public struct ReportsFeature: Reducer, TodayProvidable {
           days: state.days
         )
         return .none
-      case .binding(\.$selectedFilterPeriod):
+      case .binding(\.selectedFilterPeriod):
         state.isSwitcherDismissed = state.selectedFilterPeriod == .custom
         let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
         state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
         return .run { send in
           await send(.internal(.loadDays))
         }
-      case .binding(\.$startDate):
+      case .binding(\.startDate):
         state.filterDate = state.filterDate?.setStartDate(state.startDate)
         return .run { send in
           await send(.internal(.loadDays))
         }
-      case .binding(\.$endDate):
+      case .binding(\.endDate):
         state.filterDate = state.filterDate?.setEndDate(state.endDate)
         return .run { send in
           await send(.internal(.loadDays))
@@ -252,10 +254,10 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .none
       }
     }
-    .ifLet(\.$markerList, action: /Action.markerList) {
+    .ifLet(\.$markerList, action: \.markerList) {
       MarkerListFeature()
     }
-    .ifLet(\.$activityList, action: /Action.activityList) {
+    .ifLet(\.$activityList, action: \.activityList) {
       ActivityListFeature()
     }
   }
