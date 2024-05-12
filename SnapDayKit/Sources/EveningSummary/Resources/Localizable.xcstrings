@@ -1,7 +1,31 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Who's awesome? You are! 🌟 All your tasks for today are checked off. Time to kick back and enjoy your evening. You've earned it!" : {
+    "" : {
+
+    },
+    " %lld activities " : {
+
+    },
+    " of productive time. Great work staying on track and pushing your limits!" : {
+
+    },
+    "%@" : {
+
+    },
+    "Others" : {
+
+    },
+    "today, totaling " : {
+
+    },
+    "TODAY'S TRIUMPHS" : {
+
+    },
+    "Who's awesome? You are! 🌟 All your activities for today are checked off. Time to kick back and enjoy your evening. You've earned it!" : {
+
+    },
+    "You've successfully completed" : {
 
     }
   },

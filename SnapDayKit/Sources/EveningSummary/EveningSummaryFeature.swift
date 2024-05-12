@@ -2,7 +2,18 @@ import Foundation
 import ComposableArchitecture
 import Utilities
 import Models
-import enum UiComponents.DayViewShowButtonState
+
+struct EveningTagSummary: Identifiable, Equatable {
+  var id: String { tag.id }
+  let tag: Tag
+  let dayActivities: [DayActivity]
+
+  var totalDuration: Int {
+    dayActivities.reduce(into: Int.zero, { result, dayActivity in
+      result += dayActivity.totalDuration
+    })
+  }
+}
 
 @Reducer
 public struct EveningSummaryFeature: TodayProvidable {
@@ -10,11 +21,6 @@ public struct EveningSummaryFeature: TodayProvidable {
   // MARK: - Dependencies
 
   @Dependency(\.timePeriodsProvider) private var timePeriodsProvider
-  @Dependency(\.dayActivityRepository) private var dayActivityRepository
-  @Dependency(\.dayEditor) private var dayEditor
-  @Dependency(\.date) private var date
-  private let periodTitleProvider = PeriodTitleProvider()
-  private let userNotificationCenterProvider = UserNotificationCenterProvider()
 
   // MARK: - State & Action
 
@@ -22,31 +28,21 @@ public struct EveningSummaryFeature: TodayProvidable {
   public struct State: Equatable, TodayProvidable {
     
     var day: Day?
-    var activityListOption: ActivityListOption = .collapsed
 
+    var eveningTagSummaries: [EveningTagSummary] = []
     var completedActivities: CompletedActivities {
       day?.completedActivities ?? CompletedActivities(doneCount: .zero, totalCount: .zero, percent: .zero)
     }
-    var showDoneView: Bool = false
-
-    var dayViewShowButtonState: DayViewShowButtonState {
-      guard let day,
-            !day.activities.filter(\.isDone).isEmpty else { return .none }
-      switch activityListOption {
-      case .collapsed:
-        return .show
-      case .extended:
-        return .hide
-      }
+    var showDoneView: Bool {
+      day?.activities.filter { !$0.isDone }.isEmpty == true
     }
-
-    var activitiesToShow: [DayActivity] {
-      switch activityListOption {
-      case .collapsed:
-        day?.sortedDayActivities.filter { !$0.isDone } ?? []
-      case .extended:
-        day?.sortedDayActivities ?? []
-      }
+    var doneActivitiesCount: Int {
+      day?.activities.filter(\.isDone).count ?? .zero
+    }
+    var doneActivitiesDuration: Int {
+      day?.activities.filter(\.isDone).reduce(into: Int.zero, { result, dayActivity in
+        result += dayActivity.totalDuration
+      }) ?? .zero
     }
 
     public init() { }
@@ -55,10 +51,6 @@ public struct EveningSummaryFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
-      case activityTapped(DayActivity)
-      case taskActivityTapped(DayActivity, DayActivityTask)
-      case showCompletedActivitiesTapped
-      case hideCompletedActivitiesTapped
     }
     public enum InternalAction: Equatable {
       case loadDay
@@ -97,34 +89,6 @@ public struct EveningSummaryFeature: TodayProvidable {
     switch action {
     case .appeared:
       return .send(.internal(.loadDay))
-    case .activityTapped(var dayActivity):
-      if dayActivity.doneDate == nil {
-        dayActivity.doneDate = date()
-      } else {
-        dayActivity.doneDate = nil
-      }
-      return .run { [dayActivity] send in
-        try await dayActivityRepository.saveActivity(dayActivity)
-        await send(.internal(.loadDay))
-      }
-    case .taskActivityTapped(var dayActivity, var dayActivityTask):
-      guard let index = dayActivity.dayActivityTasks.firstIndex(where: { $0.id ==  dayActivityTask.id }) else { return .none }
-      if dayActivityTask.doneDate == nil {
-        dayActivityTask.doneDate = date()
-      } else {
-        dayActivityTask.doneDate = nil
-      }
-      dayActivity.dayActivityTasks[index] = dayActivityTask
-      return .run { [dayActivity] send in
-        try await dayActivityRepository.saveActivity(dayActivity)
-        await send(.internal(.loadDay))
-      }
-    case .showCompletedActivitiesTapped:
-      state.activityListOption = .extended
-      return .none
-    case .hideCompletedActivitiesTapped:
-      state.activityListOption = .collapsed
-      return .none
     }
   }
 
@@ -136,10 +100,34 @@ public struct EveningSummaryFeature: TodayProvidable {
         await send(.internal(.setDay(timePeriod.days.first)))
       }
     case .setDay(let day):
-      let allActivitiesDone = day?.activities.filter { !$0.isDone }.isEmpty == true
-      if state.day == nil || !allActivitiesDone {
-        state.showDoneView = allActivitiesDone
+      guard let day else { return .none }
+      let allTags = day.activities.reduce(into: [Tag](), { result, dayActivity in
+        result += dayActivity.tags
+      })
+      let doneActivities = day.activities.filter(\.isDone)
+      var eveningTagSummaries = Array(Set(allTags)).map { tag in
+        EveningTagSummary(
+          tag: tag,
+          dayActivities: doneActivities.filter { $0.tags.contains(tag) }
+        )
       }
+      eveningTagSummaries.append(
+        EveningTagSummary(
+          tag: Tag(
+            name: String(localized: "Others", bundle: .module),
+            color: RGBColor(
+              red: .zero,
+              green: .zero,
+              blue: .zero,
+              alpha: 1.0
+            )
+          ),
+          dayActivities: doneActivities.filter { $0.tags.isEmpty }
+        )
+      )
+      state.eveningTagSummaries = eveningTagSummaries
+        .filter { !$0.dayActivities.isEmpty }
+        .sorted(by: { $0.tag.name < $1.tag.name })
       state.day = day
       return .none
     }

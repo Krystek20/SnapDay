@@ -1,6 +1,5 @@
 import SwiftUI
 import Resources
-import Utilities
 import Models
 
 public struct ActivitiesByTagView: View {
@@ -40,28 +39,10 @@ public struct ActivitiesByTagView: View {
 
   private func activityDetailsView(_ timePeriodActivity: TimePeriodActivity) -> some View {
     VStack(alignment: .leading, spacing: 5.0) {
-      HStack(spacing: 5.0) {
-        ActivityImageView(
-          data: timePeriodActivity.activity.icon?.data,
-          size: 30.0,
-          cornerRadius: 15.0
-        )
-        Text(timePeriodActivity.activity.name)
-          .font(.system(size: 14.0, weight: .medium))
-          .multilineTextAlignment(.leading)
-          .foregroundStyle(Color.sectionText)
-        Spacer()
-        if timePeriodActivity.duration > .zero {
-          HStack(spacing: 5.0) {
-            Image(systemName: "clock")
-              .foregroundStyle(Color.sectionText)
-              .imageScale(.small)
-            Text(TimeProvider.duration(from: timePeriodActivity.duration, bundle: .module) ?? "")
-              .font(.system(size: 12.0, weight: .semibold))
-              .foregroundStyle(Color.sectionText)
-          }
-        }
-      }
+      ActivitySummaryRow(
+        activityType: .activity(timePeriodActivity.activity),
+        durationType: .custom(timePeriodActivity.duration)
+      )
 
       if timePeriodActivity.activity.isRepeatable {
         ProgressView(value: timePeriodActivity.completedValue) {
