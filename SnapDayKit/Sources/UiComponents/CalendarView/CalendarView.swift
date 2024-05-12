@@ -97,8 +97,11 @@ public struct CalendarView: View {
   @ViewBuilder
   private var timeSummary: some View {
     if let daySummary, daySummary.duration > .zero {
-      TimeSummaryView(daySummary: daySummary)
-        .padding(.all, 10.0)
+      VStack(spacing: .zero) {
+        Divider()
+        TimeSummaryView(daySummary: daySummary)
+          .padding(.all, 10.0)
+      }
     }
   }
 
