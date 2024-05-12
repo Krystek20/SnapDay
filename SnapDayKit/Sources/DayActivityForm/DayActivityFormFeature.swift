@@ -5,7 +5,7 @@ import MarkerForm
 import DayActivityTaskForm
 
 @Reducer
-public struct DayActivityFormFeature: Reducer {
+public struct DayActivityFormFeature {
 
   // MARK: - Dependencies
 
@@ -202,7 +202,10 @@ public struct DayActivityFormFeature: Reducer {
     switch action {
     case .addButtonTapped:
       state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
-        dayActivityTask: DayActivityTask(id: uuid()),
+        dayActivityTask: DayActivityTask(
+          id: uuid(),
+          dayActivityId: state.dayActivity.id
+        ),
         type: .new
       )
       return .none

@@ -6,7 +6,7 @@ import EmojiPicker
 import Utilities
 
 @Reducer
-public struct ActivityTaskFormFeature: Reducer, TodayProvidable {
+public struct ActivityTaskFormFeature: TodayProvidable {
 
   public enum ActivityTaskFormType {
     case new
@@ -44,7 +44,7 @@ public struct ActivityTaskFormFeature: Reducer, TodayProvidable {
 
     let type: ActivityTaskFormType
 
-    public init(activityTask: ActivityTask, type: ActivityTaskFormType = .new) {
+    public init(activityTask: ActivityTask, type: ActivityTaskFormType) {
       self.activityTask = activityTask
       self.type = type
       self.focus = type.focus

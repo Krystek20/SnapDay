@@ -1,14 +1,16 @@
 import Foundation
 import Models
 import Dependencies
+import struct Repositories.Transactions
 
 public struct DayEditor {
-  public var prepareDays: @Sendable (_ activities: [Activity], _ dateRange: ClosedRange<Date>) async throws -> ([Day])
+  public var prepareDays: @Sendable (_ activities: [Activity], _ dateRange: ClosedRange<Date>) async throws -> [Day]
   public var updateDays: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
   public var addActivity: @Sendable (_ activity: Activity, _ date: Date) async throws -> ()
   public var removeDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
   public var updateDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
   public var updateDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
+  public var applyChanges: @Sendable (_ transactions: Transactions) async throws -> [Date]
 }
 
 extension DependencyValues {
@@ -38,18 +40,10 @@ extension DayEditor: DependencyKey {
       },
       updateDayActivity: { dayActivity, date in
         try await DayUpdater().updateDayActivity(dayActivity, to: date)
+      },
+      applyChanges: { transactions in
+        try await DayUpdater().applyChanges(transactions)
       }
-    )
-  }
-
-  public static var previewValue: DayEditor {
-    DayEditor(
-      prepareDays: { _, _ in [] },
-      updateDays: { _, _ in },
-      addActivity: { _, _ in },
-      removeDayActivity: { _, _ in },
-      updateDayActivities: { _, _ in },
-      updateDayActivity: {_, _ in }
     )
   }
 }

@@ -5,6 +5,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   // MARK: - Properties
 
   public let id: UUID
+  public let dayId: UUID
   public var activity: Activity
   public var name: String
   public var icon: Icon?
@@ -20,6 +21,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
 
   public init(
     id: UUID,
+    dayId: UUID,
     activity: Activity,
     name: String,
     icon: Icon?,
@@ -32,6 +34,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     dayActivityTasks: [DayActivityTask]
   ) {
     self.id = id
+    self.dayId = dayId
     self.activity = activity
     self.name = name
     self.icon = icon

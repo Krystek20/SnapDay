@@ -12,12 +12,7 @@ public struct CalendarView: View {
   private let daySummary: DaySummary?
   private let dayViewShowButtonState: DayViewShowButtonState
   private let informationConfiguration: InformationViewConfigurable?
-  private let dayActivityTapped: (DayActivity) -> Void
-  private let dayActivityEditTapped: (DayActivity) -> Void
-  private let removeDayActivityTapped: (DayActivity) -> Void
-  private let dayActivityTaskTapped: (DayActivity, DayActivityTask) -> Void
-  private let dayActivityEditTaskTapped: (DayActivity, DayActivityTask) -> Void
-  private let removeDayActivityTaskTapped: (DayActivity, DayActivityTask) -> Void
+  private let dayViewOption: DayViewOption
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
   private let columns = Array(repeating: GridItem(), count: 7)
@@ -31,12 +26,7 @@ public struct CalendarView: View {
     daySummary: DaySummary?,
     dayViewShowButtonState: DayViewShowButtonState,
     informationConfiguration: InformationViewConfigurable?,
-    dayActivityTapped: @escaping (DayActivity) -> Void,
-    dayActivityEditTapped: @escaping (DayActivity) -> Void,
-    removeDayActivityTapped: @escaping (DayActivity) -> Void,
-    dayActivityTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
-    dayActivityEditTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
-    removeDayActivityTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
+    dayViewOption: DayViewOption,
     showCompletedTapped: @escaping () -> Void,
     hideCompletedTapped: @escaping () -> Void
   ) {
@@ -46,12 +36,7 @@ public struct CalendarView: View {
     self.daySummary = daySummary
     self.dayViewShowButtonState = dayViewShowButtonState
     self.informationConfiguration = informationConfiguration
-    self.dayActivityTapped = dayActivityTapped
-    self.dayActivityEditTapped = dayActivityEditTapped
-    self.removeDayActivityTapped = removeDayActivityTapped
-    self.dayActivityTaskTapped = dayActivityTaskTapped
-    self.dayActivityEditTaskTapped = dayActivityEditTaskTapped
-    self.removeDayActivityTaskTapped = removeDayActivityTaskTapped
+    self.dayViewOption = dayViewOption
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
   }
@@ -139,12 +124,7 @@ public struct CalendarView: View {
       activities: dayActivities,
       completedActivities: day.completedActivities,
       dayViewShowButtonState: dayViewShowButtonState,
-      activityTapped: dayActivityTapped,
-      editTapped: dayActivityEditTapped,
-      removeTapped: removeDayActivityTapped,
-      activityTaskTapped: dayActivityTaskTapped,
-      editTaskTapped: dayActivityEditTaskTapped,
-      removeTaskTapped: removeDayActivityTaskTapped,
+      dayViewOption: dayViewOption,
       showCompletedTapped: showCompletedTapped,
       hideCompletedTapped: hideCompletedTapped
     )

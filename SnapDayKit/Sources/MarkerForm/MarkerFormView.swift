@@ -20,50 +20,58 @@ public struct MarkerFormView: View {
   // MARK: - Views
 
   public var body: some View {
-    VStack(spacing: .zero) {
-      formView
-      Spacer(minLength: 15.0)
-      bottomView
-        .padding(.bottom, 15.0)
+    WithPerceptionTracking {
+      VStack(spacing: .zero) {
+        formView
+        Spacer(minLength: 15.0)
+        bottomView
+          .padding(.bottom, 15.0)
+      }
+      .padding(.horizontal, 15.0)
+      .padding(.top, 25.0)
+      .activityBackground
     }
-    .padding(.horizontal, 15.0)
-    .padding(.top, 25.0)
-    .activityBackground
   }
 
   private var formView: some View {
-    VStack(alignment: .leading, spacing: 15.0) {
-      FormTextField(
-        title: String(localized: "Name", bundle: .module),
-        value: $store.name
-      )
-      colorsSection
+    WithPerceptionTracking {
+      VStack(alignment: .leading, spacing: 15.0) {
+        FormTextField(
+          title: String(localized: "Name", bundle: .module),
+          value: $store.name
+        )
+        colorsSection
+      }
+      .maxWidth()
     }
-    .maxWidth()
   }
 
   @ViewBuilder
   private var colorsSection: some View {
-    FormColorField(
-      title: String(localized: "Color", bundle: .module),
-      color: Binding(
-        get: {
-          store.color.color
-        },
-        set: { value in
-          $store.color.wrappedValue = value.rgbColor
-        }
+    WithPerceptionTracking {
+      FormColorField(
+        title: String(localized: "Color", bundle: .module),
+        color: Binding(
+          get: {
+            store.color.color
+          },
+          set: { value in
+            $store.color.wrappedValue = value.rgbColor
+          }
+        )
       )
-    )
+    }
   }
 
   private var bottomView: some View {
-    VStack(spacing: 10.0) {
-      Button(String(localized: "Save", bundle: .module)) {
-        store.send(.view(.saveButtonTapped))
+    WithPerceptionTracking {
+      VStack(spacing: 10.0) {
+        Button(String(localized: "Save", bundle: .module)) {
+          store.send(.view(.saveButtonTapped))
+        }
+        .disabled(store.name.isEmpty)
+        .buttonStyle(PrimaryButtonStyle(disabled: store.name.isEmpty))
       }
-      .disabled(store.name.isEmpty)
-      .buttonStyle(PrimaryButtonStyle(disabled: store.name.isEmpty))
     }
   }
 }

@@ -7,43 +7,89 @@ final class CoreDataStack {
   // MARK: - Properties
 
   var backgroundContext: NSManagedObjectContext {
-    persistentContainer.newBackgroundContext()
+    let context = persistentContainer.newBackgroundContext()
+    context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+    context.transactionAuthor = TransactionAuthor.app()
+    return context
   }
-  private let persistentContainer: NSPersistentContainer
-  private let context: NSManagedObjectContext
+  private let persistentContainer: PersistentContainerType
 
   // MARK: - Private
 
   private init(
     name: String,
     managedObjectModelType: ManagedObjectModelType.Type = NSManagedObjectModel.self,
-    persistentContainerType: PersistentContainerType.Type = NSPersistentContainer.self,
+    persistentContainerType: PersistentContainerType.Type = NSPersistentCloudKitContainer.self,
+    coreDataBackupService: CoreDataBackupService = CoreDataBackupService(),
+    remoteChangeObserver: RemoteChangeObserver = RemoteChangeObserver(),
+    fileManager: FileManager = .default,
     inMemoryStore: Bool = false
   ) {
     guard let modelURL = Bundle.module.coreDataModelUrl(name: name),
-          let managedObjectModel = managedObjectModelType.init(contentsOf: modelURL) else {
+          let managedObjectModel = managedObjectModelType.init(contentsOf: modelURL),
+          let storeURL = try? fileManager.storeURL else {
       fatalError("managedObjectModel not created for name: \(name)")
     }
+
     let persistentContainer = persistentContainerType.init(
       name: name,
       managedObjectModel: managedObjectModel
     )
-    persistentContainer.loadPersistentStores { _, error in
-      guard let error = error as NSError? else { return }
-      fatalError("loadPersistentStores failed: \(error.localizedDescription)")
-    }
 
+    let description: NSPersistentStoreDescription
     if inMemoryStore {
-      let description = NSPersistentStoreDescription()
+      description = NSPersistentStoreDescription()
       description.type = NSInMemoryStoreType
       description.shouldAddStoreAsynchronously = false
       description.url = URL(filePath: "/dev/null")
-      persistentContainer.persistentStoreDescriptions = [description]
+    } else {
+      description = NSPersistentStoreDescription(url: storeURL)
+      description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.mobilove.snapday")
+      description.setOption(true as NSObject, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+      description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+    }
+    persistentContainer.persistentStoreDescriptions = [description]
+
+    persistentContainer.loadPersistentStores { description, error in
+      guard let loadPersistentStoresError = error as NSError? else { return }
+      do {
+        try coreDataBackupService.loadFromBackup(
+          persistentContainer: persistentContainer,
+          description: description
+        )
+      } catch {
+        fatalError("loadPersistentStores failed: \(loadPersistentStoresError.localizedDescription) backupError: \(error.localizedDescription)")
+      }
     }
 
     self.persistentContainer = persistentContainer
-    self.context = persistentContainer.viewContext
-    self.context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+    self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
+    self.persistentContainer.viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+    self.persistentContainer.viewContext.transactionAuthor = TransactionAuthor.app()
+
+    do {
+        try persistentContainer.viewContext.setQueryGenerationFrom(.current)
+    } catch {
+        fatalError("Failed to pin viewContext to the current generation:\(error)")
+    }
+
+    do {
+      try coreDataBackupService.scheduleBackups(
+        persistentContainer: persistentContainer,
+        storeURL: storeURL,
+        description: description
+      )
+    } catch {
+      print("Backup schedule failed: \(error)")
+    }
+
+    Task {
+      await remoteChangeObserver.startObservingRemoteChanges(
+        persistantStoreCoordinator: persistentContainer.persistentStoreCoordinator,
+        storeURL: storeURL,
+        backgroundContextProvider: { [weak self] in self?.backgroundContext }
+      )
+    }
   }
 }
 

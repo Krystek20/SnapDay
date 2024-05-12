@@ -1,5 +1,5 @@
 import Foundation
 
 enum EntityError: Error {
-  case attributeNil(fileID: String = #fileID)
+  case attributeNil(fileID: String = #fileID, message: String = "")
 }

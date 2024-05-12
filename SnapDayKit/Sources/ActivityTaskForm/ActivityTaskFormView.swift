@@ -37,25 +37,29 @@ public struct ActivityTaskFormView: View {
   // MARK: - Views
 
   public var body: some View {
-    content
-      .navigationTitle(title)
-      .fullScreenCover(item: $store.scope(state: \.showEmojiPicker, action: \.showEmojiPicker)) { store in
-        NavigationStack {
-          EmojiPickerView(store: store)
+    WithPerceptionTracking {
+      content
+        .navigationTitle(title)
+        .fullScreenCover(item: $store.scope(state: \.showEmojiPicker, action: \.showEmojiPicker)) { store in
+          NavigationStack {
+            EmojiPickerView(store: store)
+          }
         }
-      }
+    }
   }
 
   private var content: some View {
-    VStack(spacing: .zero) {
-      formView
-        .padding(.bottom, 15.0)
-      saveButton
-        .padding(.bottom, 15.0)
-        .padding(.horizontal, 15.0)
+    WithPerceptionTracking {
+      VStack(spacing: .zero) {
+        formView
+          .padding(.bottom, 15.0)
+        saveButton
+          .padding(.bottom, 15.0)
+          .padding(.horizontal, 15.0)
+      }
+      .activityBackground
+      .bind($store.focus, to: $focus)
     }
-    .activityBackground
-    .bind($store.focus, to: $focus)
   }
 
   private var formView: some View {
@@ -72,119 +76,127 @@ public struct ActivityTaskFormView: View {
   }
 
   private var imageField: some View {
-    Menu {
-      Button(
-        String(localized: "Select Emoji", bundle: .module),
-        action: {
-          store.send(.view(.iconTapped))
-        }
-      )
-      Button(
-        String(localized: "Pick Photo", bundle: .module),
-        action: {
-          store.send(.view(.pickPhotoTapped))
-        }
-      )
-      Button(
-        String(localized: "Remove", bundle: .module),
-        action: {
-          store.send(.view(.removeImageTapped))
-        }
-      )
-    } label: {
-      HStack(spacing: 10.0) {
-        ActivityImageView(
-          data: store.activityTask.icon?.data,
-          size: 30.0,
-          cornerRadius: 5.0,
-          tintColor: .actionBlue
+    WithPerceptionTracking {
+      Menu {
+        Button(
+          String(localized: "Select Emoji", bundle: .module),
+          action: {
+            store.send(.view(.iconTapped))
+          }
         )
-        Text("Change icon", bundle: .module)
-          .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.actionBlue)
-        Spacer()
-      }
-    }
-    .formBackgroundModifier()
-    .photosPicker(
-      isPresented: $store.isPhotoPickerPresented,
-      selection: Binding(
-        get: { 
-          store.photoItem?.photosPickerItem
-        },
-        set: { value in
-          store.send(.view(.imageSelected(PhotoItem(photosPickerItem: value))))
+        Button(
+          String(localized: "Pick Photo", bundle: .module),
+          action: {
+            store.send(.view(.pickPhotoTapped))
+          }
+        )
+        Button(
+          String(localized: "Remove", bundle: .module),
+          action: {
+            store.send(.view(.removeImageTapped))
+          }
+        )
+      } label: {
+        HStack(spacing: 10.0) {
+          ActivityImageView(
+            data: store.activityTask.icon?.data,
+            size: 30.0,
+            cornerRadius: 5.0,
+            tintColor: .actionBlue
+          )
+          Text("Change icon", bundle: .module)
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          Spacer()
         }
-      ),
-      matching: .images,
-      preferredItemEncoding: .current,
-      photoLibrary: .shared()
-    )
+      }
+      .formBackgroundModifier()
+      .photosPicker(
+        isPresented: $store.isPhotoPickerPresented,
+        selection: Binding(
+          get: {
+            store.photoItem?.photosPickerItem
+          },
+          set: { value in
+            store.send(.view(.imageSelected(PhotoItem(photosPickerItem: value))))
+          }
+        ),
+        matching: .images,
+        preferredItemEncoding: .current,
+        photoLibrary: .shared()
+      )
+    }
   }
 
   private var nameTextField: some View {
-    FormTextField(
-      title: String(localized: "Name", bundle: .module),
-      placeholder: String(localized: "Enter name", bundle: .module),
-      value: $store.activityTask.name
-    )
-    .focused($focus, equals: .name)
+    WithPerceptionTracking {
+      FormTextField(
+        title: String(localized: "Name", bundle: .module),
+        placeholder: String(localized: "Enter name", bundle: .module),
+        value: $store.activityTask.name
+      )
+      .focused($focus, equals: .name)
+    }
   }
 
   private var durationView: some View {
     ScrollViewReader { reader in
-      VStack(alignment: .leading, spacing: 10.0) {
-        Toggle(
-          isOn: Binding(
-            get: {
-              store.activityTask.isDefaultDuration
-            },
-            set: {
-              $store.activityTask.wrappedValue.setDefaultDuration($0)
-            }
-          )
-        ) {
-          Text(String(localized: "Default duration", bundle: .module))
-            .formTitleTextStyle
-        }
-        .toggleStyle(CheckToggleStyle())
-        if store.activityTask.isDefaultDuration {
-          DurationPickerView(
-            selectedHours: Binding(
+      WithPerceptionTracking {
+        VStack(alignment: .leading, spacing: 10.0) {
+          Toggle(
+            isOn: Binding(
               get: {
-                store.activityTask.hours
+                store.activityTask.isDefaultDuration
               },
               set: {
-                $store.activityTask.wrappedValue.setDurationHours($0)
-              }
-            ),
-            selectedMinutes: Binding(
-              get: {
-                store.activityTask.minutes
-              },
-              set: {
-                $store.activityTask.wrappedValue.setDurationMinutes($0)
+                $store.activityTask.wrappedValue.setDefaultDuration($0)
               }
             )
-          )
-          .scrollOnAppear("DurationView", anchor: .bottom, reader: reader)
+          ) {
+            Text(String(localized: "Default duration", bundle: .module))
+              .formTitleTextStyle
+          }
+          .toggleStyle(CheckToggleStyle())
+          if store.activityTask.isDefaultDuration {
+            DurationPickerView(
+              selectedHours: Binding(
+                get: {
+                  store.activityTask.hours
+                },
+                set: {
+                  $store.activityTask.wrappedValue.setDurationHours($0)
+                }
+              ),
+              selectedMinutes: Binding(
+                get: {
+                  store.activityTask.minutes
+                },
+                set: {
+                  $store.activityTask.wrappedValue.setDurationMinutes($0)
+                }
+              )
+            )
+            .scrollOnAppear("DurationView", anchor: .bottom, reader: reader)
+          }
         }
+        .formBackgroundModifier()
+        .id("DurationView")
       }
-      .formBackgroundModifier()
-      .id("DurationView")
     }
   }
 
   private var saveButton: some View {
-    Button(
-      action: {
-        store.send(.view(.saveButtonTapped))
-      },
-      label: {
-        Text("Save", bundle: .module)
-      }
-    )
-    .disabled(store.isSaveButtonDisabled)
-    .buttonStyle(PrimaryButtonStyle(disabled: store.isSaveButtonDisabled))
+    WithPerceptionTracking {
+      Button(
+        action: {
+          store.send(.view(.saveButtonTapped))
+        },
+        label: {
+          Text("Save", bundle: .module)
+        }
+      )
+      .disabled(store.isSaveButtonDisabled)
+      .buttonStyle(PrimaryButtonStyle(disabled: store.isSaveButtonDisabled))
+    }
   }
 }

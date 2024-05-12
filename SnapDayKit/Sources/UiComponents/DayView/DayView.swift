@@ -4,18 +4,18 @@ import Models
 
 public struct DayView: View {
 
+  private enum RightAction {
+    case toggle(isDone: Bool)
+    case more
+  }
+
   // MARK: - Properties
 
   private let isPastDay: Bool
   private let activities: [DayActivity]
   private let completedActivities: CompletedActivities
   private let dayViewShowButtonState: DayViewShowButtonState
-  private let activityTapped: (DayActivity) -> Void
-  private let editTapped: (DayActivity) -> Void
-  private let removeTapped: (DayActivity) -> Void
-  private let activityTaskTapped: (DayActivity, DayActivityTask) -> Void
-  private let editTaskTapped: (DayActivity, DayActivityTask) -> Void
-  private let removeTaskTapped: (DayActivity, DayActivityTask) -> Void
+  private let dayViewOption: DayViewOption
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
 
@@ -26,12 +26,7 @@ public struct DayView: View {
     activities: [DayActivity],
     completedActivities: CompletedActivities,
     dayViewShowButtonState: DayViewShowButtonState,
-    activityTapped: @escaping (DayActivity) -> Void,
-    editTapped: @escaping (DayActivity) -> Void,
-    removeTapped: @escaping (DayActivity) -> Void,
-    activityTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
-    editTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
-    removeTaskTapped: @escaping (DayActivity, DayActivityTask) -> Void,
+    dayViewOption: DayViewOption,
     showCompletedTapped: @escaping () -> Void,
     hideCompletedTapped: @escaping () -> Void
   ) {
@@ -39,12 +34,7 @@ public struct DayView: View {
     self.activities = activities
     self.completedActivities = completedActivities
     self.dayViewShowButtonState = dayViewShowButtonState
-    self.activityTapped = activityTapped
-    self.editTapped = editTapped
-    self.removeTapped = removeTapped
-    self.activityTaskTapped = activityTaskTapped
-    self.editTaskTapped = editTaskTapped
-    self.removeTaskTapped = removeTaskTapped
+    self.dayViewOption = dayViewOption
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
   }
@@ -54,19 +44,23 @@ public struct DayView: View {
   public var body: some View {
     LazyVStack(spacing: .zero) {
       ForEach(activities) { dayActivity in
-        VStack(spacing: .zero) {
-          menuActivityView(dayActivity)
-          Divider()
-            .padding(.leading, dayActivity.dayActivityTasks.isEmpty ? .zero : 20.0)
+        switch dayViewOption {
+        case .simple(let dayViewSimpleActions):
+          simpleActivityView(dayActivity, dayViewSimpleActions)
+        case .all(let dayViewAllActions):
+          menuActivityView(dayActivity, dayViewAllActions)
         }
+        divider(addPadding: !dayActivity.dayActivityTasks.isEmpty)
 
         ForEach(tasks(for: dayActivity)) { activityTask in
-          VStack(spacing: .zero) {
-            menuActivityTaskView(dayActivity, activityTask)
+          switch dayViewOption {
+          case .simple(let dayViewSimpleActions):
+            simpleDayActivityTaskView(dayActivity, activityTask, dayViewSimpleActions)
+          case .all(let dayViewAllActions):
+            menuActivityTaskView(dayActivity, activityTask, dayViewAllActions)
               .padding(.leading, 10.0)
-            Divider()
-              .padding(.leading, dayActivity.dayActivityTasks.last?.id == activityTask.id ? .zero : 20.0)
           }
+          divider(addPadding: dayActivity.dayActivityTasks.last?.id != activityTask.id)
         }
       }
       doneRowViewIfNeeded()
@@ -74,11 +68,41 @@ public struct DayView: View {
     }
   }
 
-  private func menuActivityView(_ dayActivity: DayActivity) -> some View {
+  private func simpleActivityView(
+    _ dayActivity: DayActivity,
+    _ dayViewSimpleActions: DayViewSimpleActions
+  ) -> some View {
+    dayActivityView(dayActivity, rightAction: .toggle(isDone: dayActivity.isDone))
+      .contentShape(Rectangle())
+      .onTapGesture {
+        dayViewSimpleActions.activityTapped(dayActivity)
+      }
+  }
+
+  private func simpleDayActivityTaskView(
+    _ dayActivity: DayActivity,
+    _ dayActivityTask: DayActivityTask,
+    _ dayViewSimpleActions: DayViewSimpleActions
+  ) -> some View {
+    dayActivityTaskView(
+      dayActivityTask,
+      rightAction: .toggle(isDone: dayActivityTask.isDone)
+    )
+    .padding(.leading, 10.0)
+    .contentShape(Rectangle())
+    .onTapGesture {
+      dayViewSimpleActions.activityTaskTapped(dayActivity, dayActivityTask)
+    }
+  }
+
+  private func menuActivityView(
+    _ dayActivity: DayActivity,
+    _ dayViewAllActions: DayViewAllActions
+  ) -> some View {
     Menu {
       Button(
         action: {
-          activityTapped(dayActivity)
+          dayViewAllActions.activityTapped(dayActivity)
         },
         label: {
           if dayActivity.isDone {
@@ -92,7 +116,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          editTapped(dayActivity)
+          dayViewAllActions.editTapped(dayActivity)
         },
         label: {
           Text("Edit", bundle: .module)
@@ -101,7 +125,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          removeTapped(dayActivity)
+          dayViewAllActions.removeTapped(dayActivity)
         },
         label: {
           Text("Remove", bundle: .module)
@@ -109,29 +133,19 @@ public struct DayView: View {
         }
       )
     } label: {
-      dayActivityView(dayActivity)
+      dayActivityView(dayActivity, rightAction: .more)
     }
+  }
+
+  private func divider(addPadding: Bool) -> some View {
+    Divider()
+      .padding(.leading, addPadding ? 20.0 : .zero)
   }
 
   @ViewBuilder
   private func doneRowViewIfNeeded() -> some View {
     if !activities.isEmpty {
-      HStack(spacing: 10.0) {
-        CircularProgressView(
-          progress: completedActivities.percent,
-          lineWidth: 4.0
-        )
-        .frame(width: 20.0, height: 20.0)
-        Text("Completed activities", bundle: .module)
-          .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.standardText)
-        Spacer()
-        Text("\(completedActivities.doneCount) / \(completedActivities.totalCount)", bundle: .module)
-          .font(.system(size: 12.0, weight: .semibold))
-          .foregroundStyle(Color.standardText)
-      }
-      .padding(.all, 14.0)
-      .background(Color.selection)
+      CompletedActivitiesView(completedActivities: completedActivities)
     }
   }
 
@@ -178,11 +192,13 @@ public struct DayView: View {
           .padding(.all, 14.0)
         }
       )
-      Divider()
     }
   }
 
-  private func dayActivityView(_ dayActivity: DayActivity) -> some View {
+  private func dayActivityView(
+    _ dayActivity: DayActivity,
+    rightAction: RightAction
+  ) -> some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
         data: dayActivity.icon?.data,
@@ -197,9 +213,7 @@ public struct DayView: View {
         subtitleView(for: dayActivity)
       }
       Spacer()
-      Image(systemName: "ellipsis")
-        .foregroundStyle(Color.sectionText)
-        .imageScale(.medium)
+      view(for: rightAction)
     }
     .padding(.all, 10.0)
   }
@@ -230,11 +244,15 @@ public struct DayView: View {
     }
   }
 
-  private func menuActivityTaskView(_ dayActivity: DayActivity, _ dayActivityTask: DayActivityTask) -> some View {
+  private func menuActivityTaskView(
+    _ dayActivity: DayActivity,
+    _ dayActivityTask: DayActivityTask,
+    _ dayViewAllActions: DayViewAllActions
+  ) -> some View {
     Menu {
       Button(
         action: {
-          activityTaskTapped(dayActivity, dayActivityTask)
+          dayViewAllActions.activityTaskTapped(dayActivity, dayActivityTask)
         },
         label: {
           if dayActivityTask.isDone {
@@ -248,7 +266,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          editTaskTapped(dayActivity, dayActivityTask)
+          dayViewAllActions.editTaskTapped(dayActivity, dayActivityTask)
         },
         label: {
           Text("Edit", bundle: .module)
@@ -257,7 +275,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          removeTaskTapped(dayActivity, dayActivityTask)
+          dayViewAllActions.removeTaskTapped(dayActivityTask)
         },
         label: {
           Text("Remove", bundle: .module)
@@ -265,11 +283,14 @@ public struct DayView: View {
         }
       )
     } label: {
-      dayActivityTaskView(dayActivityTask)
+      dayActivityTaskView(dayActivityTask, rightAction: .more)
     }
   }
 
-  private func dayActivityTaskView(_ dayActivityTask: DayActivityTask) -> some View {
+  private func dayActivityTaskView(
+    _ dayActivityTask: DayActivityTask,
+    rightAction: RightAction
+  ) -> some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
         data: dayActivityTask.icon?.data,
@@ -284,9 +305,7 @@ public struct DayView: View {
         subtitleView(for: dayActivityTask)
       }
       Spacer()
-      Image(systemName: "ellipsis")
-        .foregroundStyle(Color.sectionText)
-        .imageScale(.medium)
+      view(for: rightAction)
     }
     .padding(.all, 10.0)
   }
@@ -334,6 +353,19 @@ public struct DayView: View {
       dayActivity.toDoTasks
     case .hide, .none:
       dayActivity.dayActivityTasks
+    }
+  }
+
+  private func view(for rightAction: RightAction) -> some View {
+    switch rightAction {
+    case .toggle(let isDone):
+      Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
+        .foregroundStyle(isDone ? Color.actionBlue : Color.sectionText)
+        .imageScale(.medium)
+    case .more:
+      Image(systemName: "ellipsis")
+        .foregroundStyle(Color.sectionText)
+        .imageScale(.medium)
     }
   }
 }

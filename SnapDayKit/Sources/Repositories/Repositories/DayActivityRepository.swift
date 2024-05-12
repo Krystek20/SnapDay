@@ -4,6 +4,8 @@ import Models
 
 public struct DayActivityRepository {
   public var saveActivity: @Sendable (DayActivity) async throws -> ()
+  public var removeActivity: @Sendable (DayActivity) async throws -> ()
+  public var removeDayActivityTask: @Sendable (DayActivityTask) async throws -> ()
 }
 
 extension DependencyValues {
@@ -18,14 +20,15 @@ extension DayActivityRepository: DependencyKey {
     DayActivityRepository(
       saveActivity: { dayActivity in
         try await EntityHandler().save(dayActivity)
-      }
-    )
-  }
-
-  public static var previewValue: DayActivityRepository {
-    DayActivityRepository(
-      saveActivity: { dayActivity in
-        try await EntityHandler().save(dayActivity)
+      },
+      removeActivity: { dayActivity in
+        try await EntityHandler().delete(dayActivity)
+        for dayActivityTask in dayActivity.dayActivityTasks {
+          try await EntityHandler().delete(dayActivityTask)
+        }
+      },
+      removeDayActivityTask: { dayActivityTask in
+        try await EntityHandler().delete(dayActivityTask)
       }
     )
   }

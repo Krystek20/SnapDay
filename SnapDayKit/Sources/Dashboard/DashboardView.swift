@@ -25,86 +25,88 @@ public struct DashboardView: View {
 
 
   public var body: some View {
-    ZStack(alignment: .top) {
-      ScrollView {
-        picker
-          .padding(.horizontal, 15.0)
-          .padding(.top, 65.0)
+    WithPerceptionTracking {
+      ZStack(alignment: .top) {
+        ScrollView {
+          picker
+            .padding(.horizontal, 15.0)
+            .padding(.top, 65.0)
 
-        periods
-          .padding(.horizontal, 15.0)
-          .padding(.top, 15.0)
+          periods
+            .padding(.horizontal, 15.0)
+            .padding(.top, 15.0)
 
-        summaryOnTheChart
-          .padding(.horizontal, 15.0)
-          .padding(.top, 15.0)
-      }
-      .maxWidth()
-      .scrollIndicators(.hidden)
-
-      Switcher(
-        title: store.activitiesPresentationTitle,
-        leftArrowAction: {
-          store.send(.view(.decreaseButtonTapped))
-        },
-        rightArrowAction: {
-          store.send(.view(.increaseButtonTapped))
+          summaryOnTheChart
+            .padding(.horizontal, 15.0)
+            .padding(.top, 15.0)
         }
-      )
-    }
-    .activityBackground
-    .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
-      NavigationStack {
-        ActivityListView(store: store)
+        .maxWidth()
+        .scrollIndicators(.hidden)
+
+        Switcher(
+          title: store.activitiesPresentationTitle,
+          leftArrowAction: {
+            store.send(.view(.decreaseButtonTapped))
+          },
+          rightArrowAction: {
+            store.send(.view(.increaseButtonTapped))
+          }
+        )
       }
-      .presentationDetents([.medium, .large])
-    }
-    .sheet(item: $store.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
-      NavigationStack {
-        DayActivityFormView(store: store)
+      .activityBackground
+      .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
+        NavigationStack {
+          ActivityListView(store: store)
+        }
+        .presentationDetents([.medium, .large])
       }
-      .presentationDetents([.large])
-    }
-    .sheet(item: $store.scope(state: \.addActivity, action: \.addActivity)) { store in
-      NavigationStack {
-        ActivityFormView(store: store)
+      .sheet(item: $store.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
+        NavigationStack {
+          DayActivityFormView(store: store)
+        }
+        .presentationDetents([.large])
       }
-      .presentationDetents([.large])
-    }
-    .sheet(item: $store.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
-      NavigationStack {
-        DayActivityTaskFormView(store: store)
+      .sheet(item: $store.scope(state: \.addActivity, action: \.addActivity)) { store in
+        NavigationStack {
+          ActivityFormView(store: store)
+        }
+        .presentationDetents([.large])
       }
-      .presentationDetents([.large])
-    }
-    .task {
-      store.send(.view(.appeared))
-    }
-    .navigationTitle(String(localized: "Dashboard", bundle: .module))
-    .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        HStack {
-          Button(
-            action: {
-              store.send(.view(.reportButtonTapped))
-            },
-            label: {
-              Image(systemName: "text.badge.checkmark")
+      .sheet(item: $store.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
+        NavigationStack {
+          DayActivityTaskFormView(store: store)
+        }
+        .presentationDetents([.large])
+      }
+      .task {
+        store.send(.view(.appeared))
+      }
+      .navigationTitle(String(localized: "Dashboard", bundle: .module))
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          HStack {
+            Button(
+              action: {
+                store.send(.view(.reportButtonTapped))
+              },
+              label: {
+                Image(systemName: "text.badge.checkmark")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+
+            Menu {
+              Button(String(localized: "One-time activity", bundle: .module), action: {
+                store.send(.view(.oneTimeActivityButtonTapped))
+              })
+              Button(String(localized: "Activity list", bundle: .module), action: {
+                store.send(.view(.activityListButtonTapped))
+              })
+            } label: {
+              Image(systemName: "plus.app")
                 .foregroundStyle(Color.actionBlue)
             }
-          )
-
-          Menu {
-            Button(String(localized: "One-time activity", bundle: .module), action: {
-              store.send(.view(.oneTimeActivityButtonTapped))
-            })
-            Button(String(localized: "Activity list", bundle: .module), action: {
-              store.send(.view(.activityListButtonTapped))
-            })
-          } label: {
-            Image(systemName: "plus.app")
-              .foregroundStyle(Color.actionBlue)
           }
         }
       }
@@ -113,61 +115,69 @@ public struct DashboardView: View {
 
   @MainActor
   private var picker: some View {
-    Picker(
-      selection: $store.selectedPeriod,
-      content: {
-        ForEach(store.periods) { period in
-          Text(period.name).tag(period)
-        }
-      },
-      label: { EmptyView() }
-    )
-    .pickerStyle(.segmented)
+    WithPerceptionTracking {
+      Picker(
+        selection: $store.selectedPeriod,
+        content: {
+          ForEach(store.periods) { period in
+            Text(period.name).tag(period)
+          }
+        },
+        label: { EmptyView() }
+      )
+      .pickerStyle(.segmented)
+    }
   }
 
   @ViewBuilder
   private var summaryOnTheChart: some View {
-    if let linearChartValues = store.linearChartValues {
-      SectionView(
-        name: String(localized: "Summary", bundle: .module),
-        rightContent: { EmptyView() },
-        content: {
-          LinearChartView(
-            points: linearChartValues.points,
-            expectedPoints: linearChartValues.expectedPoints,
-            currentPoint: linearChartValues.currentPoint
-          )
-          .frame(height: 200.0)
-          .padding(.vertical, 15.0)
-          .formBackgroundModifier()
-        }
-      )
+    WithPerceptionTracking {
+      if let linearChartValues = store.linearChartValues {
+        SectionView(
+          name: String(localized: "Summary", bundle: .module),
+          rightContent: { EmptyView() },
+          content: {
+            LinearChartView(
+              points: linearChartValues.points,
+              expectedPoints: linearChartValues.expectedPoints,
+              currentPoint: linearChartValues.currentPoint
+            )
+            .frame(height: 200.0)
+            .padding(.vertical, 15.0)
+            .formBackgroundModifier()
+          }
+        )
+      }
     }
   }
 
   @MainActor
   private var periods: some View {
-    SectionView(
-      name: store.activitiesPresentationTitle,
-      rightContent: { },
-      content: {
-        periodsContent
-          .formBackgroundModifier(padding: EdgeInsets(.zero))
-      }
-    )
+    WithPerceptionTracking {
+      SectionView(
+        name: store.activitiesPresentationTitle,
+        rightContent: { },
+        content: {
+          periodsContent
+            .formBackgroundModifier(padding: EdgeInsets(.zero))
+        }
+      )
+    }
   }
 
   @ViewBuilder
   @MainActor
   private var periodsContent: some View {
-    if let activitiesPresentationType = store.activitiesPresentationType {
-      switch activitiesPresentationType {
-      case .monthsList(let timePeriods):
-        monthsView(timePeriods: timePeriods)
-      case .calendar(let calendarItems):
-        calendarView(calendarItems: calendarItems)
-      case .daysList(let style):
-        dayList(daysSelectorStyle: style)
+    WithPerceptionTracking {
+      if let activitiesPresentationType = store.activitiesPresentationType {
+        switch activitiesPresentationType {
+        case .monthsList(let timePeriods):
+          monthsView(timePeriods: timePeriods)
+        case .calendar(let calendarItems):
+          calendarView(calendarItems: calendarItems)
+        case .daysList(let style):
+          dayList(daysSelectorStyle: style)
+        }
       }
     }
   }
@@ -183,73 +193,68 @@ public struct DashboardView: View {
 
   @MainActor
   private func calendarView(calendarItems: [CalendarItemType]) -> some View {
-    CalendarView(
-      selectedDay: $store.selectedDay,
-      dayActivities: store.activities,
-      calendarItems: calendarItems,
-      daySummary: store.daySummary,
-      dayViewShowButtonState: store.dayViewShowButtonState,
-      informationConfiguration: store.dayInformation,
-      dayActivityTapped: { dayActivity in
-        store.send(.view(.dayActivityTapped(dayActivity)))
-      },
-      dayActivityEditTapped: { dayActivity in
-        store.send(.view(.dayActivityEditTapped(dayActivity)))
-      },
-      removeDayActivityTapped: { dayActivity in
-        store.send(.view(.dayActivityRemoveTapped(dayActivity)))
-      },
-      dayActivityTaskTapped: { dayActivity, dayActivityTask in
-        store.send(.view(.dayActivityTaskTapped(dayActivity, dayActivityTask)))
-      },
-      dayActivityEditTaskTapped: { dayActivity, dayActivityTask in
-        store.send(.view(.dayActivityEditTaskTapped(dayActivity, dayActivityTask)))
-      },
-      removeDayActivityTaskTapped: { dayActivity, dayActivityTask in
-        store.send(.view(.removeDayActivityTaskTapped(dayActivity, dayActivityTask)))
-      },
-      showCompletedTapped: {
-        store.send(.view(.showCompletedActivitiesTapped))
-      },
-      hideCompletedTapped: {
-        store.send(.view(.hideCompletedActivitiesTapped))
-      }
-    )
+    WithPerceptionTracking {
+      CalendarView(
+        selectedDay: $store.selectedDay,
+        dayActivities: store.activities,
+        calendarItems: calendarItems,
+        daySummary: store.daySummary,
+        dayViewShowButtonState: store.dayViewShowButtonState,
+        informationConfiguration: store.dayInformation,
+        dayViewOption: dayViewOption,
+        showCompletedTapped: {
+          store.send(.view(.showCompletedActivitiesTapped))
+        },
+        hideCompletedTapped: {
+          store.send(.view(.hideCompletedActivitiesTapped))
+        }
+      )
+    }
   }
 
   @MainActor
   private func dayList(daysSelectorStyle: DaysSelectorStyle) -> some View {
-    DaysSelectorView(
-      selectedDay: $store.selectedDay,
-      dayActivities: store.activities,
-      daysSelectorStyle: daysSelectorStyle,
-      daySummary: store.daySummary,
-      dayViewShowButtonState: store.dayViewShowButtonState,
-      informationConfiguration: store.dayInformation,
-      dayActivityTapped: { dayActivity in
-        store.send(.view(.dayActivityTapped(dayActivity)))
-      },
-      dayActivityEditTapped: { dayActivity in
-        store.send(.view(.dayActivityEditTapped(dayActivity)))
-      },
-      removeDayActivityTapped: { dayActivity in
-        store.send(.view(.dayActivityRemoveTapped(dayActivity)))
-      },
-      dayActivityTaskTapped: { dayActivity, dayActivityTask in
-        store.send(.view(.dayActivityTaskTapped(dayActivity, dayActivityTask)))
-      },
-      dayActivityEditTaskTapped: { dayActivity, dayActivityTask in
-        store.send(.view(.dayActivityEditTaskTapped(dayActivity, dayActivityTask)))
-      },
-      removeDayActivityTaskTapped: { dayActivity, dayActivityTask in
-        store.send(.view(.removeDayActivityTaskTapped(dayActivity, dayActivityTask)))
-      },
-      showCompletedTapped: {
-        store.send(.view(.showCompletedActivitiesTapped))
-      },
-      hideCompletedTapped: {
-        store.send(.view(.hideCompletedActivitiesTapped))
-      }
+    WithPerceptionTracking {
+      DaysSelectorView(
+        selectedDay: $store.selectedDay,
+        dayActivities: store.activities,
+        daysSelectorStyle: daysSelectorStyle,
+        daySummary: store.daySummary,
+        dayViewShowButtonState: store.dayViewShowButtonState,
+        informationConfiguration: store.dayInformation,
+        dayViewOption: dayViewOption,
+        showCompletedTapped: {
+          store.send(.view(.showCompletedActivitiesTapped))
+        },
+        hideCompletedTapped: {
+          store.send(.view(.hideCompletedActivitiesTapped))
+        }
+      )
+    }
+  }
+
+  private var dayViewOption: DayViewOption {
+    .all(
+      DayViewAllActions(
+        activityTapped: { dayActivity in
+          store.send(.view(.dayActivityTapped(dayActivity)))
+        },
+        editTapped: { dayActivity in
+          store.send(.view(.dayActivityEditTapped(dayActivity)))
+        },
+        removeTapped: { dayActivity in
+          store.send(.view(.dayActivityRemoveTapped(dayActivity)))
+        },
+        activityTaskTapped: { dayActivity, dayActivityTask in
+          store.send(.view(.dayActivityTaskTapped(dayActivity, dayActivityTask)))
+        },
+        editTaskTapped: { dayActivity, dayActivityTask in
+          store.send(.view(.dayActivityEditTaskTapped(dayActivity, dayActivityTask)))
+        },
+        removeTaskTapped: { dayActivityTask in
+          store.send(.view(.removeDayActivityTaskTapped(dayActivityTask)))
+        }
+      )
     )
   }
 }

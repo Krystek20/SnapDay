@@ -11,9 +11,10 @@ import DayActivityTaskForm
 import Combine
 import enum UiComponents.DayViewShowButtonState
 import protocol UiComponents.InformationViewConfigurable
+import CoreData
 
 @Reducer
-public struct DashboardFeature: Reducer, TodayProvidable {
+public struct DashboardFeature: TodayProvidable {
 
   // MARK: - Dependencies
 
@@ -23,6 +24,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
   private let periodTitleProvider = PeriodTitleProvider()
+  private let userNotificationCenterProvider = UserNotificationCenterProvider()
 
   // MARK: - State & Action
 
@@ -80,6 +82,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
 
     var selectedPeriod: Period = .day
     var selectedDay: Day?
+    var streamSetup: Bool = false
 
     @Presents var activityList: ActivityListFeature.State?
     @Presents var editDayActivity: DayActivityFormFeature.State?
@@ -99,7 +102,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case dayActivityRemoveTapped(DayActivity)
       case dayActivityTaskTapped(DayActivity, DayActivityTask)
       case dayActivityEditTaskTapped(DayActivity, DayActivityTask)
-      case removeDayActivityTaskTapped(DayActivity, DayActivityTask)
+      case removeDayActivityTaskTapped(DayActivityTask)
       case showCompletedActivitiesTapped
       case hideCompletedActivitiesTapped
       case reportButtonTapped
@@ -108,6 +111,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case decreaseButtonTapped
     }
     public enum InternalAction: Equatable {
+      case changedDates([Date])
       case loadTimePeriods
       case timePeriodLoaded(_ timePeriod: TimePeriod)
       case removeDayActivity(_ dayActivity: DayActivity)
@@ -138,7 +142,7 @@ public struct DashboardFeature: Reducer, TodayProvidable {
       case .view(let viewAction):
         return handleViewAction(viewAction, state: &state)
       case .internal(let internalAction):
-        return handleInteralAction(internalAction, state: &state)
+        return handleInternalAction(internalAction, state: &state)
       case .editDayActivity(let action):
         return handleDayActivityFormAction(action, state: &state)
       case .activityList(let action):
@@ -181,9 +185,22 @@ public struct DashboardFeature: Reducer, TodayProvidable {
   private func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
     switch action {
     case .appeared:
-      return .concatenate(
+      guard !state.streamSetup else { return .none }
+      state.streamSetup = true
+      return .merge(
         .run { send in
           await send(.internal(.loadTimePeriods))
+        },
+        .run { send in
+          for await notification in NotificationCenter.default.publisher(for: .snapDayStoreDidChange).values {
+            guard let userInfo = notification.object as? [UserInfoKey: Any],
+                  let transactions = userInfo[.transactions] as? Transactions else { return }
+            let changedDates = try await dayEditor.applyChanges(transactions)
+            await send(.internal(.changedDates(changedDates)))
+          }
+        },
+        .run { send in
+          try await userNotificationCenterProvider.schedule(identifier: .eveningSummary)
         },
         .run { send in
           for await _ in NotificationCenter.default.publisher(for: .NSCalendarDayChanged).values {
@@ -244,11 +261,9 @@ public struct DashboardFeature: Reducer, TodayProvidable {
         type: .edit
       )
       return .none
-    case .removeDayActivityTaskTapped(var dayActivity, let dayActivityTask):
-      guard let index = dayActivity.dayActivityTasks.firstIndex(where: { $0.id ==  dayActivityTask.id }) else { return .none }
-      dayActivity.dayActivityTasks.remove(at: index)
-      return .run { [dayActivity] send in
-        try await dayActivityRepository.saveActivity(dayActivity)
+    case .removeDayActivityTaskTapped(let dayActivityTask):
+      return .run { [dayActivityTask] send in
+        try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
         await send(.internal(.loadTimePeriods))
       }
     case .showCompletedActivitiesTapped:
@@ -277,16 +292,29 @@ public struct DashboardFeature: Reducer, TodayProvidable {
     }
   }
 
-  private func handleInteralAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
+  private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
     switch action {
+    case .changedDates(let dates):
+      for date in dates {
+        if state.timePeriod?.dateRange.contains(date) == true {
+          return .run { send in
+            await send(.internal(.loadTimePeriods))
+          }
+        }
+      }
+      return .none
     case .calendarDayChanged:
       return .run { send in
         await send(.internal(.loadTimePeriods))
       }
     case .loadTimePeriods:
       return .run { [period = state.selectedPeriod, shift = state.shift] send in
-        let timePerdiod = try await timePeriodsProvider.timePeriod(period, today, shift)
-        await send(.internal(.timePeriodLoaded(timePerdiod)))
+        do {
+          let timePerdiod = try await timePeriodsProvider.timePeriod(period, today, shift)
+          await send(.internal(.timePeriodLoaded(timePerdiod)))
+        } catch {
+          print("error: \(error)")
+        }
       }
     case .timePeriodLoaded(let timePeriod):
       state.timePeriod = timePeriod

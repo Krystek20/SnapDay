@@ -20,29 +20,31 @@ public struct EmojiPickerView: View {
   // MARK: - Views
 
   public var body: some View {
-    VStack(alignment: .leading, spacing: 20.0) {
-      titleSection
-        .padding(.top, 5.0)
-      emojiTextField
-    }
-    .padding(.horizontal, 15.0)
-    .activityBackground
-    .bind($store.focus, to: $focus)
-    .navigationTitle(String(localized: "Set Your Activity Emoji", bundle: .module))
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button(String(localized: "Save", bundle: .module)) {
-          store.send(.view(.saveButtonTapped))
-        }
-        .font(.system(size: 12.0, weight: .bold))
-        .foregroundStyle(Color.actionBlue)
+    WithPerceptionTracking {
+      VStack(alignment: .leading, spacing: 20.0) {
+        titleSection
+          .padding(.top, 5.0)
+        emojiTextField
       }
-      ToolbarItem(placement: .topBarLeading) {
-        Button(String(localized: "Cancel", bundle: .module)) {
-          store.send(.view(.cancelButtonTapped))
+      .padding(.horizontal, 15.0)
+      .activityBackground
+      .bind($store.focus, to: $focus)
+      .navigationTitle(String(localized: "Set Your Activity Emoji", bundle: .module))
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          Button(String(localized: "Save", bundle: .module)) {
+            store.send(.view(.saveButtonTapped))
+          }
+          .font(.system(size: 12.0, weight: .bold))
+          .foregroundStyle(Color.actionBlue)
         }
-        .font(.system(size: 12.0, weight: .bold))
-        .foregroundStyle(Color.actionBlue)
+        ToolbarItem(placement: .topBarLeading) {
+          Button(String(localized: "Cancel", bundle: .module)) {
+            store.send(.view(.cancelButtonTapped))
+          }
+          .font(.system(size: 12.0, weight: .bold))
+          .foregroundStyle(Color.actionBlue)
+        }
       }
     }
   }
@@ -58,7 +60,9 @@ public struct EmojiPickerView: View {
   }
 
   private var emojiTextField: some View {
-    EmojiTextField(text: $store.emoji)
-      .focused($focus, equals: .searchEmoji)
+    WithPerceptionTracking {
+      EmojiTextField(text: $store.emoji)
+        .focused($focus, equals: .searchEmoji)
+    }
   }
 }

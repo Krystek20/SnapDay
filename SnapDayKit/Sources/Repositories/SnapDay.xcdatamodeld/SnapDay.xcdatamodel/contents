@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22757" systemVersion="23A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22757" systemVersion="23A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="ActivityEntity" representedClassName="ActivityEntity" syncable="YES" codeGenerationType="class">
         <attribute name="defaultDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="frequencyJson" optional="YES" attributeType="Binary" customClassName="ActivityFrequency"/>
-        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isDefaultDuration" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isVisible" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
@@ -13,24 +13,19 @@
         <relationship name="icon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IconEntity" inverseName="activities" inverseEntity="IconEntity"/>
         <relationship name="labels" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ActivityLabelEntity" inverseName="activity" inverseEntity="ActivityLabelEntity"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TagEntity" inverseName="activities" inverseEntity="TagEntity"/>
-        <uniquenessConstraints>
-            <uniquenessConstraint>
-                <constraint value="identifier"/>
-            </uniquenessConstraint>
-        </uniquenessConstraints>
     </entity>
     <entity name="ActivityLabelEntity" representedClassName="ActivityLabelEntity" syncable="YES" codeGenerationType="class">
         <attribute name="identifier" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="activity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ActivityEntity" inverseName="labels" inverseEntity="ActivityEntity"/>
-        <relationship name="color" maxCount="1" deletionRule="Nullify" destinationEntity="RGBColorEntity" inverseName="labels" inverseEntity="RGBColorEntity"/>
+        <relationship name="color" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RGBColorEntity" inverseName="labels" inverseEntity="RGBColorEntity"/>
         <relationship name="dayActivities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayActivityEntity" inverseName="labels" inverseEntity="DayActivityEntity"/>
     </entity>
     <entity name="ActivityTaskEntity" representedClassName="ActivityTaskEntity" syncable="YES" codeGenerationType="class">
         <attribute name="defaultDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isDefaultDuration" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
-        <attribute name="name" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="activity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ActivityEntity" inverseName="activityTasks" inverseEntity="ActivityEntity"/>
         <relationship name="dayActivityTasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayActivityTaskEntity" inverseName="activityTask" inverseEntity="DayActivityTaskEntity"/>
         <relationship name="icon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IconEntity" inverseName="activityTasks" inverseEntity="IconEntity"/>
@@ -38,7 +33,7 @@
     <entity name="DayActivityEntity" representedClassName="DayActivityEntity" syncable="YES" codeGenerationType="class">
         <attribute name="doneDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="duration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isGeneratedAutomatically" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="overview" optional="YES" attributeType="String"/>
@@ -48,16 +43,11 @@
         <relationship name="icon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IconEntity" inverseName="dayActivities" inverseEntity="IconEntity"/>
         <relationship name="labels" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ActivityLabelEntity" inverseName="dayActivities" inverseEntity="ActivityLabelEntity"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TagEntity" inverseName="dayActivities" inverseEntity="TagEntity"/>
-        <uniquenessConstraints>
-            <uniquenessConstraint>
-                <constraint value="identifier"/>
-            </uniquenessConstraint>
-        </uniquenessConstraints>
     </entity>
     <entity name="DayActivityTaskEntity" representedClassName="DayActivityTaskEntity" syncable="YES" codeGenerationType="class">
         <attribute name="doneDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="duration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="overview" optional="YES" attributeType="String"/>
         <relationship name="activityTask" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ActivityTaskEntity" inverseName="dayActivityTasks" inverseEntity="ActivityTaskEntity"/>
@@ -65,15 +55,9 @@
         <relationship name="icon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IconEntity" inverseName="dayActivityTasks" inverseEntity="IconEntity"/>
     </entity>
     <entity name="DayEntity" representedClassName="DayEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="activities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayActivityEntity" inverseName="day" inverseEntity="DayActivityEntity"/>
-        <uniquenessConstraints>
-            <uniquenessConstraint>
-                <constraint value="date"/>
-                <constraint value="identifier"/>
-            </uniquenessConstraint>
-        </uniquenessConstraints>
     </entity>
     <entity name="IconEntity" representedClassName="IconEntity" syncable="YES" codeGenerationType="class">
         <attribute name="data" optional="YES" attributeType="Binary"/>
@@ -87,22 +71,16 @@
         <attribute name="alpha" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="blue" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="green" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="identifier" attributeType="String"/>
+        <attribute name="identifier" optional="YES" attributeType="String"/>
         <attribute name="red" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="labels" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ActivityLabelEntity" inverseName="color" inverseEntity="ActivityLabelEntity"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TagEntity" inverseName="color" inverseEntity="TagEntity"/>
     </entity>
     <entity name="TagEntity" representedClassName="TagEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="identifier" attributeType="String"/>
+        <attribute name="identifier" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
         <relationship name="activities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ActivityEntity" inverseName="tags" inverseEntity="ActivityEntity"/>
-        <relationship name="color" maxCount="1" deletionRule="Nullify" destinationEntity="RGBColorEntity" inverseName="tags" inverseEntity="RGBColorEntity"/>
+        <relationship name="color" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RGBColorEntity" inverseName="tags" inverseEntity="RGBColorEntity"/>
         <relationship name="dayActivities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayActivityEntity" inverseName="tags" inverseEntity="DayActivityEntity"/>
-        <uniquenessConstraints>
-            <uniquenessConstraint>
-                <constraint value="identifier"/>
-                <constraint value="name"/>
-            </uniquenessConstraint>
-        </uniquenessConstraints>
     </entity>
 </model>

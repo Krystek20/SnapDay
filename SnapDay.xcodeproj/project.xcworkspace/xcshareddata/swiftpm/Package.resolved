@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "e593aba2c6222daad7c4f2732a431eed2c09bb07",
-        "version" : "1.3.0"
+        "revision" : "79623dbe2c7672f5e450d8325613d231454390b3",
+        "version" : "1.3.2"
       }
     },
     {
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-perception",
       "state" : {
-        "revision" : "a5bb578d963fcdbffe4fd56c92b2e222f5b02c8a",
-        "version" : "1.1.2"
+        "revision" : "520c458a832d1287e6b698c5f657ae848fd696ff",
+        "version" : "1.1.4"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swiftui-navigation",
       "state" : {
-        "revision" : "d9e72f3083c08375794afa216fb2f89c0114f303",
-        "version" : "1.2.1"
+        "revision" : "2ec6c3a15293efff6083966b38439a4004f25565",
+        "version" : "1.3.0"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "b13b1d1a8e787a5ffc71ac19dcaf52183ab27ba2",
-        "version" : "1.1.1"
+        "revision" : "6f30bdba373bbd7fbfe241dddd732651f2fbd1e2",
+        "version" : "1.1.2"
       }
     }
   ],

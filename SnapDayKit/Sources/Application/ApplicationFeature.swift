@@ -1,9 +1,12 @@
 import Dashboard
 import Reports
 import ComposableArchitecture
+import Utilities
 
 @Reducer
-public struct ApplicationFeature: Reducer {
+public struct ApplicationFeature {
+
+  private let userNotificationCenterProvider = UserNotificationCenterProvider()
 
   // MARK: - State & Action
 
@@ -15,6 +18,7 @@ public struct ApplicationFeature: Reducer {
   }
 
   public enum Action: Equatable {
+    case appeared
     case dashboard(DashboardFeature.Action)
     case path(StackAction<Path.State, Path.Action>)
   }
@@ -37,7 +41,9 @@ public struct ApplicationFeature: Reducer {
 
   // MARK: - Initialization
 
-  public init() { }
+  public init() { 
+    userNotificationCenterProvider.registerCategories()
+  }
 
   // MARK: - Body
 
@@ -48,6 +54,12 @@ public struct ApplicationFeature: Reducer {
 
     Reduce { state, action in
       switch action {
+      case .appeared:
+        return .concatenate(
+          .run { send in
+            guard try await userNotificationCenterProvider.requestAuthorization() else { return }
+          }
+        )
       case .dashboard(.delegate(let action)):
         return handleDashboardDelegate(action: action, state: &state)
       case .dashboard:

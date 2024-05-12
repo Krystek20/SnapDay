@@ -39,21 +39,26 @@ public struct ApplicationView: View {
   // MARK: - Views
 
   public var body: some View {
-    NavigationStackStore(store.scope(state: \.path, action: \.path)) {
-      DashboardView(
-        store: store.scope(
-          state: \.dashboard,
-          action: \.dashboard
+    WithPerceptionTracking {
+      NavigationStackStore(store.scope(state: \.path, action: \.path)) {
+        DashboardView(
+          store: store.scope(
+            state: \.dashboard,
+            action: \.dashboard
+          )
         )
-      )
-    } destination: { state in
-      switch state {
-      case .reports:
-        CaseLet(
-          /ApplicationFeature.Path.State.reports,
-           action: ApplicationFeature.Path.Action.reports,
-           then: ReportsView.init
-        )
+        .onAppear {
+          store.send(.appeared)
+        }
+      } destination: { state in
+        switch state {
+        case .reports:
+          CaseLet(
+            /ApplicationFeature.Path.State.reports,
+             action: ApplicationFeature.Path.Action.reports,
+             then: ReportsView.init
+          )
+        }
       }
     }
   }

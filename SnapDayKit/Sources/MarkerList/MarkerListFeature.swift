@@ -4,7 +4,7 @@ import Models
 import Common
 
 @Reducer
-public struct MarkerListFeature: Reducer {
+public struct MarkerListFeature {
 
   public enum MarkerListType: Equatable {
     case tag(selected: Tag?, available: [Tag])
@@ -37,6 +37,8 @@ public struct MarkerListFeature: Reducer {
       case markerSelected(MarkerListSelection)
     }
     public enum InternalAction: Equatable { }
+
+    @CasePathable
     public enum DelegateAction: Equatable {
       case markerSelected(MarkerListSelection)
     }

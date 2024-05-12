@@ -8,7 +8,7 @@ import Utilities
 import ActivityTaskForm
 
 @Reducer
-public struct ActivityFormFeature: Reducer, TodayProvidable {
+public struct ActivityFormFeature: TodayProvidable {
 
   public enum ActivityFormType {
     case new
@@ -26,7 +26,7 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
 
   @Dependency(\.tagRepository.loadTags) var loadTags
   @Dependency(\.tagRepository.deleteTag) var deleteTag
-  @Dependency(\.activityRepository.saveActivity) var saveActivity
+  @Dependency(\.activityRepository) var activityRepository
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.uuid) var uuid
 
@@ -65,6 +65,7 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
     }
 
     let type: ActivityFormType
+    var tasksToRemove: [ActivityTask] = []
 
     public init(activity: Activity, type: ActivityFormType = .new) {
       self.activity = activity
@@ -121,103 +122,17 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case .view(.appeared):
-        return .send(.internal(.loadTags))
-      case .view(.submitTagTapped):
-        showNewTag(state: &state)
-        return .none
-      case .view(.addTagButtonTapped):
-        showNewTag(state: &state)
-        return .none
-      case .view(.addedTagTapped(let tag)):
-        removeTag(tag, state: &state)
-        return .send(.internal(.loadTags))
-      case .view(.existingTagTapped(let tag)):
-        appendTag(tag, state: &state)
-        return .send(.internal(.loadTags))
-      case .view(.removeTagTapped(let tag)):
-        return .run { send in
-          try await deleteTag(tag)
-          await send(.internal(.loadTags))
-        }
-      case .view(.iconTapped):
-        state.emojiPicker = EmojiPickerFeature.State()
-        return .none
-      case .view(.pickPhotoTapped):
-        state.isPhotoPickerPresented = true
-        return .none
-      case .view(.removeImageTapped):
-        state.activity.icon = nil
-        return .none
-      case .view(.saveButtonTapped):
-        state.activity.startDate = today
-        return .run { [activity = state.activity, type = state.type] send in
-          try await saveActivity(activity)
-          switch type {
-          case .new:
-            await send(.delegate(.activityCreated(activity)))
-          case .edit:
-            await send(.delegate(.activityUpdated(activity)))
-          }
-          await dismiss()
-        }
-      case .view(.imageSelected(let item)):
-        return .run { send in
-          let data = try await item.loadImageData(size: 140.0)
-          await send(.internal(.setImageDate(data)))
-        }
-      case .view(.addTaskButtonTapped):
-        state.activityTaskForm = ActivityTaskFormFeature.State(
-          activityTask: ActivityTask(
-            id: uuid()
-          )
-        )
-        return .none
-      case .view(.editButtonTapped(let activityTask)):
-        state.activityTaskForm = ActivityTaskFormFeature.State(
-          activityTask: activityTask
-        )
-        return .none
-      case .view(.removeButtonTapped(let activityTask)):
-        state.activity.tasks.removeAll(where: { $0.id == activityTask.id })
-        return .none
-      case .internal(.setExistingTags(let tags)):
-        state.existingTags = tags
-        return .none
-      case .internal(.loadTags):
-        return .run { [enteredTags = state.activity.tags] send in
-          let existingTags = try await loadTags(enteredTags)
-          await send(.internal(.setExistingTags(existingTags)))
-        }
-      case .internal(.setImageDate(let imageData)):
-        state.activity.icon = Icon(
-          id: uuid(),
-          data: imageData
-        )
-        return .none
+      case .view(let viewAction):
+        return handleViewAction(viewAction, state: &state)
+      case .internal(let internalAction):
+        return handleInternalAction(internalAction, state: &state)
+      case .markerForm(let action):
+        return handleMarkerFormAction(action, state: &state)
+      case .emojiPicker(let action):
+        return handleEmojiPickerAction(action, state: &state)
+      case .activityTaskForm(let action):
+        return handleActivityTaskFormAction(action, state: &state)
       case .delegate:
-        return .none
-      case .markerForm(.presented(.delegate(.tagCreated(let tag)))):
-        state.newTag = .empty
-        state.focus = nil
-        appendTag(tag, state: &state)
-        return .none
-      case .markerForm:
-        return .none
-      case .emojiPicker(.presented(.delegate(.dataSelected(let data)))):
-        return .run { [data] send in
-          await send(.internal(.setImageDate(data)))
-        }
-      case .emojiPicker:
-        return .none
-      case .activityTaskForm(.presented(.delegate(.activityTask(let activityTask)))):
-        if let index = state.activity.tasks.firstIndex(where: { $0.id == activityTask.id }) {
-          state.activity.tasks[index] = activityTask
-        } else {
-          state.activity.tasks.append(activityTask)
-        }
-        return .none
-      case .activityTaskForm:
         return .none
       case .binding:
         return .none
@@ -231,6 +146,133 @@ public struct ActivityFormFeature: Reducer, TodayProvidable {
     }
     .ifLet(\.$activityTaskForm, action: \.activityTaskForm) {
       ActivityTaskFormFeature()
+    }
+  }
+
+  private func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .appeared:
+      return .send(.internal(.loadTags))
+    case .submitTagTapped:
+      showNewTag(state: &state)
+      return .none
+    case .addTagButtonTapped:
+      showNewTag(state: &state)
+      return .none
+    case .addedTagTapped(let tag):
+      removeTag(tag, state: &state)
+      return .send(.internal(.loadTags))
+    case .existingTagTapped(let tag):
+      appendTag(tag, state: &state)
+      return .send(.internal(.loadTags))
+    case .removeTagTapped(let tag):
+      return .run { send in
+        try await deleteTag(tag)
+        await send(.internal(.loadTags))
+      }
+    case .iconTapped:
+      state.emojiPicker = EmojiPickerFeature.State()
+      return .none
+    case .pickPhotoTapped:
+      state.isPhotoPickerPresented = true
+      return .none
+    case .removeImageTapped:
+      state.activity.icon = nil
+      return .none
+    case .saveButtonTapped:
+      state.activity.startDate = today
+      return .run { [activity = state.activity, type = state.type, tasks = state.tasksToRemove] send in
+        for task in tasks {
+          try await activityRepository.removeActivityTask(task)
+        }
+        try await activityRepository.saveActivity(activity)
+        switch type {
+        case .new:
+          await send(.delegate(.activityCreated(activity)))
+        case .edit:
+          await send(.delegate(.activityUpdated(activity)))
+        }
+        await dismiss()
+      }
+    case .imageSelected(let item):
+      return .run { send in
+        let data = try await item.loadImageData(size: 140.0)
+        await send(.internal(.setImageDate(data)))
+      }
+    case .addTaskButtonTapped:
+      state.activityTaskForm = ActivityTaskFormFeature.State(
+        activityTask: ActivityTask(
+          id: uuid()
+        ),
+        type: .new
+      )
+      return .none
+    case .editButtonTapped(let activityTask):
+      state.activityTaskForm = ActivityTaskFormFeature.State(
+        activityTask: activityTask,
+        type: .edit
+      )
+      return .none
+    case .removeButtonTapped(let activityTask):
+      state.tasksToRemove.append(activityTask)
+      state.activity.tasks.removeAll(where: { $0.id == activityTask.id })
+      return .none
+    }
+  }
+
+  private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .setExistingTags(let tags):
+      state.existingTags = tags
+      return .none
+    case .loadTags:
+      return .run { [enteredTags = state.activity.tags] send in
+        let existingTags = try await loadTags(enteredTags)
+        await send(.internal(.setExistingTags(existingTags)))
+      }
+    case .setImageDate(let imageData):
+      state.activity.icon = Icon(
+        id: uuid(),
+        data: imageData
+      )
+      return .none
+    }
+  }
+
+  private func handleMarkerFormAction(_ action: PresentationAction<MarkerFormFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.tagCreated(let tag))):
+      state.newTag = .empty
+      state.focus = nil
+      appendTag(tag, state: &state)
+      return .none
+    case .presented, .dismiss:
+      return .none
+    }
+  }
+
+  private func handleEmojiPickerAction(_ action: PresentationAction<EmojiPickerFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.dataSelected(let data))):
+      return .run { [data] send in
+        await send(.internal(.setImageDate(data)))
+      }
+    case .presented, .dismiss:
+      return .none
+    }
+  }
+
+  private func handleActivityTaskFormAction(_ action: PresentationAction<ActivityTaskFormFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.activityTask(let activityTask))):
+      if let index = state.activity.tasks.firstIndex(where: { $0.id == activityTask.id }) {
+        state.activity.tasks[index] = activityTask
+      } else {
+        state.activity.tasks.append(activityTask)
+      }
+      return .none
+    case .presented, .dismiss:
+      return .none
     }
   }
 

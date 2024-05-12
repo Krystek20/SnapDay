@@ -9,7 +9,7 @@ import MarkerList
 import ActivityList
 
 @Reducer
-public struct ReportsFeature: Reducer, TodayProvidable {
+public struct ReportsFeature: TodayProvidable {
 
   // MARK: - Dependencies
 
@@ -43,7 +43,9 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     var allTags: [Tag] = []
     var selectedTag: Tag?
 
-    var allLabels: [ActivityLabel] = []
+    var showLabel: Bool {
+      selectedActivity?.labels.isEmpty == false
+    }
     var selectedLabel: ActivityLabel?
 
     var days: [Day] = []
@@ -107,99 +109,14 @@ public struct ReportsFeature: Reducer, TodayProvidable {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case .view(.appeared):
-        state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: today, upperBound: nil)
-        return .run { send in
-          let tags = try await tagRepository.loadTags([])
-          await send(.internal(.tagsLoaded(tags)))
-          await send(.internal(.loadDays))
-        }
-      case .view(.decreaseButtonTapped):
-        state.periodShift -= 1
-        let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
-        state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
-        return .run { send in
-          await send(.internal(.loadDays))
-        }
-      case .view(.increaseButtonTapped):
-        state.periodShift += 1
-        let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
-        state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
-        return .run { send in
-          await send(.internal(.loadDays))
-        }
-      case .view(.tagTapped):
-        guard let selectedTag = state.selectedTag else { return .none }
-        let availableTags = state.allTags.filter { tag in
-          state.days.contains(where: { $0.activities.contains(where: { $0.tags.contains(tag) }) })
-        }
-        state.markerList = MarkerListFeature.State(
-          type: .tag(selected: selectedTag, available: availableTags)
-        )
-        return .none
-      case .view(.labelTapped):
-        let availableLabels = state.selectedActivity?.labels ?? []
-        state.markerList = MarkerListFeature.State(
-          type: .label(selected: state.selectedLabel, available: availableLabels)
-        )
-        return .none
-      case .view(.selectActivityButtonTapped):
-        state.activityList = ActivityListFeature.State(
-          configuration: ActivityListFeature.ActivityListConfiguration(
-            type: .singleSelection(selectedActivity: state.selectedActivity),
-            isActivityEditable: false,
-            fetchingOption: .prefetched(state.activities)
-          )
-        )
-        return .none
-      case .internal(.tagsLoaded(let tags)):
-        state.allTags = tags.sorted(by: { $0.name < $1.name })
-        state.selectedTag = state.allTags.first
-        return .none
-      case .internal(.loadDays):
-        guard let filterDate = state.filterDate else { return .none }
-        return .run { [dateRange = filterDate.range] send in
-          let days = try await dayRepository.loadDays(dateRange)
-          await send(.internal(.daysLoaded(days)))
-        }
-      case .internal(.daysLoaded(let days)):
-        state.days = days
-        state.activities = days.map { day in
-          day.activities.compactMap { dayActivity -> Activity? in
-            guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
-            return dayActivity.activity
-          }
-        }
-        .joined()
-        .sorted(by: { $0.name < $1.name })
-        state.selectedActivity = nil
-
-        setupSectionsAndSelectedTag(&state, days: days)
-
-        return .run { send in
-          await send(.internal(.loadSummary))
-          await send(.internal(.loadReportDays))
-        }
-      case .internal(.loadSummary):
-        let reportSummaryProvider = ReportSummaryProvider()
-        state.summary = reportSummaryProvider.prepareSummary(
-          days: state.days,
-          selectedActivity: state.selectedActivity,
-          selectedTag: state.selectedTag,
-          selectedLabel: state.selectedLabel,
-          today: today
-        )
-        return .none
-      case .internal(.loadReportDays):
-        let reportDaysProvider = ReportDaysProvider()
-        state.reportDays = reportDaysProvider.prepareReportDays(
-          selectedFilterPeriod: state.selectedFilterPeriod,
-          selectedActivity: state.selectedActivity,
-          selectedLabel: state.selectedLabel,
-          selectedTag: state.selectedTag,
-          days: state.days
-        )
-        return .none
+      case .view(let viewAction):
+        return handleViewAction(viewAction, state: &state)
+      case .internal(let internalAction):
+        return handleInternalAction(internalAction, state: &state)
+      case .markerList(let action):
+        return (handleMarkerListAction(action, state: &state))
+      case .activityList(let action):
+        return handleActivityListAction(action, state: &state)
       case .binding(\.selectedFilterPeriod):
         state.isSwitcherDismissed = state.selectedFilterPeriod == .custom
         let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
@@ -217,39 +134,6 @@ public struct ReportsFeature: Reducer, TodayProvidable {
         return .run { send in
           await send(.internal(.loadDays))
         }
-      case .markerList(.presented(.delegate(.markerSelected(let markerSelection)))):
-        switch markerSelection {
-        case .tag(let tag):
-          state.selectedTag = tag
-          state.selectedActivity = nil
-          state.selectedLabel = nil
-          let activities = state.days.map { day in
-            day.activities.compactMap { dayActivity -> Activity? in
-              guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
-              return dayActivity.activity
-            }
-          }
-          .joined()
-          state.activities = Array(Set(activities))
-            .sorted(by: { $0.name < $1.name })
-        case .label(let label):
-          state.selectedLabel = label
-        }
-        return .run { send in
-          await send(.internal(.loadSummary))
-          await send(.internal(.loadReportDays))
-        }
-      case .markerList:
-        return .none
-      case .activityList(.presented(.delegate(.activitiesSelected(let activities)))):
-        state.selectedActivity = activities.first
-        state.selectedLabel = nil
-        return .run { send in
-          await send(.internal(.loadSummary))
-          await send(.internal(.loadReportDays))
-        }
-      case .activityList:
-        return .none
       case .binding:
         return .none
       }
@@ -267,6 +151,153 @@ public struct ReportsFeature: Reducer, TodayProvidable {
   public init() { }
 
   // MARK: - Private
+
+  private func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .appeared:
+      state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: today, upperBound: nil)
+      return .run { send in
+        let tags = try await tagRepository.loadTags([])
+        await send(.internal(.tagsLoaded(tags)))
+        await send(.internal(.loadDays))
+      }
+    case .decreaseButtonTapped:
+      state.periodShift -= 1
+      let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
+      state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
+      return .run { send in
+        await send(.internal(.loadDays))
+      }
+    case .increaseButtonTapped:
+      state.periodShift += 1
+      let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
+      state.filterDate = FilterDate(filter: state.selectedFilterPeriod, lowerBound: range.lowerBound, upperBound: range.upperBound)
+      return .run { send in
+        await send(.internal(.loadDays))
+      }
+    case .tagTapped:
+      guard let selectedTag = state.selectedTag else { return .none }
+      let availableTags = state.allTags.filter { tag in
+        state.days.contains(where: { $0.activities.contains(where: { $0.tags.contains(tag) }) })
+      }
+      state.markerList = MarkerListFeature.State(
+        type: .tag(selected: selectedTag, available: availableTags)
+      )
+      return .none
+    case .labelTapped:
+      let availableLabels = state.selectedActivity?.labels ?? []
+      state.markerList = MarkerListFeature.State(
+        type: .label(selected: state.selectedLabel, available: availableLabels)
+      )
+      return .none
+    case .selectActivityButtonTapped:
+      state.activityList = ActivityListFeature.State(
+        configuration: ActivityListFeature.ActivityListConfiguration(
+          type: .singleSelection(selectedActivity: state.selectedActivity),
+          isActivityEditable: false,
+          fetchingOption: .prefetched(state.activities)
+        )
+      )
+      return .none
+    }
+  }
+
+  private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .tagsLoaded(let tags):
+      state.allTags = tags.sorted(by: { $0.name < $1.name })
+      state.selectedTag = state.allTags.first
+      return .none
+    case .loadDays:
+      guard let filterDate = state.filterDate else { return .none }
+      return .run { [dateRange = filterDate.range] send in
+        let days = try await dayRepository.loadDays(dateRange)
+        await send(.internal(.daysLoaded(days)))
+      }
+    case .daysLoaded(let days):
+      state.days = days.sorted(by: { $0.date < $1.date })
+      let activities = state.days.map { day in
+        day.activities.compactMap { dayActivity -> Activity? in
+          guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
+          return dayActivity.activity
+        }
+      }
+      .joined()
+      state.activities = Array(Set(activities))
+        .sorted(by: { $0.name < $1.name })
+      state.selectedActivity = nil
+
+      setupSectionsAndSelectedTag(&state, days: days)
+
+      return .run { send in
+        await send(.internal(.loadSummary))
+        await send(.internal(.loadReportDays))
+      }
+    case .loadSummary:
+      let reportSummaryProvider = ReportSummaryProvider()
+      state.summary = reportSummaryProvider.prepareSummary(
+        days: state.days,
+        selectedActivity: state.selectedActivity,
+        selectedTag: state.selectedTag,
+        selectedLabel: state.selectedLabel,
+        today: today
+      )
+      return .none
+    case .loadReportDays:
+      let reportDaysProvider = ReportDaysProvider()
+      state.reportDays = reportDaysProvider.prepareReportDays(
+        selectedFilterPeriod: state.selectedFilterPeriod,
+        selectedActivity: state.selectedActivity,
+        selectedLabel: state.selectedLabel,
+        selectedTag: state.selectedTag,
+        days: state.days
+      )
+      return .none
+    }
+  }
+
+  private func handleMarkerListAction(_ action: PresentationAction<MarkerListFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.markerSelected(let markerSelection))):
+      switch markerSelection {
+      case .tag(let tag):
+        state.selectedTag = tag
+        state.selectedActivity = nil
+        state.selectedLabel = nil
+        let activities = state.days.map { day in
+          day.activities.compactMap { dayActivity -> Activity? in
+            guard dayActivity.tags.contains(where: { $0 == state.selectedTag }) else { return nil }
+            return dayActivity.activity
+          }
+        }
+        .joined()
+        state.activities = Array(Set(activities))
+          .sorted(by: { $0.name < $1.name })
+      case .label(let label):
+        state.selectedLabel = label
+      }
+      return .run { send in
+        await send(.internal(.loadSummary))
+        await send(.internal(.loadReportDays))
+      }
+    case .presented, .dismiss:
+      return .none
+    }
+  }
+
+  private func handleActivityListAction(_ action: PresentationAction<ActivityListFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.activitiesSelected(let activities))):
+      state.selectedActivity = activities.first
+      state.selectedLabel = nil
+      return .run { send in
+        await send(.internal(.loadSummary))
+        await send(.internal(.loadReportDays))
+      }
+    case .presented, .dismiss:
+      return .none
+    }
+  }
 
   private func prepareDateRange(for selectedFilter: FilterPeriod?, shiftPeriod: Int) -> ClosedRange<Date> {
     guard let selectedFilter else { return today...today }

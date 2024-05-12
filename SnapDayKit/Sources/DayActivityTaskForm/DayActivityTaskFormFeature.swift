@@ -5,7 +5,7 @@ import Models
 import EmojiPicker
 
 @Reducer
-public struct DayActivityTaskFormFeature: Reducer {
+public struct DayActivityTaskFormFeature {
 
   public enum DayActivityTaskFormType {
     case new

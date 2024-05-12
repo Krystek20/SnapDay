@@ -5,6 +5,7 @@ import Models
 public struct ActivityRepository {
   public var loadActivities: @Sendable () async throws -> [Activity]
   public var saveActivity: @Sendable (Activity) async throws -> ()
+  public var removeActivityTask: @Sendable (ActivityTask) async throws -> ()
 }
 
 extension DependencyValues {
@@ -26,14 +27,10 @@ extension ActivityRepository: DependencyKey {
       },
       saveActivity: { activity in
         try await EntityHandler().save(activity)
+      },
+      removeActivityTask: { activityTask in
+        try await EntityHandler().delete(activityTask)
       }
-    )
-  }
-
-  public static var previewValue: ActivityRepository {
-    ActivityRepository(
-      loadActivities: { [] },
-      saveActivity: { _ in }
     )
   }
 }

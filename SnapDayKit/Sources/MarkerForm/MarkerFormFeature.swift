@@ -4,7 +4,7 @@ import Models
 import Common
 
 @Reducer
-public struct MarkerFormFeature: Reducer {
+public struct MarkerFormFeature {
 
   public enum MarkerType: Equatable {
     case tag

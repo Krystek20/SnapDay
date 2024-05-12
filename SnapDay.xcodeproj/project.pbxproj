@@ -14,6 +14,12 @@
 		D4779ACC2B6043280067E3AC /* SnapDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4779AC52B6043280067E3AC /* SnapDayApp.swift */; };
 		D4779ACE2B6043E30067E3AC /* SnapDayUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4779ABF2B6043270067E3AC /* SnapDayUITestsLaunchTests.swift */; };
 		D4779ACF2B6043E60067E3AC /* SnapDayUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4779AC02B6043270067E3AC /* SnapDayUITests.swift */; };
+		D4CCE6252BC7B4BB00C198C5 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CCE6242BC7B4BB00C198C5 /* UserNotifications.framework */; };
+		D4CCE6272BC7B4BB00C198C5 /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CCE6262BC7B4BB00C198C5 /* UserNotificationsUI.framework */; };
+		D4CCE62A2BC7B4BB00C198C5 /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CCE6292BC7B4BB00C198C5 /* NotificationViewController.swift */; };
+		D4CCE62D2BC7B4BB00C198C5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = D4CCE62C2BC7B4BB00C198C5 /* Base */; };
+		D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */ = {isa = PBXBuildFile; productRef = D4CCE63C2BCACB8E00C198C5 /* EveningSummary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,7 +30,28 @@
 			remoteGlobalIDString = D443ECED2AD0771C002225CF;
 			remoteInfo = SnapToday;
 		};
+		D4CCE62F2BC7B4BB00C198C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D443ECE62AD0771C002225CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D4CCE6222BC7B4BB00C198C5;
+			remoteInfo = "Notification Content";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D4CCE6322BC7B4BB00C198C5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D443ECEE2AD0771C002225CF /* SnapDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -36,6 +63,14 @@
 		D4779AC42B6043280067E3AC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D4779AC52B6043280067E3AC /* SnapDayApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapDayApp.swift; sourceTree = "<group>"; };
 		D4779AC62B6043280067E3AC /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Notification Content.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4CCE6242BC7B4BB00C198C5 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		D4CCE6262BC7B4BB00C198C5 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		D4CCE6292BC7B4BB00C198C5 /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
+		D4CCE62C2BC7B4BB00C198C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		D4CCE62E2BC7B4BB00C198C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D4CCE63E2BCAD13800C198C5 /* SnapDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnapDay.entitlements; sourceTree = "<group>"; };
+		D4CCE63F2BCAD27900C198C5 /* Notification Content.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Notification Content.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,12 +89,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4CCE6202BC7B4BB00C198C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */,
+				D4CCE6272BC7B4BB00C198C5 /* UserNotificationsUI.framework in Frameworks */,
+				D4CCE6252BC7B4BB00C198C5 /* UserNotifications.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		D432465A2AD0820100D3E8F9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D4CCE6242BC7B4BB00C198C5 /* UserNotifications.framework */,
+				D4CCE6262BC7B4BB00C198C5 /* UserNotificationsUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -70,6 +117,7 @@
 				D4779ABD2B6043270067E3AC /* SnapDayKit */,
 				D4779AC12B6043280067E3AC /* SnapDay */,
 				D4779ABE2B6043270067E3AC /* SnapDayUITests */,
+				D4CCE6282BC7B4BB00C198C5 /* Notification Content */,
 				D443ECEF2AD0771C002225CF /* Products */,
 				D432465A2AD0820100D3E8F9 /* Frameworks */,
 			);
@@ -80,6 +128,7 @@
 			children = (
 				D443ECEE2AD0771C002225CF /* SnapDay.app */,
 				D443ED082AD0771D002225CF /* SnapDayUITests.xctest */,
+				D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,6 +145,7 @@
 		D4779AC12B6043280067E3AC /* SnapDay */ = {
 			isa = PBXGroup;
 			children = (
+				D4CCE63E2BCAD13800C198C5 /* SnapDay.entitlements */,
 				D4779AC22B6043280067E3AC /* Assets.xcassets */,
 				D4779AC32B6043280067E3AC /* Preview Content */,
 				D4779AC52B6043280067E3AC /* SnapDayApp.swift */,
@@ -112,6 +162,17 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		D4CCE6282BC7B4BB00C198C5 /* Notification Content */ = {
+			isa = PBXGroup;
+			children = (
+				D4CCE63F2BCAD27900C198C5 /* Notification Content.entitlements */,
+				D4CCE6292BC7B4BB00C198C5 /* NotificationViewController.swift */,
+				D4CCE62B2BC7B4BB00C198C5 /* MainInterface.storyboard */,
+				D4CCE62E2BC7B4BB00C198C5 /* Info.plist */,
+			);
+			path = "Notification Content";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -122,10 +183,12 @@
 				D443ECEA2AD0771C002225CF /* Sources */,
 				D443ECEB2AD0771C002225CF /* Frameworks */,
 				D443ECEC2AD0771C002225CF /* Resources */,
+				D4CCE6322BC7B4BB00C198C5 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D4CCE6302BC7B4BB00C198C5 /* PBXTargetDependency */,
 			);
 			name = SnapDay;
 			packageProductDependencies = (
@@ -153,6 +216,26 @@
 			productReference = D443ED082AD0771D002225CF /* SnapDayUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		D4CCE6222BC7B4BB00C198C5 /* Notification Content */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D4CCE6352BC7B4BB00C198C5 /* Build configuration list for PBXNativeTarget "Notification Content" */;
+			buildPhases = (
+				D4CCE61F2BC7B4BB00C198C5 /* Sources */,
+				D4CCE6202BC7B4BB00C198C5 /* Frameworks */,
+				D4CCE6212BC7B4BB00C198C5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Notification Content";
+			packageProductDependencies = (
+				D4CCE63C2BCACB8E00C198C5 /* EveningSummary */,
+			);
+			productName = "Notification Content";
+			productReference = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -160,7 +243,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 1530;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					D443ECED2AD0771C002225CF = {
@@ -169,6 +252,9 @@
 					D443ED072AD0771D002225CF = {
 						CreatedOnToolsVersion = 15.0;
 						TestTargetID = D443ECED2AD0771C002225CF;
+					};
+					D4CCE6222BC7B4BB00C198C5 = {
+						CreatedOnToolsVersion = 15.3;
 					};
 				};
 			};
@@ -188,6 +274,7 @@
 			targets = (
 				D443ECED2AD0771C002225CF /* SnapDay */,
 				D443ED072AD0771D002225CF /* SnapDayUITests */,
+				D4CCE6222BC7B4BB00C198C5 /* Notification Content */,
 			);
 		};
 /* End PBXProject section */
@@ -207,6 +294,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D4CCE6212BC7B4BB00C198C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4CCE62D2BC7B4BB00C198C5 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +325,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4CCE61F2BC7B4BB00C198C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4CCE62A2BC7B4BB00C198C5 /* NotificationViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -238,7 +341,23 @@
 			target = D443ECED2AD0771C002225CF /* SnapDay */;
 			targetProxy = D443ED092AD0771D002225CF /* PBXContainerItemProxy */;
 		};
+		D4CCE6302BC7B4BB00C198C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D4CCE6222BC7B4BB00C198C5 /* Notification Content */;
+			targetProxy = D4CCE62F2BC7B4BB00C198C5 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D4CCE62B2BC7B4BB00C198C5 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D4CCE62C2BC7B4BB00C198C5 /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		D443ED102AD0771D002225CF /* Debug */ = {
@@ -363,8 +482,10 @@
 		D443ED132AD0771E002225CF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -384,7 +505,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.5;
+				MARKETING_VERSION = 0.0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -398,8 +519,10 @@
 		D443ED142AD0771E002225CF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -419,7 +542,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.5;
+				MARKETING_VERSION = 0.0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -466,6 +589,68 @@
 			};
 			name = Release;
 		};
+		D4CCE6332BC7B4BB00C198C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Notification Content/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Notification Content";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Notification Content - Development";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D4CCE6342BC7B4BB00C198C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Notification Content/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Notification Content";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Notification Content - Distribution";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -496,12 +681,25 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		D4CCE6352BC7B4BB00C198C5 /* Build configuration list for PBXNativeTarget "Notification Content" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4CCE6332BC7B4BB00C198C5 /* Debug */,
+				D4CCE6342BC7B4BB00C198C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		D432465B2AD0820100D3E8F9 /* Application */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Application;
+		};
+		D4CCE63C2BCACB8E00C198C5 /* EveningSummary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EveningSummary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

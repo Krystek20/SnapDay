@@ -10,6 +10,12 @@ public protocol Entity {
   func managedObject(_ context: NSManagedObjectContext) throws -> ManagedObject
 }
 
+public extension Entity {
+  static var entityName: String? {
+    ManagedObject.entity().name
+  }
+}
+
 public struct EntityHandler {
 
   // MARK: - Dependencies
@@ -24,6 +30,13 @@ public struct EntityHandler {
     @SortBuilder sorts: () -> [NSSortDescriptor] = { [] }
   ) async throws -> [T] {
     try await fetch(objectType: objectType, predicates: predicates(), sorts: sorts())
+  }
+
+  public func fetch<T: Entity>(
+    objectID: NSManagedObjectID
+  ) throws -> T? {
+    let context = coreDataStack.backgroundContext
+    return try T(object: context.object(with: objectID) as? T.ManagedObject)
   }
 
   public func fetch<T: Entity>(

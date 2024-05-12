@@ -7,7 +7,7 @@ import Models
 import Common
 
 @Reducer
-public struct ActivityListFeature: Reducer {
+public struct ActivityListFeature {
 
   public struct ActivityListConfiguration: Equatable {
     public enum ActivityListFetchingOption: Equatable {

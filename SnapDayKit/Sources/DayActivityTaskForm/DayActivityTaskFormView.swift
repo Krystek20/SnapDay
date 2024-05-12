@@ -37,13 +37,15 @@ public struct DayActivityTaskFormView: View {
   // MARK: - Views
 
   public var body: some View {
-    content
-      .navigationTitle(title)
-      .fullScreenCover(item: $store.scope(state: \.showEmojiPicker, action: \.showEmojiPicker)) { store in
-        NavigationStack {
-          EmojiPickerView(store: store)
+    WithPerceptionTracking {
+      content
+        .navigationTitle(title)
+        .fullScreenCover(item: $store.scope(state: \.showEmojiPicker, action: \.showEmojiPicker)) { store in
+          NavigationStack {
+            EmojiPickerView(store: store)
+          }
         }
-      }
+    }
   }
 
   private var content: some View {
@@ -74,78 +76,84 @@ public struct DayActivityTaskFormView: View {
 
   @ViewBuilder
   private var isDoneToggleViewIfEdit: some View {
-    if case .edit = store.type {
-      Toggle(
-        isOn: Binding(
-          get: { store.dayActivityTask.isDone },
-          set: { value in store.send(.view(.isDoneToggleChanged(value))) }
-        )
-      ) {
-        Text("Completed", bundle: .module)
-          .formTitleTextStyle
+    WithPerceptionTracking {
+      if case .edit = store.type {
+        Toggle(
+          isOn: Binding(
+            get: { store.dayActivityTask.isDone },
+            set: { value in store.send(.view(.isDoneToggleChanged(value))) }
+          )
+        ) {
+          Text("Completed", bundle: .module)
+            .formTitleTextStyle
+        }
+        .toggleStyle(CheckToggleStyle())
+        .formBackgroundModifier()
       }
-      .toggleStyle(CheckToggleStyle())
-      .formBackgroundModifier()
     }
   }
 
   private var imageField: some View {
-    Menu {
-      Button(
-        String(localized: "Select Emoji", bundle: .module),
-        action: {
-          store.send(.view(.iconTapped))
-        }
-      )
-      Button(
-        String(localized: "Pick Photo", bundle: .module),
-        action: {
-          store.send(.view(.pickPhotoTapped))
-        }
-      )
-      Button(
-        String(localized: "Remove", bundle: .module),
-        action: {
-          store.send(.view(.removeImageTapped))
-        }
-      )
-    } label: {
-      HStack(spacing: 10.0) {
-        ActivityImageView(
-          data: store.dayActivityTask.icon?.data,
-          size: 30.0,
-          cornerRadius: 5.0,
-          tintColor: .actionBlue
+    WithPerceptionTracking {
+      Menu {
+        Button(
+          String(localized: "Select Emoji", bundle: .module),
+          action: {
+            store.send(.view(.iconTapped))
+          }
         )
-        Text("Change icon", bundle: .module)
-          .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.actionBlue)
-        Spacer()
-      }
-    }
-    .formBackgroundModifier()
-    .photosPicker(
-      isPresented: $store.isPhotoPickerPresented,
-      selection: Binding(
-        get: {
-          store.photoItem?.photosPickerItem
-        },
-        set: { value in
-          store.send(.view(.imageSelected(PhotoItem(photosPickerItem: value))))
+        Button(
+          String(localized: "Pick Photo", bundle: .module),
+          action: {
+            store.send(.view(.pickPhotoTapped))
+          }
+        )
+        Button(
+          String(localized: "Remove", bundle: .module),
+          action: {
+            store.send(.view(.removeImageTapped))
+          }
+        )
+      } label: {
+        HStack(spacing: 10.0) {
+          ActivityImageView(
+            data: store.dayActivityTask.icon?.data,
+            size: 30.0,
+            cornerRadius: 5.0,
+            tintColor: .actionBlue
+          )
+          Text("Change icon", bundle: .module)
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          Spacer()
         }
-      ),
-      matching: .images,
-      preferredItemEncoding: .current,
-      photoLibrary: .shared()
-    )
+      }
+      .formBackgroundModifier()
+      .photosPicker(
+        isPresented: $store.isPhotoPickerPresented,
+        selection: Binding(
+          get: {
+            store.photoItem?.photosPickerItem
+          },
+          set: { value in
+            store.send(.view(.imageSelected(PhotoItem(photosPickerItem: value))))
+          }
+        ),
+        matching: .images,
+        preferredItemEncoding: .current,
+        photoLibrary: .shared()
+      )
+    }
   }
 
   private var nameTextField: some View {
-    FormTextField(
-      title: String(localized: "Name", bundle: .module),
-      placeholder: String(localized: "Enter name", bundle: .module),
-      value: $store.dayActivityTask.name
-    )
+    WithPerceptionTracking {
+      FormTextField(
+        title: String(localized: "Name", bundle: .module),
+        placeholder: String(localized: "Enter name", bundle: .module),
+        value: $store.dayActivityTask.name
+      )
+    }
   }
 
   private var durationFormView: some View {
@@ -159,39 +167,43 @@ public struct DayActivityTaskFormView: View {
   }
 
   private var durationView: some View {
-    DurationPickerView(
-      selectedHours: Binding(
-        get: {
-          store.dayActivityTask.hours
-        },
-        set: {
-          $store.dayActivityTask.wrappedValue.setDurationHours($0)
-        }
-      ),
-      selectedMinutes: Binding(
-        get: {
-          store.dayActivityTask.minutes
-        },
-        set: {
-          $store.dayActivityTask.wrappedValue.setDurationMinutes($0)
-        }
+    WithPerceptionTracking {
+      DurationPickerView(
+        selectedHours: Binding(
+          get: {
+            store.dayActivityTask.hours
+          },
+          set: {
+            $store.dayActivityTask.wrappedValue.setDurationHours($0)
+          }
+        ),
+        selectedMinutes: Binding(
+          get: {
+            store.dayActivityTask.minutes
+          },
+          set: {
+            $store.dayActivityTask.wrappedValue.setDurationMinutes($0)
+          }
+        )
       )
-    )
+    }
   }
 
   private var overviewTextField: some View {
-    FormTextField(
-      title: String(localized: "Overview", bundle: .module),
-      placeholder: String(localized: "Enter overview", bundle: .module),
-      value: Binding(
-        get: {
-          store.dayActivityTask.overview ?? ""
-        },
-        set: {
-          $store.dayActivityTask.wrappedValue.overview = $0
-        }
+    WithPerceptionTracking {
+      FormTextField(
+        title: String(localized: "Overview", bundle: .module),
+        placeholder: String(localized: "Enter overview", bundle: .module),
+        value: Binding(
+          get: {
+            store.dayActivityTask.overview ?? ""
+          },
+          set: {
+            $store.dayActivityTask.wrappedValue.overview = $0
+          }
+        )
       )
-    )
+    }
   }
 
   @ViewBuilder
@@ -203,26 +215,30 @@ public struct DayActivityTaskFormView: View {
   }
 
   private var saveButton: some View {
-    Button(
-      action: {
-        store.send(.view(.saveButtonTapped))
-      },
-      label: {
-        Text("Save", bundle: .module)
-      }
-    )
-    .buttonStyle(PrimaryButtonStyle())
+    WithPerceptionTracking {
+      Button(
+        action: {
+          store.send(.view(.saveButtonTapped))
+        },
+        label: {
+          Text("Save", bundle: .module)
+        }
+      )
+      .buttonStyle(PrimaryButtonStyle())
+    }
   }
 
   private var deleteButton: some View {
-    Button(
-      action: {
-        store.send(.view(.deleteButtonTapped))
-      },
-      label: {
-        Text("Delete", bundle: .module)
-      }
-    )
-    .buttonStyle(DestructiveButtonStyle())
+    WithPerceptionTracking {
+      Button(
+        action: {
+          store.send(.view(.deleteButtonTapped))
+        },
+        label: {
+          Text("Delete", bundle: .module)
+        }
+      )
+      .buttonStyle(DestructiveButtonStyle())
+    }
   }
 }

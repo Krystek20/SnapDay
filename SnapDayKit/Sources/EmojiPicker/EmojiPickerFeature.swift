@@ -3,7 +3,7 @@ import ComposableArchitecture
 import Common
 
 @Reducer
-public struct EmojiPickerFeature: Reducer {
+public struct EmojiPickerFeature {
 
   // MARK: - Dependecies
 

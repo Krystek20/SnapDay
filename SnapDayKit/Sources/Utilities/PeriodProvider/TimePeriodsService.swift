@@ -28,7 +28,7 @@ struct TimePeriodsService {
     let days = try await prepareDays(try await loadActivities(), dateRange)
     return TimePeriod(
       id: uuid(),
-      days: days,
+      days: days.sorted(by: { $0.date < $1.date }),
       name: period.rawValue,
       type: period,
       dateRange: dateRange
