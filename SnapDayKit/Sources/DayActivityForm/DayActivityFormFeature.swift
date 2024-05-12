@@ -1,11 +1,18 @@
+import Foundation
 import ComposableArchitecture
 import Common
 import Models
 import MarkerForm
+import EmojiPicker
 import DayActivityTaskForm
 
 @Reducer
 public struct DayActivityFormFeature {
+
+  public enum DayActivityFormType {
+    case new
+    case edit
+  }
 
   // MARK: - Dependencies
 
@@ -21,20 +28,45 @@ public struct DayActivityFormFeature {
   @ObservableState
   public struct State: Equatable {
 
+    public enum Field: Hashable {
+      case name
+    }
+
+    var focus: Field?
+
+    var title: String {
+      switch type {
+      case .new:
+        String(localized: "New day activity", bundle: .module)
+      case .edit:
+        String(localized: "Edit day activity", bundle: .module)
+      }
+    }
+
+    var showLabelField: Bool {
+      dayActivity.activity != nil
+    }
+
     var existingTags: [Tag] = []
     var existingLabels: [ActivityLabel] = []
 
     var showAddTagButton: Bool { !newTag.isEmpty }
     var showAddLabelButton: Bool { !newLabel.isEmpty }
     
+    let type: DayActivityFormType
     var dayActivity: DayActivity
     var newTag = String.empty
     var newLabel = String.empty
     
+    var isPhotoPickerPresented: Bool = false
+    var photoItem: PhotoItem?
+
+    @Presents var emojiPicker: EmojiPickerFeature.State?
     @Presents var addMarker: MarkerFormFeature.State?
     @Presents var dayActivityTaskForm: DayActivityTaskFormFeature.State?
 
-    public init(dayActivity: DayActivity) {
+    public init(type: DayActivityFormType, dayActivity: DayActivity) {
+      self.type = type
       self.dayActivity = dayActivity
     }
   }
@@ -71,18 +103,25 @@ public struct DayActivityFormFeature {
       case saveButtonTapped
       case deleteButtonTapped
       case isDoneToggleChanged(Bool)
+      case iconTapped
+      case pickPhotoTapped
+      case removeImageTapped
+      case imageSelected(PhotoItem)
     }
     public enum InternalAction: Equatable { 
       case setExistingTags([Tag])
       case loadTags
       case setExistingLabels([ActivityLabel])
       case loadLabels
+      case setImageDate(_ date: Data?)
     }
     public enum DelegateAction: Equatable {
+      case activityCreated(DayActivity)
       case activityDeleted(DayActivity)
       case activityUpdated(DayActivity)
     }
 
+    case emojiPicker(PresentationAction<EmojiPickerFeature.Action>)
     case addMarker(PresentationAction<MarkerFormFeature.Action>)
     case dayActivityTaskForm(PresentationAction<DayActivityTaskFormFeature.Action>)
 
@@ -107,6 +146,8 @@ public struct DayActivityFormFeature {
         handleViewAction(viewAction, state: &state)
       case .internal(let internalAction):
         handleInternalAction(internalAction, state: &state)
+      case .emojiPicker(let action):
+        handleEmojiPickerAction(action, state: &state)
       case .addMarker(let presentableMarkerAction):
         handleAddMarker(presentableMarkerAction, state: &state)
       case .dayActivityTaskForm(let presentableDayActivityTaskFormAction):
@@ -116,6 +157,9 @@ public struct DayActivityFormFeature {
       case .binding:
         .none
       }
+    }
+    .ifLet(\.$emojiPicker, action: \.emojiPicker) {
+      EmojiPickerFeature()
     }
     .ifLet(\.$addMarker, action: \.addMarker) {
       MarkerFormFeature()
@@ -133,8 +177,13 @@ public struct DayActivityFormFeature {
         await send(.internal(.loadLabels))
       })
     case .saveButtonTapped:
-      return .run { [activity = state.dayActivity] send in
-        await send(.delegate(.activityUpdated(activity)))
+      return .run { [activity = state.dayActivity, type = state.type] send in
+        switch type {
+        case .new:
+          await send(.delegate(.activityCreated(activity)))
+        case .edit:
+          await send(.delegate(.activityUpdated(activity)))
+        }
         await dismiss()
       }
     case .deleteButtonTapped:
@@ -151,6 +200,20 @@ public struct DayActivityFormFeature {
     case .isDoneToggleChanged(let value):
       state.dayActivity.doneDate = value ? date() : nil
       return .none
+    case .iconTapped:
+      state.emojiPicker = EmojiPickerFeature.State()
+      return .none
+    case .pickPhotoTapped:
+      state.isPhotoPickerPresented = true
+      return .none
+    case .removeImageTapped:
+      state.dayActivity.icon = nil
+      return .none
+    case .imageSelected(let item):
+      return .run { send in
+        let data = try await item.loadImageData(size: 140.0)
+        await send(.internal(.setImageDate(data)))
+      }
     }
   }
 
@@ -240,10 +303,28 @@ public struct DayActivityFormFeature {
       state.existingLabels = labels
       return .none
     case .loadLabels:
-      return .run { [activity = state.dayActivity.activity, enteredLabels = state.dayActivity.labels] send in
+      guard let activity = state.dayActivity.activity else { return .none }
+      return .run { [activity, enteredLabels = state.dayActivity.labels] send in
         let existingLabels = try await activityLabelRepository.loadLabels(activity, enteredLabels)
         await send(.internal(.setExistingLabels(existingLabels)))
       }
+    case .setImageDate(let imageData):
+      state.dayActivity.icon = Icon(
+        id: uuid(),
+        data: imageData
+      )
+      return .none
+    }
+  }
+
+  private func handleEmojiPickerAction(_ action: PresentationAction<EmojiPickerFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.dataSelected(let data))):
+      return .run { [data] send in
+        await send(.internal(.setImageDate(data)))
+      }
+    case .presented, .dismiss:
+      return .none
     }
   }
 
@@ -254,10 +335,10 @@ public struct DayActivityFormFeature {
       appendTag(tag, state: &state)
       return .none
     case .presented(.delegate(.labelCreated(let label))):
-      state.newLabel = .empty
+      guard let activity = state.dayActivity.activity else { return .none }
       appendLabel(label, state: &state)
-      state.dayActivity.activity.labels.append(label)
-      return .run { [activity = state.dayActivity.activity] send in
+      state.dayActivity.activity?.labels.append(label)
+      return .run { [activity] send in
         try await activityRepository.saveActivity(activity)
       }
     default:

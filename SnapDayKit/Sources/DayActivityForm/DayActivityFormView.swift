@@ -5,12 +5,15 @@ import Resources
 import Models
 import MarkerForm
 import DayActivityTaskForm
+import EmojiPicker
+import PhotosUI
 
 @MainActor
 public struct DayActivityFormView: View {
 
   // MARK: - Properties
 
+  @FocusState private var focus: DayActivityFormFeature.State.Field?
   @Perception.Bindable private var store: StoreOf<DayActivityFormFeature>
   private let padding = EdgeInsets(
     top: 10.0,
@@ -30,12 +33,15 @@ public struct DayActivityFormView: View {
   public var body: some View {
     WithPerceptionTracking {
       content
-        .navigationTitle(String(localized: "Edit day activity", bundle: .module))
+        .navigationTitle(store.title)
+        .fullScreenCover(item: $store.scope(state: \.emojiPicker, action: \.emojiPicker)) { store in
+          NavigationStack {
+            EmojiPickerView(store: store)
+          }
+        }
         .sheet(item: $store.scope(state: \.addMarker, action: \.addMarker)) { store in
           NavigationStack {
             MarkerFormView(store: store)
-              .navigationTitle(String(localized: "Add Tag", bundle: .module))
-              .navigationBarTitleDisplayMode(.large)
           }
           .presentationDetents([.medium])
         }
@@ -68,10 +74,14 @@ public struct DayActivityFormView: View {
     ScrollView {
       VStack(spacing: 15.0) {
         isDoneToggleView
+        imageField
+        nameTextField
+        tagsView
         durationFormView
         overviewTextField
-        tagsView
-        labelsView
+        if store.showLabelField {
+          labelsView
+        }
         tasksView
       }
       .padding(padding)
@@ -98,6 +108,70 @@ public struct DayActivityFormView: View {
       }
       .toggleStyle(CheckToggleStyle())
       .formBackgroundModifier()
+    }
+  }
+
+  private var imageField: some View {
+    WithPerceptionTracking {
+      Menu {
+        Button(
+          String(localized: "Select Emoji", bundle: .module),
+          action: {
+            store.send(.view(.iconTapped))
+          }
+        )
+        Button(
+          String(localized: "Pick Photo", bundle: .module),
+          action: {
+            store.send(.view(.pickPhotoTapped))
+          }
+        )
+        Button(
+          String(localized: "Remove", bundle: .module),
+          action: {
+            store.send(.view(.removeImageTapped))
+          }
+        )
+      } label: {
+        HStack(spacing: 10.0) {
+          ActivityImageView(
+            data: store.dayActivity.icon?.data,
+            size: 30.0,
+            cornerRadius: 5.0,
+            tintColor: .actionBlue
+          )
+          Text("Change icon", bundle: .module)
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          Spacer()
+        }
+      }
+      .formBackgroundModifier()
+      .photosPicker(
+        isPresented: $store.isPhotoPickerPresented,
+        selection: Binding(
+          get: {
+            store.photoItem?.photosPickerItem
+          },
+          set: { value in
+            store.send(.view(.imageSelected(PhotoItem(photosPickerItem: value))))
+          }
+        ),
+        matching: .images,
+        preferredItemEncoding: .current,
+        photoLibrary: .shared()
+      )
+    }
+  }
+
+  private var nameTextField: some View {
+    WithPerceptionTracking {
+      FormTextField(
+        title: String(localized: "Name", bundle: .module),
+        placeholder: String(localized: "Enter name", bundle: .module),
+        value: $store.dayActivity.name
+      )
+      .focused($focus, equals: .name)
     }
   }
 

@@ -216,6 +216,12 @@ final class DayUpdater {
     try await saveDays(days)
   }
 
+  func addDayActivity(_ dayActivity: DayActivity, to date: Date) async throws {
+    guard var day = try await dayRepository.loadDay(date) else { return }
+    day.activities.append(dayActivity)
+    try await saveDay(day)
+  }
+
   func updateDayActivity(_ dayActivity: DayActivity, to date: Date) async throws {
     guard var day = try await dayRepository.loadDay(date),
           let index = day.activities.firstIndex(where: { $0.id == dayActivity.id }) else { return }
@@ -270,7 +276,7 @@ final class DayUpdater {
     for index in days.indices {
       let isToday = days[index].date == startDate
       let activitiesToRemove = days[index].activities.filter {
-        $0.activity.id == activity.id
+        $0.activity?.id == activity.id
         && $0.isGeneratedAutomatically
         && (!isToday || !$0.isDone)
       }
@@ -287,7 +293,7 @@ final class DayUpdater {
     let dates = try activityDatesCreator.createsDates(for: activity, dateRange: alignedDateRange)
     days.indices.forEach { index in
       guard dates.contains(days[index].date),
-            !days[index].activities.contains(where: { $0.activity.id == activity.id }) else { return }
+            !days[index].activities.contains(where: { $0.activity?.id == activity.id }) else { return }
       days[index].activities.append(
         createDayActivity(
           dayId: days[index].id,

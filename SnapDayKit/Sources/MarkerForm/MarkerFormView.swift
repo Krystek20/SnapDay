@@ -21,6 +21,14 @@ public struct MarkerFormView: View {
 
   public var body: some View {
     WithPerceptionTracking {
+      content
+        .navigationTitle(store.title)
+        .navigationBarTitleDisplayMode(.large)
+    }
+  }
+
+  private var content: some View {
+    WithPerceptionTracking {
       VStack(spacing: .zero) {
         formView
         Spacer(minLength: 15.0)

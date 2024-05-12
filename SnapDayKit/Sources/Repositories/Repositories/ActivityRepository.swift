@@ -21,7 +21,6 @@ extension ActivityRepository: DependencyKey {
       loadActivities: {
         try await EntityHandler().fetch(
           objectType: Activity.self,
-          predicates: loadActivitiesPredicates,
           sorts: loadActivitiesSorts
         )
       },
@@ -36,13 +35,6 @@ extension ActivityRepository: DependencyKey {
 }
 
 // MARK: - Helpers
-
-private extension ActivityRepository {
-  @PredicateBuilder
-  static var loadActivitiesPredicates: [NSPredicate] {
-    NSPredicate(format: "isVisible == true")
-  }
-}
 
 private extension ActivityRepository {
   @SortBuilder

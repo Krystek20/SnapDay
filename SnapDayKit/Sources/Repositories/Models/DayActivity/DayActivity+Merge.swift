@@ -3,7 +3,7 @@ import Models
 extension DayActivity {
   mutating public func merge(_ dayActivities: [DayActivity]) {
     for dayActivity in dayActivities {
-      guard activity.id == dayActivity.id else { return }
+      guard activity?.id == dayActivity.activity?.id else { return }
       if icon == nil {
         icon = dayActivity.icon
       }

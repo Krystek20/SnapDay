@@ -9,11 +9,13 @@ extension DayActivityEntity {
     overview = dayActivity.overview
     isGeneratedAutomatically = dayActivity.isGeneratedAutomatically
     doneDate = dayActivity.doneDate
-    activity = try ActivityEntity.object(
-      identifier: dayActivity.activity.id.uuidString,
-      fetchRequest: Activity.fetchRequest,
-      context: context
-    )
+    if let activityId = dayActivity.activity?.id.uuidString {
+      activity = try ActivityEntity.object(
+        identifier: activityId,
+        fetchRequest: Activity.fetchRequest,
+        context: context
+      )
+    }
     name = dayActivity.name
     icon = try dayActivity.icon?.managedObject(context)
     tags = Set(

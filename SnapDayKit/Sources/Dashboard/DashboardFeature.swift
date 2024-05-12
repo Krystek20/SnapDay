@@ -218,10 +218,13 @@ public struct DashboardFeature: TodayProvidable {
       )
       return .none
     case .oneTimeActivityButtonTapped:
-      state.addActivity = ActivityFormFeature.State(
-        activity: Activity(
+      guard let selectedDay = state.selectedDay else { return .none }
+      state.editDayActivity = DayActivityFormFeature.State(
+        type: .new,
+        dayActivity: DayActivity(
           id: uuid(),
-          isVisible: false
+          dayId: selectedDay.id,
+          isGeneratedAutomatically: false
         )
       )
       return .none
@@ -236,7 +239,10 @@ public struct DashboardFeature: TodayProvidable {
         await send(.internal(.loadTimePeriods))
       }
     case .dayActivityEditTapped(let dayActivity):
-      state.editDayActivity = DayActivityFormFeature.State(dayActivity: dayActivity)
+      state.editDayActivity = DayActivityFormFeature.State(
+        type: .edit,
+        dayActivity: dayActivity
+      )
       return .none
     case .dayActivityRemoveTapped(let dayActivity):
       return .run { send in
@@ -330,6 +336,11 @@ public struct DashboardFeature: TodayProvidable {
 
   private func handleDayActivityFormAction(_ action: PresentationAction<DayActivityFormFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
+    case .presented(.delegate(.activityCreated(let dayActivity))):
+      return .run { [dayActivity, dayToUpdate = state.selectedDay] send in
+        try await dayEditor.addDayActivity(dayActivity, dayToUpdate?.date ?? today)
+        await send(.internal(.loadTimePeriods))
+      }
     case .presented(.delegate(.activityUpdated(let dayActivity))):
       return .run { [dayActivity, dayToUpdate = state.selectedDay] send in
         try await dayEditor.updateDayActivity(dayActivity, dayToUpdate?.date ?? today)

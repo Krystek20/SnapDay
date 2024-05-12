@@ -6,7 +6,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
 
   public let id: UUID
   public let dayId: UUID
-  public var activity: Activity
+  public var activity: Activity?
   public var name: String
   public var icon: Icon?
   public var doneDate: Date?
@@ -22,16 +22,16 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   public init(
     id: UUID,
     dayId: UUID,
-    activity: Activity,
-    name: String,
-    icon: Icon?,
-    doneDate: Date?,
-    duration: Int,
-    overview: String?,
+    activity: Activity? = nil,
+    name: String = "",
+    icon: Icon? = nil,
+    doneDate: Date? = nil,
+    duration: Int = .zero,
+    overview: String? = nil,
     isGeneratedAutomatically: Bool,
-    tags: [Tag],
-    labels: [ActivityLabel],
-    dayActivityTasks: [DayActivityTask]
+    tags: [Tag] = [],
+    labels: [ActivityLabel] = [],
+    dayActivityTasks: [DayActivityTask] = []
   ) {
     self.id = id
     self.dayId = dayId

@@ -21,6 +21,16 @@ public struct MarkerFormFeature {
 
   @ObservableState
   public struct State: Equatable {
+
+    var title: String {
+      switch markerType {
+      case .tag:
+        String(localized: "Add Tag", bundle: .module)
+      case .label:
+        String(localized: "Add Label", bundle: .module)
+      }
+    }
+
     var markerType: MarkerType
     var name: String
     var color: RGBColor = .random

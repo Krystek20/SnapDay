@@ -20,10 +20,10 @@
     "Add tag" : {
 
     },
-    "Add Tag" : {
+    "Add task" : {
 
     },
-    "Add task" : {
+    "Change icon" : {
 
     },
     "Completed" : {
@@ -44,6 +44,9 @@
     "Enter label" : {
 
     },
+    "Enter name" : {
+
+    },
     "Enter overview" : {
 
     },
@@ -59,7 +62,16 @@
     "Labels" : {
 
     },
+    "Name" : {
+
+    },
+    "New day activity" : {
+
+    },
     "Overview" : {
+
+    },
+    "Pick Photo" : {
 
     },
     "Remove" : {
@@ -69,6 +81,9 @@
 
     },
     "Select" : {
+
+    },
+    "Select Emoji" : {
 
     },
     "Set duration" : {

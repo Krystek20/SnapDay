@@ -192,20 +192,18 @@ public struct ActivityFormView: View {
   @ViewBuilder
   private var recurrencyViewIfNeeded: some View {
     WithPerceptionTracking {
-      if store.activity.isVisible {
-        ScrollViewReader { reader in
-          WithPerceptionTracking {
-            VStack(spacing: 10.0) {
-              toggleView
-              frequencyOptionsIfNeeded(reader: reader)
-              weekdaysViewIfNeeded(reader: reader)
-              monthlyScheduleViewIfNeeded(reader: reader)
-              monthGridIfNeeded(reader: reader)
-              monthlyWeekdaysViewIfNeeded(reader: reader)
-            }
-            .formBackgroundModifier()
-            .id("RecurrencyView")
+      ScrollViewReader { reader in
+        WithPerceptionTracking {
+          VStack(spacing: 10.0) {
+            toggleView
+            frequencyOptionsIfNeeded(reader: reader)
+            weekdaysViewIfNeeded(reader: reader)
+            monthlyScheduleViewIfNeeded(reader: reader)
+            monthGridIfNeeded(reader: reader)
+            monthlyWeekdaysViewIfNeeded(reader: reader)
           }
+          .formBackgroundModifier()
+          .id("RecurrencyView")
         }
       }
     }
@@ -326,10 +324,7 @@ public struct ActivityFormView: View {
               set: { $store.activity.wrappedValue.setDefaultDuration($0) }
             )
           ) {
-            let durationText = store.activity.isVisible
-            ? String(localized: "Default duration", bundle: .module)
-            : String(localized: "Duration", bundle: .module)
-            Text(durationText)
+            Text(String(localized: "Default duration", bundle: .module))
               .formTitleTextStyle
           }
           .toggleStyle(CheckToggleStyle())

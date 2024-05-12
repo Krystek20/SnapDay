@@ -15,16 +15,17 @@ public struct TagSectionsProvider {
 
   private func reduceIntoTimePeriodActivity(_ result: inout [TimePeriodActivity], day: Day) {
     day.activities.forEach { dayActivity in
-      if let index = result.firstIndex(where: { $0.activity.id == dayActivity.activity.id }) {
+      if let index = result.firstIndex(where: { $0.activity.id == dayActivity.activity?.id }) {
         let timePeriodActivity = result[index]
         result[index] = timePeriodActivity.increasedCount(
           dayActivity.isDone,
           duration: dayActivity.duration
         )
       } else {
+        guard let activity = dayActivity.activity else { return }
         result.append(
           TimePeriodActivity(
-            activity: dayActivity.activity,
+            activity: activity,
             tags: dayActivity.tags,
             totalCount: 1,
             doneCount: dayActivity.isDone ? 1 : .zero,
