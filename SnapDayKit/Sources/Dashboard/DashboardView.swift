@@ -80,29 +80,48 @@ public struct DashboardView: View {
       .navigationTitle(String(localized: "Dashboard", bundle: .module))
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .topBarLeading) {
           HStack {
             Button(
               action: {
                 store.send(.view(.reportButtonTapped))
               },
               label: {
-                Image(systemName: "text.badge.checkmark")
+                Image(systemName: "chart.bar.xaxis")
                   .foregroundStyle(Color.actionBlue)
               }
             )
-
-            Menu {
-              Button(String(localized: "One-time activity", bundle: .module), action: {
-                store.send(.view(.oneTimeActivityButtonTapped))
-              })
-              Button(String(localized: "Activity list", bundle: .module), action: {
+            Button(
+              action: {
+                store.send(.view(.todayButtonTapped))
+              },
+              label: {
+                Image(systemName: "smallcircle.filled.circle")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+          }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+          HStack {
+            Button(
+              action: {
                 store.send(.view(.activityListButtonTapped))
-              })
-            } label: {
-              Image(systemName: "plus.app")
-                .foregroundStyle(Color.actionBlue)
-            }
+              },
+              label: {
+                Image(systemName: "text.badge.plus")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+            Button(
+              action: {
+                store.send(.view(.oneTimeActivityButtonTapped))
+              },
+              label: {
+                Image(systemName: "plus.circle")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
           }
         }
       }

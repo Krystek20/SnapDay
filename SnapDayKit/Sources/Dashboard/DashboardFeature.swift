@@ -95,6 +95,7 @@ public struct DashboardFeature: TodayProvidable {
       case showCompletedActivitiesTapped
       case hideCompletedActivitiesTapped
       case reportButtonTapped
+      case todayButtonTapped
       case selectedPeriod(Period)
       case increaseButtonTapped
       case decreaseButtonTapped
@@ -281,6 +282,12 @@ public struct DashboardFeature: TodayProvidable {
       }
     case .decreaseButtonTapped:
       state.shift -= 1
+      return .run { send in
+        await send(.internal(.loadTimePeriods))
+      }
+    case .todayButtonTapped:
+      state.shift = .zero
+      state.selectedDay = nil
       return .run { send in
         await send(.internal(.loadTimePeriods))
       }
