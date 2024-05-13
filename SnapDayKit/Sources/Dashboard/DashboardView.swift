@@ -35,10 +35,6 @@ public struct DashboardView: View {
           periods
             .padding(.horizontal, 15.0)
             .padding(.top, 15.0)
-
-          summaryOnTheChart
-            .padding(.horizontal, 15.0)
-            .padding(.top, 15.0)
         }
         .maxWidth()
         .scrollIndicators(.hidden)
@@ -126,28 +122,6 @@ public struct DashboardView: View {
         label: { EmptyView() }
       )
       .pickerStyle(.segmented)
-    }
-  }
-
-  @ViewBuilder
-  private var summaryOnTheChart: some View {
-    WithPerceptionTracking {
-      if let linearChartValues = store.linearChartValues {
-        SectionView(
-          name: String(localized: "Summary", bundle: .module),
-          rightContent: { EmptyView() },
-          content: {
-            LinearChartView(
-              points: linearChartValues.points,
-              expectedPoints: linearChartValues.expectedPoints,
-              currentPoint: linearChartValues.currentPoint
-            )
-            .frame(height: 200.0)
-            .padding(.vertical, 15.0)
-            .formBackgroundModifier()
-          }
-        )
-      }
     }
   }
 

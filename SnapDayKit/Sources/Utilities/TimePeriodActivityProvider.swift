@@ -19,7 +19,7 @@ public struct TagSectionsProvider {
         let timePeriodActivity = result[index]
         result[index] = timePeriodActivity.increasedCount(
           dayActivity.isDone,
-          duration: dayActivity.duration
+          duration: dayActivity.totalDuration
         )
       } else {
         guard let activity = dayActivity.activity else { return }
@@ -29,7 +29,7 @@ public struct TagSectionsProvider {
             tags: dayActivity.tags,
             totalCount: 1,
             doneCount: dayActivity.isDone ? 1 : .zero,
-            duration: dayActivity.isDone ? dayActivity.duration : .zero
+            duration: dayActivity.isDone ? dayActivity.totalDuration : .zero
           )
         )
       }

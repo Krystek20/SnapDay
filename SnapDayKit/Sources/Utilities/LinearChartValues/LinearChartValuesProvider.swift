@@ -1,9 +1,11 @@
 import Foundation
 import Models
 
-struct LinearChartValuesProvider {
+public struct LinearChartValuesProvider {
 
-  func prepareValues(for selectedDay: Day) -> LinearChartValues {
+  public init() { }
+
+  public func prepareValues(for selectedDay: Day) -> LinearChartValues {
     LinearChartValues(
       points: completedDaysValues(for: selectedDay),
       expectedPoints: selectedDay.activities.count,
@@ -11,13 +13,11 @@ struct LinearChartValuesProvider {
     )
   }
 
-  func prepareValues(for timePeriod: TimePeriod, selectedDay: Day, until date: Date) -> LinearChartValues {
+  public func prepareValues(for days: [Day], until date: Date) -> LinearChartValues {
     LinearChartValues(
-      points: completedDaysValues(for: timePeriod, until: date),
-      expectedPoints: timePeriod.days.count,
-      currentPoint: selectedDay.date <= date
-      ? timePeriod.days.firstIndex(of: selectedDay) ?? .zero
-      : timePeriod.days.lastIndex(where: { $0.activities.contains(where: { $0.isDone }) }) ?? .zero
+      points: completedDaysValues(for: days, until: date),
+      expectedPoints: days.count,
+      currentPoint: days.lastIndex(where: { $0.activities.contains(where: { $0.isDone }) }) ?? .zero
     )
   }
 
@@ -33,12 +33,12 @@ struct LinearChartValuesProvider {
       })
   }
 
-  private func completedDaysValues(for timePeriod: TimePeriod, until date: Date) -> [Double] {
-    timePeriod.days
+  private func completedDaysValues(for days: [Day], until date: Date) -> [Double] {
+    days
       .filter { $0.date <= date }
       .sorted(by: { $0.date < $1.date })
       .reduce(into: [Double](), { result, day in
-        let value = (result.last ?? .zero) + Double(day.completedCount) / Double(timePeriod.plannedCount)
+        let value = (result.last ?? .zero) + Double(day.completedCount) / Double(days.plannedCount)
         result.append(value)
       })
   }

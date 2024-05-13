@@ -39,21 +39,9 @@ public extension TimePeriod {
 }
 
 public extension TimePeriod {
-  var plannedCount: Int {
-    days.reduce(into: Int.zero) { result, day in
-      result += day.plannedCount
-    }
-  }
-
-  var completedCount: Int {
-    days.reduce(into: Int.zero) { result, day in
-      result += day.completedCount
-    }
-  }
-
   var completedValue: Double {
-    guard plannedCount != .zero else { return .zero }
-    return min(Double(completedCount) / Double(plannedCount), 1.0)
+    guard days.plannedCount != .zero else { return .zero }
+    return min(Double(days.completedCount) / Double(days.plannedCount), 1.0)
   }
 
   var percent: Int {

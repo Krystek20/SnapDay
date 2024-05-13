@@ -44,17 +44,6 @@ public struct DashboardFeature: TodayProvidable {
       return DaySummary(day: selectedDay)
     }
 
-    var linearChartValues: LinearChartValues? {
-      guard let timePeriod, let selectedDay else { return nil }
-      let linearChartValuesProvider = LinearChartValuesProvider()
-      switch timePeriod.type {
-      case .day:
-        return linearChartValuesProvider.prepareValues(for: selectedDay)
-      case .week, .month, .quarter:
-        return linearChartValuesProvider.prepareValues(for: timePeriod, selectedDay: selectedDay, until: today)
-      }
-    }
-
     var activities: [DayActivity] {
       switch activityListOption {
       case .collapsed:

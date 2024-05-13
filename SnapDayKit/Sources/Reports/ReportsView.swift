@@ -78,6 +78,7 @@ public struct ReportsView: View {
       VStack(alignment: .leading, spacing: 10.0) {
         picker
         customDatePickers
+        progress
         filtersSection
         summarySection
         activitiesByTag
@@ -127,6 +128,28 @@ public struct ReportsView: View {
           )
         }
         .formBackgroundModifier()
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var progress: some View {
+    WithPerceptionTracking {
+      if let linearChartValues = store.linearChartValues {
+        SectionView(
+          name: String(localized: "Progress", bundle: .module),
+          rightContent: { EmptyView() },
+          content: {
+            LinearChartView(
+              points: linearChartValues.points,
+              expectedPoints: linearChartValues.expectedPoints,
+              currentPoint: linearChartValues.currentPoint
+            )
+            .frame(height: 200.0)
+            .padding(.vertical, 15.0)
+            .formBackgroundModifier()
+          }
+        )
       }
     }
   }

@@ -70,6 +70,17 @@ public struct ReportsFeature: TodayProvidable {
       selectedFilterPeriod == .custom
     }
 
+    var linearChartValues: LinearChartValues? {
+      let linearChartValuesProvider = LinearChartValuesProvider()
+      switch selectedFilterPeriod {
+      case .day:
+        guard let day = days.first else { return nil }
+        return linearChartValuesProvider.prepareValues(for: day)
+      case .week, .month, .quarter, .custom:
+        return linearChartValuesProvider.prepareValues(for: days, until: today)
+      }
+    }
+
     public init(selectedFilterDate: FilterPeriod = .month) {
       self.selectedFilterPeriod = selectedFilterDate
     }

@@ -55,3 +55,17 @@ extension Day {
     })
   }
 }
+
+public extension [Day] {
+  var plannedCount: Int {
+    reduce(into: Int.zero) { result, day in
+      result += day.plannedCount
+    }
+  }
+
+  var completedCount: Int {
+    reduce(into: Int.zero) { result, day in
+      result += day.completedCount
+    }
+  }
+}
