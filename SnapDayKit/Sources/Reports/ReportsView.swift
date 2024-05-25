@@ -54,21 +54,17 @@ public struct ReportsView: View {
       }
       .navigationTitle(String(localized: "Reports", bundle: .module))
       .sheet(item: $store.scope(state: \.markerList, action: \.markerList)) { store in
-        WithPerceptionTracking {
-          NavigationStack {
-            MarkerListView(store: store)
-              .navigationBarTitleDisplayMode(.large)
-          }
-          .presentationDetents([.medium])
+        NavigationStack {
+          MarkerListView(store: store)
+            .navigationBarTitleDisplayMode(.large)
         }
+        .presentationDetents([.medium])
       }
       .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
-        WithPerceptionTracking {
-          NavigationStack {
-            ActivityListView(store: store)
-          }
-          .presentationDetents([.medium, .large])
+        NavigationStack {
+          ActivityListView(store: store)
         }
+        .presentationDetents([.medium, .large])
       }
     }
   }

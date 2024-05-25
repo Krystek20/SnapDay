@@ -42,7 +42,7 @@ public struct ApplicationView: View {
 
   public var body: some View {
     WithPerceptionTracking {
-      NavigationStackStore(store.scope(state: \.path, action: \.path)) {
+      NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
         DashboardView(
           store: store.scope(
             state: \.dashboard,
@@ -52,14 +52,12 @@ public struct ApplicationView: View {
         .onAppear {
           store.send(.appeared)
         }
-      } destination: { state in
-        switch state {
+      } destination: { store in
+        switch store.state {
         case .reports:
-          CaseLet(
-            /ApplicationFeature.Path.State.reports,
-             action: ApplicationFeature.Path.Action.reports,
-             then: ReportsView.init
-          )
+          if let store = store.scope(state: \.reports, action: \.reports) {
+            ReportsView(store: store)
+          }
         }
       }
       .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in

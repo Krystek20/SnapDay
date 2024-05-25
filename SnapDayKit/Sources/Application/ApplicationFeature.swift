@@ -30,7 +30,10 @@ public struct ApplicationFeature {
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
   }
 
-  public struct Path: Reducer {
+  @Reducer
+  public struct Path {
+    
+    @ObservableState
     public enum State: Equatable {
       case reports(ReportsFeature.State)
     }
