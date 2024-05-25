@@ -4,11 +4,6 @@ import Models
 
 public struct DayView: View {
 
-  private enum RightAction {
-    case toggle(isDone: Bool)
-    case more
-  }
-
   // MARK: - Properties
 
   private let isPastDay: Bool
@@ -45,8 +40,6 @@ public struct DayView: View {
     LazyVStack(spacing: .zero) {
       ForEach(activities) { dayActivity in
         switch dayViewOption {
-        case .simple(let dayViewSimpleActions):
-          simpleActivityView(dayActivity, dayViewSimpleActions)
         case .all(let dayViewAllActions):
           menuActivityView(dayActivity, dayViewAllActions)
         }
@@ -54,10 +47,8 @@ public struct DayView: View {
 
         ForEach(tasks(for: dayActivity)) { activityTask in
           switch dayViewOption {
-          case .simple(let dayViewSimpleActions):
-            simpleDayActivityTaskView(dayActivity, activityTask, dayViewSimpleActions)
           case .all(let dayViewAllActions):
-            menuActivityTaskView(dayActivity, activityTask, dayViewAllActions)
+            menuActivityTaskView(activityTask, dayViewAllActions)
               .padding(.leading, 10.0)
           }
           divider(addPadding: dayActivity.dayActivityTasks.last?.id != activityTask.id)
@@ -65,33 +56,6 @@ public struct DayView: View {
       }
       doneRowViewIfNeeded()
       showOrHideDoneActivitiesViewIfNeeded()
-    }
-  }
-
-  private func simpleActivityView(
-    _ dayActivity: DayActivity,
-    _ dayViewSimpleActions: DayViewSimpleActions
-  ) -> some View {
-    dayActivityView(dayActivity, rightAction: .toggle(isDone: dayActivity.isDone))
-      .contentShape(Rectangle())
-      .onTapGesture {
-        dayViewSimpleActions.activityTapped(dayActivity)
-      }
-  }
-
-  private func simpleDayActivityTaskView(
-    _ dayActivity: DayActivity,
-    _ dayActivityTask: DayActivityTask,
-    _ dayViewSimpleActions: DayViewSimpleActions
-  ) -> some View {
-    dayActivityTaskView(
-      dayActivityTask,
-      rightAction: .toggle(isDone: dayActivityTask.isDone)
-    )
-    .padding(.leading, 10.0)
-    .contentShape(Rectangle())
-    .onTapGesture {
-      dayViewSimpleActions.activityTaskTapped(dayActivity, dayActivityTask)
     }
   }
 
@@ -125,6 +89,15 @@ public struct DayView: View {
       )
       Button(
         action: {
+          dayViewAllActions.addNewActivityTask(dayActivity)
+        },
+        label: {
+          Text("Add task", bundle: .module)
+          Image(systemName: "plus.circle")
+        }
+      )
+      Button(
+        action: {
           dayViewAllActions.removeTapped(dayActivity)
         },
         label: {
@@ -133,7 +106,10 @@ public struct DayView: View {
         }
       )
     } label: {
-      dayActivityView(dayActivity, rightAction: .more)
+      DayActivityRow(
+        activity: dayActivity,
+        trailingIcon: .more
+      )
     }
   }
 
@@ -195,64 +171,14 @@ public struct DayView: View {
     }
   }
 
-  private func dayActivityView(
-    _ dayActivity: DayActivity,
-    rightAction: RightAction
-  ) -> some View {
-    HStack(spacing: 5.0) {
-      ActivityImageView(
-        data: dayActivity.icon?.data,
-        size: 30.0,
-        cornerRadius: 15.0
-      )
-      VStack(alignment: .leading, spacing: 2.0) {
-        Text(dayActivity.name)
-          .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(dayActivity.isDone, color: .sectionText)
-        subtitleView(for: dayActivity)
-      }
-      Spacer()
-      view(for: rightAction)
-    }
-    .padding(.all, 10.0)
-  }
-
-  @ViewBuilder
-  private func subtitleView(for dayActivity: DayActivity) -> some View {
-    HStack(spacing: 5.0) {
-      if let overview = dayActivity.overview, !overview.isEmpty {
-        Text(overview)
-          .font(.system(size: 12.0, weight: .regular))
-          .lineLimit(1)
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(dayActivity.isDone, color: .sectionText)
-      }
-
-      if let textDuration = duration(for: dayActivity.totalDuration) {
-        if dayActivity.overview != nil && dayActivity.overview?.isEmpty == false {
-          Text("-")
-            .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.sectionText)
-        }
-
-        Text(textDuration)
-          .font(.system(size: 12.0, weight: .regular))
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(dayActivity.isDone, color: .sectionText)
-      }
-    }
-  }
-
   private func menuActivityTaskView(
-    _ dayActivity: DayActivity,
     _ dayActivityTask: DayActivityTask,
     _ dayViewAllActions: DayViewAllActions
   ) -> some View {
     Menu {
       Button(
         action: {
-          dayViewAllActions.activityTaskTapped(dayActivity, dayActivityTask)
+          dayViewAllActions.activityTaskTapped(dayActivityTask)
         },
         label: {
           if dayActivityTask.isDone {
@@ -266,7 +192,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          dayViewAllActions.editTaskTapped(dayActivity, dayActivityTask)
+          dayViewAllActions.editTaskTapped(dayActivityTask)
         },
         label: {
           Text("Edit", bundle: .module)
@@ -283,69 +209,14 @@ public struct DayView: View {
         }
       )
     } label: {
-      dayActivityTaskView(dayActivityTask, rightAction: .more)
-    }
-  }
-
-  private func dayActivityTaskView(
-    _ dayActivityTask: DayActivityTask,
-    rightAction: RightAction
-  ) -> some View {
-    HStack(spacing: 5.0) {
-      ActivityImageView(
-        data: dayActivityTask.icon?.data,
-        size: 30.0,
-        cornerRadius: 15.0
+      DayActivityRow(
+        activity: dayActivityTask,
+        trailingIcon: .more
       )
-      VStack(alignment: .leading, spacing: 2.0) {
-        Text(dayActivityTask.name)
-          .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(dayActivityTask.isDone, color: .sectionText)
-        subtitleView(for: dayActivityTask)
-      }
-      Spacer()
-      view(for: rightAction)
-    }
-    .padding(.all, 10.0)
-  }
-
-  @ViewBuilder
-  private func subtitleView(for dayActivityTask: DayActivityTask) -> some View {
-    HStack(spacing: 5.0) {
-      if let overview = dayActivityTask.overview, !overview.isEmpty {
-        Text(overview)
-          .font(.system(size: 12.0, weight: .regular))
-          .lineLimit(1)
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(dayActivityTask.isDone, color: .sectionText)
-      }
-
-      if let textDuration = duration(for: dayActivityTask.duration) {
-        if dayActivityTask.overview != nil && dayActivityTask.overview?.isEmpty == false {
-          Text("-")
-            .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.sectionText)
-        }
-
-        Text(textDuration)
-          .font(.system(size: 12.0, weight: .regular))
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(dayActivityTask.isDone, color: .sectionText)
-      }
     }
   }
 
   // MARK: - Helpers
-
-  private func duration(for duration: Int) -> String? {
-    guard duration > .zero else { return nil }
-    let minutes = duration % 60
-    let hours = duration / 60
-    return hours > .zero
-    ? String(localized: "\(hours)h \(minutes)min", bundle: .module)
-    : String(localized: "\(minutes)min", bundle: .module)
-  }
 
   private func tasks(for dayActivity: DayActivity) -> [DayActivityTask] {
     switch dayViewShowButtonState {
@@ -353,19 +224,6 @@ public struct DayView: View {
       dayActivity.toDoTasks
     case .hide, .none:
       dayActivity.dayActivityTasks
-    }
-  }
-
-  private func view(for rightAction: RightAction) -> some View {
-    switch rightAction {
-    case .toggle(let isDone):
-      Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-        .foregroundStyle(isDone ? Color.actionBlue : Color.sectionText)
-        .imageScale(.medium)
-    case .more:
-      Image(systemName: "ellipsis")
-        .foregroundStyle(Color.sectionText)
-        .imageScale(.medium)
     }
   }
 }

@@ -16,6 +16,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   public var tags: [Tag]
   public var labels: [ActivityLabel]
   public var dayActivityTasks: [DayActivityTask]
+  public var reminderDate: Date?
 
   // MARK: - Initialization
 
@@ -31,7 +32,8 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     isGeneratedAutomatically: Bool,
     tags: [Tag] = [],
     labels: [ActivityLabel] = [],
-    dayActivityTasks: [DayActivityTask] = []
+    dayActivityTasks: [DayActivityTask] = [],
+    reminderDate: Date? = nil
   ) {
     self.id = id
     self.dayId = dayId
@@ -45,6 +47,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     self.tags = tags
     self.labels = labels
     self.dayActivityTasks = dayActivityTasks
+    self.reminderDate = reminderDate
   }
 }
 

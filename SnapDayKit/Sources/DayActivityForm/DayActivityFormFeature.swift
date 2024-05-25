@@ -16,12 +16,13 @@ public struct DayActivityFormFeature {
 
   // MARK: - Dependencies
 
-  @Dependency(\.dismiss) var dismiss
-  @Dependency(\.tagRepository) var tagRepository
-  @Dependency(\.activityLabelRepository) var activityLabelRepository
-  @Dependency(\.activityRepository) var activityRepository
-  @Dependency(\.date) var date
-  @Dependency(\.uuid) var uuid
+  @Dependency(\.dismiss) private var dismiss
+  @Dependency(\.tagRepository) private var tagRepository
+  @Dependency(\.activityLabelRepository) private var activityLabelRepository
+  @Dependency(\.activityRepository) private var activityRepository
+  @Dependency(\.date) private var date
+  @Dependency(\.uuid) private var uuid
+  @Dependency(\.calendar) private var calendar
 
   // MARK: - State & Action
 
@@ -60,14 +61,20 @@ public struct DayActivityFormFeature {
     
     var isPhotoPickerPresented: Bool = false
     var photoItem: PhotoItem?
+    let availableDateHours: ClosedRange<Date>
 
     @Presents var emojiPicker: EmojiPickerFeature.State?
     @Presents var addMarker: MarkerFormFeature.State?
     @Presents var dayActivityTaskForm: DayActivityTaskFormFeature.State?
 
-    public init(type: DayActivityFormType, dayActivity: DayActivity) {
+    public init(
+      type: DayActivityFormType,
+      dayActivity: DayActivity,
+      availableDateHours: ClosedRange<Date>
+    ) {
       self.type = type
       self.dayActivity = dayActivity
+      self.availableDateHours = availableDateHours
     }
   }
 
@@ -107,6 +114,7 @@ public struct DayActivityFormFeature {
       case pickPhotoTapped
       case removeImageTapped
       case imageSelected(PhotoItem)
+      case remindToggeled(Bool)
     }
     public enum InternalAction: Equatable { 
       case setExistingTags([Tag])
@@ -214,6 +222,11 @@ public struct DayActivityFormFeature {
         let data = try await item.loadImageData(size: 140.0)
         await send(.internal(.setImageDate(data)))
       }
+    case .remindToggeled(let value):
+      state.dayActivity.reminderDate = value
+      ? calendar.setHourAndMinute(date.now, toDate: state.availableDateHours.lowerBound)
+      : nil
+      return .none
     }
   }
 
@@ -269,7 +282,8 @@ public struct DayActivityFormFeature {
           id: uuid(),
           dayActivityId: state.dayActivity.id
         ),
-        type: .new
+        type: .new,
+        availableDateHours: state.availableDateHours
       )
       return .none
     case .selectButtonTapped(let dayActivityTask):
@@ -279,7 +293,8 @@ public struct DayActivityFormFeature {
     case .editButtonTapped(let dayActivityTask):
       state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
         dayActivityTask: dayActivityTask,
-        type: .edit
+        type: .edit,
+        availableDateHours: state.availableDateHours
       )
       return .none
     case .removeButtonTapped(let dayActivityTask):

@@ -4,28 +4,35 @@
     "" : {
 
     },
-    " %lld activities " : {
+    " " : {
 
     },
-    " of productive time. Great work staying on track and pushing your limits!" : {
+    "Great work staying on track and pushing your limits!" : {
 
     },
-    "%@" : {
+    "It looks like you didn't complete any activities today. Don't be discouraged! Tomorrow is a new day to set your goals and achieve them. Remember, every small step counts towards your progress!" : {
 
     },
     "Others" : {
 
     },
-    "today, totaling " : {
-
-    },
     "TODAY'S TRIUMPHS" : {
 
     },
-    "Who's awesome? You are! 🌟 All your activities for today are checked off. Time to kick back and enjoy your evening. You've earned it!" : {
+    "Who's awesome? You are! 🌟 All your activities for today are checked off. Time to kick back and enjoy your evening. You've earned it! " : {
 
     },
-    "You've successfully completed" : {
+    "You've successfully completed **%lld activities**, totaling **%@** of productive time." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You've successfully completed **%1$lld activities**, totaling **%2$@** of productive time."
+          }
+        }
+      }
+    },
+    "You've successfully completed **%lld activities**." : {
 
     }
   },

@@ -40,7 +40,7 @@ public struct DayActivityTaskFormView: View {
     WithPerceptionTracking {
       content
         .navigationTitle(title)
-        .fullScreenCover(item: $store.scope(state: \.showEmojiPicker, action: \.showEmojiPicker)) { store in
+        .fullScreenCover(item: $store.scope(state: \.emojiPicker, action: \.emojiPicker)) { store in
           NavigationStack {
             EmojiPickerView(store: store)
           }
@@ -66,6 +66,7 @@ public struct DayActivityTaskFormView: View {
         imageField
         nameTextField
         durationFormView
+        reminderFormView
         overviewTextField
       }
       .padding(padding)
@@ -185,6 +186,24 @@ public struct DayActivityTaskFormView: View {
             $store.dayActivityTask.wrappedValue.setDurationMinutes($0)
           }
         )
+      )
+    }
+  }
+
+  private var reminderFormView: some View {
+    WithPerceptionTracking {
+      ReminderFormView(
+        reminderDate: store.dayActivityTask.reminderDate,
+        availableDateHours: store.availableDateHours,
+        toggleBinding: Binding(
+          get: {
+            store.dayActivityTask.reminderDate != nil
+          },
+          set: { value in
+            store.send(.view(.remindToggeled(value)))
+          }
+        ),
+        dateBinding: $store.dayActivityTask.reminderDate
       )
     }
   }

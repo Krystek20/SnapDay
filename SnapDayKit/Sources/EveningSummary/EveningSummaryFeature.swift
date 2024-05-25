@@ -26,7 +26,7 @@ public struct EveningSummaryFeature: TodayProvidable {
 
   @ObservableState
   public struct State: Equatable, TodayProvidable {
-    
+
     var day: Day?
 
     var eveningTagSummaries: [EveningTagSummary] = []
@@ -45,7 +45,11 @@ public struct EveningSummaryFeature: TodayProvidable {
       }) ?? .zero
     }
 
-    public init() { }
+    let date: Date
+
+    public init(date: Date) { 
+      self.date = date
+    }
   }
 
   public enum Action: BindableAction, Equatable {
@@ -95,8 +99,8 @@ public struct EveningSummaryFeature: TodayProvidable {
   private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
     switch action {
     case .loadDay:
-      return .run { send in
-        let timePeriod = try await timePeriodsProvider.timePeriod(.day, today, .zero)
+      return .run { [date = state.date] send in
+        let timePeriod = try await timePeriodsProvider.timePeriod(.day, date, .zero)
         await send(.internal(.setDay(timePeriod.days.first)))
       }
     case .setDay(let day):

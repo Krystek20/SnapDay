@@ -42,6 +42,9 @@
     "%lldmin" : {
 
     },
+    "Add task" : {
+
+    },
     "Completed activities" : {
 
     },
@@ -57,10 +60,16 @@
     "Remaining Time" : {
 
     },
+    "Reminder" : {
+
+    },
     "Remove" : {
 
     },
     "Select" : {
+
+    },
+    "Set time" : {
 
     },
     "Show completed" : {

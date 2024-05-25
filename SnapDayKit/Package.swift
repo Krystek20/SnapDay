@@ -29,6 +29,7 @@ private var products: [Product] {
   Module.activityTaskForm
   Module.dayActivityTaskForm
   Module.eveningSummary
+  Module.dayActivityReminder
   Module.repositories
   Module.common
   Module.models
@@ -49,7 +50,8 @@ private var targets: [Target] {
     dependencies: sceneDependecies + [
       .dashboard,
       .activityForm,
-      .reports
+      .reports,
+      .developerTools
     ]
   )
   TargetParamenters(
@@ -95,6 +97,14 @@ private var targets: [Target] {
     module: .eveningSummary,
     dependencies: sceneDependecies
   )
+  TargetParamenters(
+    module: .dayActivityReminder,
+    dependencies: sceneDependecies
+  )
+  TargetParamenters(
+    module: .developerTools,
+    dependencies: sceneDependecies
+  )
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
   TargetParamenters(module: .repositories, dependencies: [.models, .composableArchitecture])
@@ -131,6 +141,8 @@ private enum Module: String {
   case activityTaskForm
   case dayActivityTaskForm
   case eveningSummary
+  case dayActivityReminder
+  case developerTools
   case utilities
   case repositories
   case common
@@ -174,7 +186,7 @@ private enum Module: String {
     switch self {
     case .composableArchitecture:
       []
-    case .previews, .uiComponents, .resources:
+    case .previews, .uiComponents, .resources, .developerTools:
       [.source]
     default:
       [.source, .tests]

@@ -2,25 +2,32 @@ import Dashboard
 import Reports
 import ComposableArchitecture
 import Utilities
+import DeveloperTools
 
 @Reducer
 public struct ApplicationFeature {
 
-  private let userNotificationCenterProvider = UserNotificationCenterProvider()
+  @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
 
   // MARK: - State & Action
 
+  @ObservableState
   public struct State: Equatable {
     var dashboard = DashboardFeature.State()
     var path = StackState<Path.State>()
+
+    @Presents var developerTools: DeveloperToolsFeature.State?
 
     public init() { }
   }
 
   public enum Action: Equatable {
     case appeared
+    case deviceShaked
     case dashboard(DashboardFeature.Action)
     case path(StackAction<Path.State, Path.Action>)
+
+    case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
   }
 
   public struct Path: Reducer {
@@ -60,13 +67,21 @@ public struct ApplicationFeature {
             guard try await userNotificationCenterProvider.requestAuthorization() else { return }
           }
         )
+      case .deviceShaked:
+        state.developerTools = DeveloperToolsFeature.State()
+        return .none
       case .dashboard(.delegate(let action)):
         return handleDashboardDelegate(action: action, state: &state)
       case .dashboard:
         return .none
+      case .developerTools:
+        return .none
       case .path:
         return .none
       }
+    }
+    .ifLet(\.$developerTools, action: \.developerTools) {
+      DeveloperToolsFeature()
     }
     .forEach(\.path, action: \.path) {
       Path()

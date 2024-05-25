@@ -10,6 +10,7 @@ extension DayActivityTaskEntity {
     duration = Int32(dayActivityTask.duration)
     doneDate = dayActivityTask.doneDate
     overview = dayActivityTask.overview
+    reminderDate = dayActivityTask.reminderDate
 
     if let task = dayActivityTask.activityTask {
       activityTask = try ActivityTaskEntity.object(

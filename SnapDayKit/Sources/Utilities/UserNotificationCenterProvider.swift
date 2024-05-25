@@ -1,16 +1,8 @@
 import UserNotifications
+import Repositories
 import Dependencies
-
-public enum UserNotificationidentifier: String {
-  case eveningSummary = "com.mobilove.snapday.notification.eveningSummary"
-
-  var categoryIdentifier: String {
-    switch self {
-    case .eveningSummary:
-      return "EVENING_SUMMARY"
-    }
-  }
-}
+import Models
+import Combine
 
 public protocol UserNotificationCenter {
   var delegate: (any UNUserNotificationCenterDelegate)? { get set }
@@ -18,16 +10,31 @@ public protocol UserNotificationCenter {
   func add(_ request: UNNotificationRequest) async throws
   func pendingNotificationRequests() async -> [UNNotificationRequest]
   func setNotificationCategories(_ categories: Set<UNNotificationCategory>)
+  func removePendingNotificationRequests(withIdentifiers identifiers: [String])
 }
 
 extension UNUserNotificationCenter: UserNotificationCenter { }
 
 public final class UserNotificationCenterProvider: NSObject {
 
+  private enum UserAction: String {
+    case done = "DONE_ACTION"
+    case remindInHour = "REMIND_IN_HOUR_ACTION"
+  }
+
   // MARK: - Properties
 
-  @Dependency(\.calendar) private var calendar
+  public var userActionStream: AsyncPublisher<AnyPublisher<Void, Never>> {
+    userActionSubject.eraseToAnyPublisher().values
+  }
+
   private var userNotificationCenter: UserNotificationCenter
+  private let userActionSubject = PassthroughSubject<Void, Never>()
+
+  @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
+  @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.calendar) private var calendar
+  @Dependency(\.date) private var date
 
   // MARK: - Initialization
 
@@ -44,40 +51,123 @@ public final class UserNotificationCenterProvider: NSObject {
   }
 
   public func registerCategories() {
-    let category = UNNotificationCategory(
-      identifier: UserNotificationidentifier.eveningSummary.categoryIdentifier,
+    let eveningSummaryCategory = UNNotificationCategory(
+      identifier: UserNotificationCategoryIdentifier.eveningSummary.rawValue,
       actions: [],
       intentIdentifiers: []
     )
-    userNotificationCenter.setNotificationCategories([category])
+    let doneAction = UNNotificationAction(
+      identifier: UserAction.done.rawValue,
+      title: "Mark as done",
+      options: []
+    )
+    let remindInHourAction = UNNotificationAction(
+      identifier: UserAction.remindInHour.rawValue,
+      title: "Remind me in 30 minutes",
+      options: []
+    )
+    let dayActivityReminderCategory = UNNotificationCategory(
+      identifier: UserNotificationCategoryIdentifier.dayActivityReminder.rawValue,
+      actions: [remindInHourAction, doneAction],
+      intentIdentifiers: []
+    )
+    userNotificationCenter.setNotificationCategories([
+      eveningSummaryCategory,
+      dayActivityReminderCategory
+    ])
   }
 
-  public func schedule(identifier: UserNotificationidentifier) async throws {
+  public func schedule(userNotification: any UserNotification) async throws {
     let isNotificationScheduled = await userNotificationCenter.pendingNotificationRequests().contains(where: {
-      $0.identifier == identifier.rawValue
+      $0.identifier == userNotification.identifier
     })
-    guard !isNotificationScheduled else { return }
 
-    let content = UNMutableNotificationContent()
-    content.title = "Good Evening!"
-    content.body = "Don't forget to review your day and prepare for tomorrow."
-    content.sound = .default
-    content.categoryIdentifier = identifier.categoryIdentifier
+    if isNotificationScheduled && !userNotification.canBySchedule {
+      userNotificationCenter.removePendingNotificationRequests(withIdentifiers: [userNotification.identifier])
+    }
 
-    var dateComponents = DateComponents()
-    dateComponents.calendar = calendar
-
-    dateComponents.hour = 21
-    dateComponents.minute = 15
-
-    let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-    let request = UNNotificationRequest(identifier: identifier.rawValue, content: content, trigger: trigger)
+    guard !isNotificationScheduled && userNotification.canBySchedule else { return }
+    let request = UNNotificationRequest(
+      identifier: userNotification.identifier,
+      content: userNotification.content,
+      trigger: userNotification.trigger
+    )
     try await userNotificationCenter.add(request)
+  }
+
+  public func remove(userNotification: any UserNotification) async {
+    let isNotificationScheduled = await userNotificationCenter.pendingNotificationRequests().contains(where: {
+      $0.identifier == userNotification.identifier
+    })
+    guard isNotificationScheduled else { return }
+    userNotificationCenter.removePendingNotificationRequests(withIdentifiers: [userNotification.identifier])
   }
 }
 
 extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
     [.badge, .sound, .banner, .list]
+  }
+
+  @MainActor
+  public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+    guard let userInfo = response.notification.request.content.userInfo as? [String: String],
+          let rawValue = userInfo[DayActivityNotificationKey.kind.rawValue],
+          let kind = DayActivityNotificationKind(rawValue: rawValue),
+          let identifier = userInfo[DayActivityNotificationKey.identifier.rawValue],
+          let userAction = UserAction(rawValue: response.actionIdentifier) else { return }
+
+    do {
+      switch userAction {
+      case .done:
+        switch kind {
+        case .activity:
+          guard var dayActivity = try await dayActivityRepository.activity(identifier) else { return }
+          dayActivity.doneDate = dayActivity.doneDate == nil ? date() : nil
+          try await dayActivityRepository.saveActivity(dayActivity)
+          userActionSubject.send()
+        case .activityTask:
+          guard var dayActivityTask = try await dayActivityRepository.activityTask(identifier) else { return }
+          dayActivityTask.doneDate = dayActivityTask.doneDate == nil ? date() : nil
+          try await dayActivityRepository.saveActivityTask(dayActivityTask)
+          userActionSubject.send()
+        }
+      case .remindInHour:
+        var notification: (any UserNotification)?
+        switch kind {
+        case .activity:
+          guard var dayActivity = try await dayActivityRepository.activity(identifier),
+                let reminderDate = dayActivity.reminderDate else { return }
+          dayActivity.reminderDate = calendar.date(byAdding: .minute, value: 30, to: reminderDate)
+          try await dayActivityRepository.saveActivity(dayActivity)
+          notification = DayActivityNotification(type: .activity(dayActivity), calendar: calendar)
+        case .activityTask:
+          guard var dayActivityTask = try await dayActivityRepository.activityTask(identifier),
+                let reminderDate = dayActivityTask.reminderDate else { return }
+          dayActivityTask.reminderDate = calendar.date(byAdding: .minute, value: 30, to: reminderDate)
+          try await dayActivityRepository.saveActivityTask(dayActivityTask)
+          notification = DayActivityNotification(type: .activityTask(dayActivityTask), calendar: calendar)
+        }
+        guard let notification else { return }
+        await remove(userNotification: notification)
+        try await schedule(userNotification: notification)
+        userActionSubject.send()
+      }
+    } catch {
+      print(error)
+    }
+  }
+}
+
+extension DependencyValues {
+  public var userNotificationCenterProvider: UserNotificationCenterProvider {
+    get { self[UserNotificationCenterProvider.self] }
+    set { self[UserNotificationCenterProvider.self] = newValue }
+  }
+}
+
+extension UserNotificationCenterProvider: DependencyKey {
+  public static var liveValue: UserNotificationCenterProvider {
+    UserNotificationCenterProvider()
   }
 }

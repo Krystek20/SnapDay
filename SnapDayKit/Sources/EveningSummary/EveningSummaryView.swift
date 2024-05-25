@@ -68,27 +68,47 @@ public struct EveningSummaryView: View {
 
   private var description: some View {
     WithPerceptionTracking {
-      allDoneText +
-      Text("You've successfully completed")
-        .font(.system(size: 14.0, weight: .regular)) +
-      Text(" \(store.doneActivitiesCount) activities ")
-        .font(.system(size: 14.0, weight: .bold)) +
-      Text("today, totaling ")
-        .font(.system(size: 14.0, weight: .regular)) +
-      Text("\(TimeProvider.duration(from: store.doneActivitiesDuration, bundle: .module) ?? "")")
-        .font(.system(size: 14.0, weight: .bold)) +
-      Text(" of productive time. Great work staying on track and pushing your limits!")
-        .font(.system(size: 14.0, weight: .regular))
+      Group {
+        if store.doneActivitiesCount > 0 {
+          allDoneText + totalTimeText + Text(" ") + greatWorkText
+        } else {
+          noActivitiesText
+        }
+      }
+      .font(.system(size: 14.0, weight: .regular))
+    }
+  }
+
+  private var totalTimeText: Text {
+    if let duration = TimeProvider.duration(from: store.doneActivitiesDuration, bundle: .module) {
+      activitiesWithDuration(durationText: duration)
+    } else {
+      activitiesWithoutDuration
     }
   }
 
   private var allDoneText: Text {
     if store.showDoneView {
-      Text("Who's awesome? You are! 🌟 All your activities for today are checked off. Time to kick back and enjoy your evening. You've earned it!", bundle: .module)
-        .font(.system(size: 14.0, weight: .regular))
+      Text("Who's awesome? You are! 🌟 All your activities for today are checked off. Time to kick back and enjoy your evening. You've earned it! ", bundle: .module)
     } else {
       Text("")
     }
+  }
+
+  private func activitiesWithDuration(durationText: String) -> Text {
+    Text("You've successfully completed **\(store.doneActivitiesCount) activities**, totaling **\(durationText)** of productive time.")
+  }
+
+  private var activitiesWithoutDuration: Text {
+    Text("You've successfully completed **\(store.doneActivitiesCount) activities**.")
+  }
+
+  private var greatWorkText: Text {
+    Text("Great work staying on track and pushing your limits!", bundle: .module)
+  }
+
+  private var noActivitiesText: Text {
+    Text("It looks like you didn't complete any activities today. Don't be discouraged! Tomorrow is a new day to set your goals and achieve them. Remember, every small step counts towards your progress!", bundle: .module)
   }
 
   private func contentViewChanged(size: CGSize) -> some View {

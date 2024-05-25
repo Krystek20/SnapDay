@@ -11,6 +11,7 @@
 			<key>UNNotificationExtensionCategory</key>
 			<array>
 				<string>EVENING_SUMMARY</string>
+				<string>DAY_ACTIVITY_REMINDER</string>
 			</array>
 			<key>UNNotificationExtensionInitialContentSizeRatio</key>
 			<real>1</real>

@@ -115,7 +115,7 @@ public struct DashboardView: View {
             )
             Button(
               action: {
-                store.send(.view(.oneTimeActivityButtonTapped))
+                store.send(.view(.addDayActivityButtonTapped))
               },
               label: {
                 Image(systemName: "plus.circle")
@@ -237,12 +237,15 @@ public struct DashboardView: View {
         },
         removeTapped: { dayActivity in
           store.send(.view(.dayActivityRemoveTapped(dayActivity)))
+        }, 
+        addNewActivityTask: { dayActivity in
+          store.send(.view(.addDayActivityTaskButtonTapped(dayActivity)))
         },
-        activityTaskTapped: { dayActivity, dayActivityTask in
-          store.send(.view(.dayActivityTaskTapped(dayActivity, dayActivityTask)))
+        activityTaskTapped: { dayActivityTask in
+          store.send(.view(.dayActivityTaskTapped(dayActivityTask)))
         },
-        editTaskTapped: { dayActivity, dayActivityTask in
-          store.send(.view(.dayActivityEditTaskTapped(dayActivity, dayActivityTask)))
+        editTaskTapped: { dayActivityTask in
+          store.send(.view(.dayActivityEditTaskTapped(dayActivityTask)))
         },
         removeTaskTapped: { dayActivityTask in
           store.send(.view(.removeDayActivityTaskTapped(dayActivityTask)))

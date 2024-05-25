@@ -3,13 +3,15 @@ import SwiftUI
 import Dashboard
 import Reports
 import Resources
+import DeveloperTools
+import UIKit.UIDevice
 
 @MainActor
 public struct ApplicationView: View {
 
   // MARK: - Properties
 
-  private let store: StoreOf<ApplicationFeature>
+  @Perception.Bindable private var store: StoreOf<ApplicationFeature>
 
   // MARK: - Initialization
 
@@ -59,6 +61,17 @@ public struct ApplicationView: View {
              then: ReportsView.init
           )
         }
+      }
+      .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
+        NavigationStack {
+          DeveloperToolsView(store: store)
+        }
+        .presentationDetents([.medium, .large])
+      }
+      .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification)) { _ in
+        #if DEBUG
+        store.send(.deviceShaked)
+        #endif
       }
     }
   }

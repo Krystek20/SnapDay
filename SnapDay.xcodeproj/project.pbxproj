@@ -20,6 +20,7 @@
 		D4CCE62D2BC7B4BB00C198C5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = D4CCE62C2BC7B4BB00C198C5 /* Base */; };
 		D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */ = {isa = PBXBuildFile; productRef = D4CCE63C2BCACB8E00C198C5 /* EveningSummary */; };
+		D4FE9FC32BF5342B003305A9 /* DayActivityReminder in Frameworks */ = {isa = PBXBuildFile; productRef = D4FE9FC22BF5342B003305A9 /* DayActivityReminder */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4FE9FC32BF5342B003305A9 /* DayActivityReminder in Frameworks */,
 				D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */,
 				D4CCE6272BC7B4BB00C198C5 /* UserNotificationsUI.framework in Frameworks */,
 				D4CCE6252BC7B4BB00C198C5 /* UserNotifications.framework in Frameworks */,
@@ -231,6 +233,7 @@
 			name = "Notification Content";
 			packageProductDependencies = (
 				D4CCE63C2BCACB8E00C198C5 /* EveningSummary */,
+				D4FE9FC22BF5342B003305A9 /* DayActivityReminder */,
 			);
 			productName = "Notification Content";
 			productReference = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */;
@@ -505,7 +508,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.8;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -542,7 +545,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.8;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -608,7 +611,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -639,7 +642,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -700,6 +703,10 @@
 		D4CCE63C2BCACB8E00C198C5 /* EveningSummary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EveningSummary;
+		};
+		D4FE9FC22BF5342B003305A9 /* DayActivityReminder */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DayActivityReminder;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

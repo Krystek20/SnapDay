@@ -33,5 +33,6 @@ extension DayActivityEntity {
         try task.managedObject(context)
       }
     ) as NSSet
+    reminderDate = dayActivity.reminderDate
   }
 }

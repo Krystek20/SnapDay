@@ -17,6 +17,7 @@ public struct DayActivityTaskFormFeature {
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.date) var date
   @Dependency(\.uuid) var uuid
+  @Dependency(\.calendar) var calendar
 
   // MARK: - State & Action
 
@@ -25,16 +26,19 @@ public struct DayActivityTaskFormFeature {
     
     var dayActivityTask: DayActivityTask
     var isPhotoPickerPresented: Bool = false
-    @Presents var showEmojiPicker: EmojiPickerFeature.State?
+    @Presents var emojiPicker: EmojiPickerFeature.State?
     var type: DayActivityTaskFormType
     var photoItem: PhotoItem?
+    let availableDateHours: ClosedRange<Date>
 
     public init(
       dayActivityTask: DayActivityTask,
-      type: DayActivityTaskFormType
+      type: DayActivityTaskFormType,
+      availableDateHours: ClosedRange<Date>
     ) {
       self.dayActivityTask = dayActivityTask
       self.type = type
+      self.availableDateHours = availableDateHours
     }
   }
 
@@ -47,6 +51,7 @@ public struct DayActivityTaskFormFeature {
       case saveButtonTapped
       case deleteButtonTapped
       case isDoneToggleChanged(Bool)
+      case remindToggeled(Bool)
     }
     public enum InternalAction: Equatable { 
       case setImageDate(_ date: Data?)
@@ -57,7 +62,7 @@ public struct DayActivityTaskFormFeature {
       case dayActivityTaskCreated(DayActivityTask)
     }
 
-    case showEmojiPicker(PresentationAction<EmojiPickerFeature.Action>)
+    case emojiPicker(PresentationAction<EmojiPickerFeature.Action>)
 
     case binding(BindingAction<State>)
 
@@ -76,58 +81,84 @@ public struct DayActivityTaskFormFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case .view(.saveButtonTapped):
-        return .run { [dayActivityTask = state.dayActivityTask, type = state.type] send in
-          switch type {
-          case .new:
-            await send(.delegate(.dayActivityTaskCreated(dayActivityTask)))
-          case .edit:
-            await send(.delegate(.dayActivityTaskUpdated(dayActivityTask)))
-          }
-          await dismiss()
-        }
-      case .view(.deleteButtonTapped):
-        return .run { [dayActivityTask = state.dayActivityTask] send in
-          await send(.delegate(.dayActivityTaskDeleted(dayActivityTask)))
-          await dismiss()
-        }
-      case .view(.isDoneToggleChanged(let value)):
-        state.dayActivityTask.doneDate = value ? date() : nil
-        return .none
-      case .view(.iconTapped):
-        state.showEmojiPicker = EmojiPickerFeature.State()
-        return .none
-      case .view(.pickPhotoTapped):
-        state.isPhotoPickerPresented = true
-        return .none
-      case .view(.removeImageTapped):
-        state.dayActivityTask.overview = nil
-        return .none
-      case .view(.imageSelected(let item)):
-        return .run { send in
-          let data = try await item.loadImageData(size: 140.0)
-          await send(.internal(.setImageDate(data)))
-        }
-      case .internal(.setImageDate(let imageData)):
-        state.dayActivityTask.icon = Icon(
-          id: uuid(),
-          data: imageData
-        )
-        return .none
-      case .showEmojiPicker(.presented(.delegate(.dataSelected(let data)))):
-        return .run { [data] send in
-          await send(.internal(.setImageDate(data)))
-        }
-      case .showEmojiPicker:
-        return .none
+      case .view(let viewAction):
+        handleViewAction(viewAction, state: &state)
+      case .internal(let internalAction):
+        handleInternalAction(internalAction, state: &state)
+      case .emojiPicker(let action):
+        handleEmojiPickerAction(action, state: &state)
       case .delegate:
-        return .none
+        .none
       case .binding:
-        return .none
+        .none
       }
     }
-    .ifLet(\.$showEmojiPicker, action: \.showEmojiPicker) {
+    .ifLet(\.$emojiPicker, action: \.emojiPicker) {
       EmojiPickerFeature()
+    }
+  }
+
+  func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .saveButtonTapped:
+      return .run { [dayActivityTask = state.dayActivityTask, type = state.type] send in
+        switch type {
+        case .new:
+          await send(.delegate(.dayActivityTaskCreated(dayActivityTask)))
+        case .edit:
+          await send(.delegate(.dayActivityTaskUpdated(dayActivityTask)))
+        }
+        await dismiss()
+      }
+    case .deleteButtonTapped:
+      return .run { [dayActivityTask = state.dayActivityTask] send in
+        await send(.delegate(.dayActivityTaskDeleted(dayActivityTask)))
+        await dismiss()
+      }
+    case .isDoneToggleChanged(let value):
+      state.dayActivityTask.doneDate = value ? date() : nil
+      return .none
+    case .iconTapped:
+      state.emojiPicker = EmojiPickerFeature.State()
+      return .none
+    case .pickPhotoTapped:
+      state.isPhotoPickerPresented = true
+      return .none
+    case .removeImageTapped:
+      state.dayActivityTask.overview = nil
+      return .none
+    case .imageSelected(let item):
+      return .run { send in
+        let data = try await item.loadImageData(size: 140.0)
+        await send(.internal(.setImageDate(data)))
+      }
+    case .remindToggeled(let value):
+      state.dayActivityTask.reminderDate = value
+      ? calendar.setHourAndMinute(date.now, toDate: state.availableDateHours.lowerBound)
+      : nil
+      return .none
+    }
+  }
+
+  private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .setImageDate(let imageData):
+      state.dayActivityTask.icon = Icon(
+        id: uuid(),
+        data: imageData
+      )
+      return .none
+    }
+  }
+
+  private func handleEmojiPickerAction(_ action: PresentationAction<EmojiPickerFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.dataSelected(let data))):
+      return .run { [data] send in
+        await send(.internal(.setImageDate(data)))
+      }
+    case .presented, .dismiss:
+      return .none
     }
   }
 }

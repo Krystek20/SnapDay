@@ -11,7 +11,7 @@ public struct DayEditor {
   public var removeDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
   public var updateDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
   public var updateDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
-  public var applyChanges: @Sendable (_ transactions: Transactions) async throws -> [Date]
+  public var applyChanges: @Sendable (_ transactions: Transactions) async throws -> AppliedChanges
 }
 
 extension DependencyValues {

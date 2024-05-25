@@ -13,6 +13,9 @@ extension DayActivity {
       if duration == .zero {
         duration = dayActivity.duration
       }
+      if reminderDate == nil {
+        reminderDate = dayActivity.reminderDate
+      }
       if overview == nil || overview?.isEmpty == true {
         overview = dayActivity.overview
       }

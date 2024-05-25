@@ -20,7 +20,7 @@ public struct EntityHandler {
 
   // MARK: - Dependencies
 
-  @Dependency(\.coreDataStack) var coreDataStack
+  @Dependency(\.coreDataStack) private var coreDataStack
 
   // MARK: - Public
 

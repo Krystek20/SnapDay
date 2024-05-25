@@ -78,6 +78,7 @@ public struct DayActivityFormView: View {
         nameTextField
         tagsView
         durationFormView
+        reminderFormView
         overviewTextField
         if store.showLabelField {
           labelsView
@@ -204,6 +205,24 @@ public struct DayActivityFormView: View {
             $store.dayActivity.wrappedValue.setDurationMinutes($0)
           }
         )
+      )
+    }
+  }
+
+  private var reminderFormView: some View {
+    WithPerceptionTracking {
+      ReminderFormView(
+        reminderDate: store.dayActivity.reminderDate,
+        availableDateHours: store.availableDateHours,
+        toggleBinding: Binding(
+          get: {
+            store.dayActivity.reminderDate != nil
+          },
+          set: { value in
+            store.send(.view(.remindToggeled(value)))
+          }
+        ), 
+        dateBinding: $store.dayActivity.reminderDate
       )
     }
   }

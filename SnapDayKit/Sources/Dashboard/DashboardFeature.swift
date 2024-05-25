@@ -23,8 +23,9 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
+  @Dependency(\.calendar) private var calendar
   private let periodTitleProvider = PeriodTitleProvider()
-  private let userNotificationCenterProvider = UserNotificationCenterProvider()
+  private let dashboardNotificiationUpdater = DashboardNotificiationUpdater()
 
   // MARK: - State & Action
 
@@ -37,7 +38,6 @@ public struct DashboardFeature: TodayProvidable {
     var timePeriod: TimePeriod?
     var shift: Int = .zero
     var activitiesPresentationTitle = ""
-    var dayActivityToEdit: DayActivity?
 
     var daySummary: DaySummary? {
       guard let selectedDay else { return nil }
@@ -85,12 +85,13 @@ public struct DashboardFeature: TodayProvidable {
     public enum ViewAction: Equatable {
       case appeared
       case activityListButtonTapped
-      case oneTimeActivityButtonTapped
+      case addDayActivityButtonTapped
       case dayActivityTapped(DayActivity)
       case dayActivityEditTapped(DayActivity)
       case dayActivityRemoveTapped(DayActivity)
-      case dayActivityTaskTapped(DayActivity, DayActivityTask)
-      case dayActivityEditTaskTapped(DayActivity, DayActivityTask)
+      case addDayActivityTaskButtonTapped(DayActivity)
+      case dayActivityTaskTapped(DayActivityTask)
+      case dayActivityEditTaskTapped(DayActivityTask)
       case removeDayActivityTaskTapped(DayActivityTask)
       case showCompletedActivitiesTapped
       case hideCompletedActivitiesTapped
@@ -101,11 +102,30 @@ public struct DashboardFeature: TodayProvidable {
       case decreaseButtonTapped
     }
     public enum InternalAction: Equatable {
-      case changedDates([Date])
+      case changesApplied(AppliedChanges)
       case loadTimePeriods
       case timePeriodLoaded(_ timePeriod: TimePeriod)
-      case removeDayActivity(_ dayActivity: DayActivity)
       case calendarDayChanged
+      case dayActivityAction(DayActivityAction)
+      case dayActivityTaskAction(DayActivityTaskAction)
+
+      public enum DayActivityAction: Equatable {
+        case showNewForm
+        case showEditForm(DayActivity)
+        case select(DayActivity)
+        case create(DayActivity)
+        case update(DayActivity)
+        case remove(DayActivity)
+      }
+
+      public enum DayActivityTaskAction: Equatable {
+        case showNewForm(DayActivity)
+        case showEditForm(DayActivityTask)
+        case select(DayActivityTask)
+        case create(DayActivityTask)
+        case update(DayActivityTask)
+        case remove(DayActivityTask)
+      }
     }
     public enum DelegateAction: Equatable {
       case reportsTapped
@@ -185,12 +205,17 @@ public struct DashboardFeature: TodayProvidable {
           for await notification in NotificationCenter.default.publisher(for: .snapDayStoreDidChange).values {
             guard let userInfo = notification.object as? [UserInfoKey: Any],
                   let transactions = userInfo[.transactions] as? Transactions else { return }
-            let changedDates = try await dayEditor.applyChanges(transactions)
-            await send(.internal(.changedDates(changedDates)))
+            let appliedChanges = try await dayEditor.applyChanges(transactions)
+            await send(.internal(.changesApplied(appliedChanges)))
           }
         },
         .run { send in
-          try await userNotificationCenterProvider.schedule(identifier: .eveningSummary)
+          for await _ in dashboardNotificiationUpdater.userActionStream {
+            await send(.internal(.loadTimePeriods))
+          }
+        },
+        .run { send in
+          try await dashboardNotificiationUpdater.onAppear()
         },
         .run { send in
           for await _ in NotificationCenter.default.publisher(for: .NSCalendarDayChanged).values {
@@ -207,61 +232,22 @@ public struct DashboardFeature: TodayProvidable {
         )
       )
       return .none
-    case .oneTimeActivityButtonTapped:
-      guard let selectedDay = state.selectedDay else { return .none }
-      state.editDayActivity = DayActivityFormFeature.State(
-        type: .new,
-        dayActivity: DayActivity(
-          id: uuid(),
-          dayId: selectedDay.id,
-          isGeneratedAutomatically: false
-        )
-      )
-      return .none
-    case .dayActivityTapped(var dayActivity):
-      if dayActivity.doneDate == nil {
-        dayActivity.doneDate = date()
-      } else {
-        dayActivity.doneDate = nil
-      }
-      return .run { [dayActivity] send in
-        try await dayActivityRepository.saveActivity(dayActivity)
-        await send(.internal(.loadTimePeriods))
-      }
+    case .addDayActivityButtonTapped:
+      return .send(.internal(.dayActivityAction(.showNewForm)))
+    case .dayActivityTapped(let dayActivity):
+      return .send(.internal(.dayActivityAction(.select(dayActivity))))
     case .dayActivityEditTapped(let dayActivity):
-      state.editDayActivity = DayActivityFormFeature.State(
-        type: .edit,
-        dayActivity: dayActivity
-      )
-      return .none
+      return .send(.internal(.dayActivityAction(.showEditForm(dayActivity))))
     case .dayActivityRemoveTapped(let dayActivity):
-      return .run { send in
-        await send(.internal(.removeDayActivity(dayActivity)))
-      }
-    case .dayActivityTaskTapped(var dayActivity, var dayActivityTask):
-      guard let index = dayActivity.dayActivityTasks.firstIndex(where: { $0.id ==  dayActivityTask.id }) else { return .none }
-      if dayActivityTask.doneDate == nil {
-        dayActivityTask.doneDate = date()
-      } else {
-        dayActivityTask.doneDate = nil
-      }
-      dayActivity.dayActivityTasks[index] = dayActivityTask
-      return .run { [dayActivity] send in
-        try await dayActivityRepository.saveActivity(dayActivity)
-        await send(.internal(.loadTimePeriods))
-      }
-    case .dayActivityEditTaskTapped(let dayActivity, let dayActivityTask):
-      state.dayActivityToEdit = dayActivity
-      state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
-        dayActivityTask: dayActivityTask,
-        type: .edit
-      )
-      return .none
+      return .send(.internal(.dayActivityAction(.remove(dayActivity))))
+    case .addDayActivityTaskButtonTapped(let dayActivity):
+      return .send(.internal(.dayActivityTaskAction(.showNewForm(dayActivity))))
+    case .dayActivityTaskTapped(let dayActivityTask):
+      return .send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
+    case .dayActivityEditTaskTapped(let dayActivityTask):
+      return .send(.internal(.dayActivityTaskAction(.showEditForm(dayActivityTask))))
     case .removeDayActivityTaskTapped(let dayActivityTask):
-      return .run { [dayActivityTask] send in
-        try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
-        await send(.internal(.loadTimePeriods))
-      }
+      return .send(.internal(.dayActivityTaskAction(.remove(dayActivityTask))))
     case .showCompletedActivitiesTapped:
       state.activityListOption = .extended
       return .none
@@ -269,46 +255,40 @@ public struct DashboardFeature: TodayProvidable {
       state.activityListOption = .collapsed
       return .none
     case .reportButtonTapped:
-      return .run { send in
-        await send(.delegate(.reportsTapped))
-      }
+      return .send(.delegate(.reportsTapped))
     case .selectedPeriod(let period):
       state.selectedPeriod = period
       return .none
     case .increaseButtonTapped:
       state.shift += 1
-      return .run { send in
-        await send(.internal(.loadTimePeriods))
-      }
+      return .send(.internal(.loadTimePeriods))
     case .decreaseButtonTapped:
       state.shift -= 1
-      return .run { send in
-        await send(.internal(.loadTimePeriods))
-      }
+      return .send(.internal(.loadTimePeriods))
     case .todayButtonTapped:
       state.shift = .zero
       state.selectedDay = nil
-      return .run { send in
-        await send(.internal(.loadTimePeriods))
-      }
+      return .send(.internal(.loadTimePeriods))
     }
   }
 
   private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
     switch action {
-    case .changedDates(let dates):
-      for date in dates {
-        if state.timePeriod?.dateRange.contains(date) == true {
-          return .run { send in
-            await send(.internal(.loadTimePeriods))
-          }
+    case .changesApplied(let appliedChanges):
+      let shouldReload = appliedChanges.dates.contains { date in
+        state.timePeriod?.dateRange.contains(date) ?? false
+      }
+      return .merge(
+        .run { _ in
+          try await dashboardNotificiationUpdater.onMerged(appliedChanges)
+        },
+        .run { [shouldReload] send in
+          guard shouldReload else { return }
+          await send(.internal(.loadTimePeriods))
         }
-      }
-      return .none
+      )
     case .calendarDayChanged:
-      return .run { send in
-        await send(.internal(.loadTimePeriods))
-      }
+      return .send(.internal(.loadTimePeriods))
     case .loadTimePeriods:
       return .run { [period = state.selectedPeriod, shift = state.shift] send in
         do {
@@ -322,9 +302,114 @@ public struct DashboardFeature: TodayProvidable {
       state.timePeriod = timePeriod
       setupTimePeriodConfiguration(&state, timePeriod: timePeriod)
       return .none
-    case .removeDayActivity(let dayActivity):
-      return .run { [dayActivity, dayToUpdate = state.selectedDay] send in
-        try await dayEditor.removeDayActivity(dayActivity, dayToUpdate?.date ?? today)
+    case .dayActivityAction(let action):
+      return handleDayActivityAction(action, state: &state)
+    case .dayActivityTaskAction(let action):
+      return handleDayActivityTaskAction(action, state: &state)
+    }
+  }
+
+  private func handleDayActivityAction(_ action: Action.InternalAction.DayActivityAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .showNewForm:
+      guard let selectedDay = state.selectedDay else { return .none }
+      state.editDayActivity = DayActivityFormFeature.State(
+        type: .new,
+        dayActivity: DayActivity(
+          id: uuid(),
+          dayId: selectedDay.id,
+          isGeneratedAutomatically: false
+        ),
+        availableDateHours: calendar.currentDateRange(selectedDay.date)
+      )
+      return .none
+    case .showEditForm(let dayActivity):
+      guard let selectedDay = state.selectedDay else { return .none }
+      state.editDayActivity = DayActivityFormFeature.State(
+        type: .edit,
+        dayActivity: dayActivity,
+        availableDateHours: calendar.currentDateRange(selectedDay.date)
+      )
+      return .none
+    case .select(var dayActivity):
+      dayActivity.doneDate = dayActivity.doneDate == nil ? date() : nil
+      return .run { [dayActivity] send in
+        try await dayActivityRepository.saveActivity(dayActivity)
+        await send(.internal(.loadTimePeriods))
+      }
+    case .create(let dayActivity):
+      return .run { [dayActivity, selectedDay = state.selectedDay] send in
+        try await dashboardNotificiationUpdater.onActivityCreated(dayActivity)
+        try await dayEditor.addDayActivity(dayActivity, selectedDay?.date ?? today)
+        await send(.internal(.loadTimePeriods))
+      }
+    case .update(let dayActivity):
+      let dayActivityBeforeUpdate = state.selectedDay?.activities.first(where: { $0.id == dayActivity.id })
+      return .run { [dayActivityBeforeUpdate, dayActivity, selectedDay = state.selectedDay] send in
+        try await dashboardNotificiationUpdater.onActivityUpdated(dayActivity, dayActivityBeforeUpdate: dayActivityBeforeUpdate)
+        try await dayEditor.updateDayActivity(dayActivity, selectedDay?.date ?? today)
+        await send(.internal(.loadTimePeriods))
+      }
+    case .remove(let dayActivity):
+      return .run { [dayActivity, selectedDay = state.selectedDay] send in
+        try await dashboardNotificiationUpdater.onActivityRemoved(dayActivity)
+        try await dayEditor.removeDayActivity(dayActivity, selectedDay?.date ?? today)
+        await send(.internal(.loadTimePeriods))
+      }
+    }
+  }
+
+  private func handleDayActivityTaskAction(_ action: Action.InternalAction.DayActivityTaskAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .showNewForm(let dayActivity):
+      guard let day = state.selectedDay else { return .none }
+      state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
+        dayActivityTask: DayActivityTask(
+          id: uuid(),
+          dayActivityId: dayActivity.id
+        ),
+        type: .new,
+        availableDateHours: calendar.currentDateRange(day.date)
+      )
+      return .none
+    case .showEditForm(let dayActivityTask):
+      guard let day = state.selectedDay else { return .none }
+      state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
+        dayActivityTask: dayActivityTask,
+        type: .edit,
+        availableDateHours: calendar.currentDateRange(day.date)
+      )
+      return .none
+    case .select(var dayActivityTask):
+      dayActivityTask.doneDate = dayActivityTask.doneDate == nil ? date() : nil
+      return .run { [dayActivityTask] send in
+        try await dayActivityRepository.saveActivityTask(dayActivityTask)
+        await send(.internal(.loadTimePeriods))
+      }
+    case .create(let dayActivityTask):
+      guard var dayActivity = state.selectedDay?.activities.first(where: { $0.id == dayActivityTask.dayActivityId }) else { return .none }
+      dayActivity.dayActivityTasks.append(dayActivityTask)
+      return .run { [dayActivity, dayActivityTask] send in
+        try await dashboardNotificiationUpdater.onActivityTaskCreated(dayActivityTask)
+        try await dayActivityRepository.saveActivity(dayActivity)
+        await send(.internal(.loadTimePeriods))
+      }
+    case .update(let dayActivityTask):
+      let dayActivityTaskBeforeUpdate = state
+        .selectedDay?
+        .activities
+        .first(where: { $0.dayActivityTasks.contains { $0.id == dayActivityTask.id } })?
+        .dayActivityTasks
+        .first(where: { $0.id == dayActivityTask.id })
+      return .run { [dayActivityTask] send in
+        try await dayActivityRepository.saveActivityTask(dayActivityTask)
+        try await dashboardNotificiationUpdater.onActivityTaskUpdated(dayActivityTask, dayActivityTaskBeforeUpdate: dayActivityTaskBeforeUpdate)
+        await send(.internal(.loadTimePeriods))
+      }
+    case .remove(let dayActivityTask):
+      return .run { [dayActivityTask] send in
+        try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
+        try await dashboardNotificiationUpdater.onActivityTaskRemoved(dayActivityTask)
         await send(.internal(.loadTimePeriods))
       }
     }
@@ -333,19 +418,11 @@ public struct DashboardFeature: TodayProvidable {
   private func handleDayActivityFormAction(_ action: PresentationAction<DayActivityFormFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
     case .presented(.delegate(.activityCreated(let dayActivity))):
-      return .run { [dayActivity, dayToUpdate = state.selectedDay] send in
-        try await dayEditor.addDayActivity(dayActivity, dayToUpdate?.date ?? today)
-        await send(.internal(.loadTimePeriods))
-      }
+      return .send(.internal(.dayActivityAction(.create(dayActivity))))
     case .presented(.delegate(.activityUpdated(let dayActivity))):
-      return .run { [dayActivity, dayToUpdate = state.selectedDay] send in
-        try await dayEditor.updateDayActivity(dayActivity, dayToUpdate?.date ?? today)
-        await send(.internal(.loadTimePeriods))
-      }
+      return .send(.internal(.dayActivityAction(.update(dayActivity))))
     case .presented(.delegate(.activityDeleted(let dayActivity))):
-      return .run { send in
-        await send(.internal(.removeDayActivity(dayActivity)))
-      }
+      return .send(.internal(.dayActivityAction(.remove(dayActivity))))
     default:
       return .none
     }
@@ -378,8 +455,8 @@ public struct DashboardFeature: TodayProvidable {
   private func handleActivityFormAction(_ action: PresentationAction<ActivityFormFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
     case .presented(.delegate(.activityCreated(let activity))):
-      return .run { [activity, dayToUpdate = state.selectedDay] send in
-        try await dayEditor.addActivity(activity, dayToUpdate?.date ?? today)
+      return .run { [activity, selectedDay = state.selectedDay] send in
+        try await dayEditor.addActivity(activity, selectedDay?.date ?? today)
         await send(.internal(.loadTimePeriods))
       }
     default:
@@ -389,26 +466,12 @@ public struct DashboardFeature: TodayProvidable {
 
   private func handleDayActivityTaskFormAction(_ action: PresentationAction<DayActivityTaskFormFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
-    case .presented(.delegate(.dayActivityTaskDeleted(let dayActivityTask))):
-      guard var dayActivityToEdit = state.dayActivityToEdit else { return .none }
-      dayActivityToEdit.dayActivityTasks.removeAll(where: { $0.id ==  dayActivityTask.id })
-      state.dayActivityToEdit = nil
-      return .run { [dayActivityToEdit] send in
-        try await dayActivityRepository.saveActivity(dayActivityToEdit)
-        await send(.internal(.loadTimePeriods))
-      }
+    case .presented(.delegate(.dayActivityTaskCreated(let dayActivityTask))):
+      return .send(.internal(.dayActivityTaskAction(.create(dayActivityTask))))
     case .presented(.delegate(.dayActivityTaskUpdated(let dayActivityTask))):
-      guard var dayActivityToEdit = state.dayActivityToEdit,
-            let index = dayActivityToEdit.dayActivityTasks.firstIndex(where: { $0.id == dayActivityTask.id }) else { return .none }
-      dayActivityToEdit.dayActivityTasks[index] = dayActivityTask
-      state.dayActivityToEdit = nil
-      return .run { [dayActivityToEdit] send in
-        try await dayActivityRepository.saveActivity(dayActivityToEdit)
-        await send(.internal(.loadTimePeriods))
-      }
-    case .dismiss:
-      state.dayActivityToEdit = nil
-      return .none
+      return .send(.internal(.dayActivityTaskAction(.update(dayActivityTask))))
+    case .presented(.delegate(.dayActivityTaskDeleted(let dayActivityTask))):
+      return .send(.internal(.dayActivityTaskAction(.remove(dayActivityTask))))
     default:
       return .none
     }

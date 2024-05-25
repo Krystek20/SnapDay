@@ -17,7 +17,8 @@ extension DayActivityTask {
       icon: try entity.icon.map(Icon.init),
       doneDate: entity.doneDate,
       duration: Int(entity.duration),
-      overview: entity.overview
+      overview: entity.overview,
+      reminderDate: entity.reminderDate
     )
   }
 }
