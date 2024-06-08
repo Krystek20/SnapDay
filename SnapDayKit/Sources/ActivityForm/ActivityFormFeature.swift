@@ -29,11 +29,13 @@ public struct ActivityFormFeature: TodayProvidable {
   @Dependency(\.activityRepository) var activityRepository
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.uuid) var uuid
+  @Dependency(\.calendar) var calendar
+  @Dependency(\.date) var date
 
   // MARK: - State & Action
 
   @ObservableState
-  public struct State: Equatable {
+  public struct State: Equatable, TodayProvidable {
 
     public enum Field: Hashable {
       case name
@@ -63,6 +65,10 @@ public struct ActivityFormFeature: TodayProvidable {
       @Dependency(\.calendar) var calendar
       return WeekdaysProvider(calendar: calendar).weekdays
     }
+    var dateHoursAndMinutes: ClosedRange<Date> {
+      @Dependency(\.calendar) var calendar
+      return calendar.hoursAndMinutes(today)
+    }
 
     let type: ActivityFormType
     var tasksToRemove: [ActivityTask] = []
@@ -90,6 +96,7 @@ public struct ActivityFormFeature: TodayProvidable {
       case addTaskButtonTapped
       case editButtonTapped(ActivityTask)
       case removeButtonTapped(ActivityTask)
+      case remindToggeled(Bool)
     }
     public enum InternalAction: Equatable {
       case setExistingTags([Tag])
@@ -216,6 +223,11 @@ public struct ActivityFormFeature: TodayProvidable {
     case .removeButtonTapped(let activityTask):
       state.tasksToRemove.append(activityTask)
       state.activity.tasks.removeAll(where: { $0.id == activityTask.id })
+      return .none
+    case .remindToggeled(let value):
+      state.activity.defaultReminderDate = value
+      ? calendar.setHourAndMinute(date.now, toDate: state.dateHoursAndMinutes.lowerBound)
+      : nil
       return .none
     }
   }

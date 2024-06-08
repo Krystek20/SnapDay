@@ -24,8 +24,8 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
   @Dependency(\.calendar) private var calendar
+  @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   private let periodTitleProvider = PeriodTitleProvider()
-  private let dashboardNotificiationUpdater = DashboardNotificiationUpdater()
 
   // MARK: - State & Action
 
@@ -210,12 +210,14 @@ public struct DashboardFeature: TodayProvidable {
           }
         },
         .run { send in
-          for await _ in dashboardNotificiationUpdater.userActionStream {
+          for await _ in userNotificationCenterProvider.userActionStream {
             await send(.internal(.loadTimePeriods))
           }
         },
         .run { send in
-          try await dashboardNotificiationUpdater.onAppear()
+          try await userNotificationCenterProvider.schedule(
+            userNotification: EveningSummary(calendar: calendar)
+          )
         },
         .run { send in
           for await _ in NotificationCenter.default.publisher(for: .NSCalendarDayChanged).values {
@@ -279,9 +281,6 @@ public struct DashboardFeature: TodayProvidable {
         state.timePeriod?.dateRange.contains(date) ?? false
       }
       return .merge(
-        .run { _ in
-          try await dashboardNotificiationUpdater.onMerged(appliedChanges)
-        },
         .run { [shouldReload] send in
           guard shouldReload else { return }
           await send(.internal(.loadTimePeriods))
@@ -301,7 +300,9 @@ public struct DashboardFeature: TodayProvidable {
     case .timePeriodLoaded(let timePeriod):
       state.timePeriod = timePeriod
       setupTimePeriodConfiguration(&state, timePeriod: timePeriod)
-      return .none
+      return .run { _ in
+        try await userNotificationCenterProvider.reloadReminders()
+      }
     case .dayActivityAction(let action):
       return handleDayActivityAction(action, state: &state)
     case .dayActivityTaskAction(let action):
@@ -339,20 +340,16 @@ public struct DashboardFeature: TodayProvidable {
       }
     case .create(let dayActivity):
       return .run { [dayActivity, selectedDay = state.selectedDay] send in
-        try await dashboardNotificiationUpdater.onActivityCreated(dayActivity)
         try await dayEditor.addDayActivity(dayActivity, selectedDay?.date ?? today)
         await send(.internal(.loadTimePeriods))
       }
     case .update(let dayActivity):
-      let dayActivityBeforeUpdate = state.selectedDay?.activities.first(where: { $0.id == dayActivity.id })
-      return .run { [dayActivityBeforeUpdate, dayActivity, selectedDay = state.selectedDay] send in
-        try await dashboardNotificiationUpdater.onActivityUpdated(dayActivity, dayActivityBeforeUpdate: dayActivityBeforeUpdate)
+      return .run { [dayActivity, selectedDay = state.selectedDay] send in
         try await dayEditor.updateDayActivity(dayActivity, selectedDay?.date ?? today)
         await send(.internal(.loadTimePeriods))
       }
     case .remove(let dayActivity):
       return .run { [dayActivity, selectedDay = state.selectedDay] send in
-        try await dashboardNotificiationUpdater.onActivityRemoved(dayActivity)
         try await dayEditor.removeDayActivity(dayActivity, selectedDay?.date ?? today)
         await send(.internal(.loadTimePeriods))
       }
@@ -389,27 +386,18 @@ public struct DashboardFeature: TodayProvidable {
     case .create(let dayActivityTask):
       guard var dayActivity = state.selectedDay?.activities.first(where: { $0.id == dayActivityTask.dayActivityId }) else { return .none }
       dayActivity.dayActivityTasks.append(dayActivityTask)
-      return .run { [dayActivity, dayActivityTask] send in
-        try await dashboardNotificiationUpdater.onActivityTaskCreated(dayActivityTask)
+      return .run { [dayActivity] send in
         try await dayActivityRepository.saveActivity(dayActivity)
         await send(.internal(.loadTimePeriods))
       }
     case .update(let dayActivityTask):
-      let dayActivityTaskBeforeUpdate = state
-        .selectedDay?
-        .activities
-        .first(where: { $0.dayActivityTasks.contains { $0.id == dayActivityTask.id } })?
-        .dayActivityTasks
-        .first(where: { $0.id == dayActivityTask.id })
       return .run { [dayActivityTask] send in
         try await dayActivityRepository.saveActivityTask(dayActivityTask)
-        try await dashboardNotificiationUpdater.onActivityTaskUpdated(dayActivityTask, dayActivityTaskBeforeUpdate: dayActivityTaskBeforeUpdate)
         await send(.internal(.loadTimePeriods))
       }
     case .remove(let dayActivityTask):
       return .run { [dayActivityTask] send in
         try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
-        try await dashboardNotificiationUpdater.onActivityTaskRemoved(dayActivityTask)
         await send(.internal(.loadTimePeriods))
       }
     }

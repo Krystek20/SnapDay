@@ -15,7 +15,7 @@ public protocol UserNotificationCenter {
 
 extension UNUserNotificationCenter: UserNotificationCenter { }
 
-public final class UserNotificationCenterProvider: NSObject {
+public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
 
   private enum UserAction: String {
     case done = "DONE_ACTION"
@@ -103,6 +103,53 @@ public final class UserNotificationCenterProvider: NSObject {
     userNotificationCenter.removePendingNotificationRequests(withIdentifiers: [userNotification.identifier])
   }
 }
+
+extension UserNotificationCenterProvider {
+  public func reloadReminders() async throws {
+    let pendingRequests = await userNotificationCenter.pendingNotificationRequests()
+      .filter { $0.content.categoryIdentifier == UserNotificationCategoryIdentifier.dayActivityReminder.rawValue }
+    userNotificationCenter.removePendingNotificationRequests(withIdentifiers: pendingRequests.map(\.identifier))
+
+    let dayActivities = try await dayActivityRepository.activities(today...tomorrow)
+    for dayActivity in dayActivities {
+      if let reminderDate = dayActivity.reminderDate, reminderDate > date.now {
+        try await schedule(
+          userNotification: DayActivityNotification(
+            type: .activity(dayActivity),
+            calendar: calendar
+          )
+        )
+      }
+      for dayActivityTask in dayActivity.dayActivityTasks {
+        guard let reminderDate = dayActivityTask.reminderDate, reminderDate > date.now else { continue }
+        try await userNotificationCenterProvider.schedule(
+          userNotification: DayActivityNotification(
+            type: .activityTask(dayActivityTask),
+            calendar: calendar
+          )
+        )
+      }
+    }
+  }
+}
+
+#if DEBUG
+extension UserNotificationCenterProvider {
+  public var pendingRequests: [String] {
+    get async {
+      await userNotificationCenter.pendingNotificationRequests()
+        .map { request in
+          let identifier = request.identifier
+          guard let trigger = request.trigger as? UNCalendarNotificationTrigger,
+             let triggerDate = calendar.nextDate(after: Date(), matching: trigger.dateComponents, matchingPolicy: .nextTime) else {
+            return identifier
+          }
+          return identifier + " | \(triggerDate)"
+        }
+    }
+  }
+}
+#endif
 
 extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {

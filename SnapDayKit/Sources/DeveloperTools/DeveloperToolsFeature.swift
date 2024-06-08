@@ -20,16 +20,20 @@ public struct DeveloperToolsFeature: TodayProvidable {
 
   @ObservableState
   public struct State: Equatable {
+    var pendingIdentifiers: [String] = []
     public init() { }
   }
 
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable { 
+      case appeared
       case sendDayActivityReminderNotificationButtonTapped
       case sendDayActivityTaskReminderNotificationButtonTapped
       case sendEveningSummaryReminderNotificationButtonTapped
     }
-    public enum InternalAction: Equatable { 
+    public enum InternalAction: Equatable {
+      case loadPendingRequests
+      case setPendingIdentifiers([String])
       case schedule(notification: DeveloperNotificiation)
     }
     public enum DelegateAction: Equatable { }
@@ -67,6 +71,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
 
   private func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
     switch action {
+    case .appeared:
+        .send(.internal(.loadPendingRequests))
     case .sendDayActivityReminderNotificationButtonTapped:
       .run { send in
         let day = try await dayRepository.loadDay(today)
@@ -103,10 +109,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
         }
     case .sendEveningSummaryReminderNotificationButtonTapped:
         .run { send in
-          let eveningSummary = EveningSummary(
-            calendar: calendar,
-            date: date.now
-          )
+          let eveningSummary = EveningSummary(calendar: calendar)
           let notification = DeveloperNotificiation(
             identifier: uuid().uuidString,
             content: eveningSummary.content
@@ -119,31 +122,21 @@ public struct DeveloperToolsFeature: TodayProvidable {
   private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
     switch action {
     case .schedule(let notification):
-        .run { send in
-          try await userNotificationCenterProvider.schedule(
-            userNotification: notification
-          )
-        }
+      return .run { send in
+        try await userNotificationCenterProvider.schedule(
+          userNotification: notification
+        )
+      }
+    case .loadPendingRequests:
+      return .run { send in
+        #if DEBUG
+        let identifiers = await userNotificationCenterProvider.pendingRequests
+        await send(.internal(.setPendingIdentifiers(identifiers)))
+        #endif
+      }
+    case .setPendingIdentifiers(let identifiers):
+      state.pendingIdentifiers = identifiers
+      return .none
     }
-  }
-}
-
-import UserNotifications
-
-public struct DeveloperNotificiation: UserNotification {
-
-  public var identifier: String
-  public var content: UNMutableNotificationContent
-  public var trigger: UNCalendarNotificationTrigger?
-  public var canBySchedule: Bool
-
-  init(
-    identifier: String,
-    content: UNMutableNotificationContent
-  ) {
-    self.identifier = identifier
-    self.content = content
-    self.trigger = nil
-    self.canBySchedule = true
   }
 }

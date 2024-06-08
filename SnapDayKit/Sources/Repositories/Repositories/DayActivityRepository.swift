@@ -5,6 +5,7 @@ import Models
 public struct DayActivityRepository {
   public var activity: @Sendable (String) async throws -> DayActivity?
   public var activityTask: @Sendable (String) async throws -> DayActivityTask?
+  public var activities: @Sendable (ClosedRange<Date>) async throws -> [DayActivity]
   public var saveActivity: @Sendable (DayActivity) async throws -> ()
   public var saveActivityTask: @Sendable (DayActivityTask) async throws -> ()
   public var removeActivity: @Sendable (DayActivity) async throws -> ()
@@ -34,6 +35,14 @@ extension DayActivityRepository: DependencyKey {
           objectType: DayActivityTask.self,
           predicates: [
             NSPredicate(format: "identifier == %@", dayActivityTaskId)
+          ]
+        )
+      },
+      activities: { dates in
+        try await EntityHandler().fetch(
+          objectType: DayActivity.self,
+          predicates: [
+            NSPredicate(format: "day.date >= %@ AND day.date <= %@", dates.lowerBound as NSDate, dates.upperBound as NSDate)
           ]
         )
       },

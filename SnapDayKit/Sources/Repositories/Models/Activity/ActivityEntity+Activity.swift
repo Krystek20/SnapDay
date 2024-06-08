@@ -30,5 +30,6 @@ extension ActivityEntity {
         try task.managedObject(context)
       }
     ) as NSSet
+    defaultReminderDate = activity.defaultReminderDate
   }
 }

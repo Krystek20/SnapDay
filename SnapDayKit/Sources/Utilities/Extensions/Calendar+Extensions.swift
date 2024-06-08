@@ -34,6 +34,15 @@ extension Calendar {
     dateComponents.minute = currentMinute
     return date(from: dateComponents)
   }
+
+  public func hoursAndMinutes(_ forDate: Date) -> ClosedRange<Date> {
+    let startOfDay = startOfDay(for: forDate)
+    var endOfDayComponents = DateComponents()
+    endOfDayComponents.hour = 23
+    endOfDayComponents.minute = 59
+    let endOfDay = date(byAdding: endOfDayComponents, to: startOfDay)
+    return startOfDay...(endOfDay ?? startOfDay)
+  }
 }
 
 extension Calendar {

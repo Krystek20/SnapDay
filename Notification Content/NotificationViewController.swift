@@ -15,7 +15,7 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
     guard let identifier = UserNotificationCategoryIdentifier(rawValue: notification.request.content.categoryIdentifier) else { return }
     switch identifier {
     case .eveningSummary:
-      addEveningSummaryView(userInfo: notification.request.content.userInfo)
+      addEveningSummaryView(date: notification.date)
     case .dayActivityReminder:
       addDayActivityReminderView(userInfo: notification.request.content.userInfo)
     }
@@ -23,12 +23,7 @@ final class NotificationViewController: UIViewController, UNNotificationContentE
 
   // MARK: - Views
 
-  private func addEveningSummaryView(userInfo: [AnyHashable: Any]) {
-    let dateFormatter = ISO8601DateFormatter()
-    guard let userInfo = userInfo as? [String: String],
-          let stringDate = userInfo[EveningSummaryNotificationKey.date.rawValue],
-          let date = dateFormatter.date(from: stringDate) else { return }
-
+  private func addEveningSummaryView(date: Date) {
     var eveningSummaryView = EveningSummaryView(
       store: Store(
         initialState: EveningSummaryFeature.State(

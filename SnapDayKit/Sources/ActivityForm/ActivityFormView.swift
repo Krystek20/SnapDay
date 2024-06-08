@@ -56,7 +56,7 @@ public struct ActivityFormView: View {
               .navigationTitle(String(localized: "Add Task", bundle: .module))
               .navigationBarTitleDisplayMode(.large)
           }
-          .presentationDetents([.medium])
+          .presentationDetents([.large])
         }
         .fullScreenCover(item: $store.scope(state: \.emojiPicker, action: \.emojiPicker)) { store in
           NavigationStack {
@@ -91,6 +91,7 @@ public struct ActivityFormView: View {
         tagsView
         recurrencyViewIfNeeded
         durationView
+        reminderFormView
         tasksView
       }
       .padding(padding)
@@ -345,6 +346,24 @@ public struct ActivityFormView: View {
         .formBackgroundModifier()
         .id("DurationView")
       }
+    }
+  }
+
+  private var reminderFormView: some View {
+    WithPerceptionTracking {
+      ReminderFormView(
+        title: String(localized: "Default Reminder", bundle: .module),
+        availableDateHours: store.dateHoursAndMinutes,
+        toggleBinding: Binding(
+          get: {
+            store.activity.defaultReminderDate != nil
+          },
+          set: { value in
+            store.send(.view(.remindToggeled(value)))
+          }
+        ),
+        dateBinding: $store.activity.defaultReminderDate
+      )
     }
   }
 

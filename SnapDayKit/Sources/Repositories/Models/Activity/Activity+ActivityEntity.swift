@@ -23,7 +23,8 @@ extension Activity {
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
       startDate: entity.startDate,
       labels: try labels.map(ActivityLabel.init),
-      tasks: try tasks.map(ActivityTask.init)
+      tasks: try tasks.map(ActivityTask.init),
+      defaultReminderDate: entity.defaultReminderDate
     )
   }
 }

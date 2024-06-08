@@ -68,6 +68,7 @@ public struct ActivityTaskFormView: View {
         imageField
         nameTextField
         durationView
+        reminderFormView
       }
       .padding(padding)
       .maxWidth()
@@ -184,6 +185,25 @@ public struct ActivityTaskFormView: View {
       }
     }
   }
+
+  private var reminderFormView: some View {
+    WithPerceptionTracking {
+      ReminderFormView(
+        title: String(localized: "Default Reminder", bundle: .module),
+        availableDateHours: store.dateHoursAndMinutes,
+        toggleBinding: Binding(
+          get: {
+            store.activityTask.defaultReminderDate != nil
+          },
+          set: { value in
+            store.send(.view(.remindToggeled(value)))
+          }
+        ),
+        dateBinding: $store.activityTask.defaultReminderDate
+      )
+    }
+  }
+
 
   private var saveButton: some View {
     WithPerceptionTracking {

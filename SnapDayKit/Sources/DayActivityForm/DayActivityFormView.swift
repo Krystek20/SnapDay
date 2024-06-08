@@ -212,7 +212,7 @@ public struct DayActivityFormView: View {
   private var reminderFormView: some View {
     WithPerceptionTracking {
       ReminderFormView(
-        reminderDate: store.dayActivity.reminderDate,
+        title: String(localized: "Reminder", bundle: .module),
         availableDateHours: store.availableDateHours,
         toggleBinding: Binding(
           get: {

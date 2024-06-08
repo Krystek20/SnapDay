@@ -9,5 +9,6 @@ extension ActivityTaskEntity {
     icon = try activityTask.icon?.managedObject(context)
     isDefaultDuration = activityTask.defaultDuration != nil
     defaultDuration = Int32(activityTask.defaultDuration ?? .zero)
+    defaultReminderDate = activityTask.defaultReminderDate
   }
 }

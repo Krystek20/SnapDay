@@ -195,7 +195,8 @@ final class DayUpdater {
       day.activities.append(
         createDayActivity(
           dayId: day.id,
-          activity: activity
+          activity: activity,
+          dayDate: day.date
         )
       )
       return day
@@ -210,7 +211,8 @@ final class DayUpdater {
       createDayActivity(
         dayId: day.id,
         activity: activity,
-        createdByUser: true
+        createdByUser: true,
+        dayDate: day.date
       )
     )
     try await saveDay(day)
@@ -314,7 +316,8 @@ final class DayUpdater {
       days[index].activities.append(
         createDayActivity(
           dayId: days[index].id,
-          activity: activity
+          activity: activity,
+          dayDate: days[index].date
         )
       )
     }
@@ -332,7 +335,8 @@ final class DayUpdater {
         guard days.contains(date) else { return nil }
         return createDayActivity(
           dayId: dayId,
-          activity: activity
+          activity: activity,
+          dayDate: date
         )
       }
     )
@@ -341,7 +345,8 @@ final class DayUpdater {
   private func createDayActivity(
     dayId: UUID,
     activity: Activity,
-    createdByUser: Bool = false
+    createdByUser: Bool = false,
+    dayDate: Date
   ) -> DayActivity {
     let dayActivityId = uuid()
     return DayActivity(
@@ -365,10 +370,21 @@ final class DayUpdater {
           icon: $0.icon,
           doneDate: nil,
           duration: $0.defaultDuration ?? .zero,
-          overview: nil
+          overview: nil,
+          reminderDate: reminderDate(from: $0.defaultReminderDate, dayDate: dayDate)
         )
-      }
+      },
+      reminderDate: reminderDate(from: activity.defaultReminderDate, dayDate: dayDate)
     )
+  }
+
+  private func reminderDate(from reminderDate: Date?, dayDate: Date) -> Date? {
+    guard let reminderDate else { return nil }
+    var components = calendar.dateComponents([.year, .month, .day], from: dayDate)
+    let reminderComponets = calendar.dateComponents([.hour, .minute], from: reminderDate)
+    components.hour = reminderComponets.hour
+    components.minute = reminderComponets.minute
+    return calendar.date(from: components)
   }
 
   private func saveDays(_ days: [Day]) async throws {

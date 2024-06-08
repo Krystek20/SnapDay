@@ -13,6 +13,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
   public var startDate: Date?
   public var labels: [ActivityLabel]
   public var tasks: [ActivityTask]
+  public var defaultReminderDate: Date?
 
   // MARK: - Initialization
   
@@ -25,7 +26,8 @@ public struct Activity: Identifiable, Equatable, Hashable {
     defaultDuration: Int? = nil,
     startDate: Date? = nil,
     labels: [ActivityLabel] = [],
-    tasks: [ActivityTask] = []
+    tasks: [ActivityTask] = [],
+    defaultReminderDate: Date? = nil
   ) {
     self.id = id
     self.name = name
@@ -36,6 +38,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
     self.startDate = startDate
     self.labels = labels
     self.tasks = tasks
+    self.defaultReminderDate = defaultReminderDate
   }
 }
 

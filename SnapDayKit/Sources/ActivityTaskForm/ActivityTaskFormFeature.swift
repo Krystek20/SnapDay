@@ -24,11 +24,13 @@ public struct ActivityTaskFormFeature: TodayProvidable {
 
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.uuid) var uuid
+  @Dependency(\.calendar) var calendar
+  @Dependency(\.date) var date
 
   // MARK: - State & Action
 
   @ObservableState
-  public struct State: Equatable {
+  public struct State: Equatable, TodayProvidable {
 
     public enum Field: Hashable {
       case name
@@ -41,6 +43,11 @@ public struct ActivityTaskFormFeature: TodayProvidable {
     @Presents var showEmojiPicker: EmojiPickerFeature.State?
     var photoItem: PhotoItem?
     var isSaveButtonDisabled: Bool { activityTask.name.isEmpty }
+
+    var dateHoursAndMinutes: ClosedRange<Date> {
+      @Dependency(\.calendar) var calendar
+      return calendar.hoursAndMinutes(today)
+    }
 
     let type: ActivityTaskFormType
 
@@ -58,6 +65,7 @@ public struct ActivityTaskFormFeature: TodayProvidable {
       case removeImageTapped
       case saveButtonTapped
       case imageSelected(PhotoItem)
+      case remindToggeled(Bool)
     }
     public enum InternalAction: Equatable {
       case setImageDate(_ date: Data?)
@@ -105,6 +113,11 @@ public struct ActivityTaskFormFeature: TodayProvidable {
           let data = try await item.loadImageData(size: 140.0)
           await send(.internal(.setImageDate(data)))
         }
+      case .view(.remindToggeled(let value)):
+        state.activityTask.defaultReminderDate = value
+        ? calendar.setHourAndMinute(date.now, toDate: state.dateHoursAndMinutes.lowerBound)
+        : nil
+        return .none
       case .internal(.setImageDate(let imageData)):
         state.activityTask.icon = Icon(
           id: uuid(),

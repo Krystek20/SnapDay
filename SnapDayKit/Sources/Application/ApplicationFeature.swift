@@ -5,9 +5,11 @@ import Utilities
 import DeveloperTools
 
 @Reducer
-public struct ApplicationFeature {
+public struct ApplicationFeature: TodayProvidable {
 
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
+  @Dependency(\.backgroundUpdater) private var backgroundUpdater
+  @Dependency(\.timePeriodsProvider) private var timePeriodsProvider
 
   // MARK: - State & Action
 
@@ -23,6 +25,7 @@ public struct ApplicationFeature {
 
   public enum Action: Equatable {
     case appeared
+    case createDayBackgroundTaskCalled
     case deviceShaked
     case dashboard(DashboardFeature.Action)
     case path(StackAction<Path.State, Path.Action>)
@@ -51,7 +54,7 @@ public struct ApplicationFeature {
 
   // MARK: - Initialization
 
-  public init() { 
+  public init() {
     userNotificationCenterProvider.registerCategories()
   }
 
@@ -65,11 +68,21 @@ public struct ApplicationFeature {
     Reduce { state, action in
       switch action {
       case .appeared:
-        return .concatenate(
-          .run { send in
+        return .merge(
+          .run { _ in
             guard try await userNotificationCenterProvider.requestAuthorization() else { return }
+          },
+          .run { _ in
+            try backgroundUpdater.scheduleCreatingDayBackgroundTask()
           }
         )
+      case .createDayBackgroundTaskCalled:
+        DeveloperToolsLogger.shared.append(.refresh(.runInBackground))
+        return .run { _ in
+          try backgroundUpdater.scheduleCreatingDayBackgroundTask()
+          _ = try await timePeriodsProvider.timePeriod(.day, tomorrow, .zero)
+          try await userNotificationCenterProvider.reloadReminders()
+        }
       case .deviceShaked:
         state.developerTools = DeveloperToolsFeature.State()
         return .none

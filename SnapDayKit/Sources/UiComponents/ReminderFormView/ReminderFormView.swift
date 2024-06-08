@@ -4,7 +4,7 @@ public struct ReminderFormView: View {
 
   // MARK: - Properties
 
-  private let reminderDate: Date?
+  private let title: String
   private let availableDateHours: ClosedRange<Date>
   private let toggleBinding: Binding<Bool>
   private let dateBinding: Binding<Date?>
@@ -12,12 +12,12 @@ public struct ReminderFormView: View {
   // MARK: - Initialization
 
   public init(
-    reminderDate: Date?,
+    title: String,
     availableDateHours: ClosedRange<Date>,
     toggleBinding: Binding<Bool>,
     dateBinding: Binding<Date?>
   ) {
-    self.reminderDate = reminderDate
+    self.title = title
     self.availableDateHours = availableDateHours
     self.toggleBinding = toggleBinding
     self.dateBinding = dateBinding
@@ -33,7 +33,7 @@ public struct ReminderFormView: View {
   private var reminderView: some View {
     VStack(spacing: 5.0) {
       Toggle(isOn: toggleBinding) {
-        Text("Reminder", bundle: .module)
+        Text(title)
           .formTitleTextStyle
       }
       .toggleStyle(CheckToggleStyle())
