@@ -10,7 +10,7 @@ public struct DayView: View {
   private let activities: [DayActivity]
   private let completedActivities: CompletedActivities
   private let dayViewShowButtonState: DayViewShowButtonState
-  private let dayViewOption: DayViewOption
+  private let dayActivityAction: (DayActivityActionType) -> Void
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
 
@@ -21,7 +21,7 @@ public struct DayView: View {
     activities: [DayActivity],
     completedActivities: CompletedActivities,
     dayViewShowButtonState: DayViewShowButtonState,
-    dayViewOption: DayViewOption,
+    dayActivityAction: @escaping (DayActivityActionType) -> Void,
     showCompletedTapped: @escaping () -> Void,
     hideCompletedTapped: @escaping () -> Void
   ) {
@@ -29,7 +29,7 @@ public struct DayView: View {
     self.activities = activities
     self.completedActivities = completedActivities
     self.dayViewShowButtonState = dayViewShowButtonState
-    self.dayViewOption = dayViewOption
+    self.dayActivityAction = dayActivityAction
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
   }
@@ -39,18 +39,12 @@ public struct DayView: View {
   public var body: some View {
     LazyVStack(spacing: .zero) {
       ForEach(activities) { dayActivity in
-        switch dayViewOption {
-        case .all(let dayViewAllActions):
-          menuActivityView(dayActivity, dayViewAllActions)
-        }
+        menuActivityView(dayActivity)
         divider(addPadding: !dayActivity.dayActivityTasks.isEmpty)
 
         ForEach(tasks(for: dayActivity)) { activityTask in
-          switch dayViewOption {
-          case .all(let dayViewAllActions):
-            menuActivityTaskView(activityTask, dayViewAllActions)
-              .padding(.leading, 10.0)
-          }
+          menuActivityTaskView(activityTask)
+            .padding(.leading, 10.0)
           divider(addPadding: dayActivity.dayActivityTasks.last?.id != activityTask.id)
         }
       }
@@ -59,14 +53,11 @@ public struct DayView: View {
     }
   }
 
-  private func menuActivityView(
-    _ dayActivity: DayActivity,
-    _ dayViewAllActions: DayViewAllActions
-  ) -> some View {
+  private func menuActivityView(_ dayActivity: DayActivity) -> some View {
     Menu {
       Button(
         action: {
-          dayViewAllActions.activityTapped(dayActivity)
+          dayActivityAction(.dayActivity(.tapped, dayActivity))
         },
         label: {
           if dayActivity.isDone {
@@ -80,7 +71,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          dayViewAllActions.editTapped(dayActivity)
+          dayActivityAction(.dayActivity(.edit, dayActivity))
         },
         label: {
           Text("Edit", bundle: .module)
@@ -89,7 +80,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          dayViewAllActions.addNewActivityTask(dayActivity)
+          dayActivityAction(.dayActivity(.addActivityTask, dayActivity))
         },
         label: {
           Text("Add task", bundle: .module)
@@ -98,7 +89,25 @@ public struct DayView: View {
       )
       Button(
         action: {
-          dayViewAllActions.removeTapped(dayActivity)
+          dayActivityAction(.dayActivity(.move, dayActivity))
+        },
+        label: {
+          Text("Move", bundle: .module)
+          Image(systemName: "arrow.left.and.right")
+        }
+      )
+      Button(
+        action: {
+          dayActivityAction(.dayActivity(.copy, dayActivity))
+        },
+        label: {
+          Text("Copy", bundle: .module)
+          Image(systemName: "doc.on.doc")
+        }
+      )
+      Button(
+        action: {
+          dayActivityAction(.dayActivity(.remove, dayActivity))
         },
         label: {
           Text("Remove", bundle: .module)
@@ -171,14 +180,11 @@ public struct DayView: View {
     }
   }
 
-  private func menuActivityTaskView(
-    _ dayActivityTask: DayActivityTask,
-    _ dayViewAllActions: DayViewAllActions
-  ) -> some View {
+  private func menuActivityTaskView(_ dayActivityTask: DayActivityTask) -> some View {
     Menu {
       Button(
         action: {
-          dayViewAllActions.activityTaskTapped(dayActivityTask)
+          dayActivityAction(.dayActivityTask(.tapped, dayActivityTask))
         },
         label: {
           if dayActivityTask.isDone {
@@ -192,7 +198,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          dayViewAllActions.editTaskTapped(dayActivityTask)
+          dayActivityAction(.dayActivityTask(.edit, dayActivityTask))
         },
         label: {
           Text("Edit", bundle: .module)
@@ -201,7 +207,7 @@ public struct DayView: View {
       )
       Button(
         action: {
-          dayViewAllActions.removeTaskTapped(dayActivityTask)
+          dayActivityAction(.dayActivityTask(.remove, dayActivityTask))
         },
         label: {
           Text("Remove", bundle: .module)

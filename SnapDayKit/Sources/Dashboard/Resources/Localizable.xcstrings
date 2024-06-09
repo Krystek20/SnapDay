@@ -7,42 +7,25 @@
     "A Day of Unplanned Possibilities" : {
 
     },
-    "Activities" : {
-      "extractionState" : "stale",
+    "Copy" : {
+
+    },
+    "Dashboard" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activities"
-          }
-        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktywności"
+            "value" : "Pulpit nawigacyjny"
           }
         }
       }
     },
-    "Dashboard" : {
-
-    },
     "Day" : {
-
-    },
-    "Hi %@," : {
-      "extractionState" : "stale",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hi %@,"
-          }
-        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cześć %@,"
+            "value" : "Dzień"
           }
         }
       }
@@ -51,27 +34,34 @@
 
     },
     "Month" : {
-
-    },
-    "Quarter" : {
-
-    },
-    "Week" : {
-
-    },
-    "Welcome back 👋" : {
-      "extractionState" : "stale",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Welcome back 👋"
-          }
-        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Witaj ponownie 👋"
+            "value" : "Miesiąc"
+          }
+        }
+      }
+    },
+    "Move" : {
+
+    },
+    "Quarter" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kwartał"
+          }
+        }
+      }
+    },
+    "Week" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tydzień"
           }
         }
       }

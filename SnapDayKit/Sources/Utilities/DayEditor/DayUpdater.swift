@@ -248,6 +248,52 @@ final class DayUpdater {
     try await saveDay(day)
   }
 
+  func moveDayActivity(_ dayActivity: DayActivity, fromDate: Date, toDate: Date) async throws {
+    var fromDay = try await dayRepository.loadDay(fromDate)
+    fromDay?.activities.removeAll(where: { $0.id == dayActivity.id })
+    if let fromDay {
+      try await dayRepository.saveDay(fromDay)
+    }
+    var dayActivity = dayActivity
+    dayActivity.isGeneratedAutomatically = false
+    dayActivity.reminderDate = reminderDate(from: dayActivity.reminderDate, dayDate: toDate)
+
+    if var day = try await dayRepository.loadDay(toDate) {
+      dayActivity.dayId = day.id
+      day.activities.append(dayActivity)
+      try await dayRepository.saveDay(day)
+    } else {
+      let dayId = uuid()
+      dayActivity.dayId = dayId
+      let day = Day(
+        id: dayId,
+        date: toDate,
+        activities: [dayActivity]
+      )
+      try await dayRepository.saveDay(day)
+    }
+  }
+
+  func copyDayActivity(_ dayActivity: DayActivity, to dates: [Date]) async throws {
+    for date in dates {
+      if var day = try await dayRepository.loadDay(date) {
+        day.activities.append(
+          copy(dayActivity: dayActivity, dayId: day.id, dayDate: date)
+        )
+        try await dayRepository.saveDay(day)
+      } else {
+        let dayId = uuid()
+        let dayActivity = copy(dayActivity: dayActivity, dayId: dayId, dayDate: date)
+        let day = Day(
+          id: dayId,
+          date: date,
+          activities: [dayActivity]
+        )
+        try await dayRepository.saveDay(day)
+      }
+    }
+  }
+
   // MARK: - Private
 
   private func createDates(for activities: [Activity], dateRange: ClosedRange<Date>) throws -> [Activity: [Date]] {
@@ -375,6 +421,36 @@ final class DayUpdater {
         )
       },
       reminderDate: reminderDate(from: activity.defaultReminderDate, dayDate: dayDate)
+    )
+  }
+
+  private func copy(dayActivity: DayActivity, dayId: UUID, dayDate: Date) -> DayActivity {
+    let dayActivityId = uuid()
+    return DayActivity(
+      id: dayActivityId,
+      dayId: dayId,
+      activity: dayActivity.activity,
+      name: dayActivity.name,
+      icon: dayActivity.icon,
+      doneDate: dayActivity.doneDate,
+      duration: dayActivity.duration,
+      isGeneratedAutomatically: false,
+      tags: dayActivity.tags,
+      labels: dayActivity.labels,
+      dayActivityTasks: dayActivity.dayActivityTasks.map { dayActivityTask in
+        DayActivityTask(
+          id: uuid(),
+          dayActivityId: dayActivityId,
+          activityTask: dayActivityTask.activityTask,
+          name: dayActivityTask.name,
+          icon: dayActivityTask.icon,
+          doneDate: dayActivityTask.doneDate,
+          duration: dayActivityTask.duration,
+          overview: dayActivityTask.overview,
+          reminderDate: reminderDate(from: dayActivityTask.reminderDate, dayDate: dayDate)
+        )
+      },
+      reminderDate: reminderDate(from: dayActivity.reminderDate, dayDate: dayDate)
     )
   }
 

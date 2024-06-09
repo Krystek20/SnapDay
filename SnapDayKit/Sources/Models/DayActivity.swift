@@ -5,14 +5,14 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   // MARK: - Properties
 
   public let id: UUID
-  public let dayId: UUID
+  public var dayId: UUID
   public var activity: Activity?
   public var name: String
   public var icon: Icon?
   public var doneDate: Date?
   public var duration: Int
   public var overview: String?
-  public let isGeneratedAutomatically: Bool
+  public var isGeneratedAutomatically: Bool
   public var tags: [Tag]
   public var labels: [ActivityLabel]
   public var dayActivityTasks: [DayActivityTask]

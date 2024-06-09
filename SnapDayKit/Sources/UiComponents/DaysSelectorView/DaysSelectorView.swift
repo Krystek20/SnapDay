@@ -13,7 +13,7 @@ public struct DaysSelectorView: View {
   private let daySummary: DaySummary?
   private let dayViewShowButtonState: DayViewShowButtonState
   private let informationConfiguration: InformationViewConfigurable?
-  private let dayViewOption: DayViewOption
+  private let dayActivityAction: (DayActivityActionType) -> Void
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
 
@@ -26,7 +26,7 @@ public struct DaysSelectorView: View {
     daySummary: DaySummary?,
     dayViewShowButtonState: DayViewShowButtonState,
     informationConfiguration: InformationViewConfigurable?,
-    dayViewOption: DayViewOption,
+    dayActivityAction: @escaping (DayActivityActionType) -> Void,
     showCompletedTapped: @escaping () -> Void,
     hideCompletedTapped: @escaping () -> Void
   ) {
@@ -36,7 +36,7 @@ public struct DaysSelectorView: View {
     self.daySummary = daySummary
     self.dayViewShowButtonState = dayViewShowButtonState
     self.informationConfiguration = informationConfiguration
-    self.dayViewOption = dayViewOption
+    self.dayActivityAction = dayActivityAction
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
   }
@@ -129,7 +129,7 @@ public struct DaysSelectorView: View {
       activities: dayActivities,
       completedActivities: day.completedActivities,
       dayViewShowButtonState: dayViewShowButtonState,
-      dayViewOption: dayViewOption,
+      dayActivityAction: dayActivityAction,
       showCompletedTapped: showCompletedTapped,
       hideCompletedTapped: hideCompletedTapped
     )

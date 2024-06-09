@@ -7,6 +7,7 @@ import ActivityList
 import DayActivityForm
 import ActivityForm
 import DayActivityTaskForm
+import CalendarPicker
 import Models
 
 public struct DashboardView: View {
@@ -73,6 +74,12 @@ public struct DashboardView: View {
           DayActivityTaskFormView(store: store)
         }
         .presentationDetents([.large])
+      }
+      .sheet(item: $store.scope(state: \.calendarPicker, action: \.calendarPicker)) { store in
+        NavigationStack {
+          CalendarPickerView(store: store)
+        }
+        .presentationDetents([.medium])
       }
       .task {
         store.send(.view(.appeared))
@@ -194,7 +201,9 @@ public struct DashboardView: View {
         daySummary: store.daySummary,
         dayViewShowButtonState: store.dayViewShowButtonState,
         informationConfiguration: store.dayInformation,
-        dayViewOption: dayViewOption,
+        dayActivityAction: { action in
+          store.send(.view(.dayActivityActionPerfomed(action)))
+        },
         showCompletedTapped: {
           store.send(.view(.showCompletedActivitiesTapped))
         },
@@ -215,7 +224,9 @@ public struct DashboardView: View {
         daySummary: store.daySummary,
         dayViewShowButtonState: store.dayViewShowButtonState,
         informationConfiguration: store.dayInformation,
-        dayViewOption: dayViewOption,
+        dayActivityAction: { action in
+          store.send(.view(.dayActivityActionPerfomed(action)))
+        },
         showCompletedTapped: {
           store.send(.view(.showCompletedActivitiesTapped))
         },
@@ -224,33 +235,5 @@ public struct DashboardView: View {
         }
       )
     }
-  }
-
-  private var dayViewOption: DayViewOption {
-    .all(
-      DayViewAllActions(
-        activityTapped: { dayActivity in
-          store.send(.view(.dayActivityTapped(dayActivity)))
-        },
-        editTapped: { dayActivity in
-          store.send(.view(.dayActivityEditTapped(dayActivity)))
-        },
-        removeTapped: { dayActivity in
-          store.send(.view(.dayActivityRemoveTapped(dayActivity)))
-        }, 
-        addNewActivityTask: { dayActivity in
-          store.send(.view(.addDayActivityTaskButtonTapped(dayActivity)))
-        },
-        activityTaskTapped: { dayActivityTask in
-          store.send(.view(.dayActivityTaskTapped(dayActivityTask)))
-        },
-        editTaskTapped: { dayActivityTask in
-          store.send(.view(.dayActivityEditTaskTapped(dayActivityTask)))
-        },
-        removeTaskTapped: { dayActivityTask in
-          store.send(.view(.removeDayActivityTaskTapped(dayActivityTask)))
-        }
-      )
-    )
   }
 }

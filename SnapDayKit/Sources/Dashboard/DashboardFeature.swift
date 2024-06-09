@@ -8,10 +8,10 @@ import Models
 import Common
 import ActivityForm
 import DayActivityTaskForm
+import CalendarPicker
 import Combine
 import enum UiComponents.DayViewShowButtonState
 import protocol UiComponents.InformationViewConfigurable
-import CoreData
 
 @Reducer
 public struct DashboardFeature: TodayProvidable {
@@ -77,6 +77,7 @@ public struct DashboardFeature: TodayProvidable {
     @Presents var editDayActivity: DayActivityFormFeature.State?
     @Presents var addActivity: ActivityFormFeature.State?
     @Presents var dayActivityTaskForm: DayActivityTaskFormFeature.State?
+    @Presents var calendarPicker: CalendarPickerFeature.State?
 
     public init() { }
   }
@@ -86,13 +87,7 @@ public struct DashboardFeature: TodayProvidable {
       case appeared
       case activityListButtonTapped
       case addDayActivityButtonTapped
-      case dayActivityTapped(DayActivity)
-      case dayActivityEditTapped(DayActivity)
-      case dayActivityRemoveTapped(DayActivity)
-      case addDayActivityTaskButtonTapped(DayActivity)
-      case dayActivityTaskTapped(DayActivityTask)
-      case dayActivityEditTaskTapped(DayActivityTask)
-      case removeDayActivityTaskTapped(DayActivityTask)
+      case dayActivityActionPerfomed(DayActivityActionType)
       case showCompletedActivitiesTapped
       case hideCompletedActivitiesTapped
       case reportButtonTapped
@@ -115,7 +110,11 @@ public struct DashboardFeature: TodayProvidable {
         case select(DayActivity)
         case create(DayActivity)
         case update(DayActivity)
+        case copy(DayActivity, dates: [Date])
+        case move(DayActivity, date: Date)
         case remove(DayActivity)
+        case showDatePicker(DayActivity)
+        case showMultiDatePicker(DayActivity)
       }
 
       public enum DayActivityTaskAction: Equatable {
@@ -137,6 +136,7 @@ public struct DashboardFeature: TodayProvidable {
     case editDayActivity(PresentationAction<DayActivityFormFeature.Action>)
     case addActivity(PresentationAction<ActivityFormFeature.Action>)
     case dayActivityTaskForm(PresentationAction<DayActivityTaskFormFeature.Action>)
+    case calendarPicker(PresentationAction<CalendarPickerFeature.Action>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
@@ -161,6 +161,8 @@ public struct DashboardFeature: TodayProvidable {
         return handleActivityFormAction(action, state: &state)
       case .dayActivityTaskForm(let action):
         return handleDayActivityTaskFormAction(action, state: &state)
+      case .calendarPicker(let action):
+        return handleCalendarPickerAction(action, state: &state)
       case .delegate:
         return .none
       case .binding(\.selectedPeriod):
@@ -183,6 +185,9 @@ public struct DashboardFeature: TodayProvidable {
     }
     .ifLet(\.$dayActivityTaskForm, action: \.dayActivityTaskForm) {
       DayActivityTaskFormFeature()
+    }
+    .ifLet(\.$calendarPicker, action: \.calendarPicker) {
+      CalendarPickerFeature()
     }
   }
 
@@ -236,20 +241,8 @@ public struct DashboardFeature: TodayProvidable {
       return .none
     case .addDayActivityButtonTapped:
       return .send(.internal(.dayActivityAction(.showNewForm)))
-    case .dayActivityTapped(let dayActivity):
-      return .send(.internal(.dayActivityAction(.select(dayActivity))))
-    case .dayActivityEditTapped(let dayActivity):
-      return .send(.internal(.dayActivityAction(.showEditForm(dayActivity))))
-    case .dayActivityRemoveTapped(let dayActivity):
-      return .send(.internal(.dayActivityAction(.remove(dayActivity))))
-    case .addDayActivityTaskButtonTapped(let dayActivity):
-      return .send(.internal(.dayActivityTaskAction(.showNewForm(dayActivity))))
-    case .dayActivityTaskTapped(let dayActivityTask):
-      return .send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
-    case .dayActivityEditTaskTapped(let dayActivityTask):
-      return .send(.internal(.dayActivityTaskAction(.showEditForm(dayActivityTask))))
-    case .removeDayActivityTaskTapped(let dayActivityTask):
-      return .send(.internal(.dayActivityTaskAction(.remove(dayActivityTask))))
+    case .dayActivityActionPerfomed(let actionType):
+      return performDayActivityAction(actionType)
     case .showCompletedActivitiesTapped:
       state.activityListOption = .extended
       return .none
@@ -310,6 +303,35 @@ public struct DashboardFeature: TodayProvidable {
     }
   }
 
+  private func performDayActivityAction(_ actionType: DayActivityActionType) -> Effect<Action> {
+    switch actionType {
+    case .dayActivity(let dayActivityAction, let dayActivity):
+      switch dayActivityAction {
+      case .tapped:
+        .send(.internal(.dayActivityAction(.select(dayActivity))))
+      case .edit:
+        .send(.internal(.dayActivityAction(.showEditForm(dayActivity))))
+      case .copy:
+        .send(.internal(.dayActivityAction(.showMultiDatePicker(dayActivity))))
+      case .move:
+        .send(.internal(.dayActivityAction(.showDatePicker(dayActivity))))
+      case .remove:
+        .send(.internal(.dayActivityAction(.remove(dayActivity))))
+      case .addActivityTask:
+        .send(.internal(.dayActivityTaskAction(.showNewForm(dayActivity))))
+      }
+    case .dayActivityTask(let dayActivityTaskAction, let dayActivityTask):
+      switch dayActivityTaskAction {
+      case .tapped:
+        .send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
+      case .edit:
+        .send(.internal(.dayActivityTaskAction(.showEditForm(dayActivityTask))))
+      case .remove:
+        .send(.internal(.dayActivityTaskAction(.remove(dayActivityTask))))
+      }
+    }
+  }
+
   private func handleDayActivityAction(_ action: Action.InternalAction.DayActivityAction, state: inout State) -> Effect<Action> {
     switch action {
     case .showNewForm:
@@ -348,11 +370,42 @@ public struct DashboardFeature: TodayProvidable {
         try await dayEditor.updateDayActivity(dayActivity, selectedDay?.date ?? today)
         await send(.internal(.loadTimePeriods))
       }
+    case .move(let dayActivity, let toDate):
+      guard let fromDate = state.selectedDay?.date else { return .none }
+      return .run { send in
+        try await dayEditor.moveDayActivity(dayActivity, fromDate, toDate)
+        await send(.internal(.loadTimePeriods))
+      }
+    case .copy(let dayActivity, let dates):
+      return .run { send in
+        try await dayEditor.copyDayActivity(dayActivity, dates)
+        await send(.internal(.loadTimePeriods))
+      }
     case .remove(let dayActivity):
       return .run { [dayActivity, selectedDay = state.selectedDay] send in
         try await dayEditor.removeDayActivity(dayActivity, selectedDay?.date ?? today)
         await send(.internal(.loadTimePeriods))
       }
+    case .showDatePicker(let dayActivity):
+      guard let selectedDay = state.selectedDay else { return .none }
+      state.calendarPicker = CalendarPickerFeature.State(
+        type: .singleSelection,
+        date: selectedDay.date,
+        objectIdentifier: dayActivity.id.uuidString,
+        actionIdentifier: CalendarActivityAction.move.rawValue,
+        buttonTitle: String(localized: "Move", bundle: .module)
+      )
+      return .none
+    case .showMultiDatePicker(let dayActivity):
+      guard let selectedDay = state.selectedDay else { return .none }
+      state.calendarPicker = CalendarPickerFeature.State(
+        type: .multiSelection,
+        date: selectedDay.date,
+        objectIdentifier: dayActivity.id.uuidString,
+        actionIdentifier: CalendarActivityAction.copy.rawValue,
+        buttonTitle: String(localized: "Copy", bundle: .module)
+      )
+      return .none
     }
   }
 
@@ -460,6 +513,27 @@ public struct DashboardFeature: TodayProvidable {
       return .send(.internal(.dayActivityTaskAction(.update(dayActivityTask))))
     case .presented(.delegate(.dayActivityTaskDeleted(let dayActivityTask))):
       return .send(.internal(.dayActivityTaskAction(.remove(dayActivityTask))))
+    default:
+      return .none
+    }
+  }
+
+  private func handleCalendarPickerAction(_ action: PresentationAction<CalendarPickerFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.delegate(.datesSelected(let dates, let objectIdentifier, let actionIdentifier))):
+      guard let objectIdentifier, let actionIdentifier, let action = CalendarActivityAction(rawValue: actionIdentifier) else { return .none }
+      return .run { [objectIdentifier, action, dates] send in
+        guard let dayActivity = try await dayActivityRepository.activity(objectIdentifier) else { return }
+        switch action {
+        case .copy:
+          await send(.internal(.dayActivityAction(.copy(dayActivity, dates: dates))))
+        case .move:
+          guard let firstDate = dates.first else { return }
+          await send(.internal(.dayActivityAction(.move(dayActivity, date: firstDate))))
+        }
+      }
+    case .dismiss:
+      return .none
     default:
       return .none
     }
