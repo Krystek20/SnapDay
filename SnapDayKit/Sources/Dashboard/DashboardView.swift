@@ -81,6 +81,8 @@ public struct DashboardView: View {
         }
         .presentationDetents([.medium])
       }
+      .alert($store.scope(state: \.dayActivityAlert, action: \.dayActivityAlert))
+      .alert($store.scope(state: \.dayActivityTaskAlert, action: \.dayActivityTaskAlert))
       .task {
         store.send(.view(.appeared))
       }

@@ -7,6 +7,12 @@
     "A Day of Unplanned Possibilities" : {
 
     },
+    "Complete Activity" : {
+
+    },
+    "Complete Activity?" : {
+
+    },
     "Copy" : {
 
     },
@@ -33,6 +39,15 @@
     "Hope it was enjoyable!" : {
 
     },
+    "Incomplete Subtasks" : {
+
+    },
+    "Mark Activity Only" : {
+
+    },
+    "Mark All as Done" : {
+
+    },
     "Month" : {
       "localizations" : {
         "pl" : {
@@ -46,6 +61,9 @@
     "Move" : {
 
     },
+    "Not Yet" : {
+
+    },
     "Quarter" : {
       "localizations" : {
         "pl" : {
@@ -55,6 +73,12 @@
           }
         }
       }
+    },
+    "This activity has incomplete subtasks. Would you like to mark the activity and all its subtasks as done?" : {
+
+    },
+    "This is the last task for this activity. Would you like to mark the activity as complete?" : {
+
     },
     "Week" : {
       "localizations" : {
