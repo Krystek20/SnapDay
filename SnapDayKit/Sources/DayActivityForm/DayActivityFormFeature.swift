@@ -66,6 +66,8 @@ public struct DayActivityFormFeature {
     @Presents var emojiPicker: EmojiPickerFeature.State?
     @Presents var addMarker: MarkerFormFeature.State?
     @Presents var dayActivityTaskForm: DayActivityTaskFormFeature.State?
+    @Presents var dayActivityAlert: AlertState<Action.DayActivityAlert>?
+    @Presents var dayActivityTaskAlert: AlertState<Action.DayActivityTaskAlert>?
 
     public init(
       type: DayActivityFormType,
@@ -116,19 +118,31 @@ public struct DayActivityFormFeature {
       case imageSelected(PhotoItem)
       case remindToggeled(Bool)
     }
-    public enum InternalAction: Equatable { 
+    public enum InternalAction: Equatable {
       case setExistingTags([Tag])
       case loadTags
       case setExistingLabels([ActivityLabel])
       case loadLabels
       case setImageDate(_ date: Data?)
+      case showAlertSelectAll
+      case showAlertSelectActivity
     }
     public enum DelegateAction: Equatable {
       case activityCreated(DayActivity)
       case activityDeleted(DayActivity)
       case activityUpdated(DayActivity)
     }
+    public enum DayActivityAlert: Equatable {
+      case confirmTapped
+      case cancelTapped
+    }
+    public enum DayActivityTaskAlert: Equatable {
+      case confirmTapped
+      case cancelTapped
+    }
 
+    case dayActivityAlert(PresentationAction<DayActivityAlert>)
+    case dayActivityTaskAlert(PresentationAction<DayActivityTaskAlert>)
     case emojiPicker(PresentationAction<EmojiPickerFeature.Action>)
     case addMarker(PresentationAction<MarkerFormFeature.Action>)
     case dayActivityTaskForm(PresentationAction<DayActivityTaskFormFeature.Action>)
@@ -160,6 +174,10 @@ public struct DayActivityFormFeature {
         handleAddMarker(presentableMarkerAction, state: &state)
       case .dayActivityTaskForm(let presentableDayActivityTaskFormAction):
         handleDayActivityTaskForm(presentableDayActivityTaskFormAction, state: &state)
+      case .dayActivityAlert(let action):
+        handleDayActivityAlertAction(action, state: &state)
+      case .dayActivityTaskAlert(let action):
+        handleDayActivityTaskAlertAction(action, state: &state)
       case .delegate:
         .none
       case .binding:
@@ -206,8 +224,12 @@ public struct DayActivityFormFeature {
     case .task(let taskAction):
       return handleViewTaskAction(taskAction, state: &state)
     case .isDoneToggleChanged(let value):
-      state.dayActivity.doneDate = value ? date() : nil
-      return .none
+      if state.dayActivity.hasIncompleteSubtasksAndNotDone {
+        return .send(.internal(.showAlertSelectAll))
+      } else {
+        state.dayActivity.doneDate = value ? date() : nil
+        return .none
+      }
     case .iconTapped:
       state.emojiPicker = EmojiPickerFeature.State()
       return .none
@@ -288,8 +310,13 @@ public struct DayActivityFormFeature {
       return .none
     case .selectButtonTapped(let dayActivityTask):
       guard let index = state.dayActivity.dayActivityTasks.firstIndex(where: { $0.id ==  dayActivityTask.id }) else { return .none }
-      state.dayActivity.dayActivityTasks[index].doneDate = dayActivityTask.doneDate == nil ? date() : nil
-      return .none
+      defer {
+        state.dayActivity.dayActivityTasks[index].doneDate = dayActivityTask.doneDate == nil ? date() : nil
+      }
+      guard state.dayActivity.areSubtasksCompleted(excluding: state.dayActivity.dayActivityTasks[index]) else {
+        return .none
+      }
+      return .send(.internal(.showAlertSelectActivity))
     case .editButtonTapped(let dayActivityTask):
       state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
         dayActivityTask: dayActivityTask,
@@ -327,6 +354,18 @@ public struct DayActivityFormFeature {
       state.dayActivity.icon = Icon(
         id: uuid(),
         data: imageData
+      )
+      return .none
+    case .showAlertSelectAll:
+      state.dayActivityAlert = AlertState<Action.DayActivityAlert>.showAlertSelectAll(
+        confirmAction: .confirmTapped,
+        cancelAction: .cancelTapped
+      )
+      return .none
+    case .showAlertSelectActivity:
+      state.dayActivityTaskAlert = AlertState<Action.DayActivityTaskAlert>.dayActivityTaskAlert(
+        confirmAction: .confirmTapped,
+        cancelAction: .cancelTapped
       )
       return .none
     }
@@ -368,10 +407,54 @@ public struct DayActivityFormFeature {
       return .none
     case .presented(.delegate(.dayActivityTaskUpdated(let dayActivityTask))):
       guard let index = state.dayActivity.dayActivityTasks.firstIndex(where: { $0.id == dayActivityTask.id }) else { return .none }
-      state.dayActivity.dayActivityTasks[index] = dayActivityTask
-      return .none
+      defer {
+        state.dayActivity.dayActivityTasks[index] = dayActivityTask
+      }
+      guard state.dayActivity.areSubtasksCompleted(excluding: state.dayActivity.dayActivityTasks[index]) else {
+        return .none
+      }
+      return .send(.internal(.showAlertSelectActivity))
     case .presented(.delegate(.dayActivityTaskCreated(let dayActivityTask))):
       state.dayActivity.dayActivityTasks.append(dayActivityTask)
+      return .none
+    default:
+      return .none
+    }
+  }
+
+  private func handleDayActivityAlertAction(_ action: PresentationAction<Action.DayActivityAlert>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.cancelTapped):
+      state.dayActivityAlert = nil
+      if !state.dayActivity.isDone {
+        state.dayActivity.doneDate = date()
+      }
+      return .none
+    case .presented(.confirmTapped):
+      state.dayActivityAlert = nil
+      if !state.dayActivity.isDone {
+        state.dayActivity.doneDate = date()
+      }
+      for index in 0..<state.dayActivity.dayActivityTasks.count {
+        guard !state.dayActivity.dayActivityTasks[index].isDone else { continue }
+        state.dayActivity.dayActivityTasks[index].doneDate = date()
+      }
+      return .none
+    default:
+      return .none
+    }
+  }
+
+  private func handleDayActivityTaskAlertAction(_ action: PresentationAction<Action.DayActivityTaskAlert>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .presented(.cancelTapped):
+      state.dayActivityTaskAlert = nil
+      return .none
+    case .presented(.confirmTapped):
+      state.dayActivityTaskAlert = nil
+      if !state.dayActivity.isDone {
+        state.dayActivity.doneDate = date()
+      }
       return .none
     default:
       return .none

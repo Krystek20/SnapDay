@@ -68,3 +68,20 @@ extension DayActivity {
     dayActivityTasks.filter { !$0.isDone }
   }
 }
+
+extension DayActivity {
+  public var hasIncompleteSubtasksAndNotDone: Bool {
+    return doneDate == nil && hasIncompleteSubtasks
+  }
+
+  private var hasIncompleteSubtasks: Bool {
+    !dayActivityTasks.filter { !$0.isDone }.isEmpty
+  }
+
+  public func areSubtasksCompleted(excluding dayActivityTask: DayActivityTask) -> Bool {
+    let areAllSubtasksDone = dayActivityTasks
+      .filter { $0.id != dayActivityTask.id && !$0.isDone }
+      .isEmpty
+    return dayActivityTask.doneDate == nil && doneDate == nil && areAllSubtasksDone
+  }
+}

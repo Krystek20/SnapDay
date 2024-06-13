@@ -326,7 +326,7 @@ public struct DashboardFeature: TodayProvidable {
     case .dayActivity(let dayActivityAction, let dayActivity):
       switch dayActivityAction {
       case .tapped:
-        dayActivity.areAllSubtasksDone
+        dayActivity.hasIncompleteSubtasksAndNotDone
         ? .send(.internal(.dayActivityAction(.showAlertSelectAll(dayActivity))))
         : .send(.internal(.dayActivityAction(.select(dayActivity))))
       case .edit:
@@ -345,7 +345,7 @@ public struct DashboardFeature: TodayProvidable {
       case .tapped:
         .run { send in
           guard let dayActivity = try await dayActivityRepository.activity(dayActivityTask.dayActivityId.uuidString) else { return }
-          if dayActivity.areAllSubtasksDone(exclude: dayActivityTask) {
+          if dayActivity.areSubtasksCompleted(excluding: dayActivityTask) {
             await send(.internal(.dayActivityTaskAction(.showAlertSelectActivity(dayActivity, dayActivityTask))))
           } else {
             await send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
@@ -477,9 +477,17 @@ public struct DashboardFeature: TodayProvidable {
         await send(.internal(.loadTimePeriods))
       }
     case .update(let dayActivityTask):
-      return .run { [dayActivityTask] send in
+      let dayActivity = state.selectedDay?.activities.first(where: { $0.dayActivityTasks.contains(where: { $0.id == dayActivityTask.id }) })
+      let dayActivityTaskBeforeUpdate = dayActivity?.dayActivityTasks.first(where: { $0.id == dayActivityTask.id })
+      var showShowAlert = false
+      if let dayActivity, let dayActivityTaskBeforeUpdate {
+        showShowAlert = dayActivity.areSubtasksCompleted(excluding: dayActivityTaskBeforeUpdate)
+      }
+      return .run { [showShowAlert, dayActivityTask] send in
         try await dayActivityRepository.saveActivityTask(dayActivityTask)
         await send(.internal(.loadTimePeriods))
+        guard showShowAlert, let dayActivity = try await dayActivityRepository.activity(dayActivityTask.dayActivityId.uuidString) else { return }
+        await send(.internal(.dayActivityTaskAction(.showAlertSelectActivity(dayActivity, dayActivityTask))))
       }
     case .remove(let dayActivityTask):
       return .run { [dayActivityTask] send in
@@ -580,12 +588,17 @@ public struct DashboardFeature: TodayProvidable {
     switch action {
     case .presented(.cancelTapped(let dayActivityTask)):
       state.dayActivityTaskAlert = nil
+      guard !dayActivityTask.isDone else { return .none }
       return .send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
     case .presented(.confirmTapped(let dayActivity, let dayActivityTask)):
       state.dayActivityTaskAlert = nil
       return .run { send in
-        await send(.internal(.dayActivityAction(.select(dayActivity))))
-        await send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
+        if !dayActivity.isDone {
+          await send(.internal(.dayActivityAction(.select(dayActivity))))
+        }
+        if !dayActivityTask.isDone {
+          await send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
+        }
       }
     default:
       return .none

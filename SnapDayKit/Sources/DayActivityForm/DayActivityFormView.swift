@@ -51,6 +51,8 @@ public struct DayActivityFormView: View {
           }
           .presentationDetents([.large])
         }
+        .alert($store.scope(state: \.dayActivityAlert, action: \.dayActivityAlert))
+        .alert($store.scope(state: \.dayActivityTaskAlert, action: \.dayActivityTaskAlert))
     }
   }
 
