@@ -74,6 +74,7 @@ public struct ReportsView: View {
       VStack(alignment: .leading, spacing: 10.0) {
         picker
         customDatePickers
+        monthsView
         progress
         filtersSection
         summarySection
@@ -358,6 +359,15 @@ public struct ReportsView: View {
               .formBackgroundModifier()
           }
         )
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var monthsView: some View {
+    WithPerceptionTracking {
+      if !store.periods.isEmpty {
+        PeriodsView(periods: store.periods)
       }
     }
   }

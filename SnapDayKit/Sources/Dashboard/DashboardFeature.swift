@@ -18,26 +18,26 @@ public struct DashboardFeature: TodayProvidable {
 
   // MARK: - Dependencies
 
-  @Dependency(\.timePeriodsProvider) private var timePeriodsProvider
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
   @Dependency(\.calendar) private var calendar
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
-  private let periodTitleProvider = PeriodTitleProvider()
+  private let dayProvider = DayProvider()
 
   // MARK: - State & Action
 
   @ObservableState
   public struct State: Equatable, TodayProvidable {
 
-    var activitiesPresentationType: ActivitiesPresentationType?
     var activityListOption: ActivityListOption = .collapsed
-    var periods = Period.allCases
-    var timePeriod: TimePeriod?
-    var shift: Int = .zero
-    var activitiesPresentationTitle = ""
+    
+    var title: String {
+      let formatter = DateFormatter()
+      formatter.dateFormat = "EEEE, d MMM yyyy"
+      return formatter.string(from: date ?? today)
+    }
 
     var daySummary: DaySummary? {
       guard let selectedDay else { return nil }
@@ -65,11 +65,13 @@ public struct DashboardFeature: TodayProvidable {
     }
 
     var dayInformation: InformationViewConfigurable? {
-      let emptyDayConfiguration: EmptyDayConfiguration = selectedDay?.isOlderThenToday == true ? .pastDay : .todayOrFuture
+      let emptyDayConfiguration: EmptyDayConfiguration = selectedDay?.isOlderThenToday == true 
+      ? .pastDay
+      : .todayOrFuture
       return selectedDay?.activities.isEmpty == true ? emptyDayConfiguration : nil
     }
 
-    var selectedPeriod: Period = .day
+    var date: Date?
     var selectedDay: Day?
     var streamSetup: Bool = false
 
@@ -87,6 +89,7 @@ public struct DashboardFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
+      case calendarButtonTapped
       case activityListButtonTapped
       case addDayActivityButtonTapped
       case dayActivityActionPerfomed(DayActivityActionType)
@@ -94,14 +97,15 @@ public struct DashboardFeature: TodayProvidable {
       case hideCompletedActivitiesTapped
       case reportButtonTapped
       case todayButtonTapped
-      case selectedPeriod(Period)
       case increaseButtonTapped
       case decreaseButtonTapped
     }
     public enum InternalAction: Equatable {
+      case showDatePicker
       case changesApplied(AppliedChanges)
-      case loadTimePeriods
-      case timePeriodLoaded(_ timePeriod: TimePeriod)
+      case loadDay
+      case setDate(_ date: Date)
+      case setDay(_ day: Day)
       case calendarDayChanged
       case dayActivityAction(DayActivityAction)
       case dayActivityTaskAction(DayActivityTaskAction)
@@ -183,11 +187,6 @@ public struct DashboardFeature: TodayProvidable {
         return handleDayActivityTaskAlertAction(action, state: &state)
       case .delegate:
         return .none
-      case .binding(\.selectedPeriod):
-        state.shift = .zero
-        return .run { send in
-          await send(.internal(.loadTimePeriods))
-        }
       case .binding:
         return .none
       }
@@ -222,7 +221,7 @@ public struct DashboardFeature: TodayProvidable {
       state.streamSetup = true
       return .merge(
         .run { send in
-          await send(.internal(.loadTimePeriods))
+          await send(.internal(.loadDay))
         },
         .run { send in
           for await notification in NotificationCenter.default.publisher(for: .snapDayStoreDidChange).values {
@@ -234,7 +233,7 @@ public struct DashboardFeature: TodayProvidable {
         },
         .run { send in
           for await _ in userNotificationCenterProvider.userActionStream {
-            await send(.internal(.loadTimePeriods))
+            await send(.internal(.loadDay))
           }
         },
         .run { send in
@@ -248,6 +247,8 @@ public struct DashboardFeature: TodayProvidable {
           }
         }
       )
+    case .calendarButtonTapped:
+      return .send(.internal(.showDatePicker))
     case .activityListButtonTapped:
       state.activityList = ActivityListFeature.State(
         configuration: ActivityListFeature.ActivityListConfiguration(
@@ -269,19 +270,18 @@ public struct DashboardFeature: TodayProvidable {
       return .none
     case .reportButtonTapped:
       return .send(.delegate(.reportsTapped))
-    case .selectedPeriod(let period):
-      state.selectedPeriod = period
-      return .none
     case .increaseButtonTapped:
-      state.shift += 1
-      return .send(.internal(.loadTimePeriods))
+      let currentDate = state.date ?? today
+      state.date = calendar.date(byAdding: .day, value: 1, to: currentDate)
+      return .send(.internal(.loadDay))
     case .decreaseButtonTapped:
-      state.shift -= 1
-      return .send(.internal(.loadTimePeriods))
+      let currentDate = state.date ?? today
+      state.date = calendar.date(byAdding: .day, value: -1, to: currentDate)
+      return .send(.internal(.loadDay))
     case .todayButtonTapped:
-      state.shift = .zero
+      state.date = nil
       state.selectedDay = nil
-      return .send(.internal(.loadTimePeriods))
+      return .send(.internal(.loadDay))
     }
   }
 
@@ -289,28 +289,30 @@ public struct DashboardFeature: TodayProvidable {
     switch action {
     case .changesApplied(let appliedChanges):
       let shouldReload = appliedChanges.dates.contains { date in
-        state.timePeriod?.dateRange.contains(date) ?? false
+        state.date == date
       }
       return .merge(
         .run { [shouldReload] send in
           guard shouldReload else { return }
-          await send(.internal(.loadTimePeriods))
+          await send(.internal(.loadDay))
         }
       )
     case .calendarDayChanged:
-      return .send(.internal(.loadTimePeriods))
-    case .loadTimePeriods:
-      return .run { [period = state.selectedPeriod, shift = state.shift] send in
+      return .send(.internal(.loadDay))
+    case .setDate(let date):
+      state.date = date
+      return .send(.internal(.loadDay))
+    case .loadDay:
+      return .run { [date = state.date] send in
         do {
-          let timePerdiod = try await timePeriodsProvider.timePeriod(period, today, shift)
-          await send(.internal(.timePeriodLoaded(timePerdiod)))
+          let day = try await dayProvider.day(for: date ?? today)
+          await send(.internal(.setDay(day)))
         } catch {
           print("error: \(error)")
         }
       }
-    case .timePeriodLoaded(let timePeriod):
-      state.timePeriod = timePeriod
-      setupTimePeriodConfiguration(&state, timePeriod: timePeriod)
+    case .setDay(let day):
+      state.selectedDay = day
       return .run { _ in
         try await userNotificationCenterProvider.reloadReminders()
       }
@@ -318,6 +320,14 @@ public struct DashboardFeature: TodayProvidable {
       return handleDayActivityAction(action, state: &state)
     case .dayActivityTaskAction(let action):
       return handleDayActivityTaskAction(action, state: &state)
+    case .showDatePicker:
+      guard let selectedDay = state.selectedDay else { return .none }
+      state.calendarPicker = CalendarPickerFeature.State(
+        type: .singleSelection(.noConfirmation),
+        date: selectedDay.date,
+        actionIdentifier: CalendarActivityAction.changeDate.rawValue
+      )
+      return .none
     }
   }
 
@@ -385,52 +395,50 @@ public struct DashboardFeature: TodayProvidable {
       dayActivity.doneDate = dayActivity.doneDate == nil ? date() : nil
       return .run { [dayActivity] send in
         try await dayActivityRepository.saveActivity(dayActivity)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .create(let dayActivity):
       return .run { [dayActivity, selectedDay = state.selectedDay] send in
         try await dayEditor.addDayActivity(dayActivity, selectedDay?.date ?? today)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .update(let dayActivity):
       return .run { [dayActivity, selectedDay = state.selectedDay] send in
         try await dayEditor.updateDayActivity(dayActivity, selectedDay?.date ?? today)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .move(let dayActivity, let toDate):
       guard let fromDate = state.selectedDay?.date else { return .none }
       return .run { send in
         try await dayEditor.moveDayActivity(dayActivity, fromDate, toDate)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .copy(let dayActivity, let dates):
       return .run { send in
         try await dayEditor.copyDayActivity(dayActivity, dates)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .remove(let dayActivity):
       return .run { [dayActivity, selectedDay = state.selectedDay] send in
         try await dayEditor.removeDayActivity(dayActivity, selectedDay?.date ?? today)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .showDatePicker(let dayActivity):
       guard let selectedDay = state.selectedDay else { return .none }
       state.calendarPicker = CalendarPickerFeature.State(
-        type: .singleSelection,
+        type: .singleSelection(.navigationButton(title: String(localized: "Move", bundle: .module))),
         date: selectedDay.date,
         objectIdentifier: dayActivity.id.uuidString,
-        actionIdentifier: CalendarActivityAction.move.rawValue,
-        buttonTitle: String(localized: "Move", bundle: .module)
+        actionIdentifier: CalendarActivityAction.move.rawValue
       )
       return .none
     case .showMultiDatePicker(let dayActivity):
       guard let selectedDay = state.selectedDay else { return .none }
       state.calendarPicker = CalendarPickerFeature.State(
-        type: .multiSelection,
+        type: .multiSelection(title: String(localized: "Copy", bundle: .module)),
         date: selectedDay.date,
         objectIdentifier: dayActivity.id.uuidString,
-        actionIdentifier: CalendarActivityAction.copy.rawValue,
-        buttonTitle: String(localized: "Copy", bundle: .module)
+        actionIdentifier: CalendarActivityAction.copy.rawValue
       )
       return .none
     case .showAlertSelectAll(let dayActivity):
@@ -467,14 +475,14 @@ public struct DashboardFeature: TodayProvidable {
       dayActivityTask.doneDate = dayActivityTask.doneDate == nil ? date() : nil
       return .run { [dayActivityTask] send in
         try await dayActivityRepository.saveActivityTask(dayActivityTask)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .create(let dayActivityTask):
       guard var dayActivity = state.selectedDay?.activities.first(where: { $0.id == dayActivityTask.dayActivityId }) else { return .none }
       dayActivity.dayActivityTasks.append(dayActivityTask)
       return .run { [dayActivity] send in
         try await dayActivityRepository.saveActivity(dayActivity)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .update(let dayActivityTask):
       let dayActivity = state.selectedDay?.activities.first(where: { $0.dayActivityTasks.contains(where: { $0.id == dayActivityTask.id }) })
@@ -485,14 +493,14 @@ public struct DashboardFeature: TodayProvidable {
       }
       return .run { [showShowAlert, dayActivityTask] send in
         try await dayActivityRepository.saveActivityTask(dayActivityTask)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
         guard showShowAlert, let dayActivity = try await dayActivityRepository.activity(dayActivityTask.dayActivityId.uuidString) else { return }
         await send(.internal(.dayActivityTaskAction(.showAlertSelectActivity(dayActivity, dayActivityTask))))
       }
     case .remove(let dayActivityTask):
       return .run { [dayActivityTask] send in
         try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .showAlertSelectActivity(let dayActivity, let dayActivityTask):
       state.dayActivityTaskAlert = AlertState<Action.DayActivityTaskAlert>.dayActivityTaskAlert(
@@ -521,19 +529,19 @@ public struct DashboardFeature: TodayProvidable {
     case .presented(.delegate(.activityAdded(let activity))):
       return .run { [activity, dayToUpdate = state.selectedDay] send in
         try await dayEditor.updateDayActivities(activity, dayToUpdate?.date ?? today)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .presented(.delegate(.activityUpdated(let activity))):
       return .run { [activity, dayToUpdate = state.selectedDay] send in
         try await dayEditor.updateDayActivities(activity, dayToUpdate?.date ?? today)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     case .presented(.delegate(.activitiesSelected(let activities))):
       return .run { [activities, dayToUpdate = state.selectedDay] send in
         for activity in activities {
           try await dayEditor.addActivity(activity, dayToUpdate?.date ?? today)
         }
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     default:
       return .none
@@ -545,7 +553,7 @@ public struct DashboardFeature: TodayProvidable {
     case .presented(.delegate(.activityCreated(let activity))):
       return .run { [activity, selectedDay = state.selectedDay] send in
         try await dayEditor.addActivity(activity, selectedDay?.date ?? today)
-        await send(.internal(.loadTimePeriods))
+        await send(.internal(.loadDay))
       }
     default:
       return .none
@@ -610,63 +618,28 @@ public struct DashboardFeature: TodayProvidable {
   private func handleCalendarPickerAction(_ action: PresentationAction<CalendarPickerFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
     case .presented(.delegate(.datesSelected(let dates, let objectIdentifier, let actionIdentifier))):
-      guard let objectIdentifier, let actionIdentifier, let action = CalendarActivityAction(rawValue: actionIdentifier) else { return .none }
+      guard let actionIdentifier,
+            let action = CalendarActivityAction(rawValue: actionIdentifier) else { return .none }
       return .run { [objectIdentifier, action, dates] send in
-        guard let dayActivity = try await dayActivityRepository.activity(objectIdentifier) else { return }
         switch action {
         case .copy:
+          guard let objectIdentifier,
+                let dayActivity = try await dayActivityRepository.activity(objectIdentifier) else { return }
           await send(.internal(.dayActivityAction(.copy(dayActivity, dates: dates))))
         case .move:
-          guard let firstDate = dates.first else { return }
+          guard let objectIdentifier,
+                let dayActivity = try await dayActivityRepository.activity(objectIdentifier),
+                let firstDate = dates.first else { return }
           await send(.internal(.dayActivityAction(.move(dayActivity, date: firstDate))))
+        case .changeDate:
+          guard let firstDate = dates.first else { return }
+          await send(.internal(.setDate(firstDate)))
         }
       }
     case .dismiss:
       return .none
     default:
       return .none
-    }
-  }
-
-  private func setupTimePeriodConfiguration(_ state: inout State, timePeriod: TimePeriod) {
-    do {
-      let presentationTypeProvider = ActivitiesPresentationTypeProvider()
-      let presentationType = try presentationTypeProvider.presentationType(for: timePeriod)
-      state.activitiesPresentationType = presentationType
-      state.selectedDay = findSelectedDay(for: presentationType, currentSelectedDay: state.selectedDay)
-      let filterDate = FilterDate(type: presentationType, dateRange: timePeriod.dateRange)
-      state.activitiesPresentationTitle = try periodTitleProvider.title(for: filterDate)
-    } catch {
-      print(error)
-    }
-  }
-
-  private func findSelectedDay(for presentationType: ActivitiesPresentationType, currentSelectedDay: Day?) -> Day? {
-    switch presentationType {
-    case .monthsList:
-      return nil
-    case .calendar(let calendarItems):
-      let calendarDays = calendarItems.compactMap(\.day)
-      let todayDay = calendarItems.first(where: {
-        guard case .day(let day) = $0 else { return false }
-        return day.date == today
-      })?.day
-      guard let currentSelectedDate = currentSelectedDay?.date else { return todayDay }
-      return calendarDays.contains(where: { $0.date == currentSelectedDate })
-      ? calendarItems.first(where: {
-        guard case .day(let day) = $0 else { return false }
-        return day.date == currentSelectedDay?.date
-      })?.day
-      : todayDay ?? calendarDays.first
-    case .daysList(let style):
-      switch style {
-      case .single(let day):
-        return day
-      case .multi(let days):
-        return days.contains(where: { $0.date == currentSelectedDay?.date })
-        ? days.first(where: { $0.date == currentSelectedDay?.date })
-        : days.first(where: { $0.date == today }) ?? days.first
-      }
     }
   }
 }

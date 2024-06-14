@@ -37,7 +37,7 @@ public struct DayView: View {
   // MARK: - Views
 
   public var body: some View {
-    LazyVStack(spacing: .zero) {
+    VStack(spacing: .zero) {
       ForEach(activities) { dayActivity in
         menuActivityView(dayActivity)
         divider(addPadding: !dayActivity.dayActivityTasks.isEmpty)

@@ -68,4 +68,13 @@ public extension [Day] {
       result += day.completedCount
     }
   }
+
+  var completedValue: Double {
+    guard plannedCount != .zero else { return .zero }
+    return Swift.min(Double(completedCount) / Double(plannedCount), 1.0)
+  }
+
+  var percent: Int {
+    Int(completedValue * 100)
+  }
 }

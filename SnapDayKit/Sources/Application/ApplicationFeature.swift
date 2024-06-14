@@ -9,7 +9,7 @@ public struct ApplicationFeature: TodayProvidable {
 
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.backgroundUpdater) private var backgroundUpdater
-  @Dependency(\.timePeriodsProvider) private var timePeriodsProvider
+  private let dayProvider = DayProvider()
 
   // MARK: - State & Action
 
@@ -80,7 +80,7 @@ public struct ApplicationFeature: TodayProvidable {
         DeveloperToolsLogger.shared.append(.refresh(.runInBackground))
         return .run { _ in
           try backgroundUpdater.scheduleCreatingDayBackgroundTask()
-          _ = try await timePeriodsProvider.timePeriod(.day, tomorrow, .zero)
+          _ = try await dayProvider.day(for: tomorrow)
           try await userNotificationCenterProvider.reloadReminders()
         }
       case .deviceShaked:

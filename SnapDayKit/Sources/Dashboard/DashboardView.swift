@@ -29,19 +29,15 @@ public struct DashboardView: View {
     WithPerceptionTracking {
       ZStack(alignment: .top) {
         ScrollView {
-          picker
+          dayListSection
             .padding(.horizontal, 15.0)
             .padding(.top, 65.0)
-
-          periods
-            .padding(.horizontal, 15.0)
-            .padding(.top, 15.0)
         }
         .maxWidth()
         .scrollIndicators(.hidden)
 
         Switcher(
-          title: store.activitiesPresentationTitle,
+          title: store.title,
           leftArrowAction: {
             store.send(.view(.decreaseButtonTapped))
           },
@@ -115,6 +111,15 @@ public struct DashboardView: View {
           HStack {
             Button(
               action: {
+                store.send(.view(.calendarButtonTapped))
+              },
+              label: {
+                Image(systemName: "calendar")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+            Button(
+              action: {
                 store.send(.view(.activityListButtonTapped))
               },
               label: {
@@ -137,92 +142,24 @@ public struct DashboardView: View {
     }
   }
 
-  @MainActor
-  private var picker: some View {
-    WithPerceptionTracking {
-      Picker(
-        selection: $store.selectedPeriod,
-        content: {
-          ForEach(store.periods) { period in
-            Text(period.name).tag(period)
-          }
-        },
-        label: { EmptyView() }
-      )
-      .pickerStyle(.segmented)
-    }
-  }
-
-  @MainActor
-  private var periods: some View {
+  private var dayListSection: some View {
     WithPerceptionTracking {
       SectionView(
-        name: store.activitiesPresentationTitle,
+        name: store.title,
         rightContent: { },
         content: {
-          periodsContent
+          dayList
             .formBackgroundModifier(padding: EdgeInsets(.zero))
         }
       )
     }
   }
 
-  @ViewBuilder
-  @MainActor
-  private var periodsContent: some View {
-    WithPerceptionTracking {
-      if let activitiesPresentationType = store.activitiesPresentationType {
-        switch activitiesPresentationType {
-        case .monthsList(let timePeriods):
-          monthsView(timePeriods: timePeriods)
-        case .calendar(let calendarItems):
-          calendarView(calendarItems: calendarItems)
-        case .daysList(let style):
-          dayList(daysSelectorStyle: style)
-        }
-      }
-    }
-  }
-
-  private func monthsView(timePeriods: [TimePeriod]) -> some View {
-    TimePeriodsView(
-      timePeriods: timePeriods,
-      timePeriodTapped: { timePeriod in
-//          store.send(.view(.timePeriodTapped(timePeriod)))
-      }
-    )
-  }
-
-  @MainActor
-  private func calendarView(calendarItems: [CalendarItemType]) -> some View {
-    WithPerceptionTracking {
-      CalendarView(
-        selectedDay: $store.selectedDay,
-        dayActivities: store.activities,
-        calendarItems: calendarItems,
-        daySummary: store.daySummary,
-        dayViewShowButtonState: store.dayViewShowButtonState,
-        informationConfiguration: store.dayInformation,
-        dayActivityAction: { action in
-          store.send(.view(.dayActivityActionPerfomed(action)))
-        },
-        showCompletedTapped: {
-          store.send(.view(.showCompletedActivitiesTapped))
-        },
-        hideCompletedTapped: {
-          store.send(.view(.hideCompletedActivitiesTapped))
-        }
-      )
-    }
-  }
-
-  @MainActor
-  private func dayList(daysSelectorStyle: DaysSelectorStyle) -> some View {
+  private var dayList: some View {
     WithPerceptionTracking {
       DaysSelectorView(
         selectedDay: $store.selectedDay,
         dayActivities: store.activities,
-        daysSelectorStyle: daysSelectorStyle,
         daySummary: store.daySummary,
         dayViewShowButtonState: store.dayViewShowButtonState,
         informationConfiguration: store.dayInformation,

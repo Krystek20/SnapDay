@@ -18,9 +18,9 @@ struct EveningTagSummary: Identifiable, Equatable {
 @Reducer
 public struct EveningSummaryFeature: TodayProvidable {
 
-  // MARK: - Dependencies
+  // MARK: - Properties
 
-  @Dependency(\.timePeriodsProvider) private var timePeriodsProvider
+  private var dayProvider = DayProvider()
 
   // MARK: - State & Action
 
@@ -100,8 +100,8 @@ public struct EveningSummaryFeature: TodayProvidable {
     switch action {
     case .loadDay:
       return .run { [date = state.date] send in
-        let timePeriod = try await timePeriodsProvider.timePeriod(.day, date, .zero)
-        await send(.internal(.setDay(timePeriod.days.first)))
+        let day = try await dayProvider.day(for: date)
+        await send(.internal(.setDay(day)))
       }
     case .setDay(let day):
       guard let day else { return .none }

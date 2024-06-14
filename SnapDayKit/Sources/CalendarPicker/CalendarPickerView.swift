@@ -25,19 +25,21 @@ public struct CalendarPickerView: View {
         .maxFrame()
         .activityBackground
         .toolbar {
-          ToolbarItem(placement: .topBarTrailing) {
-            Button(store.buttonTitle) {
-              store.send(.view(.trailingButtonTapped))
+          if let buttonTitle = store.buttonTitle {
+            ToolbarItem(placement: .topBarTrailing) {
+              Button(buttonTitle) {
+                store.send(.view(.trailingButtonTapped))
+              }
+              .font(.system(size: 12.0, weight: .bold))
+              .foregroundStyle(Color.actionBlue)
             }
-            .font(.system(size: 12.0, weight: .bold))
-            .foregroundStyle(Color.actionBlue)
-          }
-          ToolbarItem(placement: .topBarLeading) {
-            Button(String(localized: "Cancel", bundle: .module)) {
-              store.send(.view(.cancelButtonTapped))
+            ToolbarItem(placement: .topBarLeading) {
+              Button(String(localized: "Cancel", bundle: .module)) {
+                store.send(.view(.cancelButtonTapped))
+              }
+              .font(.system(size: 12.0, weight: .bold))
+              .foregroundStyle(Color.actionBlue)
             }
-            .font(.system(size: 12.0, weight: .bold))
-            .foregroundStyle(Color.actionBlue)
           }
         }
     }

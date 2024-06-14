@@ -7,6 +7,8 @@ import Common
 import Combine
 import MarkerList
 import ActivityList
+import struct UiComponents.PeriodViewModel
+import struct UiComponents.PeriodViewModelProvider
 
 @Reducer
 public struct ReportsFeature: TodayProvidable {
@@ -47,6 +49,12 @@ public struct ReportsFeature: TodayProvidable {
       selectedActivity?.labels.isEmpty == false
     }
     var selectedLabel: ActivityLabel?
+    
+    var periods: [PeriodViewModel] {
+      guard selectedFilterPeriod == .quarter else { return [] }
+      let provider = PeriodViewModelProvider()
+      return provider.preparePeriodViewModel(from: days, to: .month)
+    }
 
     var days: [Day] = []
     var activities: [Activity] = []
