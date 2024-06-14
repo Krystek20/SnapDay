@@ -592,14 +592,16 @@ public struct DashboardFeature: TodayProvidable {
       return .send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
     case .presented(.confirmTapped(let dayActivity, let dayActivityTask)):
       state.dayActivityTaskAlert = nil
-      return .run { send in
-        if !dayActivity.isDone {
+      return .concatenate(
+        .run { send in
+          guard !dayActivity.isDone else { return }
           await send(.internal(.dayActivityAction(.select(dayActivity))))
-        }
-        if !dayActivityTask.isDone {
+        },
+        .run { send in
+          guard !dayActivityTask.isDone else { return }
           await send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
         }
-      }
+      )
     default:
       return .none
     }
