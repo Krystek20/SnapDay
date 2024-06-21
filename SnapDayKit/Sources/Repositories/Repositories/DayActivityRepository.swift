@@ -2,13 +2,29 @@ import Foundation
 import Dependencies
 import Models
 
+public struct ActivitiesFetchConfiguration {
+  let range: ClosedRange<Date>?
+  let onlyGeneratedAutomatically: Bool?
+  let hasTemplateId: Bool?
+
+  public init(
+    range: ClosedRange<Date>? = nil,
+    onlyGeneratedAutomatically: Bool? = nil,
+    hasTemplateId: Bool? = nil
+  ) {
+    self.range = range
+    self.onlyGeneratedAutomatically = onlyGeneratedAutomatically
+    self.hasTemplateId = hasTemplateId
+  }
+}
+
 public struct DayActivityRepository {
   public var activity: @Sendable (String) async throws -> DayActivity?
   public var activityTask: @Sendable (String) async throws -> DayActivityTask?
-  public var activities: @Sendable (ClosedRange<Date>) async throws -> [DayActivity]
-  public var saveActivity: @Sendable (DayActivity) async throws -> ()
-  public var saveActivityTask: @Sendable (DayActivityTask) async throws -> ()
-  public var removeActivity: @Sendable (DayActivity) async throws -> ()
+  public var activities: @Sendable (ActivitiesFetchConfiguration) async throws -> [DayActivity]
+  public var saveDayActivity: @Sendable (DayActivity) async throws -> ()
+  public var saveDayActivityTask: @Sendable (DayActivityTask) async throws -> ()
+  public var removeDayActivity: @Sendable (DayActivity) async throws -> ()
   public var removeDayActivityTask: @Sendable (DayActivityTask) async throws -> ()
 }
 
@@ -38,21 +54,37 @@ extension DayActivityRepository: DependencyKey {
           ]
         )
       },
-      activities: { dates in
-        try await EntityHandler().fetch(
+      activities: { configuration in
+        var predicates: [NSPredicate] = []
+        if let range = configuration.range {
+          predicates.append(
+            NSPredicate(format: "day.date >= %@ AND day.date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)
+          )
+        }
+        if let onlyGeneratedAutomatically = configuration.onlyGeneratedAutomatically {
+          predicates.append(
+            NSPredicate(format: "isGeneratedAutomatically == %@", NSNumber(value: onlyGeneratedAutomatically))
+          )
+        }
+        if let hasTemplateId = configuration.hasTemplateId {
+          let predicate = hasTemplateId
+          ? NSPredicate(format: "activity != nil")
+          : NSPredicate(format: "activity == nil")
+          predicates.append(predicate)
+        }
+        return try await EntityHandler().fetch(
           objectType: DayActivity.self,
-          predicates: [
-            NSPredicate(format: "day.date >= %@ AND day.date <= %@", dates.lowerBound as NSDate, dates.upperBound as NSDate)
-          ]
+          predicates: predicates,
+          sorts: loadActivitiesSorts
         )
       },
-      saveActivity: { dayActivity in
+      saveDayActivity: { dayActivity in
         try await EntityHandler().save(dayActivity)
       },
-      saveActivityTask: { dayActivityTask in
+      saveDayActivityTask: { dayActivityTask in
         try await EntityHandler().save(dayActivityTask)
       },
-      removeActivity: { dayActivity in
+      removeDayActivity: { dayActivity in
         try await EntityHandler().delete(dayActivity)
         for dayActivityTask in dayActivity.dayActivityTasks {
           try await EntityHandler().delete(dayActivityTask)
@@ -62,5 +94,12 @@ extension DayActivityRepository: DependencyKey {
         try await EntityHandler().delete(dayActivityTask)
       }
     )
+  }
+}
+
+private extension DayActivityRepository {
+  @SortBuilder
+  static var loadActivitiesSorts: [NSSortDescriptor] {
+    NSSortDescriptor(key: "name", ascending: true)
   }
 }

@@ -4,22 +4,15 @@ import Common
 import Models
 import MarkerForm
 import EmojiPicker
-import DayActivityTaskForm
 
 @Reducer
 public struct DayActivityFormFeature {
-
-  public enum DayActivityFormType {
-    case new
-    case edit
-  }
 
   // MARK: - Dependencies
 
   @Dependency(\.dismiss) private var dismiss
   @Dependency(\.tagRepository) private var tagRepository
   @Dependency(\.activityLabelRepository) private var activityLabelRepository
-  @Dependency(\.activityRepository) private var activityRepository
   @Dependency(\.date) private var date
   @Dependency(\.uuid) private var uuid
   @Dependency(\.calendar) private var calendar
@@ -29,33 +22,38 @@ public struct DayActivityFormFeature {
   @ObservableState
   public struct State: Equatable {
 
+    public enum DayActivityFormType {
+      case new
+      case edit
+    }
+
     public enum Field: Hashable {
       case name
     }
 
+    var form: DayActivityForm
     var focus: Field?
-
-    var title: String {
-      switch type {
-      case .new:
-        String(localized: "New day activity", bundle: .module)
-      case .edit:
-        String(localized: "Edit day activity", bundle: .module)
-      }
-    }
-
-    var showLabelField: Bool {
-      dayActivity.activity != nil
-    }
 
     var existingTags: [Tag] = []
     var existingLabels: [ActivityLabel] = []
 
     var showAddTagButton: Bool { !newTag.isEmpty }
     var showAddLabelButton: Bool { !newLabel.isEmpty }
-    
+
+    var title: String {
+      switch type {
+      case .new:
+        form.newTitle
+      case .edit:
+        form.editTitle
+      }
+    }
+
+    var isSaveButtonDisabled: Bool {
+      !form.validated
+    }
+
     let type: DayActivityFormType
-    var dayActivity: DayActivity
     var newTag = String.empty
     var newLabel = String.empty
     
@@ -65,17 +63,15 @@ public struct DayActivityFormFeature {
 
     @Presents var emojiPicker: EmojiPickerFeature.State?
     @Presents var addMarker: MarkerFormFeature.State?
-    @Presents var dayActivityTaskForm: DayActivityTaskFormFeature.State?
-    @Presents var dayActivityAlert: AlertState<Action.DayActivityAlert>?
-    @Presents var dayActivityTaskAlert: AlertState<Action.DayActivityTaskAlert>?
+    @Presents var dayActivityTaskForm: DayActivityFormFeature.State?
 
     public init(
+      form: DayActivityForm,
       type: DayActivityFormType,
-      dayActivity: DayActivity,
       availableDateHours: ClosedRange<Date>
     ) {
+      self.form = form
       self.type = type
-      self.dayActivity = dayActivity
       self.availableDateHours = availableDateHours
     }
   }
@@ -100,9 +96,9 @@ public struct DayActivityFormFeature {
 
       public enum TaskAction: Equatable {
         case addButtonTapped
-        case selectButtonTapped(DayActivityTask)
-        case editButtonTapped(DayActivityTask)
-        case removeButtonTapped(DayActivityTask)
+        case selectButtonTapped(DayActivityForm)
+        case editButtonTapped(DayActivityForm)
+        case removeButtonTapped(DayActivityForm)
       }
 
       case appeared
@@ -111,7 +107,6 @@ public struct DayActivityFormFeature {
       case task(TaskAction)
       case saveButtonTapped
       case deleteButtonTapped
-      case isDoneToggleChanged(Bool)
       case iconTapped
       case pickPhotoTapped
       case removeImageTapped
@@ -124,28 +119,16 @@ public struct DayActivityFormFeature {
       case setExistingLabels([ActivityLabel])
       case loadLabels
       case setImageDate(_ date: Data?)
-      case showAlertSelectAll
-      case showAlertSelectActivity
     }
     public enum DelegateAction: Equatable {
-      case activityCreated(DayActivity)
-      case activityDeleted(DayActivity)
-      case activityUpdated(DayActivity)
-    }
-    public enum DayActivityAlert: Equatable {
-      case confirmTapped
-      case cancelTapped
-    }
-    public enum DayActivityTaskAlert: Equatable {
-      case confirmTapped
-      case cancelTapped
+      case activityCreated(DayActivityForm)
+      case activityDeleted(DayActivityForm)
+      case activityUpdated(DayActivityForm)
     }
 
-    case dayActivityAlert(PresentationAction<DayActivityAlert>)
-    case dayActivityTaskAlert(PresentationAction<DayActivityTaskAlert>)
     case emojiPicker(PresentationAction<EmojiPickerFeature.Action>)
     case addMarker(PresentationAction<MarkerFormFeature.Action>)
-    case dayActivityTaskForm(PresentationAction<DayActivityTaskFormFeature.Action>)
+    case dayActivityTaskForm(PresentationAction<DayActivityFormFeature.Action>)
 
     case binding(BindingAction<State>)
 
@@ -174,10 +157,8 @@ public struct DayActivityFormFeature {
         handleAddMarker(presentableMarkerAction, state: &state)
       case .dayActivityTaskForm(let presentableDayActivityTaskFormAction):
         handleDayActivityTaskForm(presentableDayActivityTaskFormAction, state: &state)
-      case .dayActivityAlert(let action):
-        handleDayActivityAlertAction(action, state: &state)
-      case .dayActivityTaskAlert(let action):
-        handleDayActivityTaskAlertAction(action, state: &state)
+      case .binding(\.form):
+        handleCompleted(state: &state)
       case .delegate:
         .none
       case .binding:
@@ -191,8 +172,15 @@ public struct DayActivityFormFeature {
       MarkerFormFeature()
     }
     .ifLet(\.$dayActivityTaskForm, action: \.dayActivityTaskForm) {
-      DayActivityTaskFormFeature()
+      DayActivityFormFeature()
     }
+  }
+
+  func handleCompleted(state: inout State) -> Effect<Action> {
+    if state.form.completed && state.form.reminderDate != nil {
+      state.form.reminderDate = nil
+    }
+    return .none
   }
 
   func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
@@ -203,18 +191,18 @@ public struct DayActivityFormFeature {
         await send(.internal(.loadLabels))
       })
     case .saveButtonTapped:
-      return .run { [activity = state.dayActivity, type = state.type] send in
+      return .run { [form = state.form, type = state.type] send in
         switch type {
         case .new:
-          await send(.delegate(.activityCreated(activity)))
+          await send(.delegate(.activityCreated(form)))
         case .edit:
-          await send(.delegate(.activityUpdated(activity)))
+          await send(.delegate(.activityUpdated(form)))
         }
         await dismiss()
       }
     case .deleteButtonTapped:
-      return .run { [activity = state.dayActivity] send in
-        await send(.delegate(.activityDeleted(activity)))
+      return .run { [form = state.form] send in
+        await send(.delegate(.activityDeleted(form)))
         await dismiss()
       }
     case .tag(let tagAction):
@@ -223,13 +211,6 @@ public struct DayActivityFormFeature {
       return handleViewLabelAction(labelAction, state: &state)
     case .task(let taskAction):
       return handleViewTaskAction(taskAction, state: &state)
-    case .isDoneToggleChanged(let value):
-      if state.dayActivity.hasIncompleteSubtasksAndNotDone {
-        return .send(.internal(.showAlertSelectAll))
-      } else {
-        state.dayActivity.doneDate = value ? date() : nil
-        return .none
-      }
     case .iconTapped:
       state.emojiPicker = EmojiPickerFeature.State()
       return .none
@@ -237,7 +218,7 @@ public struct DayActivityFormFeature {
       state.isPhotoPickerPresented = true
       return .none
     case .removeImageTapped:
-      state.dayActivity.icon = nil
+      state.form.icon = nil
       return .none
     case .imageSelected(let item):
       return .run { send in
@@ -245,7 +226,7 @@ public struct DayActivityFormFeature {
         await send(.internal(.setImageDate(data)))
       }
     case .remindToggeled(let value):
-      state.dayActivity.reminderDate = value
+      state.form.reminderDate = value
       ? calendar.setHourAndMinute(date.now, toDate: state.availableDateHours.lowerBound)
       : nil
       return .none
@@ -299,34 +280,32 @@ public struct DayActivityFormFeature {
   private func handleViewTaskAction(_ action: Action.ViewAction.TaskAction, state: inout State) -> Effect<Action> {
     switch action {
     case .addButtonTapped:
-      state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
-        dayActivityTask: DayActivityTask(
-          id: uuid(),
-          dayActivityId: state.dayActivity.id
+      state.dayActivityTaskForm = DayActivityFormFeature.State(
+        form: DayActivityForm(
+          dayActivityTask: DayActivityTask(
+            id: uuid(),
+            dayActivityId: state.form.id
+          )
         ),
         type: .new,
         availableDateHours: state.availableDateHours
       )
       return .none
-    case .selectButtonTapped(let dayActivityTask):
-      guard let index = state.dayActivity.dayActivityTasks.firstIndex(where: { $0.id ==  dayActivityTask.id }) else { return .none }
-      defer {
-        state.dayActivity.dayActivityTasks[index].doneDate = dayActivityTask.doneDate == nil ? date() : nil
+    case .selectButtonTapped(let dayActivityTaskForm):
+      state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }).map { index in
+        state.form.tasks[index].completed.toggle()
       }
-      guard state.dayActivity.areSubtasksCompleted(excluding: state.dayActivity.dayActivityTasks[index]) else {
-        return .none
-      }
-      return .send(.internal(.showAlertSelectActivity))
-    case .editButtonTapped(let dayActivityTask):
-      state.dayActivityTaskForm = DayActivityTaskFormFeature.State(
-        dayActivityTask: dayActivityTask,
+      return .none
+    case .editButtonTapped(let dayActivityTaskForm):
+      state.dayActivityTaskForm = DayActivityFormFeature.State(
+        form: dayActivityTaskForm,
         type: .edit,
         availableDateHours: state.availableDateHours
       )
       return .none
-    case .removeButtonTapped(let dayActivityTask):
-      guard let index = state.dayActivity.dayActivityTasks.firstIndex(where: { $0.id ==  dayActivityTask.id }) else { return .none }
-      state.dayActivity.dayActivityTasks.remove(at: index)
+    case .removeButtonTapped(let dayActivityTaskForm):
+      guard let index = state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }) else { return .none }
+      state.form.tasks.remove(at: index)
       return .none
     }
   }
@@ -337,7 +316,7 @@ public struct DayActivityFormFeature {
       state.existingTags = tags
       return .none
     case .loadTags:
-      return .run { [enteredTags = state.dayActivity.tags] send in
+      return .run { [enteredTags = state.form.tags] send in
         let existingTags = try await tagRepository.loadTags(enteredTags)
         await send(.internal(.setExistingTags(existingTags)))
       }
@@ -345,27 +324,15 @@ public struct DayActivityFormFeature {
       state.existingLabels = labels
       return .none
     case .loadLabels:
-      guard let activity = state.dayActivity.activity else { return .none }
-      return .run { [activity, enteredLabels = state.dayActivity.labels] send in
-        let existingLabels = try await activityLabelRepository.loadLabels(activity, enteredLabels)
+      guard let parentId = state.form.ids[.parentId] else { return .none }
+      return .run { [parentId, enteredLabels = state.form.labels] send in
+        let existingLabels = try await activityLabelRepository.loadLabels(parentId, enteredLabels)
         await send(.internal(.setExistingLabels(existingLabels)))
       }
     case .setImageDate(let imageData):
-      state.dayActivity.icon = Icon(
+      state.form.icon = Icon(
         id: uuid(),
         data: imageData
-      )
-      return .none
-    case .showAlertSelectAll:
-      state.dayActivityAlert = AlertState<Action.DayActivityAlert>.showAlertSelectAll(
-        confirmAction: .confirmTapped,
-        cancelAction: .cancelTapped
-      )
-      return .none
-    case .showAlertSelectActivity:
-      state.dayActivityTaskAlert = AlertState<Action.DayActivityTaskAlert>.dayActivityTaskAlert(
-        confirmAction: .confirmTapped,
-        cancelAction: .cancelTapped
       )
       return .none
     }
@@ -389,72 +356,26 @@ public struct DayActivityFormFeature {
       appendTag(tag, state: &state)
       return .none
     case .presented(.delegate(.labelCreated(let label))):
-      guard let activity = state.dayActivity.activity else { return .none }
+      state.newLabel = .empty
       appendLabel(label, state: &state)
-      state.dayActivity.activity?.labels.append(label)
-      return .run { [activity] send in
-        try await activityRepository.saveActivity(activity)
-      }
-    default:
-      return .none
-    }
-  }
-
-  func handleDayActivityTaskForm(_ action: PresentationAction<DayActivityTaskFormFeature.Action>, state: inout State) -> Effect<Action> {
-    switch action {
-    case .presented(.delegate(.dayActivityTaskDeleted(let dayActivityTask))):
-      state.dayActivity.dayActivityTasks.removeAll(where: { $0.id ==  dayActivityTask.id })
-      return .none
-    case .presented(.delegate(.dayActivityTaskUpdated(let dayActivityTask))):
-      guard let index = state.dayActivity.dayActivityTasks.firstIndex(where: { $0.id == dayActivityTask.id }) else { return .none }
-      defer {
-        state.dayActivity.dayActivityTasks[index] = dayActivityTask
-      }
-      guard state.dayActivity.areSubtasksCompleted(excluding: state.dayActivity.dayActivityTasks[index]) else {
-        return .none
-      }
-      return .send(.internal(.showAlertSelectActivity))
-    case .presented(.delegate(.dayActivityTaskCreated(let dayActivityTask))):
-      state.dayActivity.dayActivityTasks.append(dayActivityTask)
       return .none
     default:
       return .none
     }
   }
 
-  private func handleDayActivityAlertAction(_ action: PresentationAction<Action.DayActivityAlert>, state: inout State) -> Effect<Action> {
+  func handleDayActivityTaskForm(_ action: PresentationAction<DayActivityFormFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
-    case .presented(.cancelTapped):
-      state.dayActivityAlert = nil
-      if !state.dayActivity.isDone {
-        state.dayActivity.doneDate = date()
+    case .presented(.delegate(.activityDeleted(let dayActivityTaskForm))):
+      state.form.tasks.removeAll(where: { $0.id == dayActivityTaskForm.id })
+      return .none
+    case .presented(.delegate(.activityUpdated(let dayActivityTaskForm))):
+      state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }).map { index in
+        state.form.tasks[index] = dayActivityTaskForm
       }
       return .none
-    case .presented(.confirmTapped):
-      state.dayActivityAlert = nil
-      if !state.dayActivity.isDone {
-        state.dayActivity.doneDate = date()
-      }
-      for index in 0..<state.dayActivity.dayActivityTasks.count {
-        guard !state.dayActivity.dayActivityTasks[index].isDone else { continue }
-        state.dayActivity.dayActivityTasks[index].doneDate = date()
-      }
-      return .none
-    default:
-      return .none
-    }
-  }
-
-  private func handleDayActivityTaskAlertAction(_ action: PresentationAction<Action.DayActivityTaskAlert>, state: inout State) -> Effect<Action> {
-    switch action {
-    case .presented(.cancelTapped):
-      state.dayActivityTaskAlert = nil
-      return .none
-    case .presented(.confirmTapped):
-      state.dayActivityTaskAlert = nil
-      if !state.dayActivity.isDone {
-        state.dayActivity.doneDate = date()
-      }
+    case .presented(.delegate(.activityCreated(let dayActivityTaskForm))):
+      state.form.tasks.append(dayActivityTaskForm)
       return .none
     default:
       return .none
@@ -472,30 +393,30 @@ public struct DayActivityFormFeature {
   }
 
   private func appendTag(_ tag: Tag, state: inout State) {
-    guard !state.dayActivity.tags.contains(where: { $0.name == tag.name }) else { return }
-    state.dayActivity.tags.append(tag)
+    guard !state.form.tags.contains(where: { $0.name == tag.name }) else { return }
+    state.form.tags.append(tag)
   }
 
   private func removeTag(_ tag: Tag, state: inout State) {
-    guard state.dayActivity.tags.contains(where: { $0.name == tag.name }) else { return }
-    state.dayActivity.tags.removeAll(where: { $0.name == tag.name })
+    guard state.form.tags.contains(where: { $0.name == tag.name }) else { return }
+    state.form.tags.removeAll(where: { $0.name == tag.name })
   }
 
   private func showNewLabel(state: inout State) {
-    guard !state.newLabel.isEmpty else { return }
+    guard !state.newLabel.isEmpty, let parentId = state.form.ids[.parentId] else { return }
     state.addMarker = MarkerFormFeature.State(
-      markerType: .label,
+      markerType: .label(activityId: parentId),
       name: state.newLabel
     )
   }
 
   private func appendLabel(_ label: ActivityLabel, state: inout State) {
-    guard !state.dayActivity.labels.contains(where: { $0.name == label.name }) else { return }
-    state.dayActivity.labels.append(label)
+    guard !state.form.labels.contains(where: { $0.name == label.name }) else { return }
+    state.form.labels.append(label)
   }
 
   private func removeLabel(_ label: ActivityLabel, state: inout State) {
-    guard state.dayActivity.labels.contains(where: { $0.name == label.name }) else { return }
-    state.dayActivity.labels.removeAll(where: { $0.name == label.name })
+    guard state.form.labels.contains(where: { $0.name == label.name }) else { return }
+    state.form.labels.removeAll(where: { $0.name == label.name })
   }
 }

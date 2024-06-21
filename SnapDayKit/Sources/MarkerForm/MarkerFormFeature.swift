@@ -1,3 +1,4 @@
+import Foundation
 import ComposableArchitecture
 import Repositories
 import Models
@@ -8,13 +9,14 @@ public struct MarkerFormFeature {
 
   public enum MarkerType: Equatable {
     case tag
-    case label
+    case label(activityId: UUID)
   }
 
   // MARK: - Dependencies
 
   @Dependency(\.tagRepository.saveTag) var saveTag
   @Dependency(\.activityLabelRepository.saveLabel) var saveLabel
+  @Dependency(\.activityRepository) private var activityRepository
   @Dependency(\.dismiss) var dismiss
 
   // MARK: - State & Action
@@ -77,9 +79,12 @@ public struct MarkerFormFeature {
             let tag = Tag(name: name, color: color)
             try await saveTag(tag)
             await send(.delegate(.tagCreated(tag)))
-          case .label:
+          case .label(let activityId):
+            guard var activity = try await activityRepository.activity(activityId) else { return }
             let label = ActivityLabel(name: name, color: color)
             try await saveLabel(label)
+            activity.labels.append(label)
+            try await activityRepository.saveActivity(activity)
             await send(.delegate(.labelCreated(label)))
           }
           await dismiss()

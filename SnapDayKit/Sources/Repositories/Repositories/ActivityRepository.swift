@@ -3,6 +3,7 @@ import Dependencies
 import Models
 
 public struct ActivityRepository {
+  public var activity: @Sendable (UUID) async throws -> Activity?
   public var loadActivities: @Sendable () async throws -> [Activity]
   public var saveActivity: @Sendable (Activity) async throws -> ()
   public var removeActivityTask: @Sendable (ActivityTask) async throws -> ()
@@ -18,6 +19,14 @@ extension DependencyValues {
 extension ActivityRepository: DependencyKey {
   public static var liveValue: ActivityRepository {
     ActivityRepository(
+      activity: { activityId in
+        try await EntityHandler().fetch(
+          objectType: Activity.self,
+          predicates: [
+            NSPredicate(format: "identifier == %@", activityId as CVarArg)
+          ]
+        )
+      },
       loadActivities: {
         try await EntityHandler().fetch(
           objectType: Activity.self,

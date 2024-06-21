@@ -5,7 +5,7 @@ import Models
 public struct ActivityLabelRepository {
   public var saveLabel: @Sendable (ActivityLabel) async throws -> ()
   public var deleteLabel: @Sendable (ActivityLabel) async throws -> ()
-  public var loadLabels: @Sendable (_ activity: Activity, _ excludedLabels: [ActivityLabel]) async throws -> [ActivityLabel]
+  public var loadLabels: @Sendable (_ activityId: UUID, _ excludedLabels: [ActivityLabel]) async throws -> [ActivityLabel]
 }
 
 extension DependencyValues {
@@ -24,10 +24,10 @@ extension ActivityLabelRepository: DependencyKey {
       deleteLabel: { label in
         try await EntityHandler().delete(label)
       },
-      loadLabels: { activity, excludedTags in
+      loadLabels: { activityId, excludedTags in
         try await EntityHandler().fetch(
           objectType: ActivityLabel.self,
-          predicates: loadLabelsPredicate(activity: activity, excludedTags),
+          predicates: loadLabelsPredicate(activityId: activityId, excludedTags),
           sorts: loadLabelsSorts
         )
       }
@@ -47,9 +47,9 @@ extension ActivityLabelRepository: DependencyKey {
 
 private extension ActivityLabelRepository {
   @PredicateBuilder
-  static func loadLabelsPredicate(activity: Activity, _ excludedLabels: [ActivityLabel]) -> [NSPredicate] {
+  static func loadLabelsPredicate(activityId: UUID, _ excludedLabels: [ActivityLabel]) -> [NSPredicate] {
     let excludedLabelsNames = excludedLabels.map(\.name)
-    NSPredicate(format: "activity.identifier == %@ AND NOT (name IN %@)", activity.id as CVarArg, excludedLabelsNames)
+    NSPredicate(format: "activity.identifier == %@ AND NOT (name IN %@)", activityId as CVarArg, excludedLabelsNames)
   }
 
   @SortBuilder

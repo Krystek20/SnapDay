@@ -244,6 +244,12 @@ final class DayUpdater {
   func updateDayActivity(_ dayActivity: DayActivity, to date: Date) async throws {
     guard var day = try await dayRepository.loadDay(date),
           let index = day.activities.firstIndex(where: { $0.id == dayActivity.id }) else { return }
+    let tasksToRemove = day.activities[index].dayActivityTasks.filter {
+      !dayActivity.dayActivityTasks.contains($0)
+    }
+    for task in tasksToRemove {
+      try await removeDayActivityTask(task)
+    }
     day.activities[index] = dayActivity
     try await saveDay(day)
   }
@@ -490,6 +496,10 @@ final class DayUpdater {
   }
 
   private func removeDayActivity(_ dayActivity: DayActivity) async throws {
-    try await dayActivityRepository.removeActivity(dayActivity)
+    try await dayActivityRepository.removeDayActivity(dayActivity)
+  }
+
+  private func removeDayActivityTask(_ dayActivityTask: DayActivityTask) async throws {
+    try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
   }
 }

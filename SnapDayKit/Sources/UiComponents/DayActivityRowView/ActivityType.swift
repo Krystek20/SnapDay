@@ -19,3 +19,9 @@ extension ActivityType {
 
 extension DayActivity: ActivityType { }
 extension DayActivityTask: ActivityType { }
+extension Activity: ActivityType {
+  public var doneDate: Date? { nil }
+  public var duration: Int { defaultDuration ?? .zero }
+  public var overview: String? { nil }
+  public var reminderDate: Date? { defaultReminderDate }
+}

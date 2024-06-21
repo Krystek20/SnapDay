@@ -56,7 +56,7 @@ struct ActivityTaskView: View {
         size: 30.0,
         cornerRadius: 15.0
       )
-      VStack(alignment: .leading, spacing: 2.0) {
+      VStack(alignment: .leading, spacing: .zero) {
         Text(activityTask.name)
           .font(.system(size: 14.0, weight: .medium))
           .foregroundStyle(Color.sectionText)

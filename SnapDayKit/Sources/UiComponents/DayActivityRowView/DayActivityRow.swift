@@ -5,13 +5,16 @@ public struct DayActivityRow: View, DurationFormatting {
 
   private let activity: ActivityType
   private let trailingIcon: TrailingIcon
+  private let trailingViewTapped: (() -> Void)?
 
   public init(
     activity: ActivityType,
-    trailingIcon: TrailingIcon
+    trailingIcon: TrailingIcon,
+    trailingViewTapped: (() -> Void)? = nil
   ) {
     self.activity = activity
     self.trailingIcon = trailingIcon
+    self.trailingViewTapped = trailingViewTapped
   }
 
   public var body: some View {
@@ -30,6 +33,9 @@ public struct DayActivityRow: View, DurationFormatting {
       }
       Spacer()
       view(for: trailingIcon)
+        .onTapGesture {
+          trailingViewTapped?()
+        }
     }
     .padding(.all, 10.0)
   }
@@ -69,6 +75,12 @@ public struct DayActivityRow: View, DurationFormatting {
     case .more:
       AnyView(
         Image(systemName: "ellipsis")
+          .foregroundStyle(Color.sectionText)
+          .imageScale(.medium)
+      )
+    case .edit:
+      AnyView(
+        Image(systemName: "square.and.pencil")
           .foregroundStyle(Color.sectionText)
           .imageScale(.medium)
       )

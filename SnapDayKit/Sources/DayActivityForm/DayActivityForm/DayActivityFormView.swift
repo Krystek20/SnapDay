@@ -4,7 +4,6 @@ import UiComponents
 import Resources
 import Models
 import MarkerForm
-import DayActivityTaskForm
 import EmojiPicker
 import PhotosUI
 
@@ -47,12 +46,10 @@ public struct DayActivityFormView: View {
         }
         .sheet(item: $store.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
           NavigationStack {
-            DayActivityTaskFormView(store: store)
+            DayActivityFormView(store: store)
           }
           .presentationDetents([.large])
         }
-        .alert($store.scope(state: \.dayActivityAlert, action: \.dayActivityAlert))
-        .alert($store.scope(state: \.dayActivityTaskAlert, action: \.dayActivityTaskAlert))
     }
   }
 
@@ -75,17 +72,15 @@ public struct DayActivityFormView: View {
   private var formView: some View {
     ScrollView {
       VStack(spacing: 15.0) {
-        isDoneToggleView
-        imageField
-        nameTextField
-        tagsView
-        durationFormView
-        reminderFormView
-        overviewTextField
-        if store.showLabelField {
-          labelsView
-        }
-        tasksView
+        prepareView(for: .completed)
+        prepareView(for: .icon)
+        prepareView(for: .name)
+        prepareView(for: .tags)
+        prepareView(for: .duration)
+        prepareView(for: .reminder)
+        prepareView(for: .overview)
+        prepareView(for: .labels)
+        prepareView(for: .tasks)
       }
       .padding(padding)
       .maxWidth()
@@ -94,18 +89,38 @@ public struct DayActivityFormView: View {
   }
 
   @ViewBuilder
-  private var isDoneToggleView: some View {
+  private func prepareView(for field: DayActivityField) -> some View {
     WithPerceptionTracking {
-      Toggle(
-        isOn: Binding(
-          get: {
-            store.dayActivity.isDone
-          },
-          set: { value in
-            store.send(.view(.isDoneToggleChanged(value)))
-          }
-        )
-      ) {
+      if store.form.fields.contains(field) {
+        switch field {
+        case .completed:
+          completedView
+        case .icon:
+          iconView
+        case .name:
+          nameView
+        case .tags:
+          tagsView
+        case .duration:
+          durationView
+        case .reminder:
+          reminderView
+        case .overview:
+          overviewView
+        case .tasks:
+          tasksView
+        case .labels:
+          labelsView
+        case .frequency:
+          EmptyView()
+        }
+      }
+    }
+  }
+
+  private var completedView: some View {
+    WithPerceptionTracking {
+      Toggle(isOn: $store.form.completed) {
         Text("Completed", bundle: .module)
           .formTitleTextStyle
       }
@@ -114,7 +129,7 @@ public struct DayActivityFormView: View {
     }
   }
 
-  private var imageField: some View {
+  private var iconView: some View {
     WithPerceptionTracking {
       Menu {
         Button(
@@ -138,7 +153,7 @@ public struct DayActivityFormView: View {
       } label: {
         HStack(spacing: 10.0) {
           ActivityImageView(
-            data: store.dayActivity.icon?.data,
+            data: store.form.icon?.data,
             size: 30.0,
             cornerRadius: 5.0,
             tintColor: .actionBlue
@@ -167,82 +182,14 @@ public struct DayActivityFormView: View {
     }
   }
 
-  private var nameTextField: some View {
+  private var nameView: some View {
     WithPerceptionTracking {
       FormTextField(
         title: String(localized: "Name", bundle: .module),
         placeholder: String(localized: "Enter name", bundle: .module),
-        value: $store.dayActivity.name
+        value: $store.form.name
       )
       .focused($focus, equals: .name)
-    }
-  }
-
-  private var durationFormView: some View {
-    HStack(spacing: 10.0) {
-      Text("Set duration", bundle: .module)
-        .formTitleTextStyle
-      Spacer()
-      durationView
-    }
-    .formBackgroundModifier()
-  }
-
-  private var durationView: some View {
-    WithPerceptionTracking {
-      DurationPickerView(
-        selectedHours: Binding(
-          get: {
-            store.dayActivity.hours
-          },
-          set: {
-            $store.dayActivity.wrappedValue.setDurationHours($0)
-          }
-        ),
-        selectedMinutes: Binding(
-          get: {
-            store.dayActivity.minutes
-          },
-          set: {
-            $store.dayActivity.wrappedValue.setDurationMinutes($0)
-          }
-        )
-      )
-    }
-  }
-
-  private var reminderFormView: some View {
-    WithPerceptionTracking {
-      ReminderFormView(
-        title: String(localized: "Reminder", bundle: .module),
-        availableDateHours: store.availableDateHours,
-        toggleBinding: Binding(
-          get: {
-            store.dayActivity.reminderDate != nil
-          },
-          set: { value in
-            store.send(.view(.remindToggeled(value)))
-          }
-        ), 
-        dateBinding: $store.dayActivity.reminderDate
-      )
-    }
-  }
-
-  private var overviewTextField: some View {
-    WithPerceptionTracking {
-      FormTextField(
-        title: String(localized: "Overview", bundle: .module),
-        placeholder: String(localized: "Enter overview", bundle: .module),
-        value: Binding(
-          get: {
-            store.dayActivity.overview ?? ""
-          },
-          set: {
-            $store.dayActivity.wrappedValue.overview = $0
-          }
-        )
-      )
     }
   }
 
@@ -252,7 +199,7 @@ public struct DayActivityFormView: View {
         title: String(localized: "Tags", bundle: .module),
         placeholder: String(localized: "Enter tag", bundle: .module),
         existingMarkersTitle: String(localized: "Existing tags", bundle: .module),
-        markers: store.dayActivity.tags,
+        markers: store.form.tags,
         existingMarkers: store.existingTags,
         newMarker: $store.newTag,
         onSubmit: {
@@ -271,13 +218,77 @@ public struct DayActivityFormView: View {
     }
   }
 
+  private var durationView: some View {
+    HStack(spacing: 10.0) {
+      Text("Set duration", bundle: .module)
+        .formTitleTextStyle
+      Spacer()
+      durationPicker
+    }
+    .formBackgroundModifier()
+  }
+
+  private var durationPicker: some View {
+    WithPerceptionTracking {
+      DurationPickerView(
+        selectedHours: Binding(
+          get: {
+            store.form.hours
+          },
+          set: {
+            $store.form.wrappedValue.setDurationHours($0)
+          }
+        ),
+        selectedMinutes: Binding(
+          get: {
+            store.form.minutes
+          },
+          set: {
+            $store.form.wrappedValue.setDurationMinutes($0)
+          }
+        )
+      )
+    }
+  }
+
+  @ViewBuilder
+  private var reminderView: some View {
+    WithPerceptionTracking {
+      if !store.form.completed {
+        ReminderFormView(
+          title: String(localized: "Reminder", bundle: .module),
+          availableDateHours: store.availableDateHours,
+          toggleBinding: Binding(
+            get: {
+              store.form.reminderDate != nil
+            },
+            set: { value in
+              store.send(.view(.remindToggeled(value)))
+            }
+          ),
+          dateBinding: $store.form.reminderDate
+        )
+      }
+    }
+  }
+
+  private var overviewView: some View {
+    WithPerceptionTracking {
+      FormTextField(
+        title: String(localized: "Overview", bundle: .module),
+        placeholder: String(localized: "Enter overview", bundle: .module),
+        value: $store.form.overview
+      )
+    }
+  }
+
   private var labelsView: some View {
     WithPerceptionTracking {
       FormMarkerField(
         title: String(localized: "Labels", bundle: .module),
         placeholder: String(localized: "Enter label", bundle: .module),
         existingMarkersTitle: String(localized: "Existing labels", bundle: .module),
-        markers: store.dayActivity.labels,
+        markers: store.form.labels,
         existingMarkers: store.existingLabels,
         newMarker: $store.newLabel,
         onSubmit: {
@@ -311,8 +322,8 @@ public struct DayActivityFormView: View {
   private var taskContentView: some View {
     WithPerceptionTracking {
       LazyVStack(spacing: 10.0) {
-        ForEach(store.dayActivity.dayActivityTasks) { task in
-          DayActivityTaskView(
+        ForEach(store.form.tasks) { task in
+          DayActivityTaskRowView(
             dayActivityTask: task,
             selectTapped: { task in
               store.send(.view(.task(.selectButtonTapped(task))))
@@ -401,7 +412,8 @@ public struct DayActivityFormView: View {
           Text("Save", bundle: .module)
         }
       )
-      .buttonStyle(PrimaryButtonStyle())
+      .disabled(store.isSaveButtonDisabled)
+      .buttonStyle(PrimaryButtonStyle(disabled: store.isSaveButtonDisabled))
     }
   }
 

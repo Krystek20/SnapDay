@@ -28,7 +28,6 @@ private var products: [Product] {
   Module.reports
   Module.markerList
   Module.activityTaskForm
-  Module.dayActivityTaskForm
   Module.eveningSummary
   Module.dayActivityReminder
   Module.repositories
@@ -61,13 +60,12 @@ private var targets: [Target] {
       .activityList,
       .dayActivityForm,
       .activityForm,
-      .dayActivityTaskForm,
       .calendarPicker
     ]
   )
   TargetParamenters(
     module: .activityList,
-    dependencies: sceneDependecies + [.activityForm]
+    dependencies: sceneDependecies + [.activityForm, .dayActivityForm]
   )
   TargetParamenters(
     module: .activityForm,
@@ -80,7 +78,7 @@ private var targets: [Target] {
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(
     module: .dayActivityForm,
-    dependencies: sceneDependecies + [.markerForm, .dayActivityTaskForm]
+    dependencies: sceneDependecies + [.markerForm]
   )
   TargetParamenters(
     module: .reports,
@@ -89,10 +87,6 @@ private var targets: [Target] {
   TargetParamenters(module: .markerList, dependencies: sceneDependecies)
   TargetParamenters(
     module: .activityTaskForm,
-    dependencies: sceneDependecies + [.emojiPicker]
-  )
-  TargetParamenters(
-    module: .dayActivityTaskForm,
     dependencies: sceneDependecies + [.emojiPicker]
   )
   TargetParamenters(
@@ -143,7 +137,6 @@ private enum Module: String {
   case reports
   case markerList
   case activityTaskForm
-  case dayActivityTaskForm
   case eveningSummary
   case dayActivityReminder
   case developerTools

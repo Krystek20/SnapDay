@@ -209,7 +209,8 @@ public struct ActivityFormFeature: TodayProvidable {
     case .addTaskButtonTapped:
       state.activityTaskForm = ActivityTaskFormFeature.State(
         activityTask: ActivityTask(
-          id: uuid()
+          id: uuid(),
+          activityId: state.activity.id
         ),
         type: .new
       )

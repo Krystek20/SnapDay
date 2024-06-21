@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "-" : {
+
+    },
     "%lldh %lldmin" : {
       "localizations" : {
         "en" : {
@@ -26,12 +29,6 @@
     "Change icon" : {
 
     },
-    "Complete Activity" : {
-
-    },
-    "Complete Activity?" : {
-
-    },
     "Completed" : {
 
     },
@@ -44,7 +41,19 @@
     "Edit" : {
 
     },
-    "Edit day activity" : {
+    "Edit Activity" : {
+
+    },
+    "Edit Activity Task" : {
+
+    },
+    "Edit Activity Template" : {
+
+    },
+    "Edit task" : {
+
+    },
+    "Edit Template Activity Task" : {
 
     },
     "Enter label" : {
@@ -65,25 +74,25 @@
     "Existing tags" : {
 
     },
-    "Incomplete Subtasks" : {
-
-    },
     "Labels" : {
-
-    },
-    "Mark Activity Only" : {
-
-    },
-    "Mark All as Done" : {
 
     },
     "Name" : {
 
     },
-    "New day activity" : {
+    "New Activity" : {
 
     },
-    "Not Yet" : {
+    "New Activity Task" : {
+
+    },
+    "New Activity Template" : {
+
+    },
+    "New task" : {
+
+    },
+    "New Template Activity Task" : {
 
     },
     "Overview" : {
@@ -114,12 +123,6 @@
 
     },
     "Tasks" : {
-
-    },
-    "This activity has incomplete subtasks. Would you like to mark the activity and all its subtasks as done?" : {
-
-    },
-    "This is the last task for this activity. Would you like to mark the activity as complete?" : {
 
     }
   },
