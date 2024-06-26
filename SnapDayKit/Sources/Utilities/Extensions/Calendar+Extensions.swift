@@ -15,17 +15,6 @@ extension Calendar {
     return dateFormatter.standaloneMonthSymbols[month - 1]
   }
 
-  public func currentDateRange(_ fromDate: Date) -> ClosedRange<Date> {
-    var components = dateComponents([.year, .month, .day], from: fromDate)
-    components.hour = 0
-    components.minute = 0
-    let startDate = date(from: components) ?? fromDate
-    components.hour = 23
-    components.minute = 59
-    let endDate = date(from: components) ?? fromDate
-    return startDate...endDate
-  }
-
   public func setHourAndMinute(_ fromDate: Date, toDate: Date) -> Date? {
     let currentHour = component(.hour, from: fromDate)
     let currentMinute = component(.minute, from: fromDate)
@@ -33,15 +22,6 @@ extension Calendar {
     dateComponents.hour = currentHour
     dateComponents.minute = currentMinute
     return date(from: dateComponents)
-  }
-
-  public func hoursAndMinutes(_ forDate: Date) -> ClosedRange<Date> {
-    let startOfDay = startOfDay(for: forDate)
-    var endOfDayComponents = DateComponents()
-    endOfDayComponents.hour = 23
-    endOfDayComponents.minute = 59
-    let endOfDay = date(byAdding: endOfDayComponents, to: startOfDay)
-    return startOfDay...(endOfDay ?? startOfDay)
   }
 }
 

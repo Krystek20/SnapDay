@@ -50,9 +50,6 @@
     "Edit Activity Template" : {
 
     },
-    "Edit task" : {
-
-    },
     "Edit Template Activity Task" : {
 
     },
@@ -89,9 +86,6 @@
     "New Activity Template" : {
 
     },
-    "New task" : {
-
-    },
     "New Template Activity Task" : {
 
     },
@@ -105,6 +99,9 @@
 
     },
     "Remove" : {
+
+    },
+    "Repeatable" : {
 
     },
     "Save" : {

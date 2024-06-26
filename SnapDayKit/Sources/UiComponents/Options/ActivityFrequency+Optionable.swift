@@ -1,5 +1,4 @@
 import Models
-import UiComponents
 
 extension ActivityFrequency: Optionable, CaseIterable {
 

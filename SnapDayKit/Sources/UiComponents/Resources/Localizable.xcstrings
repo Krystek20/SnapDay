@@ -52,6 +52,9 @@
         }
       }
     },
+    "Biweekly" : {
+
+    },
     "Completed activities" : {
       "localizations" : {
         "pl" : {
@@ -71,6 +74,9 @@
           }
         }
       }
+    },
+    "Daily" : {
+
     },
     "Deselect" : {
       "localizations" : {
@@ -92,6 +98,15 @@
         }
       }
     },
+    "First" : {
+
+    },
+    "First day" : {
+
+    },
+    "Fourth" : {
+
+    },
     "Hide completed" : {
       "localizations" : {
         "pl" : {
@@ -101,6 +116,21 @@
           }
         }
       }
+    },
+    "Last" : {
+
+    },
+    "Last day" : {
+
+    },
+    "Mid month" : {
+
+    },
+    "Monthly" : {
+
+    },
+    "Monthly specific date" : {
+
     },
     "Move" : {
       "localizations" : {
@@ -132,6 +162,18 @@
         }
       }
     },
+    "Second" : {
+
+    },
+    "Second day" : {
+
+    },
+    "Second to last" : {
+
+    },
+    "Second to last day" : {
+
+    },
     "Select" : {
       "localizations" : {
         "pl" : {
@@ -162,6 +204,12 @@
         }
       }
     },
+    "Specific weekday" : {
+
+    },
+    "Third" : {
+
+    },
     "Total Task Time" : {
       "localizations" : {
         "pl" : {
@@ -173,6 +221,9 @@
       }
     },
     "Total: %lld" : {
+
+    },
+    "Weekly" : {
 
     }
   },

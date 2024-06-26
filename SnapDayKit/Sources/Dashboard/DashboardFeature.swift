@@ -6,7 +6,6 @@ import Repositories
 import Utilities
 import Models
 import Common
-import ActivityForm
 import CalendarPicker
 import Combine
 import enum UiComponents.DayViewShowButtonState
@@ -76,7 +75,6 @@ public struct DashboardFeature: TodayProvidable {
 
     @Presents var activityList: ActivityListFeature.State?
     @Presents var editDayActivity: DayActivityFormFeature.State?
-    @Presents var addActivity: ActivityFormFeature.State?
     @Presents var dayActivityTaskForm: DayActivityFormFeature.State?
     @Presents var calendarPicker: CalendarPickerFeature.State?
     @Presents var dayActivityAlert: AlertState<Action.DayActivityAlert>?
@@ -151,7 +149,6 @@ public struct DashboardFeature: TodayProvidable {
     case dayActivityTaskAlert(PresentationAction<DayActivityTaskAlert>)
     case activityList(PresentationAction<ActivityListFeature.Action>)
     case editDayActivity(PresentationAction<DayActivityFormFeature.Action>)
-    case addActivity(PresentationAction<ActivityFormFeature.Action>)
     case dayActivityTaskForm(PresentationAction<DayActivityFormFeature.Action>)
     case calendarPicker(PresentationAction<CalendarPickerFeature.Action>)
 
@@ -174,8 +171,6 @@ public struct DashboardFeature: TodayProvidable {
         return handleDayActivityFormAction(action, state: &state)
       case .activityList(let action):
         return handleActivityListAction(action, state: &state)
-      case .addActivity(let action):
-        return handleActivityFormAction(action, state: &state)
       case .dayActivityTaskForm(let action):
         return handleDayActivityTaskFormAction(action, state: &state)
       case .calendarPicker(let action):
@@ -195,9 +190,6 @@ public struct DashboardFeature: TodayProvidable {
     }
     .ifLet(\.$editDayActivity, action: \.editDayActivity) {
       DayActivityFormFeature()
-    }
-    .ifLet(\.$addActivity, action: \.addActivity) {
-      ActivityFormFeature()
     }
     .ifLet(\.$dayActivityTaskForm, action: \.dayActivityTaskForm) {
       DayActivityFormFeature()
@@ -374,7 +366,7 @@ public struct DashboardFeature: TodayProvidable {
           )
         ),
         type: .new,
-        availableDateHours: calendar.currentDateRange(selectedDay.date)
+        editDate: selectedDay.date
       )
       return .none
     case .showEditForm(let dayActivity):
@@ -382,7 +374,7 @@ public struct DashboardFeature: TodayProvidable {
       state.editDayActivity = DayActivityFormFeature.State(
         form: DayActivityForm(dayActivity: dayActivity),
         type: .edit,
-        availableDateHours: calendar.currentDateRange(selectedDay.date)
+        editDate: selectedDay.date
       )
       return .none
     case .select(var dayActivity):
@@ -472,7 +464,7 @@ public struct DashboardFeature: TodayProvidable {
           )
         ),
         type: .new,
-        availableDateHours: calendar.currentDateRange(day.date)
+        editDate: day.date
       )
       return .none
     case .showEditForm(let dayActivityTask):
@@ -480,7 +472,7 @@ public struct DashboardFeature: TodayProvidable {
       state.dayActivityTaskForm = DayActivityFormFeature.State(
         form: DayActivityForm(dayActivityTask: dayActivityTask),
         type: .edit,
-        availableDateHours: calendar.currentDateRange(day.date)
+        editDate: day.date
       )
       return .none
     case .select(var dayActivityTask):
@@ -553,18 +545,6 @@ public struct DashboardFeature: TodayProvidable {
         for activity in activities {
           try await dayEditor.addActivity(activity, dayToUpdate?.date ?? today)
         }
-        await send(.internal(.loadDay))
-      }
-    default:
-      return .none
-    }
-  }
-
-  private func handleActivityFormAction(_ action: PresentationAction<ActivityFormFeature.Action>, state: inout State) -> Effect<Action> {
-    switch action {
-    case .presented(.delegate(.activityCreated(let activity))):
-      return .run { [activity, selectedDay = state.selectedDay] send in
-        try await dayEditor.addActivity(activity, selectedDay?.date ?? today)
         await send(.internal(.loadDay))
       }
     default:

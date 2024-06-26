@@ -6,7 +6,8 @@ public struct ActivityRepository {
   public var activity: @Sendable (UUID) async throws -> Activity?
   public var loadActivities: @Sendable () async throws -> [Activity]
   public var saveActivity: @Sendable (Activity) async throws -> ()
-  public var removeActivityTask: @Sendable (ActivityTask) async throws -> ()
+  public var deleteActivity: @Sendable (Activity) async throws -> ()
+  public var deleteActivityTask: @Sendable (ActivityTask) async throws -> ()
 }
 
 extension DependencyValues {
@@ -36,7 +37,13 @@ extension ActivityRepository: DependencyKey {
       saveActivity: { activity in
         try await EntityHandler().save(activity)
       },
-      removeActivityTask: { activityTask in
+      deleteActivity: { activity in
+        for task in activity.tasks {
+          try await EntityHandler().delete(task)
+        }
+        try await EntityHandler().delete(activity)
+      },
+      deleteActivityTask: { activityTask in
         try await EntityHandler().delete(activityTask)
       }
     )

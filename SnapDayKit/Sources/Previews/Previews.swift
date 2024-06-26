@@ -2,7 +2,6 @@ import SwiftUI
 import ComposableArchitecture
 import Application
 import Dashboard
-import ActivityForm
 import MarkerForm
 import EmojiPicker
 import Models
@@ -21,15 +20,6 @@ import Models
     store: Store(
       initialState: DashboardFeature.State(),
       reducer: { DashboardFeature() }
-    )
-  )
-}
-
-#Preview("ActivityFormView") {
-  ActivityFormView(
-    store: Store(
-      initialState: ActivityFormFeature.State(activity: Activity(id: UUID())),
-      reducer: { ActivityFormFeature() }
     )
   )
 }

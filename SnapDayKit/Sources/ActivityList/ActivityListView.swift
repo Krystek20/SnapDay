@@ -3,7 +3,17 @@ import ComposableArchitecture
 import Resources
 import Models
 import UiComponents
-import ActivityForm
+import DayActivityForm
+
+struct ActivityPlaceholder: ActivityType, Equatable {
+  var id: UUID
+  var name: String
+  var icon: Icon? = nil
+  var doneDate: Date? = nil
+  var duration: Int = .zero
+  var overview: String? = nil
+  var reminderDate: Date? = nil
+}
 
 public struct ActivityListView: View {
 
@@ -27,6 +37,8 @@ public struct ActivityListView: View {
   public var body: some View {
     WithPerceptionTracking {
       content
+        .activityBackground
+        .searchable(text: $store.searchText, prompt: String(localized: "Add or Search for Activity", bundle: .module))
         .navigationTitle(String(localized: "Activity list", bundle: .module))
         .toolbar {
           if store.configuration.isActivityEditable {
@@ -38,9 +50,15 @@ public struct ActivityListView: View {
         .onAppear {
           store.send(.view(.appeared))
         }
-        .sheet(item: $store.scope(state: \.addActivity, action: \.addActivity)) { store in
+        .sheet(item: $store.scope(state: \.templateForm, action: \.templateForm)) { store in
           NavigationStack {
-            ActivityFormView(store: store)
+            DayActivityFormView(store: store)
+          }
+          .presentationDetents([.large])
+        }
+        .sheet(item: $store.scope(state: \.dayActivityForm, action: \.dayActivityForm)) { store in
+          NavigationStack {
+            DayActivityFormView(store: store)
           }
           .presentationDetents([.large])
         }
@@ -49,33 +67,171 @@ public struct ActivityListView: View {
 
   private var content: some View {
     WithPerceptionTracking {
-      VStack(spacing: .zero) {
-        activityList
-          .padding(.bottom, 15.0)
+      VStack(spacing: 15.0) {
+        ScrollView {
+          VStack(spacing: .zero) {
+            addNewActivity
+              .padding(.bottom, 15.0)
+            activitySection
+              .padding(.bottom, 15.0)
+            dayActivitySection
+              .padding(.bottom, 15.0)
+          }
+          .padding(.horizontal, 15.0)
+        }
+        .scrollIndicators(.hidden)
         if store.showButton {
           addButton
             .padding(.bottom, 15.0)
             .padding(.horizontal, 15.0)
         }
       }
-      .activityBackground
+    }
+  }
+
+  @ViewBuilder
+  private var addNewActivity: some View {
+    WithPerceptionTracking {
+      if store.activityPlaceholder != nil || !store.displayedNewDayActivities.isEmpty {
+        SectionView(
+          name: String(localized: "Add New", bundle: .module),
+          rightContent: { },
+          content: { newActivityList }
+        )
+      }
+    }
+  }
+
+  private var newActivityList: some View {
+    WithPerceptionTracking {
+      VStack(spacing: .zero) {
+        if let activityPlaceholder = store.activityPlaceholder {
+          DayActivityRow(activity: activityPlaceholder, trailingIcon: .none)
+            .formBackgroundModifier(padding: EdgeInsets(.zero))
+            .contentShape(Rectangle())
+            .onTapGesture {
+              store.send(.view(.activityPlaceholderTapped))
+            }
+          if !store.displayedNewDayActivities.isEmpty {
+            Divider()
+          }
+        }
+
+        ForEach(store.displayedNewDayActivities) { newDayActivity in
+          newDayActivityRow(for: newDayActivity)
+          if newDayActivity.id != store.displayedNewDayActivities.last?.id {
+            Divider()
+          }
+        }
+      }
+      .formBackgroundModifier(padding: EdgeInsets(.zero))
+    }
+  }
+
+  private func newDayActivityRow(for newDayActivity: DayActivity) -> some View {
+    WithPerceptionTracking {
+      HStack(spacing: .zero) {
+        selectionIcon
+        DayActivityRow(activity: newDayActivity, trailingIcon: .edit) {
+          store.send(.view(.dayActivityEditTapped(newDayActivity)))
+        }
+      }
+      .contentShape(Rectangle())
+      .onTapGesture {
+        store.send(.view(.newDayActivityTapped(newDayActivity)))
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var activitySection: some View {
+    WithPerceptionTracking {
+      if !store.displayedActivities.isEmpty {
+        SectionView(
+          name: String(localized: "Templates", bundle: .module),
+          rightContent: { },
+          content: { activityList }
+        )
+      }
     }
   }
 
   private var activityList: some View {
-    ScrollView {
-      WithPerceptionTracking {
-        LazyVGrid(columns: columns, spacing: 15.0) {
-          ForEach(store.activities) { activity in
-            ZStack {
-              activityBackground(activity)
-              activityView(activity)
-            }
+    WithPerceptionTracking {
+      VStack(spacing: .zero) {
+        ForEach(store.displayedActivities) { activity in
+          activityRow(for: activity)
+          if activity.id != store.displayedActivities.last?.id {
+            Divider()
           }
         }
-        .padding(.horizontal, 15.0)
       }
-      .scrollIndicators(.hidden)
+      .formBackgroundModifier(padding: EdgeInsets(.zero))
+    }
+  }
+
+  private func activityRow(for activity: Activity) -> some View {
+    WithPerceptionTracking {
+      HStack(spacing: .zero) {
+        if store.selectedActivities.contains(activity) {
+          selectionIcon
+        }
+        if store.configuration.isActivityEditable {
+          DayActivityRow(activity: activity, trailingIcon: .edit) {
+            store.send(.view(.activityEditTapped(activity)))
+          }
+        } else {
+          DayActivityRow(activity: activity, trailingIcon: .none)
+        }
+      }
+      .contentShape(Rectangle())
+      .onTapGesture {
+        store.send(.view(.activityTapped(activity)))
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var dayActivitySection: some View {
+    if !store.displayedDayActivities.isEmpty {
+      WithPerceptionTracking {
+        SectionView(
+          name: String(localized: "Historical", bundle: .module),
+          rightContent: { },
+          content: { dayActivityList }
+        )
+      }
+    }
+  }
+
+  private var dayActivityList: some View {
+    WithPerceptionTracking {
+      VStack(spacing: .zero) {
+        ForEach(store.displayedDayActivities) { dayActivity in
+          dayActivityRow(for: dayActivity)
+          if dayActivity.id != store.displayedDayActivities.last?.id {
+            Divider()
+          }
+        }
+      }
+      .formBackgroundModifier(padding: EdgeInsets(.zero))
+    }
+  }
+
+  private func dayActivityRow(for dayActivity: DayActivity) -> some View {
+    WithPerceptionTracking {
+      HStack(spacing: .zero) {
+        if store.selectedDayActivities.contains(dayActivity) {
+          selectionIcon
+        }
+        DayActivityRow(activity: dayActivity, trailingIcon: .edit) {
+          store.send(.view(.dayActivityEditTapped(dayActivity)))
+        }
+      }
+      .contentShape(Rectangle())
+      .onTapGesture {
+        store.send(.view(.dayActivityTapped(dayActivity)))
+      }
     }
   }
 
@@ -129,16 +285,26 @@ public struct ActivityListView: View {
     }
   }
 
+  private var selectionIcon: some View {
+    Image(systemName: "checkmark.circle.fill")
+      .resizable()
+      .scaledToFill()
+      .fontWeight(.light)
+      .frame(width: 20.0, height: 20.0)
+      .foregroundStyle(Color.actionBlue)
+      .padding(.leading, 10.0)
+  }
+
   private var addButton: some View {
     WithPerceptionTracking {
       Button(
         action: { store.send(.view(.addButtonTapped)) },
         label: {
-          Text("Add (\(store.selectedActivities.count))", bundle: .module)
+          Text("Add (\(store.selectedItemCount))", bundle: .module)
         }
       )
-      .disabled(store.selectedActivities.isEmpty)
-      .buttonStyle(PrimaryButtonStyle(disabled: store.selectedActivities.isEmpty))
+      .disabled(store.selectedItemCount == .zero)
+      .buttonStyle(PrimaryButtonStyle(disabled: store.selectedItemCount == .zero))
     }
   }
 

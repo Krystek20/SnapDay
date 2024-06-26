@@ -1,5 +1,4 @@
 import Models
-import UiComponents
 
 extension MonthlySchedule: CaseIterable {
   public static var allCases: [MonthlySchedule] {

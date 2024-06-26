@@ -41,9 +41,3 @@ public struct Activity: Identifiable, Equatable, Hashable {
     self.defaultReminderDate = defaultReminderDate
   }
 }
-
-extension Activity {
-  public var isRepeatable: Bool {
-    frequency != nil
-  }
-}

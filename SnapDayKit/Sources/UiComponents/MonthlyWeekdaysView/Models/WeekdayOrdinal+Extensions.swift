@@ -1,5 +1,4 @@
 import Models
-import UiComponents
 
 extension WeekdayOrdinal.Position: Optionable {
   public var name: String {

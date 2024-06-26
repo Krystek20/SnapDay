@@ -20,14 +20,12 @@ private var products: [Product] {
   Module.application
   Module.dashboard
   Module.activityList
-  Module.activityForm
   Module.markerForm
   Module.dayActivityForm
   Module.emojiPicker
   Module.calendarPicker
   Module.reports
   Module.markerList
-  Module.activityTaskForm
   Module.eveningSummary
   Module.dayActivityReminder
   Module.repositories
@@ -49,7 +47,6 @@ private var targets: [Target] {
     module: .application,
     dependencies: sceneDependecies + [
       .dashboard,
-      .activityForm,
       .reports,
       .developerTools
     ]
@@ -59,36 +56,26 @@ private var targets: [Target] {
     dependencies: sceneDependecies + [
       .activityList,
       .dayActivityForm,
-      .activityForm,
       .calendarPicker
     ]
   )
   TargetParamenters(
     module: .activityList,
-    dependencies: sceneDependecies + [.activityForm, .dayActivityForm]
-  )
-  TargetParamenters(
-    module: .activityForm,
-    dependencies: sceneDependecies + [
-      .markerForm,
-      .emojiPicker,
-      .activityTaskForm
-    ]
+    dependencies: sceneDependecies + [.dayActivityForm]
   )
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(
     module: .dayActivityForm,
-    dependencies: sceneDependecies + [.markerForm]
+    dependencies: sceneDependecies + [
+      .markerForm,
+        .emojiPicker
+    ]
   )
   TargetParamenters(
     module: .reports,
     dependencies: sceneDependecies + [.markerList, .activityList]
   )
   TargetParamenters(module: .markerList, dependencies: sceneDependecies)
-  TargetParamenters(
-    module: .activityTaskForm,
-    dependencies: sceneDependecies + [.emojiPicker]
-  )
   TargetParamenters(
     module: .eveningSummary,
     dependencies: sceneDependecies
@@ -129,14 +116,12 @@ private enum Module: String {
   case application
   case dashboard
   case activityList
-  case activityForm
   case markerForm
   case dayActivityForm
   case emojiPicker
   case calendarPicker
   case reports
   case markerList
-  case activityTaskForm
   case eveningSummary
   case dayActivityReminder
   case developerTools

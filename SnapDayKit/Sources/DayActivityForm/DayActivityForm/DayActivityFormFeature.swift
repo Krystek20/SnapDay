@@ -4,6 +4,7 @@ import Common
 import Models
 import MarkerForm
 import EmojiPicker
+import Utilities
 
 @Reducer
 public struct DayActivityFormFeature {
@@ -29,6 +30,7 @@ public struct DayActivityFormFeature {
 
     public enum Field: Hashable {
       case name
+      case tag
     }
 
     var form: DayActivityForm
@@ -49,17 +51,25 @@ public struct DayActivityFormFeature {
       }
     }
 
-    var isSaveButtonDisabled: Bool {
-      !form.validated
-    }
-
     let type: DayActivityFormType
     var newTag = String.empty
     var newLabel = String.empty
     
     var isPhotoPickerPresented: Bool = false
     var photoItem: PhotoItem?
-    let availableDateHours: ClosedRange<Date>
+    var editDate: Date
+
+    var showFrequencyOptions: Bool { form.isRepeatable }
+    var showWeekdaysView: Bool { form.areWeekdaysRequried }
+    var showMonthlyView: Bool { form.areMonthlyScheduleRequried }
+    var showMonthDays: Bool { form.areMonthDaysRequried }
+    var showMonthWeekdays: Bool { form.areMonthWeekdaysRequried }
+    var isSaveButtonDisabled: Bool { !form.validated }
+
+    var weekdays: [Weekday] {
+      @Dependency(\.calendar) var calendar
+      return WeekdaysProvider(calendar: calendar).weekdays
+    }
 
     @Presents var emojiPicker: EmojiPickerFeature.State?
     @Presents var addMarker: MarkerFormFeature.State?
@@ -68,11 +78,11 @@ public struct DayActivityFormFeature {
     public init(
       form: DayActivityForm,
       type: DayActivityFormType,
-      availableDateHours: ClosedRange<Date>
+      editDate: Date
     ) {
       self.form = form
       self.type = type
-      self.availableDateHours = availableDateHours
+      self.editDate = editDate
     }
   }
 
@@ -227,7 +237,7 @@ public struct DayActivityFormFeature {
       }
     case .remindToggeled(let value):
       state.form.reminderDate = value
-      ? calendar.setHourAndMinute(date.now, toDate: state.availableDateHours.lowerBound)
+      ? calendar.setHourAndMinute(date.now, toDate: state.editDate)
       : nil
       return .none
     }
@@ -280,15 +290,11 @@ public struct DayActivityFormFeature {
   private func handleViewTaskAction(_ action: Action.ViewAction.TaskAction, state: inout State) -> Effect<Action> {
     switch action {
     case .addButtonTapped:
+      guard let newTaskForm = state.form.newTaskForm(newId: uuid()) else { return .none }
       state.dayActivityTaskForm = DayActivityFormFeature.State(
-        form: DayActivityForm(
-          dayActivityTask: DayActivityTask(
-            id: uuid(),
-            dayActivityId: state.form.id
-          )
-        ),
+        form: newTaskForm,
         type: .new,
-        availableDateHours: state.availableDateHours
+        editDate: state.editDate
       )
       return .none
     case .selectButtonTapped(let dayActivityTaskForm):
@@ -300,7 +306,7 @@ public struct DayActivityFormFeature {
       state.dayActivityTaskForm = DayActivityFormFeature.State(
         form: dayActivityTaskForm,
         type: .edit,
-        availableDateHours: state.availableDateHours
+        editDate: state.editDate
       )
       return .none
     case .removeButtonTapped(let dayActivityTaskForm):

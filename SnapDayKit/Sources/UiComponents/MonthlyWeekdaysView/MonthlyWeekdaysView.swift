@@ -1,6 +1,5 @@
 import SwiftUI
 import Models
-import UiComponents
 import Resources
 
 public struct MonthlyWeekdaysView: View {

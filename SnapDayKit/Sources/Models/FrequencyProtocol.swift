@@ -1,28 +1,34 @@
-import Models
-import UiComponents
+import Foundation
 
-extension Activity: DefaultDurationProtocol {
-  var isActivityReadyToSave: Bool {
-    let isRepeatableSet: Bool
+public protocol FrequencyProtocol {
+  var frequency: ActivityFrequency? { get set }
+}
+
+public extension FrequencyProtocol {
+
+  var isFrequencyValid: Bool {
     switch frequency {
     case .daily:
-      isRepeatableSet = true
+      true
     case .weekly(let days):
-      isRepeatableSet = !days.isEmpty
+      !days.isEmpty
     case .biweekly(let days, _):
-      isRepeatableSet = !days.isEmpty
+      !days.isEmpty
     case .monthly(.monthlySpecificDate(let days)):
-      isRepeatableSet = !days.isEmpty
+      !days.isEmpty
     case .monthly(monthlySchedule: .weekdayOrdinal(let weekdayOrdinals)):
-      isRepeatableSet = !weekdayOrdinals.reduce(into: [Int](), { result, weekdayOrdinal in
+      !weekdayOrdinals.reduce(into: [Int](), { result, weekdayOrdinal in
         result.append(contentsOf: weekdayOrdinal.weekdays)
       }).isEmpty
     case .monthly:
-      isRepeatableSet = true
+      true
     case .none:
-      isRepeatableSet = true
+      true
     }
-    return !name.isEmpty && isRepeatableSet
+  }
+
+  var isRepeatable: Bool {
+    frequency != nil
   }
 
   mutating func setIsRepeatable(_ isRepeatable: Bool) {
@@ -50,7 +56,7 @@ extension Activity: DefaultDurationProtocol {
     default: false
     }
   }
-  
+
   var areMonthWeekdaysRequried: Bool {
     switch frequency {
     case .monthly(.weekdayOrdinal): true

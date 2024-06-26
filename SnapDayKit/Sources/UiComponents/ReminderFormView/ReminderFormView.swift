@@ -5,7 +5,6 @@ public struct ReminderFormView: View {
   // MARK: - Properties
 
   private let title: String
-  private let availableDateHours: ClosedRange<Date>
   private let toggleBinding: Binding<Bool>
   private let dateBinding: Binding<Date?>
 
@@ -13,12 +12,10 @@ public struct ReminderFormView: View {
 
   public init(
     title: String,
-    availableDateHours: ClosedRange<Date>,
     toggleBinding: Binding<Bool>,
     dateBinding: Binding<Date?>
   ) {
     self.title = title
-    self.availableDateHours = availableDateHours
     self.toggleBinding = toggleBinding
     self.dateBinding = dateBinding
   }
@@ -43,7 +40,6 @@ public struct ReminderFormView: View {
             get: { date },
             set: { value in dateBinding.wrappedValue = value }
           ),
-          in: availableDateHours,
           displayedComponents: [.hourAndMinute],
           label: {
             Text("Set time", bundle: .module)

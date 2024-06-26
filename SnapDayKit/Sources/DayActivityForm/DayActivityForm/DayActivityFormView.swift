@@ -66,6 +66,7 @@ public struct DayActivityFormView: View {
       .onAppear {
         store.send(.view(.appeared))
       }
+      .bind($store.focus, to: $focus)
     }
   }
 
@@ -76,6 +77,7 @@ public struct DayActivityFormView: View {
         prepareView(for: .icon)
         prepareView(for: .name)
         prepareView(for: .tags)
+        prepareView(for: .frequency)
         prepareView(for: .duration)
         prepareView(for: .reminder)
         prepareView(for: .overview)
@@ -101,6 +103,8 @@ public struct DayActivityFormView: View {
           nameView
         case .tags:
           tagsView
+        case .frequency:
+          frequencyView
         case .duration:
           durationView
         case .reminder:
@@ -111,8 +115,6 @@ public struct DayActivityFormView: View {
           tasksView
         case .labels:
           labelsView
-        case .frequency:
-          EmptyView()
         }
       }
     }
@@ -218,6 +220,124 @@ public struct DayActivityFormView: View {
     }
   }
 
+  // MARK: - Frequency View
+
+  @ViewBuilder
+  private var frequencyView: some View {
+    WithPerceptionTracking {
+      ScrollViewReader { reader in
+        WithPerceptionTracking {
+          VStack(spacing: 10.0) {
+            toggleView
+            frequencyOptionsIfNeeded(reader: reader)
+            weekdaysViewIfNeeded(reader: reader)
+            monthlyScheduleViewIfNeeded(reader: reader)
+            monthGridIfNeeded(reader: reader)
+            monthlyWeekdaysViewIfNeeded(reader: reader)
+          }
+          .formBackgroundModifier()
+          .id("RecurrencyView")
+        }
+      }
+    }
+  }
+  
+  @ViewBuilder
+  private var toggleView: some View {
+    WithPerceptionTracking {
+      Toggle(
+        isOn: Binding(
+          get: { store.form.isRepeatable },
+          set: { value in $store.form.wrappedValue.setIsRepeatable(value) }
+        )
+      ) {
+        Text("Repeatable", bundle: .module)
+          .formTitleTextStyle
+      }
+      .toggleStyle(CheckToggleStyle())
+    }
+  }
+
+  @ViewBuilder
+  private func frequencyOptionsIfNeeded(reader: ScrollViewProxy) -> some View {
+    WithPerceptionTracking {
+      if store.showFrequencyOptions {
+        OptionsView(
+          options: ActivityFrequency.allCases,
+          selected: $store.form.frequency,
+          axis: .horizontal(.center)
+        )
+        .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func weekdaysViewIfNeeded(reader: ScrollViewProxy) -> some View {
+    WithPerceptionTracking {
+      if store.showWeekdaysView {
+        WeekdaysView(
+          selectedWeekdays:  Binding(
+            get: { store.form.weekdays },
+            set: { value in $store.form.wrappedValue.setWeekdays(value) }
+          ),
+          weekdays: store.weekdays
+        )
+        .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func monthlyScheduleViewIfNeeded(reader: ScrollViewProxy) -> some View {
+    WithPerceptionTracking {
+      if store.showMonthlyView {
+        OptionsView(
+          options: MonthlySchedule.allCases,
+          selected: Binding(
+            get: { store.form.monthlySchedule },
+            set: { value in $store.form.wrappedValue.setMonthlySchedule(value) }
+          ),
+          axis: .horizontal(.center)
+        )
+        .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func monthGridIfNeeded(reader: ScrollViewProxy) -> some View {
+    WithPerceptionTracking {
+      if store.showMonthDays {
+        MonthGrid(
+          selectedDays: Binding(
+            get: { store.form.mounthDays },
+            set: { value in $store.form.wrappedValue.setMounthDays(value) }
+          )
+        )
+        .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func monthlyWeekdaysViewIfNeeded(reader: ScrollViewProxy) -> some View {
+    WithPerceptionTracking {
+      if store.showMonthWeekdays {
+        MonthlyWeekdaysView(
+          weekdayOrdinal: Binding(
+            get: { store.form.weekdayOrdinal },
+            set: { value in $store.form.wrappedValue.setWeekdayOrdinal(value) }
+          ),
+          weekdays: store.weekdays
+        )
+        .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)
+      }
+    }
+  }
+
+  // MARK: - Duration View
+
   private var durationView: some View {
     HStack(spacing: 10.0) {
       Text("Set duration", bundle: .module)
@@ -251,13 +371,14 @@ public struct DayActivityFormView: View {
     }
   }
 
+  // MARK: - Reminder View
+
   @ViewBuilder
   private var reminderView: some View {
     WithPerceptionTracking {
       if !store.form.completed {
         ReminderFormView(
           title: String(localized: "Reminder", bundle: .module),
-          availableDateHours: store.availableDateHours,
           toggleBinding: Binding(
             get: {
               store.form.reminderDate != nil

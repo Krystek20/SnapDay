@@ -5,7 +5,6 @@ import Common
 import Resources
 import ActivityList
 import DayActivityForm
-import ActivityForm
 import CalendarPicker
 import Models
 
@@ -56,12 +55,6 @@ public struct DashboardView: View {
       .sheet(item: $store.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
         NavigationStack {
           DayActivityFormView(store: store)
-        }
-        .presentationDetents([.large])
-      }
-      .sheet(item: $store.scope(state: \.addActivity, action: \.addActivity)) { store in
-        NavigationStack {
-          ActivityFormView(store: store)
         }
         .presentationDetents([.large])
       }
