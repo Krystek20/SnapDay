@@ -23,6 +23,15 @@ extension Calendar {
     dateComponents.minute = currentMinute
     return date(from: dateComponents)
   }
+
+  public func reminderDate(from reminderDate: Date?, dayDate: Date) -> Date? {
+    guard let reminderDate else { return nil }
+    var components = dateComponents([.year, .month, .day], from: dayDate)
+    let reminderComponets = dateComponents([.hour, .minute], from: reminderDate)
+    components.hour = reminderComponets.hour
+    components.minute = reminderComponets.minute
+    return date(from: components)
+  }
 }
 
 extension Calendar {

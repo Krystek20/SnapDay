@@ -5,15 +5,18 @@ import Models
 public struct ActivitiesFetchConfiguration {
   let range: ClosedRange<Date>?
   let onlyGeneratedAutomatically: Bool?
+  let done: Bool?
   let hasTemplateId: Bool?
 
   public init(
     range: ClosedRange<Date>? = nil,
     onlyGeneratedAutomatically: Bool? = nil,
+    done: Bool? = nil,
     hasTemplateId: Bool? = nil
   ) {
     self.range = range
     self.onlyGeneratedAutomatically = onlyGeneratedAutomatically
+    self.done = done
     self.hasTemplateId = hasTemplateId
   }
 }
@@ -65,6 +68,12 @@ extension DayActivityRepository: DependencyKey {
           predicates.append(
             NSPredicate(format: "isGeneratedAutomatically == %@", NSNumber(value: onlyGeneratedAutomatically))
           )
+        }
+        if let done = configuration.done {
+          let predicate = done
+          ? NSPredicate(format: "doneDate != nil")
+          : NSPredicate(format: "doneDate == nil")
+          predicates.append(predicate)
         }
         if let hasTemplateId = configuration.hasTemplateId {
           let predicate = hasTemplateId

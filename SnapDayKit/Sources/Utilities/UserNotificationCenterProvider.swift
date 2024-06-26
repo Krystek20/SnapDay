@@ -111,7 +111,7 @@ extension UserNotificationCenterProvider {
     userNotificationCenter.removePendingNotificationRequests(withIdentifiers: pendingRequests.map(\.identifier))
 
     let dayActivities = try await dayActivityRepository.activities(
-      ActivitiesFetchConfiguration(range: today...tomorrow)
+      ActivitiesFetchConfiguration(range: today...tomorrow, done: false)
     )
     for dayActivity in dayActivities {
       if let reminderDate = dayActivity.reminderDate, reminderDate > date.now {

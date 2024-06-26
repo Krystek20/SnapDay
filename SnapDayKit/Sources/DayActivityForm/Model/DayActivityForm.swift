@@ -11,12 +11,11 @@ public enum DayActivityFormId: String {
 public enum DayActivityFormType: Equatable {
   case template
   case templateTask
-  case activity
-  case activityTask
+  case activity(showCompleted: Bool)
+  case activityTask(showCompleted: Bool)
 }
 
 public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, FrequencyProtocol {
-
   public var id: UUID
   public var ids: [DayActivityFormId: UUID]
   public var completed: Bool
@@ -35,9 +34,9 @@ public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, Freque
 extension DayActivityForm {
   var fields: [DayActivityField] {
     switch type {
-    case .activity:
+    case .activity(let showCompleted):
       [
-        .completed,
+        showCompleted ? .completed : nil,
         .icon,
         .name,
         .tags,
@@ -47,15 +46,15 @@ extension DayActivityForm {
         ids[.templateId] != nil ? .labels : nil,
         .tasks
       ].compactMap { $0 }
-    case .activityTask:
+    case .activityTask(let showCompleted):
       [
-        .completed,
+        showCompleted ? .completed : nil,
         .icon,
         .name,
         .duration,
         .reminder,
         .overview
-      ]
+      ].compactMap { $0 }
     case .template:
       [
         .icon,
@@ -97,9 +96,9 @@ extension DayActivityForm {
     case .activityTask:
       String(localized: "New Activity Task", bundle: .module)
     case .template:
-      String(localized: "New Activity Template", bundle: .module)
+      String(localized: "New Template", bundle: .module)
     case .templateTask:
-      String(localized: "New Template Activity Task", bundle: .module)
+      String(localized: "New Template Task", bundle: .module)
     }
   }
 
@@ -110,9 +109,9 @@ extension DayActivityForm {
     case .activityTask:
       String(localized: "Edit Activity Task", bundle: .module)
     case .template:
-      String(localized: "Edit Activity Template", bundle: .module)
+      String(localized: "Edit Template", bundle: .module)
     case .templateTask:
-      String(localized: "Edit Template Activity Task", bundle: .module)
+      String(localized: "Edit Template Task", bundle: .module)
     }
   }
 }
@@ -120,11 +119,11 @@ extension DayActivityForm {
 extension DayActivityForm {
   public func newTaskForm(newId: UUID) -> DayActivityForm? {
     switch type {
-    case .activity:
+    case .activity(let showCompleted):
       return DayActivityForm(
         id: newId,
         parentId: id,
-        type: .activityTask
+        type: .activityTask(showCompleted: showCompleted)
       )
     case .activityTask:
       return nil
@@ -160,7 +159,7 @@ extension DayActivityForm {
 }
 
 extension DayActivityForm {
-  public init(dayActivity: DayActivity) {
+  public init(dayActivity: DayActivity, showCompleted: Bool) {
     self.id = dayActivity.id
     self.ids = [
       .dayId: dayActivity.dayId
@@ -175,10 +174,12 @@ extension DayActivityForm {
     self.duration = dayActivity.duration
     self.reminderDate = dayActivity.reminderDate
     self.overview = dayActivity.overview ?? ""
-    self.tasks = dayActivity.dayActivityTasks.map(DayActivityForm.init)
+    self.tasks = dayActivity.dayActivityTasks.map { dayActivityTask in
+      DayActivityForm(dayActivityTask: dayActivityTask, showCompleted: showCompleted)
+    }
     self.labels = dayActivity.labels
     self.frequency = nil
-    self.type = .activity
+    self.type = .activity(showCompleted: showCompleted)
   }
 }
 
@@ -222,7 +223,7 @@ extension DayActivity {
 }
 
 extension DayActivityForm {
-  public init(dayActivityTask: DayActivityTask) {
+  public init(dayActivityTask: DayActivityTask, showCompleted: Bool) {
     self.id = dayActivityTask.id
     self.ids = [
       .parentId: dayActivityTask.dayActivityId
@@ -240,7 +241,7 @@ extension DayActivityForm {
     self.tasks = []
     self.labels = []
     self.frequency = nil
-    self.type = .activityTask
+    self.type = .activityTask(showCompleted: showCompleted)
   }
 }
 

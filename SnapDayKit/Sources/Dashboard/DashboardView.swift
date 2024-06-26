@@ -120,15 +120,6 @@ public struct DashboardView: View {
                   .foregroundStyle(Color.actionBlue)
               }
             )
-            Button(
-              action: {
-                store.send(.view(.addDayActivityButtonTapped))
-              },
-              label: {
-                Image(systemName: "plus.circle")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
           }
         }
       }

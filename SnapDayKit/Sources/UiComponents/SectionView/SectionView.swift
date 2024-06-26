@@ -37,12 +37,13 @@ public struct SectionView<Content: View, RightContent: View>: View {
 
   public var body: some View {
     VStack(alignment: .center, spacing: 5.0) {
-      HStack(alignment: .bottom) {
+      HStack(alignment: .center) {
         AnyView(label)
           .padding(.leading, 5.0)
         Spacer()
         if let rightContent = rightContent() {
           rightContent
+            .padding(.trailing, 5.0)
         }
       }
       content()

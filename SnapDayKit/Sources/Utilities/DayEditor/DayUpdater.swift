@@ -262,7 +262,7 @@ final class DayUpdater {
     }
     var dayActivity = dayActivity
     dayActivity.isGeneratedAutomatically = false
-    dayActivity.reminderDate = reminderDate(from: dayActivity.reminderDate, dayDate: toDate)
+    dayActivity.reminderDate = calendar.reminderDate(from: dayActivity.reminderDate, dayDate: toDate)
 
     if var day = try await dayRepository.loadDay(toDate) {
       dayActivity.dayId = day.id
@@ -400,73 +400,24 @@ final class DayUpdater {
     createdByUser: Bool = false,
     dayDate: Date
   ) -> DayActivity {
-    let dayActivityId = uuid()
-    return DayActivity(
-      id: dayActivityId,
+    DayActivity.create(
+      from: activity,
+      uuid: { uuid() },
+      calendar: { calendar },
       dayId: dayId,
-      activity: activity,
-      name: activity.name,
-      icon: activity.icon,
-      doneDate: nil,
-      duration: activity.defaultDuration ?? .zero,
-      overview: nil,
-      isGeneratedAutomatically: !createdByUser,
-      tags: activity.tags,
-      labels: [],
-      dayActivityTasks: activity.tasks.map {
-        DayActivityTask(
-          id: uuid(),
-          dayActivityId: dayActivityId,
-          activityTask: $0,
-          name: $0.name,
-          icon: $0.icon,
-          doneDate: nil,
-          duration: $0.defaultDuration ?? .zero,
-          overview: nil,
-          reminderDate: reminderDate(from: $0.defaultReminderDate, dayDate: dayDate)
-        )
-      },
-      reminderDate: reminderDate(from: activity.defaultReminderDate, dayDate: dayDate)
+      dayDate: dayDate,
+      createdByUser: createdByUser
     )
   }
 
   private func copy(dayActivity: DayActivity, dayId: UUID, dayDate: Date) -> DayActivity {
-    let dayActivityId = uuid()
-    return DayActivity(
-      id: dayActivityId,
+    DayActivity.copy(
+      from: dayActivity,
+      uuid: { uuid() },
       dayId: dayId,
-      activity: dayActivity.activity,
-      name: dayActivity.name,
-      icon: dayActivity.icon,
-      doneDate: dayActivity.doneDate,
-      duration: dayActivity.duration,
-      isGeneratedAutomatically: false,
-      tags: dayActivity.tags,
-      labels: dayActivity.labels,
-      dayActivityTasks: dayActivity.dayActivityTasks.map { dayActivityTask in
-        DayActivityTask(
-          id: uuid(),
-          dayActivityId: dayActivityId,
-          activityTask: dayActivityTask.activityTask,
-          name: dayActivityTask.name,
-          icon: dayActivityTask.icon,
-          doneDate: dayActivityTask.doneDate,
-          duration: dayActivityTask.duration,
-          overview: dayActivityTask.overview,
-          reminderDate: reminderDate(from: dayActivityTask.reminderDate, dayDate: dayDate)
-        )
-      },
-      reminderDate: reminderDate(from: dayActivity.reminderDate, dayDate: dayDate)
+      dayDate: dayDate,
+      calendar: { calendar }
     )
-  }
-
-  private func reminderDate(from reminderDate: Date?, dayDate: Date) -> Date? {
-    guard let reminderDate else { return nil }
-    var components = calendar.dateComponents([.year, .month, .day], from: dayDate)
-    let reminderComponets = calendar.dateComponents([.hour, .minute], from: reminderDate)
-    components.hour = reminderComponets.hour
-    components.minute = reminderComponets.minute
-    return calendar.date(from: components)
   }
 
   private func saveDays(_ days: [Day]) async throws {

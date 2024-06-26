@@ -212,8 +212,6 @@ public struct ReportsFeature: TodayProvidable {
     case .selectActivityButtonTapped:
       state.activityList = ActivityListFeature.State(
         configuration: ActivityListFeature.ActivityListConfiguration(
-          type: .singleSelection(selectedActivity: state.selectedActivity),
-          isActivityEditable: false,
           fetchingOption: .prefetched(state.activities)
         )
       )
@@ -307,7 +305,7 @@ public struct ReportsFeature: TodayProvidable {
   private func handleActivityListAction(_ action: PresentationAction<ActivityListFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
     case .presented(.delegate(.activitiesSelected(let activities))):
-      state.selectedActivity = activities.first
+//      state.selectedActivity = activities.first
       state.selectedLabel = nil
       return .run { send in
         await send(.internal(.loadSummary))

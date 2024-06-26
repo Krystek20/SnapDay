@@ -40,13 +40,6 @@ public struct ActivityListView: View {
         .activityBackground
         .searchable(text: $store.searchText, prompt: String(localized: "Add or Search for Activity", bundle: .module))
         .navigationTitle(String(localized: "Activity list", bundle: .module))
-        .toolbar {
-          if store.configuration.isActivityEditable {
-            ToolbarItem(placement: .topBarTrailing) {
-              newButton
-            }
-          }
-        }
         .onAppear {
           store.send(.view(.appeared))
         }
@@ -80,11 +73,10 @@ public struct ActivityListView: View {
           .padding(.horizontal, 15.0)
         }
         .scrollIndicators(.hidden)
-        if store.showButton {
-          addButton
-            .padding(.bottom, 15.0)
-            .padding(.horizontal, 15.0)
-        }
+
+        addButton
+          .padding(.bottom, 15.0)
+          .padding(.horizontal, 15.0)
       }
     }
   }
@@ -149,7 +141,7 @@ public struct ActivityListView: View {
       if !store.displayedActivities.isEmpty {
         SectionView(
           name: String(localized: "Templates", bundle: .module),
-          rightContent: { },
+          rightContent: { newButton },
           content: { activityList }
         )
       }
@@ -172,17 +164,8 @@ public struct ActivityListView: View {
 
   private func activityRow(for activity: Activity) -> some View {
     WithPerceptionTracking {
-      HStack(spacing: .zero) {
-        if store.selectedActivities.contains(activity) {
-          selectionIcon
-        }
-        if store.configuration.isActivityEditable {
-          DayActivityRow(activity: activity, trailingIcon: .edit) {
-            store.send(.view(.activityEditTapped(activity)))
-          }
-        } else {
-          DayActivityRow(activity: activity, trailingIcon: .none)
-        }
+      DayActivityRow(activity: activity, trailingIcon: .edit) {
+        store.send(.view(.activityEditTapped(activity)))
       }
       .contentShape(Rectangle())
       .onTapGesture {
@@ -196,7 +179,7 @@ public struct ActivityListView: View {
     if !store.displayedDayActivities.isEmpty {
       WithPerceptionTracking {
         SectionView(
-          name: String(localized: "Historical", bundle: .module),
+          name: String(localized: "Previous Activities", bundle: .module),
           rightContent: { },
           content: { dayActivityList }
         )
@@ -220,30 +203,11 @@ public struct ActivityListView: View {
 
   private func dayActivityRow(for dayActivity: DayActivity) -> some View {
     WithPerceptionTracking {
-      HStack(spacing: .zero) {
-        if store.selectedDayActivities.contains(dayActivity) {
-          selectionIcon
+      DayActivityRow(activity: dayActivity, shouldIgnoreDone: true)
+        .contentShape(Rectangle())
+        .onTapGesture {
+          store.send(.view(.dayActivityTapped(dayActivity)))
         }
-        DayActivityRow(activity: dayActivity, trailingIcon: .edit) {
-          store.send(.view(.dayActivityEditTapped(dayActivity)))
-        }
-      }
-      .contentShape(Rectangle())
-      .onTapGesture {
-        store.send(.view(.dayActivityTapped(dayActivity)))
-      }
-    }
-  }
-
-  @ViewBuilder
-  private func activityBackground(_ activity: Activity) -> some View {
-    WithPerceptionTracking {
-      if store.selectedActivities.contains(activity) {
-        Color.formBackground
-          .clipShape(RoundedRectangle(cornerRadius: 10.0))
-      } else {
-        Color.background
-      }
     }
   }
 

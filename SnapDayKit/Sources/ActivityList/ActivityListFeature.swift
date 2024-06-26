@@ -15,24 +15,13 @@ public struct ActivityListFeature: TodayProvidable {
       case fromCoreData
     }
 
-    public enum ActivityListType: Equatable {
-      case singleSelection(selectedActivity: Activity?)
-      case multiSelection(selectedActivities: [Activity])
-    }
-
-    let type: ActivityListType
-    let isActivityEditable: Bool
     let fetchingOption: ActivityListFetchingOption
     let day: Day?
 
     public init(
-      type: ActivityListType,
-      isActivityEditable: Bool,
       fetchingOption: ActivityListFetchingOption,
       day: Day? = nil
     ) {
-      self.type = type
-      self.isActivityEditable = isActivityEditable
       self.fetchingOption = fetchingOption
       self.day = day
     }
@@ -70,25 +59,16 @@ public struct ActivityListFeature: TodayProvidable {
       guard !searchText.isEmpty else { return activities }
       return activities.filter { $0.name.contains(searchText) }
     }
-    var selectedActivities: [Activity] = []
 
     var dayActivities: [DayActivity] = []
     var displayedDayActivities: [DayActivity] {
       guard !searchText.isEmpty else { return dayActivities }
       return dayActivities.filter { $0.name.contains(searchText) }
     }
-    var selectedDayActivities: [DayActivity] = []
 
-    var selectedItemCount: Int {
-      newDayActivities.count + selectedActivities.count + selectedDayActivities.count
-    }
+    var selectedItemCount: Int { newDayActivities.count }
 
     var configuration: ActivityListConfiguration
-
-    var showButton: Bool {
-      guard case .multiSelection = configuration.type else { return false }
-      return true
-    }
 
     @Presents var templateForm: DayActivityFormFeature.State?
     @Presents var dayActivityForm: DayActivityFormFeature.State?
@@ -121,7 +101,7 @@ public struct ActivityListFeature: TodayProvidable {
       case activityAdded(Activity)
       case activityUpdated(Activity)
       case activityDeleted(Activity)
-      case activitiesSelected([Activity])
+      case activitiesSelected([DayActivity])
     }
 
     case binding(BindingAction<State>)
@@ -147,8 +127,8 @@ public struct ActivityListFeature: TodayProvidable {
           await send(.internal(.loadOnStart))
         }
       case .view(.addButtonTapped):
-        return .run { [selectedActivities = state.selectedActivities] send in
-          await send(.delegate(.activitiesSelected(selectedActivities)))
+        return .run { [newDayActivities = state.newDayActivities] send in
+          await send(.delegate(.activitiesSelected(newDayActivities)))
           await dismiss()
         }
       case .view(.newButtonTapped):
@@ -164,26 +144,27 @@ public struct ActivityListFeature: TodayProvidable {
         )
         return .none
       case .view(.activityTapped(let activity)):
-        switch state.configuration.type {
-        case .singleSelection:
-          return .run { send in
-            await send(.delegate(.activitiesSelected([activity])))
-            await dismiss()
-          }
-        case .multiSelection:
-          if state.selectedActivities.contains(activity) {
-            state.selectedActivities.removeAll(where: { $0.id == activity.id })
-          } else {
-            state.selectedActivities.append(activity)
-          }
-          return .none
-        }
+        guard let day = state.configuration.day else { return .none }
+        let dayActivity = DayActivity.create(
+          from: activity,
+          uuid: { uuid() },
+          calendar: { calendar },
+          dayId: day.id,
+          dayDate: day.date,
+          createdByUser: true
+        )
+        state.newDayActivities.append(dayActivity)
+        return .none
       case .view(.dayActivityTapped(let dayActivity)):
-        if state.selectedDayActivities.contains(dayActivity) {
-          state.selectedDayActivities.removeAll(where: { $0.id == dayActivity.id })
-        } else {
-          state.selectedDayActivities.append(dayActivity)
-        }
+        guard let day = state.configuration.day else { return .none }
+        let copy = DayActivity.copy(
+          from: dayActivity,
+          uuid: { uuid() },
+          dayId: day.id,
+          dayDate: day.date,
+          calendar: { calendar }
+        )
+        state.newDayActivities.append(copy)
         return .none
       case .view(.newDayActivityTapped(let newDayActivity)):
         state.newDayActivities.removeAll(where: { $0.id == newDayActivity.id })
@@ -215,7 +196,7 @@ public struct ActivityListFeature: TodayProvidable {
       case .view(.dayActivityEditTapped(let dayActivity)):
         guard let date = state.configuration.day?.date else { return .none }
         state.dayActivityForm = DayActivityFormFeature.State(
-          form: DayActivityForm(dayActivity: dayActivity),
+          form: DayActivityForm(dayActivity: dayActivity, showCompleted: false),
           type: .edit,
           editDate: date
         )
@@ -246,46 +227,14 @@ public struct ActivityListFeature: TodayProvidable {
         }
       case .internal(.activitiesLoaded(let activities)):
         state.activities = activities
-        switch state.configuration.type {
-        case .singleSelection(let selectedActivity):
-          guard let selectedActivity else { return .none }
-          state.selectedActivities = [selectedActivity]
-        case .multiSelection(let selectedActivities):
-          state.selectedActivities = selectedActivities
-        }
         return .none
       case .internal(.dayActivitiesLoaded(let dayActivities)):
         state.dayActivities = dayActivities
-//        switch state.configuration.type {
-//        case .singleSelection(let selectedActivity):
-//          guard let selectedActivity else { return .none }
-//          state.selectedActivities = [selectedActivity]
-//        case .multiSelection(let selectedActivities):
-//          state.selectedActivities = selectedActivities
-//        }
         return .none
       case .templateForm(let action):
         return handleTemplateForm(action, state: &state)
-      case .dayActivityForm(.presented(.delegate(.activityUpdated(let dayActivity)))):
-        if let index = state.newDayActivities.firstIndex(where: { $0.id == dayActivity.id }) {
-//          state.newDayActivities[index] = dayActivity
-        } else if let index = state.dayActivities.firstIndex(where: { $0.id == dayActivity.id }) {
-//          if state.dayActivities[index] != dayActivity {
-//            state.newDayActivities.append(dayActivity)
-//            if state.selectedDayActivities.contains(where: { $0.id == dayActivity.id }) {
-//              state.selectedDayActivities.removeAll(where: { $0.id == dayActivity.id })
-//            }
-//          }
-        }
-        return .none
-      case .dayActivityForm(.presented(.delegate(.activityDeleted(let dayActivity)))):
-//        return .run { [activity] send in
-//          await send(.internal(.loadActivities))
-//          await send(.delegate(.activityUpdated(activity)))
-//        }
-        return .none
-      case .dayActivityForm:
-        return .none
+      case .dayActivityForm(let action):
+        return handleDayActivityForm(action, state: &state)
       case .delegate:
         return .none
       case .binding(\.searchText):
@@ -342,6 +291,22 @@ public struct ActivityListFeature: TodayProvidable {
         await send(.delegate(.activityDeleted(toDelete)))
         await send(.internal(.loadActivities))
       }
+    default:
+      return .none
+    }
+  }
+
+  private func handleDayActivityForm(_ action: PresentationAction<DayActivityFormFeature.Action>, state: inout State) -> Effect<Action> {
+    switch action {
+    case .dismiss:
+      return .none
+    case .presented(.delegate(.activityUpdated(let activityForm))):
+      guard let index = state.newDayActivities.firstIndex(where: { $0.id == activityForm.id }) else { return .none }
+      state.newDayActivities[index].update(by: activityForm)
+      return .none
+    case .presented(.delegate(.activityDeleted(let activityForm))):
+      state.newDayActivities.removeAll(where: { $0.id == activityForm.id })
+      return .none
     default:
       return .none
     }

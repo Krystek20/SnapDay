@@ -4,15 +4,22 @@ import Models
 public struct DayActivityRow: View, DurationFormatting {
 
   private let activity: ActivityType
+  private let shouldIgnoreDone: Bool
   private let trailingIcon: TrailingIcon
   private let trailingViewTapped: (() -> Void)?
 
+  private var isStrikethrough: Bool {
+    activity.isDone && !shouldIgnoreDone
+  }
+
   public init(
     activity: ActivityType,
-    trailingIcon: TrailingIcon,
+    shouldIgnoreDone: Bool = false,
+    trailingIcon: TrailingIcon = .none,
     trailingViewTapped: (() -> Void)? = nil
   ) {
     self.activity = activity
+    self.shouldIgnoreDone = shouldIgnoreDone
     self.trailingIcon = trailingIcon
     self.trailingViewTapped = trailingViewTapped
   }
@@ -28,7 +35,7 @@ public struct DayActivityRow: View, DurationFormatting {
         Text(activity.name)
           .font(.system(size: 14.0, weight: .medium))
           .foregroundStyle(Color.sectionText)
-          .strikethrough(activity.isDone, color: .sectionText)
+          .strikethrough(isStrikethrough, color: .sectionText)
         subtitleView
       }
       Spacer()
@@ -48,7 +55,7 @@ public struct DayActivityRow: View, DurationFormatting {
           .font(.system(size: 12.0, weight: .regular))
           .lineLimit(1)
           .foregroundStyle(Color.sectionText)
-          .strikethrough(activity.isDone, color: .sectionText)
+          .strikethrough(isStrikethrough, color: .sectionText)
       }
 
       if let textDuration = duration(for: activity.duration) {
@@ -61,7 +68,7 @@ public struct DayActivityRow: View, DurationFormatting {
         Text(textDuration)
           .font(.system(size: 12.0, weight: .regular))
           .foregroundStyle(Color.sectionText)
-          .strikethrough(activity.isDone, color: .sectionText)
+          .strikethrough(isStrikethrough, color: .sectionText)
       }
     }
   }
