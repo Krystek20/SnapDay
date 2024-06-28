@@ -74,6 +74,9 @@ public struct ApplicationFeature: TodayProvidable {
           },
           .run { _ in
             try backgroundUpdater.scheduleCreatingDayBackgroundTask()
+          },
+          .run { _ in
+            try await dayProvider.removeBrokenDays()
           }
         )
       case .createDayBackgroundTaskCalled:

@@ -5,8 +5,7 @@ import Utilities
 import Models
 import Common
 import Combine
-import MarkerList
-import ActivityList
+import SelectableList
 import struct UiComponents.PeriodViewModel
 import struct UiComponents.PeriodViewModelProvider
 
@@ -21,6 +20,12 @@ public struct ReportsFeature: TodayProvidable {
 
   // MARK: - State & Action
 
+  enum ListId: String {
+    case tag
+    case activity
+    case label
+  }
+
   @ObservableState
   public struct State: Equatable, TodayProvidable {
 
@@ -29,8 +34,7 @@ public struct ReportsFeature: TodayProvidable {
     var startDate: Date = Date()
     var endDate: Date = Date()
 
-    @Presents var markerList: MarkerListFeature.State?
-    @Presents var activityList: ActivityListFeature.State?
+    @Presents var selectableList: SelectableListViewFeature.State?
 
     var tagActivitySections: [TagActivitySection] = []
     var currectTagActivitySection: TagActivitySection? {
@@ -112,8 +116,7 @@ public struct ReportsFeature: TodayProvidable {
     }
     public enum DelegateAction: Equatable { }
 
-    case markerList(PresentationAction<MarkerListFeature.Action>)
-    case activityList(PresentationAction<ActivityListFeature.Action>)
+    case selectableList(PresentationAction<SelectableListViewFeature.Action>)
 
     case binding(BindingAction<State>)
 
@@ -132,10 +135,8 @@ public struct ReportsFeature: TodayProvidable {
         return handleViewAction(viewAction, state: &state)
       case .internal(let internalAction):
         return handleInternalAction(internalAction, state: &state)
-      case .markerList(let action):
-        return (handleMarkerListAction(action, state: &state))
-      case .activityList(let action):
-        return handleActivityListAction(action, state: &state)
+      case .selectableList(let action):
+        return (handleSelectableListAction(action, state: &state))
       case .binding(\.selectedFilterPeriod):
         state.isSwitcherDismissed = state.selectedFilterPeriod == .custom
         let range = prepareDateRange(for: state.selectedFilterPeriod, shiftPeriod: state.periodShift)
@@ -157,11 +158,8 @@ public struct ReportsFeature: TodayProvidable {
         return .none
       }
     }
-    .ifLet(\.$markerList, action: \.markerList) {
-      MarkerListFeature()
-    }
-    .ifLet(\.$activityList, action: \.activityList) {
-      ActivityListFeature()
+    .ifLet(\.$selectableList, action: \.selectableList) {
+      SelectableListViewFeature()
     }
   }
 
@@ -199,21 +197,31 @@ public struct ReportsFeature: TodayProvidable {
       let availableTags = state.allTags.filter { tag in
         state.days.contains(where: { $0.activities.contains(where: { $0.tags.contains(tag) }) })
       }
-      state.markerList = MarkerListFeature.State(
-        type: .tag(selected: selectedTag, available: availableTags)
+      state.selectableList = SelectableListViewFeature.State(
+        title: String(localized: "Tags", bundle: .module),
+        selectedItem: selectedTag.item,
+        items: availableTags.items,
+        listId: ListId.tag.rawValue,
+        isClearVisible: false
       )
       return .none
     case .labelTapped:
       let availableLabels = state.selectedActivity?.labels ?? []
-      state.markerList = MarkerListFeature.State(
-        type: .label(selected: state.selectedLabel, available: availableLabels)
+      state.selectableList = SelectableListViewFeature.State(
+        title: String(localized: "Labels", bundle: .module),
+        selectedItem: state.selectedLabel?.item,
+        items: availableLabels.items,
+        listId: ListId.label.rawValue,
+        isClearVisible: true
       )
       return .none
     case .selectActivityButtonTapped:
-      state.activityList = ActivityListFeature.State(
-        configuration: ActivityListFeature.ActivityListConfiguration(
-          fetchingOption: .prefetched(state.activities)
-        )
+      state.selectableList = SelectableListViewFeature.State(
+        title: String(localized: "Activities", bundle: .module),
+        selectedItem: state.selectedActivity?.item,
+        items: state.activities.items,
+        listId: ListId.activity.rawValue,
+        isClearVisible: true
       )
       return .none
     }
@@ -273,11 +281,13 @@ public struct ReportsFeature: TodayProvidable {
     }
   }
 
-  private func handleMarkerListAction(_ action: PresentationAction<MarkerListFeature.Action>, state: inout State) -> Effect<Action> {
+  private func handleSelectableListAction(_ action: PresentationAction<SelectableListViewFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
-    case .presented(.delegate(.markerSelected(let markerSelection))):
-      switch markerSelection {
-      case .tag(let tag):
+    case .presented(.delegate(.selected(let item, let listId))):
+      guard let listId = ListId(rawValue: listId) else { return .none }
+      switch listId {
+      case .tag:
+        guard let tag = state.allTags.first(where: { $0.id == item?.id }) else { return .none }
         state.selectedTag = tag
         state.selectedActivity = nil
         state.selectedLabel = nil
@@ -287,26 +297,14 @@ public struct ReportsFeature: TodayProvidable {
             return dayActivity.activity
           }
         }
-        .joined()
-        state.activities = Array(Set(activities))
-          .sorted(by: { $0.name < $1.name })
-      case .label(let label):
-        state.selectedLabel = label
+          .joined()
+        state.activities = Array(Set(activities)).sorted(by: { $0.name < $1.name })
+      case .activity:
+        state.selectedActivity = state.activities.first(where: { $0.id.uuidString == item?.id })
+        state.selectedLabel = nil
+      case .label:
+        state.selectedLabel = state.selectedActivity?.labels.first(where: { $0.id == item?.id })
       }
-      return .run { send in
-        await send(.internal(.loadSummary))
-        await send(.internal(.loadReportDays))
-      }
-    case .presented, .dismiss:
-      return .none
-    }
-  }
-
-  private func handleActivityListAction(_ action: PresentationAction<ActivityListFeature.Action>, state: inout State) -> Effect<Action> {
-    switch action {
-    case .presented(.delegate(.activitiesSelected(let activities))):
-//      state.selectedActivity = activities.first
-      state.selectedLabel = nil
       return .run { send in
         await send(.internal(.loadSummary))
         await send(.internal(.loadReportDays))

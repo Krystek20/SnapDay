@@ -330,7 +330,7 @@ public struct DayActivityFormFeature {
       state.existingLabels = labels
       return .none
     case .loadLabels:
-      guard let parentId = state.form.ids[.parentId] else { return .none }
+      guard let parentId = state.form.ids[.templateId] else { return .none }
       return .run { [parentId, enteredLabels = state.form.labels] send in
         let existingLabels = try await activityLabelRepository.loadLabels(parentId, enteredLabels)
         await send(.internal(.setExistingLabels(existingLabels)))
@@ -409,9 +409,9 @@ public struct DayActivityFormFeature {
   }
 
   private func showNewLabel(state: inout State) {
-    guard !state.newLabel.isEmpty, let parentId = state.form.ids[.parentId] else { return }
+    guard !state.newLabel.isEmpty, let templateId = state.form.ids[.templateId] else { return }
     state.addMarker = MarkerFormFeature.State(
-      markerType: .label(activityId: parentId),
+      markerType: .label(activityId: templateId),
       name: state.newLabel
     )
   }

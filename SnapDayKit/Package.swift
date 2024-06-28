@@ -25,7 +25,7 @@ private var products: [Product] {
   Module.emojiPicker
   Module.calendarPicker
   Module.reports
-  Module.markerList
+  Module.selectableList
   Module.eveningSummary
   Module.dayActivityReminder
   Module.repositories
@@ -73,9 +73,9 @@ private var targets: [Target] {
   )
   TargetParamenters(
     module: .reports,
-    dependencies: sceneDependecies + [.markerList, .activityList]
+    dependencies: sceneDependecies + [.selectableList]
   )
-  TargetParamenters(module: .markerList, dependencies: sceneDependecies)
+  TargetParamenters(module: .selectableList, dependencies: sceneDependecies)
   TargetParamenters(
     module: .eveningSummary,
     dependencies: sceneDependecies
@@ -121,7 +121,7 @@ private enum Module: String {
   case emojiPicker
   case calendarPicker
   case reports
-  case markerList
+  case selectableList
   case eveningSummary
   case dayActivityReminder
   case developerTools

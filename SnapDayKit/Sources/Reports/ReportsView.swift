@@ -4,8 +4,7 @@ import UiComponents
 import Resources
 import Models
 import Utilities
-import MarkerList
-import ActivityList
+import SelectableList
 
 @MainActor
 public struct ReportsView: View {
@@ -53,18 +52,12 @@ public struct ReportsView: View {
         store.send(.view(.appeared))
       }
       .navigationTitle(String(localized: "Reports", bundle: .module))
-      .sheet(item: $store.scope(state: \.markerList, action: \.markerList)) { store in
+      .sheet(item: $store.scope(state: \.selectableList, action: \.selectableList)) { store in
         NavigationStack {
-          MarkerListView(store: store)
+          SelectableListView(store: store)
             .navigationBarTitleDisplayMode(.large)
         }
         .presentationDetents([.medium])
-      }
-      .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
-        NavigationStack {
-          ActivityListView(store: store)
-        }
-        .presentationDetents([.medium, .large])
       }
     }
   }
