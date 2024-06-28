@@ -18,7 +18,7 @@ public struct ApplicationView: View {
   public init(store: StoreOf<ApplicationFeature>) {
     self.store = store
 
-    #warning("Move it")
+#warning("Move it")
     let appearance = UINavigationBarAppearance()
     appearance.backgroundColor = UIColor.background
     appearance.shadowImage = nil
@@ -42,23 +42,40 @@ public struct ApplicationView: View {
 
   public var body: some View {
     WithPerceptionTracking {
-      NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-        DashboardView(
-          store: store.scope(
-            state: \.dashboard,
-            action: \.dashboard
-          )
-        )
-        .onAppear {
-          store.send(.appeared)
-        }
-      } destination: { store in
-        switch store.state {
-        case .reports:
-          if let store = store.scope(state: \.reports, action: \.reports) {
-            ReportsView(store: store)
+      TabView(
+        selection: $store.selectedTab,
+        content: {
+          NavigationStack {
+            DashboardView(
+              store: store.scope(
+                state: \.dashboard,
+                action: \.dashboard
+              )
+            )
           }
+          .tabItem {
+            Text("Dashboard", bundle: .module)
+            Image(systemName: "rectangle.grid.2x2")
+          }
+          .tag(ApplicationFeature.Tab.dashboard)
+
+          NavigationStack {
+            ReportsView(
+              store: store.scope(
+                state: \.reports,
+                action: \.reports
+              )
+            )
+          }
+          .tabItem {
+            Text("Reports", bundle: .module)
+            Image(systemName: "doc.text")
+          }
+          .tag(ApplicationFeature.Tab.reports)
         }
+      )
+      .onAppear {
+        store.send(.appeared)
       }
       .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
         NavigationStack {

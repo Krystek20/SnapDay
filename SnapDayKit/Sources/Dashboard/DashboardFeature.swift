@@ -91,7 +91,6 @@ public struct DashboardFeature: TodayProvidable {
       case dayActivityActionPerfomed(DayActivityActionType)
       case showCompletedActivitiesTapped
       case hideCompletedActivitiesTapped
-      case reportButtonTapped
       case todayButtonTapped
       case increaseButtonTapped
       case decreaseButtonTapped
@@ -129,9 +128,7 @@ public struct DashboardFeature: TodayProvidable {
         case remove(DayActivityTask)
       }
     }
-    public enum DelegateAction: Equatable {
-      case reportsTapped
-    }
+    public enum DelegateAction: Equatable { }
     public enum DayActivityAlert: Equatable {
       case confirmTapped(dayActivity: DayActivity)
       case cancelTapped
@@ -255,8 +252,6 @@ public struct DashboardFeature: TodayProvidable {
     case .hideCompletedActivitiesTapped:
       state.activityListOption = .collapsed
       return .none
-    case .reportButtonTapped:
-      return .send(.delegate(.reportsTapped))
     case .increaseButtonTapped:
       let currentDate = state.date ?? today
       state.date = calendar.date(byAdding: .day, value: 1, to: currentDate)

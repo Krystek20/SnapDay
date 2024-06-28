@@ -15,41 +15,29 @@ public struct ApplicationFeature: TodayProvidable {
 
   @ObservableState
   public struct State: Equatable {
+    var selectedTab = Tab.dashboard
+
     var dashboard = DashboardFeature.State()
-    var path = StackState<Path.State>()
+    var reports = ReportsFeature.State()
 
     @Presents var developerTools: DeveloperToolsFeature.State?
 
     public init() { }
   }
 
-  public enum Action: Equatable {
+  public enum Action: BindableAction, Equatable {
     case appeared
     case createDayBackgroundTaskCalled
     case deviceShaked
     case dashboard(DashboardFeature.Action)
-    case path(StackAction<Path.State, Path.Action>)
-
+    case reports(ReportsFeature.Action)
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
+    case binding(BindingAction<State>)
   }
 
-  @Reducer
-  public struct Path {
-    
-    @ObservableState
-    public enum State: Equatable {
-      case reports(ReportsFeature.State)
-    }
-
-    public enum Action: Equatable {
-      case reports(ReportsFeature.Action)
-    }
-
-    public var body: some ReducerOf<Self> {
-      Scope(state: /State.reports, action: /Action.reports) {
-        ReportsFeature()
-      }
-    }
+  public enum Tab: String {
+    case dashboard
+    case reports
   }
 
   // MARK: - Initialization
@@ -61,8 +49,14 @@ public struct ApplicationFeature: TodayProvidable {
   // MARK: - Body
 
   public var body: some ReducerOf<Self> {
+    BindingReducer()
+    
     Scope(state: \.dashboard, action: \.dashboard) {
       DashboardFeature()
+    }
+    
+    Scope(state: \.reports, action: \.reports) {
+      ReportsFeature()
     }
 
     Reduce { state, action in
@@ -89,36 +83,18 @@ public struct ApplicationFeature: TodayProvidable {
       case .deviceShaked:
         state.developerTools = DeveloperToolsFeature.State()
         return .none
-      case .dashboard(.delegate(let action)):
-        return handleDashboardDelegate(action: action, state: &state)
       case .dashboard:
+        return .none
+      case .reports:
         return .none
       case .developerTools:
         return .none
-      case .path:
+      case .binding:
         return .none
       }
     }
     .ifLet(\.$developerTools, action: \.developerTools) {
       DeveloperToolsFeature()
-    }
-    .forEach(\.path, action: \.path) {
-      Path()
-    }
-  }
-
-  // MARK: - Private
-
-  private func handleDashboardDelegate(
-    action: DashboardFeature.Action.DelegateAction,
-    state: inout ApplicationFeature.State
-  ) -> EffectOf<Self> {
-    switch action {
-    case .reportsTapped:
-      state.path.append(
-        .reports(ReportsFeature.State())
-      )
-      return .none
     }
   }
 }

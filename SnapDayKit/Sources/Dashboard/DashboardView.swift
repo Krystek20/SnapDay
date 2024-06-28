@@ -82,15 +82,6 @@ public struct DashboardView: View {
           HStack {
             Button(
               action: {
-                store.send(.view(.reportButtonTapped))
-              },
-              label: {
-                Image(systemName: "chart.bar.xaxis")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
-            Button(
-              action: {
                 store.send(.view(.todayButtonTapped))
               },
               label: {
@@ -98,10 +89,6 @@ public struct DashboardView: View {
                   .foregroundStyle(Color.actionBlue)
               }
             )
-          }
-        }
-        ToolbarItem(placement: .topBarTrailing) {
-          HStack {
             Button(
               action: {
                 store.send(.view(.calendarButtonTapped))
@@ -111,16 +98,18 @@ public struct DashboardView: View {
                   .foregroundStyle(Color.actionBlue)
               }
             )
-            Button(
-              action: {
-                store.send(.view(.activityListButtonTapped))
-              },
-              label: {
-                Image(systemName: "text.badge.plus")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
           }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+          Button(
+            action: {
+              store.send(.view(.activityListButtonTapped))
+            },
+            label: {
+              Image(systemName: "text.badge.plus")
+                .foregroundStyle(Color.actionBlue)
+            }
+          )
         }
       }
     }

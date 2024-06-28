@@ -52,6 +52,7 @@ public struct ReportsView: View {
         store.send(.view(.appeared))
       }
       .navigationTitle(String(localized: "Reports", bundle: .module))
+      .navigationBarTitleDisplayMode(.inline)
       .sheet(item: $store.scope(state: \.selectableList, action: \.selectableList)) { store in
         NavigationStack {
           SelectableListView(store: store)
