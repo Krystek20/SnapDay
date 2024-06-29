@@ -5,7 +5,14 @@
 
     },
     "Cancel" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

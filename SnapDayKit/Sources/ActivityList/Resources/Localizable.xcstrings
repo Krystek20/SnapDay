@@ -1,29 +1,45 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Activity list" : {
-
-    },
     "Add (%lld)" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj (%lld)"
+          }
+        }
+      }
     },
-    "Add New" : {
-
+    "Search for Activity" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szukaj"
+          }
+        }
+      }
     },
-    "Add or Search for Activity" : {
-
-    },
-    "Edit" : {
-
-    },
-    "New" : {
-
-    },
-    "Previous Activities" : {
-
+    "Template List" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List szablonów"
+          }
+        }
+      }
     },
     "Templates" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szablony"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

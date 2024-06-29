@@ -89,7 +89,7 @@ public struct DashboardView: View {
                 store.send(.view(.todayButtonTapped))
               },
               label: {
-                Image(systemName: "smallcircle.filled.circle")
+                Image(systemName: "smallcircle.filled.circle.fill")
                   .foregroundStyle(Color.actionBlue)
               }
             )
@@ -98,22 +98,33 @@ public struct DashboardView: View {
                 store.send(.view(.calendarButtonTapped))
               },
               label: {
-                Image(systemName: "calendar")
+                Image(systemName: "calendar.circle.fill")
                   .foregroundStyle(Color.actionBlue)
               }
             )
           }
         }
         ToolbarItem(placement: .topBarTrailing) {
-          Button(
-            action: {
-              store.send(.view(.activityListButtonTapped))
-            },
-            label: {
-              Image(systemName: "text.badge.plus")
-                .foregroundStyle(Color.actionBlue)
-            }
-          )
+          HStack {
+            Button(
+              action: {
+                store.send(.view(.activityListButtonTapped))
+              },
+              label: {
+                Image(systemName: "list.bullet.circle.fill")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+            Button(
+              action: {
+                store.send(.view(.newButtonTapped))
+              },
+              label: {
+                Image(systemName: "plus.circle.fill")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+          }
         }
       }
     }
@@ -123,9 +134,7 @@ public struct DashboardView: View {
     WithPerceptionTracking {
       SectionView(
         name: store.title,
-        rightContent: {
-          newButton
-        },
+        rightContent: { },
         content: {
           dayList
             .focused($focus, equals: .name)
@@ -135,16 +144,6 @@ public struct DashboardView: View {
             .formBackgroundModifier(padding: EdgeInsets(.zero))
         }
       )
-    }
-  }
-
-  private var newButton: some View {
-    WithPerceptionTracking {
-      Button(String(localized: "New", bundle: .module)) {
-        store.send(.view(.newButtonTapped))
-      }
-      .font(.system(size: 14.0, weight: .semibold))
-      .foregroundStyle(Color.actionBlue)
     }
   }
 

@@ -2,10 +2,24 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Dashboard" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulpit nawigacyjny"
+          }
+        }
+      }
     },
     "Reports" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raporty"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

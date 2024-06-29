@@ -40,13 +40,34 @@
 
     },
     "Incomplete Subtasks" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie skończone zadania"
+          }
+        }
+      }
     },
     "Mark Activity Only" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oznacz tylko aktywność "
+          }
+        }
+      }
     },
     "Mark All as Done" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oznacz wszystkie jako wykonane"
+          }
+        }
+      }
     },
     "Month" : {
       "localizations" : {
@@ -59,13 +80,24 @@
       }
     },
     "Move" : {
-
-    },
-    "New" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenieś"
+          }
+        }
+      }
     },
     "Not Yet" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeszcze nie"
+          }
+        }
+      }
     },
     "Quarter" : {
       "localizations" : {

@@ -274,12 +274,7 @@ public struct DashboardFeature: TodayProvidable {
       return .send(.internal(.showDatePicker))
     case .activityListButtonTapped:
       guard let selectedDay = state.selectedDay else { return .none }
-      state.activityList = ActivityListFeature.State(
-        configuration: ActivityListFeature.ActivityListConfiguration(
-          fetchingOption: .fromCoreData,
-          day: selectedDay
-        )
-      )
+      state.activityList = ActivityListFeature.State(day: selectedDay)
       return .none
     case .dayActivityActionPerfomed(let actionType):
       return performDayActivityAction(actionType)
@@ -555,10 +550,19 @@ public struct DashboardFeature: TodayProvidable {
         try await dayEditor.updateDayActivities(activity, dayToUpdate?.date ?? today)
         await send(.internal(.loadDay))
       }
-    case .presented(.delegate(.activitiesSelected(let dayActivities))):
-      return .run { [dayActivities, dayToUpdate = state.selectedDay] send in
-        for dayActivity in dayActivities {
-          try await dayEditor.addDayActivity(dayActivity, dayToUpdate?.date ?? today)
+    case .presented(.delegate(.activitiesSelected(let activities))):
+      guard let selectedDay = state.selectedDay else { return .none }
+      return .run { [activities, dayToUpdate = selectedDay] send in
+        for activity in activities {
+          let dayActivity = DayActivity.create(
+            from: activity,
+            uuid: { uuid() },
+            calendar: { calendar },
+            dayId: dayToUpdate.id,
+            dayDate: dayToUpdate.date,
+            createdByUser: true
+          )
+          try await dayEditor.addDayActivity(dayActivity, dayToUpdate.date)
         }
         await send(.internal(.loadDay))
       }
