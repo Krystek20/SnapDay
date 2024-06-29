@@ -39,10 +39,13 @@ public struct DayActivityRow: View, DurationFormatting {
         subtitleView
       }
       Spacer()
-      view(for: trailingIcon)
-        .onTapGesture {
-          trailingViewTapped?()
-        }
+      HStack(spacing: 10.0) {
+        reminderIconIfNeeded
+        view(for: trailingIcon)
+          .onTapGesture {
+            trailingViewTapped?()
+          }
+      }
     }
     .padding(.all, 10.0)
   }
@@ -73,7 +76,19 @@ public struct DayActivityRow: View, DurationFormatting {
     }
   }
 
-  func view(for trailingIcon: TrailingIcon) -> AnyView {
+  @ViewBuilder
+  private var reminderIconIfNeeded: some View {
+    if activity.reminderDate != nil {
+      Image(systemName: "bell")
+        .resizable()
+        .scaledToFill()
+        .fontWeight(.light)
+        .frame(width: 15.0, height: 15.0)
+        .foregroundStyle(Color.sectionText)
+    }
+  }
+
+  private func view(for trailingIcon: TrailingIcon) -> AnyView {
     switch trailingIcon {
     case .none:
       AnyView(
