@@ -2,42 +2,59 @@ import SwiftUI
 import Resources
 import Models
 
+public struct DayNewActivity: Equatable {
+  public var name: String
+  public var isFormVisible: Bool
+
+  public init(name: String, isFormVisible: Bool) {
+    self.name = name
+    self.isFormVisible = isFormVisible
+  }
+}
+
 public struct DayView: View {
 
   // MARK: - Properties
 
   private let isPastDay: Bool
+  @Binding private var newActivity: DayNewActivity
   private let activities: [DayActivity]
   private let completedActivities: CompletedActivities
   private let dayViewShowButtonState: DayViewShowButtonState
   private let dayActivityAction: (DayActivityActionType) -> Void
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
+  private let cancelNewActivity: () -> Void
 
   // MARK: - Initialization
 
   public init(
     isPastDay: Bool,
+    newActivity: Binding<DayNewActivity>,
     activities: [DayActivity],
     completedActivities: CompletedActivities,
     dayViewShowButtonState: DayViewShowButtonState,
     dayActivityAction: @escaping (DayActivityActionType) -> Void,
     showCompletedTapped: @escaping () -> Void,
-    hideCompletedTapped: @escaping () -> Void
+    hideCompletedTapped: @escaping () -> Void,
+    cancelNewActivity: @escaping () -> Void
   ) {
     self.isPastDay = isPastDay
+    self._newActivity = newActivity
     self.activities = activities
     self.completedActivities = completedActivities
     self.dayViewShowButtonState = dayViewShowButtonState
     self.dayActivityAction = dayActivityAction
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
+    self.cancelNewActivity = cancelNewActivity
   }
 
   // MARK: - Views
 
   public var body: some View {
     VStack(spacing: .zero) {
+      newActivityFormIfNeeded
       ForEach(activities) { dayActivity in
         menuActivityView(dayActivity)
         divider(addPadding: !dayActivity.dayActivityTasks.isEmpty)
@@ -50,6 +67,35 @@ public struct DayView: View {
       }
       doneRowViewIfNeeded()
       showOrHideDoneActivitiesViewIfNeeded()
+    }
+  }
+
+  @ViewBuilder
+  private var newActivityFormIfNeeded: some View {
+    if newActivity.isFormVisible {
+      VStack(spacing: .zero) {
+        HStack(spacing: 5.0) {
+          ActivityImageView(
+            data: nil,
+            size: 30.0,
+            cornerRadius: 15.0
+          )
+          TextField("", text: $newActivity.name)
+            .font(.system(size: 14.0, weight: .medium))
+            .foregroundStyle(Color.sectionText)
+            .submitLabel(.done)
+          Spacer()
+          if !newActivity.name.isEmpty {
+            Button(String(localized: "Cancel", bundle: .module), action: cancelNewActivity)
+              .font(.system(size: 12.0, weight: .bold))
+              .foregroundStyle(Color.actionBlue)
+          }
+        }
+        .padding(.all, 10.0)
+        if !activities.isEmpty {
+          divider(addPadding: false)
+        }
+      }
     }
   }
 

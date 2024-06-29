@@ -8,6 +8,7 @@ public struct DaysSelectorView: View {
   // MARK: - Properties
 
   @Binding private var selectedDay: Day?
+  @Binding private var newActivity: DayNewActivity
   private let dayActivities: [DayActivity]
   private let daySummary: DaySummary?
   private let dayViewShowButtonState: DayViewShowButtonState
@@ -15,20 +16,24 @@ public struct DaysSelectorView: View {
   private let dayActivityAction: (DayActivityActionType) -> Void
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
+  private let cancelNewActivity: () -> Void
 
   // MARK: - Initialization
 
   public init(
     selectedDay: Binding<Day?>,
+    newActivity: Binding<DayNewActivity>,
     dayActivities: [DayActivity],
     daySummary: DaySummary?,
     dayViewShowButtonState: DayViewShowButtonState,
     informationConfiguration: InformationViewConfigurable?,
     dayActivityAction: @escaping (DayActivityActionType) -> Void,
     showCompletedTapped: @escaping () -> Void,
-    hideCompletedTapped: @escaping () -> Void
+    hideCompletedTapped: @escaping () -> Void,
+    cancelNewActivity: @escaping () -> Void
   ) {
     self._selectedDay = selectedDay
+    self._newActivity = newActivity
     self.dayActivities = dayActivities
     self.daySummary = daySummary
     self.dayViewShowButtonState = dayViewShowButtonState
@@ -36,6 +41,7 @@ public struct DaysSelectorView: View {
     self.dayActivityAction = dayActivityAction
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
+    self.cancelNewActivity = cancelNewActivity
   }
 
   // MARK: - Views
@@ -65,13 +71,15 @@ public struct DaysSelectorView: View {
 
   private func listDayView(_ day: Day) -> some View {
     DayView(
-      isPastDay: day.isOlderThenToday ?? false,
+      isPastDay: day.isOlderThenToday ?? false, 
+      newActivity: $newActivity,
       activities: dayActivities,
       completedActivities: day.completedActivities,
       dayViewShowButtonState: dayViewShowButtonState,
       dayActivityAction: dayActivityAction,
       showCompletedTapped: showCompletedTapped,
-      hideCompletedTapped: hideCompletedTapped
+      hideCompletedTapped: hideCompletedTapped,
+      cancelNewActivity: cancelNewActivity
     )
   }
 

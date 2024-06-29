@@ -29,6 +29,7 @@ public struct ReportsView: View {
           content
             .padding(.horizontal, 15.0)
             .padding(.top, store.isSwitcherDismissed ? 15.0: 65.0)
+            .padding(.bottom, 15.0)
         }
         .maxWidth()
         .scrollIndicators(.hidden)

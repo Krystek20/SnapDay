@@ -10,6 +10,7 @@ import CalendarPicker
 import Combine
 import enum UiComponents.DayViewShowButtonState
 import protocol UiComponents.InformationViewConfigurable
+import struct UiComponents.DayNewActivity
 
 @Reducer
 public struct DashboardFeature: TodayProvidable {
@@ -29,8 +30,10 @@ public struct DashboardFeature: TodayProvidable {
   @ObservableState
   public struct State: Equatable, TodayProvidable {
 
-    var activityListOption: ActivityListOption = .collapsed
-    
+    public enum Field: Hashable {
+      case name
+    }
+
     var title: String {
       let formatter = DateFormatter()
       formatter.dateFormat = "EEEE, d MMM yyyy"
@@ -72,6 +75,12 @@ public struct DashboardFeature: TodayProvidable {
     var date: Date?
     var selectedDay: Day?
     var streamSetup: Bool = false
+    var newActivity: DayNewActivity = DayNewActivity(
+      name: "",
+      isFormVisible: false
+    )
+    var activityListOption: ActivityListOption = .collapsed
+    var focus: Field?
 
     @Presents var activityList: ActivityListFeature.State?
     @Presents var editDayActivity: DayActivityFormFeature.State?
@@ -86,6 +95,9 @@ public struct DashboardFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
+      case newButtonTapped
+      case doneNewButtonTapped
+      case cancelNewButtonTapped
       case calendarButtonTapped
       case activityListButtonTapped
       case dayActivityActionPerfomed(DayActivityActionType)
@@ -233,6 +245,31 @@ public struct DashboardFeature: TodayProvidable {
           }
         }
       )
+    case .newButtonTapped:
+      state.newActivity.isFormVisible = true
+      state.focus = .name
+      return .none
+    case .doneNewButtonTapped:
+      let name = state.newActivity.name
+      state.newActivity.isFormVisible = false
+      state.newActivity.name = ""
+      state.focus = nil
+      guard !name.isEmpty, let day = state.selectedDay else { return .none }
+      return .run { [day] send in
+        let dayActivity = DayActivity(
+          id: uuid(),
+          dayId: day.id,
+          name: name,
+          isGeneratedAutomatically: false
+        )
+        try await dayEditor.addDayActivity(dayActivity, day.date)
+        await send(.internal(.loadDay))
+      }
+    case .cancelNewButtonTapped:
+      state.newActivity.isFormVisible = false
+      state.newActivity.name = ""
+      state.focus = nil
+      return .none
     case .calendarButtonTapped:
       return .send(.internal(.showDatePicker))
     case .activityListButtonTapped:

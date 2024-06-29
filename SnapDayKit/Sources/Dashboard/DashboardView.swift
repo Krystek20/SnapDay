@@ -13,6 +13,7 @@ public struct DashboardView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<DashboardFeature>
+  @FocusState private var focus: DashboardFeature.State.Field?
 
   // MARK: - Initialization
 
@@ -30,8 +31,10 @@ public struct DashboardView: View {
           dayListSection
             .padding(.horizontal, 15.0)
             .padding(.top, 65.0)
+            .padding(.bottom, 15.0)
         }
         .maxWidth()
+//        .disabled(store.showNewActivityForm)
         .scrollIndicators(.hidden)
 
         Switcher(
@@ -45,6 +48,7 @@ public struct DashboardView: View {
         )
       }
       .activityBackground
+      .bind($store.focus, to: $focus)
       .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
         NavigationStack {
           ActivityListView(store: store)
@@ -119,12 +123,28 @@ public struct DashboardView: View {
     WithPerceptionTracking {
       SectionView(
         name: store.title,
-        rightContent: { },
+        rightContent: {
+          newButton
+        },
         content: {
           dayList
+            .focused($focus, equals: .name)
+            .onSubmit {
+              store.send(.view(.doneNewButtonTapped))
+            }
             .formBackgroundModifier(padding: EdgeInsets(.zero))
         }
       )
+    }
+  }
+
+  private var newButton: some View {
+    WithPerceptionTracking {
+      Button(String(localized: "New", bundle: .module)) {
+        store.send(.view(.newButtonTapped))
+      }
+      .font(.system(size: 14.0, weight: .semibold))
+      .foregroundStyle(Color.actionBlue)
     }
   }
 
@@ -132,6 +152,7 @@ public struct DashboardView: View {
     WithPerceptionTracking {
       DaysSelectorView(
         selectedDay: $store.selectedDay,
+        newActivity: $store.newActivity,
         dayActivities: store.activities,
         daySummary: store.daySummary,
         dayViewShowButtonState: store.dayViewShowButtonState,
@@ -144,6 +165,9 @@ public struct DashboardView: View {
         },
         hideCompletedTapped: {
           store.send(.view(.hideCompletedActivitiesTapped))
+        },
+        cancelNewActivity: {
+          store.send(.view(.cancelNewButtonTapped))
         }
       )
     }
