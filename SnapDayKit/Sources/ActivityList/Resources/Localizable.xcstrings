@@ -11,32 +11,22 @@
         }
       }
     },
+    "Saved Activities" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisane aktywności"
+          }
+        }
+      }
+    },
     "Search for Activity" : {
       "localizations" : {
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Szukaj"
-          }
-        }
-      }
-    },
-    "Template List" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "List szablonów"
-          }
-        }
-      }
-    },
-    "Templates" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Szablony"
           }
         }
       }

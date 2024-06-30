@@ -9,6 +9,7 @@ public enum DayActivityActionType: Equatable {
     case move
     case remove
     case addActivityTask
+    case save
   }
 
   public enum DayActivityTaskAction: Equatable {

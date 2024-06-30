@@ -7,6 +7,9 @@
     "A Day of Unplanned Possibilities" : {
 
     },
+    "Activity Saved!" : {
+
+    },
     "Complete Activity" : {
 
     },
@@ -35,6 +38,9 @@
           }
         }
       }
+    },
+    "Great job! Your activity has been successfully saved to your activity list. You can find it under the 'Activity List' button. From there, you can make your saved activities frequently and manage them easily. Keep up the good work!" : {
+
     },
     "Hope it was enjoyable!" : {
 

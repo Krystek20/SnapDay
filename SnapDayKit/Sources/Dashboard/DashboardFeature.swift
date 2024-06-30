@@ -18,6 +18,7 @@ public struct DashboardFeature: TodayProvidable {
   // MARK: - Dependencies
 
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.activityRepository) var activityRepository
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
@@ -129,6 +130,7 @@ public struct DashboardFeature: TodayProvidable {
         case showMultiDatePicker(DayActivity)
         case showAlertSelectAll(DayActivity)
         case showAlertSelectActivity(DayActivity)
+        case save(DayActivity)
       }
 
       public enum DayActivityTaskAction: Equatable {
@@ -361,6 +363,8 @@ public struct DashboardFeature: TodayProvidable {
         .send(.internal(.dayActivityAction(.remove(dayActivity))))
       case .addActivityTask:
         .send(.internal(.dayActivityTaskAction(.showNewForm(dayActivity))))
+      case .save:
+        .send(.internal(.dayActivityAction(.save(dayActivity))))
       }
     case .dayActivityTask(let dayActivityTaskAction, let dayActivityTask):
       switch dayActivityTaskAction {
@@ -457,6 +461,22 @@ public struct DashboardFeature: TodayProvidable {
         cancelAction: .cancelTapped
       )
       return .none
+    case .save(var dayActivity):
+      guard let selectedDay = state.selectedDay else { return .none }
+      let activity = Activity(
+        uuid: { uuid() },
+        startDate: selectedDay.date,
+        dayActivity: dayActivity
+      )
+      dayActivity.activity = activity
+      return .run { [dayActivity, activity] send in
+        try await activityRepository.saveActivity(activity)
+        if #available(iOS 17.0, *) {
+          SaveActivityTip.show = true
+        }
+        try await dayActivityRepository.saveDayActivity(dayActivity)
+        await send(.internal(.loadDay))
+      }
     }
   }
 
@@ -550,6 +570,8 @@ public struct DashboardFeature: TodayProvidable {
         try await dayEditor.updateDayActivities(activity, dayToUpdate?.date ?? today)
         await send(.internal(.loadDay))
       }
+    case .presented(.delegate(.activityDeleted)):
+      return .send(.internal(.loadDay))
     case .presented(.delegate(.activitiesSelected(let activities))):
       guard let selectedDay = state.selectedDay else { return .none }
       return .run { [activities, dayToUpdate = selectedDay] send in

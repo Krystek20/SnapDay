@@ -2,16 +2,6 @@ import SwiftUI
 import Resources
 import Models
 
-public struct DayNewActivity: Equatable {
-  public var name: String
-  public var isFormVisible: Bool
-
-  public init(name: String, isFormVisible: Bool) {
-    self.name = name
-    self.isFormVisible = isFormVisible
-  }
-}
-
 public struct DayView: View {
 
   // MARK: - Properties
@@ -133,6 +123,17 @@ public struct DayView: View {
           Image(systemName: "plus.circle")
         }
       )
+      if dayActivity.activity == nil {
+        Button(
+          action: {
+            dayActivityAction(.dayActivity(.save, dayActivity))
+          },
+          label: {
+            Text("Save", bundle: .module)
+            Image(systemName: "square.and.arrow.down")
+          }
+        )
+      }
       Button(
         action: {
           dayActivityAction(.dayActivity(.move, dayActivity))

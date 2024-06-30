@@ -3,7 +3,7 @@
   "strings" : {
     "Dashboard" : {
       "localizations" : {
-        "en" : {
+        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pulpit nawigacyjny"
@@ -13,7 +13,7 @@
     },
     "Reports" : {
       "localizations" : {
-        "en" : {
+        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Raporty"

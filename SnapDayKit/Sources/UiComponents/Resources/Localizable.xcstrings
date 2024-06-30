@@ -5,10 +5,24 @@
 
     },
     "-" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-"
+          }
+        }
+      }
     },
     "%lld" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
     },
     "%lld / %lld" : {
       "localizations" : {
@@ -17,17 +31,44 @@
             "state" : "new",
             "value" : "%1$lld / %2$lld"
           }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
+          }
         }
       }
     },
     "%lld hours" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld godziny"
+          }
+        }
+      }
     },
     "%lld min" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        }
+      }
     },
     "%lld%%" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      }
     },
     "%lldh %lldmin" : {
       "localizations" : {
@@ -36,11 +77,24 @@
             "state" : "new",
             "value" : "%1$lldh %2$lldmin"
           }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lldgodz %2$lldmin"
+          }
         }
       }
     },
     "%lldmin" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldmin"
+          }
+        }
+      }
     },
     "Add task" : {
       "localizations" : {
@@ -53,10 +107,24 @@
       }
     },
     "Biweekly" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dwutygodniowa"
+          }
+        }
+      }
     },
     "Cancel" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj"
+          }
+        }
+      }
     },
     "Completed activities" : {
       "localizations" : {
@@ -79,7 +147,14 @@
       }
     },
     "Daily" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codzienna"
+          }
+        }
+      }
     },
     "Deselect" : {
       "localizations" : {
@@ -102,13 +177,34 @@
       }
     },
     "First" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pierwszy"
+          }
+        }
+      }
     },
     "First day" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pierwszy dzień"
+          }
+        }
+      }
     },
     "Fourth" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czwarty"
+          }
+        }
+      }
     },
     "Hide completed" : {
       "localizations" : {
@@ -121,19 +217,54 @@
       }
     },
     "Last" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatni"
+          }
+        }
+      }
     },
     "Last day" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatni dzień"
+          }
+        }
+      }
     },
     "Mid month" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Środek miesiąca"
+          }
+        }
+      }
     },
     "Monthly" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miesięczna"
+          }
+        }
+      }
     },
     "Monthly specific date" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzień miesiąca"
+          }
+        }
+      }
     },
     "Move" : {
       "localizations" : {
@@ -165,17 +296,55 @@
         }
       }
     },
+    "Save" : {
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz"
+          }
+        }
+      }
+    },
     "Second" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugi"
+          }
+        }
+      }
     },
     "Second day" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugi dzień"
+          }
+        }
+      }
     },
     "Second to last" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przedostatni"
+          }
+        }
+      }
     },
     "Second to last day" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przedostatni dzień"
+          }
+        }
+      }
     },
     "Select" : {
       "localizations" : {
@@ -208,10 +377,24 @@
       }
     },
     "Specific weekday" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzień tygodnia"
+          }
+        }
+      }
     },
     "Third" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzeci"
+          }
+        }
+      }
     },
     "Total Task Time" : {
       "localizations" : {
@@ -224,10 +407,24 @@
       }
     },
     "Total: %lld" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W sumie %lld"
+          }
+        }
+      }
     },
     "Weekly" : {
-
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tygodniowa"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -3,6 +3,7 @@ import Reports
 import ComposableArchitecture
 import Utilities
 import DeveloperTools
+import TipKit
 
 @Reducer
 public struct ApplicationFeature: TodayProvidable {
@@ -65,6 +66,11 @@ public struct ApplicationFeature: TodayProvidable {
         return .merge(
           .run { _ in
             guard try await userNotificationCenterProvider.requestAuthorization() else { return }
+          },
+          .run { _ in
+            if #available(iOS 17.0, *) {
+              try? Tips.configure()
+            }
           },
           .run { _ in
             try backgroundUpdater.scheduleCreatingDayBackgroundTask()

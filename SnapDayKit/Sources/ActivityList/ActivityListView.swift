@@ -28,7 +28,7 @@ public struct ActivityListView: View {
     WithPerceptionTracking {
       content
         .activityBackground
-        .navigationTitle(String(localized: "Template List", bundle: .module))
+        .navigationTitle(String(localized: "Saved Activities", bundle: .module))
         .searchable(
           text: $store.searchText,
           placement: .navigationBarDrawer(displayMode: .always),
@@ -63,7 +63,7 @@ public struct ActivityListView: View {
     WithPerceptionTracking {
       VStack(spacing: 15.0) {
         ScrollView {
-          activitySection
+          activityList
           .padding(.bottom, 15.0)
           .padding(.horizontal, 15.0)
         }
@@ -72,19 +72,6 @@ public struct ActivityListView: View {
         addButton
           .padding(.bottom, 15.0)
           .padding(.horizontal, 15.0)
-      }
-    }
-  }
-
-  @ViewBuilder
-  private var activitySection: some View {
-    WithPerceptionTracking {
-      if !store.displayedActivities.isEmpty {
-        SectionView(
-          name: String(localized: "Templates", bundle: .module),
-          rightContent: { },
-          content: { activityList }
-        )
       }
     }
   }
@@ -110,7 +97,7 @@ public struct ActivityListView: View {
 
   private func activityRow(for activity: Activity) -> some View {
     WithPerceptionTracking {
-      DayActivityRow(activity: activity, trailingIcon: .edit) {
+      DayActivityRow(activity: activity, trailingIcon: .more) {
         store.send(.view(.activityEditTapped(activity)))
       }
       .contentShape(Rectangle())

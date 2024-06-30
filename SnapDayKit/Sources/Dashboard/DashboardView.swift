@@ -28,13 +28,12 @@ public struct DashboardView: View {
     WithPerceptionTracking {
       ZStack(alignment: .top) {
         ScrollView {
-          dayListSection
+          dayList
             .padding(.horizontal, 15.0)
             .padding(.top, 65.0)
             .padding(.bottom, 15.0)
         }
         .maxWidth()
-//        .disabled(store.showNewActivityForm)
         .scrollIndicators(.hidden)
 
         Switcher(
@@ -115,6 +114,7 @@ public struct DashboardView: View {
                   .foregroundStyle(Color.actionBlue)
               }
             )
+            .modifier(TipKitViewModifier())
             Button(
               action: {
                 store.send(.view(.newButtonTapped))
@@ -127,23 +127,6 @@ public struct DashboardView: View {
           }
         }
       }
-    }
-  }
-
-  private var dayListSection: some View {
-    WithPerceptionTracking {
-      SectionView(
-        name: store.title,
-        rightContent: { },
-        content: {
-          dayList
-            .focused($focus, equals: .name)
-            .onSubmit {
-              store.send(.view(.doneNewButtonTapped))
-            }
-            .formBackgroundModifier(padding: EdgeInsets(.zero))
-        }
-      )
     }
   }
 
@@ -169,6 +152,22 @@ public struct DashboardView: View {
           store.send(.view(.cancelNewButtonTapped))
         }
       )
+      .focused($focus, equals: .name)
+      .onSubmit {
+        store.send(.view(.doneNewButtonTapped))
+      }
+      .formBackgroundModifier(padding: EdgeInsets(.zero))
+    }
+  }
+}
+
+struct TipKitViewModifier: ViewModifier {
+  func body(content: Content) -> some View {
+    if #available(iOS 17.0, *) {
+      return content
+        .popoverTip(SaveActivityTip())
+    } else {
+      return content
     }
   }
 }

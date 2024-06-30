@@ -79,12 +79,7 @@ public struct DayActivityRow: View, DurationFormatting {
   @ViewBuilder
   private var reminderIconIfNeeded: some View {
     if activity.reminderDate != nil {
-      Image(systemName: "bell")
-        .resizable()
-        .scaledToFill()
-        .fontWeight(.light)
-        .frame(width: 15.0, height: 15.0)
-        .foregroundStyle(Color.sectionText)
+      prepareIcon("bell")
     }
   }
 
@@ -96,16 +91,17 @@ public struct DayActivityRow: View, DurationFormatting {
       )
     case .more:
       AnyView(
-        Image(systemName: "ellipsis")
-          .foregroundStyle(Color.sectionText)
-          .imageScale(.medium)
-      )
-    case .edit:
-      AnyView(
-        Image(systemName: "square.and.pencil")
-          .foregroundStyle(Color.sectionText)
-          .imageScale(.medium)
+        prepareIcon("ellipsis")
       )
     }
+  }
+
+  private func prepareIcon(_ name: String) -> some View {
+    Image(systemName: name)
+      .resizable()
+      .scaledToFit()
+      .frame(width: 15.0, height: 15.0)
+      .foregroundStyle(Color.sectionText)
+      .imageScale(.medium)
   }
 }
