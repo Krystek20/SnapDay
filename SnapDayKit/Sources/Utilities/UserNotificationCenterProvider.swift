@@ -213,15 +213,13 @@ extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
     var notification: (any UserNotification)?
     switch kind {
     case .activity:
-      guard var dayActivity = try await dayActivityRepository.activity(identifier),
-            let reminderDate = dayActivity.reminderDate else { return }
-      dayActivity.reminderDate = calendar.date(byAdding: .minute, value: minutes, to: reminderDate)
+      guard var dayActivity = try await dayActivityRepository.activity(identifier) else { return }
+      dayActivity.reminderDate = calendar.date(byAdding: .minute, value: minutes, to: date.now)
       try await dayActivityRepository.saveDayActivity(dayActivity)
       notification = DayActivityNotification(type: .activity(dayActivity), calendar: calendar)
     case .activityTask:
-      guard var dayActivityTask = try await dayActivityRepository.activityTask(identifier),
-            let reminderDate = dayActivityTask.reminderDate else { return }
-      dayActivityTask.reminderDate = calendar.date(byAdding: .minute, value: minutes, to: reminderDate)
+      guard var dayActivityTask = try await dayActivityRepository.activityTask(identifier) else { return }
+      dayActivityTask.reminderDate = calendar.date(byAdding: .minute, value: minutes, to: date.now)
       try await dayActivityRepository.saveDayActivityTask(dayActivityTask)
       notification = DayActivityNotification(type: .activityTask(dayActivityTask), calendar: calendar)
     }
