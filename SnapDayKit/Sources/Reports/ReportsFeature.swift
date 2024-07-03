@@ -15,8 +15,8 @@ public struct ReportsFeature: TodayProvidable {
   // MARK: - Dependencies
 
   @Dependency(\.calendar) private var calendar
-  @Dependency(\.dayRepository) private var dayRepository
   @Dependency(\.tagRepository) private var tagRepository
+  private let dayProvider = DayProvider()
 
   // MARK: - State & Action
 
@@ -236,7 +236,7 @@ public struct ReportsFeature: TodayProvidable {
     case .loadDays:
       guard let filterDate = state.filterDate else { return .none }
       return .run { [dateRange = filterDate.range] send in
-        let days = try await dayRepository.loadDays(dateRange)
+        let days = try await dayProvider.days(dateRange)
         await send(.internal(.daysLoaded(days)))
       }
     case .daysLoaded(let days):

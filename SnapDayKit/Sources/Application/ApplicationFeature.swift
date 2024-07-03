@@ -74,16 +74,13 @@ public struct ApplicationFeature: TodayProvidable {
           },
           .run { _ in
             try backgroundUpdater.scheduleCreatingDayBackgroundTask()
-          },
-          .run { _ in
-            try await dayProvider.removeBrokenDays()
           }
         )
       case .createDayBackgroundTaskCalled:
         DeveloperToolsLogger.shared.append(.refresh(.runInBackground))
         return .run { _ in
           try backgroundUpdater.scheduleCreatingDayBackgroundTask()
-          _ = try await dayProvider.day(for: tomorrow)
+          _ = try await dayProvider.day(tomorrow)
           try await userNotificationCenterProvider.reloadReminders()
         }
       case .deviceShaked:

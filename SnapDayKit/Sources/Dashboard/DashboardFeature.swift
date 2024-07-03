@@ -321,7 +321,7 @@ public struct DashboardFeature: TodayProvidable {
     case .loadDay:
       return .run { [date = state.date] send in
         do {
-          let day = try await dayProvider.day(for: date ?? today)
+          let day = try await dayProvider.day(date ?? today)
           await send(.internal(.setDay(day)))
         } catch {
           print("error: \(error)")

@@ -105,7 +105,7 @@ public struct EveningSummaryFeature: TodayProvidable {
     case .loadDay:
       return .run { [date = state.date] send in
         let dayDate = calendar.dayFormat(date)
-        let day = try await dayProvider.day(for: dayDate)
+        let day = try await dayProvider.day(dayDate)
         await send(.internal(.setDay(day)))
       }
     case .setDay(let day):

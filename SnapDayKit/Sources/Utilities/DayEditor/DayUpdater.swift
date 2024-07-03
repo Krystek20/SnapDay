@@ -50,7 +50,24 @@ final class DayUpdater {
           days.append(newDay)
           daysToSave.append(newDay)
         case 1:
-          days.append(groupedDay[0])
+          var day = groupedDay[0]
+          
+          let activitiesToGenerateExist = activitiesWithDates.first(where: { (_, dates: [Date]) in
+            dates.contains(day.date)
+          }) != nil
+          let activitiesNotGeneratedYet = day.activities.filter { $0.isGeneratedAutomatically }.isEmpty
+          let shouldGenerateActivities = activitiesNotGeneratedYet && activitiesToGenerateExist
+
+          if shouldGenerateActivities {
+            let dayActivities = createDayActivities(
+              dayId: day.id,
+              date: day.date,
+              activitiesWithDates: activitiesWithDates
+            )
+            day.activities.append(contentsOf: dayActivities)
+            daysToSave.append(day)
+          }
+          days.append(day)
         default:
           let deduplicatedDays = deduplicatedDays(groupedDay)
           daysToSave.append(deduplicatedDays.winner)
@@ -383,15 +400,27 @@ final class DayUpdater {
     Day(
       id: dayId,
       date: date,
-      activities: activitiesWithDates.compactMap { (activity, days) in
-        guard days.contains(date) else { return nil }
-        return createDayActivity(
-          dayId: dayId,
-          activity: activity,
-          dayDate: date
-        )
-      }
+      activities: createDayActivities(
+        dayId: dayId,
+        date: date,
+        activitiesWithDates: activitiesWithDates
+      )
     )
+  }
+
+  private func createDayActivities(
+    dayId: UUID,
+    date: Date,
+    activitiesWithDates: [Activity: [Date]]
+  ) -> [DayActivity] {
+    activitiesWithDates.compactMap { activity, days in
+      guard days.contains(date) else { return nil }
+      return createDayActivity(
+        dayId: dayId,
+        activity: activity,
+        dayDate: date
+      )
+    }
   }
 
   private func createDayActivity(
