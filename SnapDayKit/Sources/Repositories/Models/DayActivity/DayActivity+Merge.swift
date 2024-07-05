@@ -7,6 +7,9 @@ extension DayActivity {
       if icon == nil {
         icon = dayActivity.icon
       }
+      if dueDate == nil {
+        dueDate = dayActivity.dueDate
+      }
       if doneDate == nil {
         doneDate = dayActivity.doneDate
       }

@@ -8,6 +8,7 @@ extension DayActivityEntity {
     duration = Int32(dayActivity.duration)
     overview = dayActivity.overview
     isGeneratedAutomatically = dayActivity.isGeneratedAutomatically
+    dueDate = dayActivity.dueDate
     doneDate = dayActivity.doneDate
     if let activityId = dayActivity.activity?.id.uuidString {
       activity = try ActivityEntity.object(

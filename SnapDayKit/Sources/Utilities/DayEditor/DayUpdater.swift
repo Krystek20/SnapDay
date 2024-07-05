@@ -271,8 +271,8 @@ final class DayUpdater {
     try await saveDay(day)
   }
 
-  func moveDayActivity(_ dayActivity: DayActivity, fromDate: Date, toDate: Date) async throws {
-    var fromDay = try await dayRepository.loadDay(fromDate)
+  func moveDayActivity(_ dayActivity: DayActivity, toDate: Date) async throws {
+    var fromDay: Day? = try await dayRepository.object(identifier: dayActivity.dayId)
     fromDay?.activities.removeAll(where: { $0.id == dayActivity.id })
     if let fromDay {
       try await dayRepository.saveDay(fromDay)

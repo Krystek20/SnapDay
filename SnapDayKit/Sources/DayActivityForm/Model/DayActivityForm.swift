@@ -24,6 +24,7 @@ public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, Freque
   public var tags: [Tag]
   public var frequency: ActivityFrequency?
   public var duration: Int
+  public var dueDate: Date?
   public var reminderDate: Date?
   public var overview: String
   public var tasks: [DayActivityForm]
@@ -41,6 +42,7 @@ extension DayActivityForm {
         .name,
         .tags,
         .duration,
+        .dueDate,
         .reminder,
         .overview,
         ids[.templateId] != nil ? .labels : nil,
@@ -173,6 +175,7 @@ extension DayActivityForm {
     self.tags = dayActivity.tags
     self.duration = dayActivity.duration
     self.reminderDate = dayActivity.reminderDate
+    self.dueDate = dayActivity.dueDate
     self.overview = dayActivity.overview ?? ""
     self.tasks = dayActivity.dayActivityTasks.map { dayActivityTask in
       DayActivityForm(dayActivityTask: dayActivityTask, showCompleted: showCompleted)
@@ -193,6 +196,7 @@ extension DayActivity {
       activity: nil,
       name: form.name,
       icon: form.icon,
+      dueDate: form.dueDate,
       doneDate: form.completed ? date.now : nil,
       duration: form.duration,
       overview: form.overview,
@@ -219,6 +223,7 @@ extension DayActivity {
     self.labels = form.labels
     self.dayActivityTasks = form.tasks.compactMap(DayActivityTask.init)
     self.reminderDate = form.reminderDate
+    self.dueDate = form.dueDate
   }
 }
 
@@ -375,6 +380,7 @@ extension DayActivityForm {
       case .name: !name.isEmpty
       case .tags: !tags.isEmpty
       case .frequency: isFrequencyValid
+      case .dueDate: dueDate != nil
       case .duration: duration > .zero
       case .reminder: reminderDate != nil
       case .overview: !overview.isEmpty

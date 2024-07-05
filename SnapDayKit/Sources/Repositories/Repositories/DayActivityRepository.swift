@@ -4,20 +4,17 @@ import Models
 
 public struct ActivitiesFetchConfiguration {
   let range: ClosedRange<Date>?
-  let onlyGeneratedAutomatically: Bool?
   let done: Bool?
-  let hasTemplateId: Bool?
+  let predicates: [NSPredicate]
 
   public init(
     range: ClosedRange<Date>? = nil,
-    onlyGeneratedAutomatically: Bool? = nil,
     done: Bool? = nil,
-    hasTemplateId: Bool? = nil
+    predicates: [NSPredicate] = []
   ) {
     self.range = range
-    self.onlyGeneratedAutomatically = onlyGeneratedAutomatically
     self.done = done
-    self.hasTemplateId = hasTemplateId
+    self.predicates = predicates
   }
 }
 
@@ -64,23 +61,13 @@ extension DayActivityRepository: DependencyKey {
             NSPredicate(format: "day.date >= %@ AND day.date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)
           )
         }
-        if let onlyGeneratedAutomatically = configuration.onlyGeneratedAutomatically {
-          predicates.append(
-            NSPredicate(format: "isGeneratedAutomatically == %@", NSNumber(value: onlyGeneratedAutomatically))
-          )
-        }
         if let done = configuration.done {
           let predicate = done
           ? NSPredicate(format: "doneDate != nil")
           : NSPredicate(format: "doneDate == nil")
           predicates.append(predicate)
         }
-        if let hasTemplateId = configuration.hasTemplateId {
-          let predicate = hasTemplateId
-          ? NSPredicate(format: "activity != nil")
-          : NSPredicate(format: "activity == nil")
-          predicates.append(predicate)
-        }
+        predicates.append(contentsOf: configuration.predicates)
         return try await EntityHandler().fetch(
           objectType: DayActivity.self,
           predicates: predicates,

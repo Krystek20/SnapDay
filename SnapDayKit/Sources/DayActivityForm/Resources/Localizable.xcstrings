@@ -38,6 +38,9 @@
     "Deselect" : {
 
     },
+    "Due date" : {
+
+    },
     "Edit" : {
 
     },
@@ -113,7 +116,13 @@
     "Select Emoji" : {
 
     },
+    "Set date" : {
+
+    },
     "Set duration" : {
+
+    },
+    "Set time" : {
 
     },
     "Tags" : {

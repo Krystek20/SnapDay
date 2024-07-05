@@ -23,6 +23,7 @@ extension DayActivity {
       activity: try entity.activity.map(Activity.init),
       name: entity.name ?? "",
       icon: try entity.icon.map(Icon.init),
+      dueDate: entity.dueDate,
       doneDate: entity.doneDate,
       duration: Int(entity.duration),
       overview: entity.overview,

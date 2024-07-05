@@ -40,6 +40,7 @@ public struct DayActivityRow: View, DurationFormatting {
       }
       Spacer()
       HStack(spacing: 10.0) {
+        dueDateIconIfNeeded
         reminderIconIfNeeded
         view(for: trailingIcon)
           .onTapGesture {
@@ -80,6 +81,13 @@ public struct DayActivityRow: View, DurationFormatting {
   private var reminderIconIfNeeded: some View {
     if activity.reminderDate != nil {
       prepareIcon("bell")
+    }
+  }
+
+  @ViewBuilder
+  private var dueDateIconIfNeeded: some View {
+    if activity.dueDate != nil {
+      prepareIcon("hourglass")
     }
   }
 

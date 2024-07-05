@@ -416,9 +416,8 @@ public struct DashboardFeature: TodayProvidable {
         }
       }
     case .move(let dayActivity, let toDate):
-      guard let fromDate = state.selectedDay?.date else { return .none }
       return .run { send in
-        try await dayEditor.moveDayActivity(dayActivity, fromDate, toDate)
+        try await dayEditor.moveDayActivity(dayActivity, toDate)
         await send(.internal(.loadDay))
       }
     case .copy(let dayActivity, let dates):

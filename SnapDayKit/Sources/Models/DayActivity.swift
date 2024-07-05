@@ -9,6 +9,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   public var activity: Activity?
   public var name: String
   public var icon: Icon?
+  public var dueDate: Date?
   public var doneDate: Date?
   public var duration: Int
   public var overview: String?
@@ -26,6 +27,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     activity: Activity? = nil,
     name: String = "",
     icon: Icon? = nil,
+    dueDate: Date? = nil,
     doneDate: Date? = nil,
     duration: Int = .zero,
     overview: String? = nil,
@@ -40,6 +42,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     self.activity = activity
     self.name = name
     self.icon = icon
+    self.dueDate = dueDate
     self.doneDate = doneDate
     self.duration = duration
     self.overview = overview

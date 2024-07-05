@@ -9,6 +9,7 @@ public protocol ActivityType {
   var duration: Int { get }
   var overview: String? { get }
   var reminderDate: Date? { get }
+  var dueDate: Date? { get }
 }
 
 extension ActivityType {
@@ -18,9 +19,12 @@ extension ActivityType {
 }
 
 extension DayActivity: ActivityType { }
-extension DayActivityTask: ActivityType { }
+extension DayActivityTask: ActivityType { 
+  public var dueDate: Date? { nil }
+}
 extension Activity: ActivityType {
   public var doneDate: Date? { nil }
+  public var dueDate: Date? { nil }
   public var duration: Int { defaultDuration ?? .zero }
   public var overview: String? { nil }
   public var reminderDate: Date? { defaultReminderDate }

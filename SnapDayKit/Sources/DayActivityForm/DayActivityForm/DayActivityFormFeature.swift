@@ -21,7 +21,7 @@ public struct DayActivityFormFeature {
   // MARK: - State & Action
 
   @ObservableState
-  public struct State: Equatable {
+  public struct State: Equatable, TodayProvidable {
 
     public enum DayActivityFormType {
       case new
@@ -58,6 +58,10 @@ public struct DayActivityFormFeature {
     var isPhotoPickerPresented: Bool = false
     var photoItem: PhotoItem?
     var editDate: Date
+
+    var canShowDateForms: Bool {
+      editDate >= today && !form.completed
+    }
 
     var showFrequencyOptions: Bool { form.isRepeatable }
     var showWeekdaysView: Bool { form.areWeekdaysRequried }
@@ -122,6 +126,7 @@ public struct DayActivityFormFeature {
       case removeImageTapped
       case imageSelected(PhotoItem)
       case remindToggeled(Bool)
+      case dueTimeToggeled(Bool)
     }
     public enum InternalAction: Equatable {
       case setExistingTags([Tag])
@@ -190,6 +195,9 @@ public struct DayActivityFormFeature {
     if state.form.completed && state.form.reminderDate != nil {
       state.form.reminderDate = nil
     }
+    if state.form.completed && state.form.dueDate != nil {
+      state.form.dueDate = nil
+    }
     return .none
   }
 
@@ -237,6 +245,11 @@ public struct DayActivityFormFeature {
       }
     case .remindToggeled(let value):
       state.form.reminderDate = value
+      ? calendar.setHourAndMinute(date.now, toDate: state.editDate)
+      : nil
+      return .none
+    case .dueTimeToggeled(let value):
+      state.form.dueDate = value
       ? calendar.setHourAndMinute(date.now, toDate: state.editDate)
       : nil
       return .none

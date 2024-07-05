@@ -79,6 +79,7 @@ public struct DayActivityFormView: View {
         prepareView(for: .tags)
         prepareView(for: .frequency)
         prepareView(for: .duration)
+        prepareView(for: .dueDate)
         prepareView(for: .reminder)
         prepareView(for: .overview)
         prepareView(for: .labels)
@@ -109,6 +110,8 @@ public struct DayActivityFormView: View {
           durationView
         case .reminder:
           reminderView
+        case .dueDate:
+          dueDateView
         case .overview:
           overviewView
         case .tasks:
@@ -376,9 +379,13 @@ public struct DayActivityFormView: View {
   @ViewBuilder
   private var reminderView: some View {
     WithPerceptionTracking {
-      if !store.form.completed {
-        ReminderFormView(
-          title: String(localized: "Reminder", bundle: .module),
+      if store.canShowDateForms {
+        DateFormView(
+          configuration: DateFormView.Configuration(
+            title: String(localized: "Reminder", bundle: .module),
+            label: String(localized: "Set time", bundle: .module),
+            components: [.hourAndMinute]
+          ),
           toggleBinding: Binding(
             get: {
               store.form.reminderDate != nil
@@ -388,6 +395,33 @@ public struct DayActivityFormView: View {
             }
           ),
           dateBinding: $store.form.reminderDate
+        )
+      }
+    }
+  }
+
+  // MARK: - DueDate View
+
+  @ViewBuilder
+  private var dueDateView: some View {
+    WithPerceptionTracking {
+      if store.canShowDateForms {
+        DateFormView(
+          configuration: DateFormView.Configuration(
+            title: String(localized: "Due date", bundle: .module),
+            label: String(localized: "Set date", bundle: .module),
+            components: [.date],
+            range: store.today...
+          ),
+          toggleBinding: Binding(
+            get: {
+              store.form.dueDate != nil
+            },
+            set: { value in
+              store.send(.view(.dueTimeToggeled(value)))
+            }
+          ),
+          dateBinding: $store.form.dueDate
         )
       }
     }
