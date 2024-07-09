@@ -126,28 +126,52 @@ extension UserNotificationCenterProvider {
       ActivitiesFetchConfiguration(range: today...tomorrow, done: false)
     )
     for dayActivity in dayActivities {
-      if let reminderDate = dayActivity.reminderDate, reminderDate > date.now {
-        try await schedule(
-          userNotification: DayActivityNotification(
-            type: .activity(dayActivity),
-            calendar: calendar
-          )
-        )
+      var isDueTimeSet = false
+      if let dueDate = dayActivity.dueDate {
+        let tomorrow = try tomorrow
+        let dayAfterTomorrow = try nextDay(tomorrow)
+        isDueTimeSet = dueDate >= tomorrow && dueDate < dayAfterTomorrow
       }
-      for dayActivityTask in dayActivity.dayActivityTasks {
-        guard let reminderDate = dayActivityTask.reminderDate, reminderDate > date.now else { continue }
-        try await userNotificationCenterProvider.schedule(
-          userNotification: DayActivityNotification(
-            type: .activityTask(dayActivityTask),
-            calendar: calendar
+
+      if let reminderDate = dayActivity.reminderDate {
+        let shiftDays = [
+          reminderDate > date.now ? 0 : nil,
+          isDueTimeSet ? 1 : nil
+        ].compactMap { $0 }
+
+        for shiftDay in shiftDays {
+          try await schedule(
+            userNotification: DayActivityNotification(
+              type: .activity(dayActivity),
+              calendar: calendar,
+              shiftDay: shiftDay
+            )
           )
-        )
+        }
+      }
+
+      for dayActivityTask in dayActivity.dayActivityTasks {
+        guard let reminderDate = dayActivityTask.reminderDate else { continue }
+        let shiftDays = [
+          reminderDate > date.now ? 0 : nil,
+          isDueTimeSet ? 1 : nil
+        ].compactMap { $0 }
+
+        for shiftDay in shiftDays {
+          try await userNotificationCenterProvider.schedule(
+            userNotification: DayActivityNotification(
+              type: .activityTask(dayActivityTask),
+              calendar: calendar,
+              shiftDay: shiftDay
+            )
+          )
+        }
       }
     }
   }
 }
 
-#if DEBUG
+//#if DEBUG
 extension UserNotificationCenterProvider {
   public var pendingRequests: [String] {
     get async {
@@ -162,8 +186,18 @@ extension UserNotificationCenterProvider {
         }
     }
   }
+
+  public func sendDeveloperMessage(_ message: String) async throws {
+    guard UserDefaults.standard.bool(forKey: "backgroundUpdatedNotificationEnabled") else { return }
+    let content = UNMutableNotificationContent()
+    content.title = "Developer message"
+    content.subtitle = message
+    content.sound = UNNotificationSound.default
+    let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+    try await userNotificationCenter.add(request)
+  }
 }
-#endif
+//#endif
 
 extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {

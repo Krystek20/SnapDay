@@ -92,7 +92,6 @@ final class DayUpdater {
 
   func applyChanges(_ transactions: Transactions) async throws -> AppliedChanges {
     var dates = Set<Date>()
-    var notifications: [AppliedChanges.ChangedNotificationType] = []
     for inserted in transactions.insertedObjectIDs where inserted.key == Day.entityName {
       for insertedDay in inserted.value {
         guard let object: Day = try dayRepository.object(objectID: insertedDay) else { continue }
@@ -124,14 +123,6 @@ final class DayUpdater {
         guard let dayActivity: DayActivity = try dayRepository.object(objectID: updatedDayActivity),
               let day: Day = try await dayRepository.object(identifier: dayActivity.dayId) else { continue }
         dates.insert(day.date)
-        notifications.append(
-          .dayActivity(
-            DayActivityNotification(
-              type: .activity(dayActivity),
-              calendar: calendar
-            )
-          )
-        )
       }
     }
 
@@ -141,18 +132,10 @@ final class DayUpdater {
               let dayActivity: DayActivity = try await dayRepository.object(identifier: dayActivityTask.dayActivityId),
               let day: Day = try await dayRepository.object(identifier: dayActivity.dayId) else { continue }
         dates.insert(day.date)
-        notifications.append(
-          .dayActivity(
-            DayActivityNotification(
-              type: .activityTask(dayActivityTask),
-              calendar: calendar
-            )
-          )
-        )
       }
     }
 
-    return AppliedChanges(dates: Array(dates), notifications: notifications)
+    return AppliedChanges(dates: Array(dates))
   }
 
   private func deduplicatedDays(_ days: [Day]) -> (

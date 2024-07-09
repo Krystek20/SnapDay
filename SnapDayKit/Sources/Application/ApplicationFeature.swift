@@ -73,15 +73,18 @@ public struct ApplicationFeature: TodayProvidable {
             }
           },
           .run { _ in
-            try backgroundUpdater.scheduleCreatingDayBackgroundTask()
+            DeveloperToolsLogger.shared.append(.refresh(.setup))
+            try await backgroundUpdater.scheduleCreatingDayBackgroundTask()
           }
         )
       case .createDayBackgroundTaskCalled:
         DeveloperToolsLogger.shared.append(.refresh(.runInBackground))
         return .run { _ in
-          try backgroundUpdater.scheduleCreatingDayBackgroundTask()
+          try await backgroundUpdater.scheduleCreatingDayBackgroundTask()
+          DeveloperToolsLogger.shared.append(.refresh(.setupInBackground))
           _ = try await dayProvider.day(tomorrow)
           try await userNotificationCenterProvider.reloadReminders()
+          try await userNotificationCenterProvider.sendDeveloperMessage("Next day set and reminders scheduled")
         }
       case .deviceShaked:
         state.developerTools = DeveloperToolsFeature.State()

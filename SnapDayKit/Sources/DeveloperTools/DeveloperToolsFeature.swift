@@ -4,6 +4,7 @@ import Repositories
 import Utilities
 import Models
 import Common
+import BackgroundTasks
 
 @Reducer
 public struct DeveloperToolsFeature: TodayProvidable {
@@ -20,7 +21,17 @@ public struct DeveloperToolsFeature: TodayProvidable {
 
   @ObservableState
   public struct State: Equatable {
+    private let key = "backgroundUpdatedNotificationEnabled"
     var pendingIdentifiers: [String] = []
+    var pendingBackgroundTask: [String] = []
+    var backgroundUpdatedNotificationEnabled: Bool {
+      get {
+        UserDefaults.standard.bool(forKey: key)
+      }
+      set {
+        UserDefaults.standard.setValue(newValue, forKey: key)
+      }
+    }
     public init() { }
   }
 
@@ -33,7 +44,9 @@ public struct DeveloperToolsFeature: TodayProvidable {
     }
     public enum InternalAction: Equatable {
       case loadPendingRequests
+      case loadBackgroundPendingRequests
       case setPendingIdentifiers([String])
+      case setBackgroundPendingIdentifiers([String])
       case schedule(notification: DeveloperNotificiation)
     }
     public enum DelegateAction: Equatable { }
@@ -72,7 +85,10 @@ public struct DeveloperToolsFeature: TodayProvidable {
   private func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
     switch action {
     case .appeared:
-        .send(.internal(.loadPendingRequests))
+      .merge(
+        .send(.internal(.loadPendingRequests)),
+        .send(.internal(.loadBackgroundPendingRequests))
+      )
     case .sendDayActivityReminderNotificationButtonTapped:
       .run { send in
         let day = try await dayRepository.loadDay(today)
@@ -129,14 +145,32 @@ public struct DeveloperToolsFeature: TodayProvidable {
       }
     case .loadPendingRequests:
       return .run { send in
-        #if DEBUG
+//        #if DEBUG
         let identifiers = await userNotificationCenterProvider.pendingRequests
         await send(.internal(.setPendingIdentifiers(identifiers)))
-        #endif
+//        #endif
+      }
+    case .loadBackgroundPendingRequests:
+      return .run { send in
+        let pendingTasks = await BGTaskScheduler.shared.pendingTaskRequests().map(\.taskIdentifier)
+        await send(.internal(.setBackgroundPendingIdentifiers(pendingTasks)))
       }
     case .setPendingIdentifiers(let identifiers):
       state.pendingIdentifiers = identifiers
       return .none
+    case .setBackgroundPendingIdentifiers(let identifiers):
+      state.pendingBackgroundTask = identifiers
+      return .none
     }
+  }
+}
+
+fileprivate extension BGTaskRequest {
+  var taskIdentifier: String {
+    var date = ""
+    if let earliestBeginDate {
+      date = "\(earliestBeginDate)"
+    }
+    return identifier + " - " + date
   }
 }

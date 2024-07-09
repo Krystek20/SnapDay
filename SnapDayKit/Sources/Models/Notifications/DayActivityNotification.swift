@@ -22,6 +22,7 @@ public struct DayActivityNotification: UserNotification {
 
   private let type: ActivityNotificationType
   private let calendar: Calendar
+  private let shiftDay: Int
 
   public var identifier: String {
     let identifier = switch type {
@@ -30,7 +31,7 @@ public struct DayActivityNotification: UserNotification {
     case .activityTask(let dayActivityTask):
       dayActivityTask.id.uuidString
     }
-    return notificationIdentifierPrefix + identifier
+    return notificationIdentifierPrefix + identifier + "_\(shiftDay)"
   }
 
   public var canBySchedule: Bool {
@@ -54,7 +55,8 @@ public struct DayActivityNotification: UserNotification {
 
   public var trigger: UNCalendarNotificationTrigger? {
     guard let reminderDate else { return nil }
-    let dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate)
+    let date = calendar.date(byAdding: .day, value: shiftDay, to: reminderDate) ?? reminderDate
+    let dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
     return UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
   }
 
@@ -95,9 +97,11 @@ public struct DayActivityNotification: UserNotification {
 
   public init(
     type: ActivityNotificationType,
-    calendar: Calendar
+    calendar: Calendar,
+    shiftDay: Int = .zero
   ) {
     self.type = type
     self.calendar = calendar
+    self.shiftDay = shiftDay
   }
 }

@@ -250,7 +250,7 @@ public struct DayActivityFormFeature {
       return .none
     case .dueTimeToggeled(let value):
       state.form.dueDate = value
-      ? calendar.setHourAndMinute(date.now, toDate: state.editDate)
+      ? calendar.dayFormat(state.editDate)
       : nil
       return .none
     }

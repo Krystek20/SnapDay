@@ -5,6 +5,7 @@ public final class DeveloperToolsLogger {
   public enum DeveloperToolsEvent {
     public enum RefreshEvent: String {
       case setup
+      case setupInBackground
       case runInBackground
     }
     case refresh(RefreshEvent)
@@ -36,12 +37,16 @@ public final class DeveloperToolsLogger {
 
   public func append(_ event: DeveloperToolsEvent) {
     var allEvents = events
-    if allEvents.count > 20 {
-      allEvents.removeLast()
-    }
     let formatter = ISO8601DateFormatter()
     let date = formatter.string(from: Date())
-    allEvents.insert(date + " - " + event.stringValue, at: .zero)
-    userDefaults.setValue(allEvents, forKey: key)
+    let separation = " - "
+    if let lastElement = allEvents.last?.components(separatedBy: separation).last, lastElement == event.stringValue {
+      let counter = allEvents.last?.components(separatedBy: separation).first ?? "1"
+      let intCounter = Int(counter) ?? 1
+      allEvents[allEvents.count - 1] = String(intCounter + 1) + separation + date + separation + event.stringValue
+    } else {
+      allEvents.insert("1" + separation + date + separation + event.stringValue, at: .zero)
+    }
+    userDefaults.setValue(Array(allEvents.suffix(5)), forKey: key)
   }
 }

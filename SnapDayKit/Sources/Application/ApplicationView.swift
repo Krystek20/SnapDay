@@ -84,9 +84,9 @@ public struct ApplicationView: View {
         .presentationDetents([.medium, .large])
       }
       .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification)) { _ in
-        #if DEBUG
+//        #if DEBUG
         store.send(.deviceShaked)
-        #endif
+//        #endif
       }
     }
   }

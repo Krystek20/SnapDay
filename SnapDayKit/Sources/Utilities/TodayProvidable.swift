@@ -12,10 +12,14 @@ public extension TodayProvidable {
 
   var tomorrow: Date {
     get throws {
-      @Dependency(\.calendar) var calendar
       @Dependency(\.date.now) var now
-      let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)
-      return try calendar.dayFormat(tomorrow.unwrapped)
+      return try nextDay(now)
     }
+  }
+
+  func nextDay(_ date: Date) throws -> Date {
+    @Dependency(\.calendar) var calendar
+    let nextDay = calendar.date(byAdding: .day, value: 1, to: date)
+    return try calendar.dayFormat(nextDay.unwrapped)
   }
 }

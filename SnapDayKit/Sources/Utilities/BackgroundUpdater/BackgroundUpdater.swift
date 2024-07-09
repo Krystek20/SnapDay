@@ -8,30 +8,11 @@ public enum BackgroundUpdaterIdentifier: String {
 
 public final class BackgroundUpdater {
 
-  public enum BackgroundUpdaterError: Error {
-    case tomorrowCanNotBeCreated
-  }
-
   // MARK: - Properties
 
   private let taskScheduler: BGTaskScheduler
   @Dependency(\.date) private var date
   @Dependency(\.calendar) private var calendar
-
-  private var tomorrow: Date {
-    get throws {
-      guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: date.now) else {
-        throw BackgroundUpdaterError.tomorrowCanNotBeCreated
-      }
-      var tomorrowComponents = calendar.dateComponents([.year, .month, .day], from: tomorrow)
-      tomorrowComponents.hour = 18
-      tomorrowComponents.minute = .zero
-      guard let tomorrowWithHours = calendar.date(from: tomorrowComponents) else {
-        throw BackgroundUpdaterError.tomorrowCanNotBeCreated
-      }
-      return tomorrowWithHours
-    }
-  }
 
   // MARK: - Initialization
 
@@ -41,11 +22,11 @@ public final class BackgroundUpdater {
 
   // MARK: - Public
 
-  public func scheduleCreatingDayBackgroundTask() throws {
-    taskScheduler.cancelAllTaskRequests()
-    DeveloperToolsLogger.shared.append(.refresh(.setup))
+  public func scheduleCreatingDayBackgroundTask() async throws {
+    let pendingTasks = await taskScheduler.pendingTaskRequests()
+    guard !pendingTasks.contains(where: { $0.identifier == BackgroundUpdaterIdentifier.createDay.rawValue }) else { return }
     let request = BGAppRefreshTaskRequest(identifier: BackgroundUpdaterIdentifier.createDay.rawValue)
-    request.earliestBeginDate = try tomorrow
+    request.earliestBeginDate = calendar.date(byAdding: .hour, value: 1, to: date.now)
     try taskScheduler.submit(request)
   }
 }
