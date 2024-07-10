@@ -125,15 +125,15 @@ extension UserNotificationCenterProvider {
     let dayActivities = try await dayActivityRepository.activities(
       ActivitiesFetchConfiguration(range: today...tomorrow, done: false)
     )
-    for dayActivity in dayActivities {
-      var isDueTimeSet = false
-      if let dueDate = dayActivity.dueDate {
-        let tomorrow = try tomorrow
-        let dayAfterTomorrow = try nextDay(tomorrow)
-        isDueTimeSet = dueDate >= tomorrow && dueDate < dayAfterTomorrow
-      }
 
+    for dayActivity in dayActivities {
       if let reminderDate = dayActivity.reminderDate {
+
+        var isDueTimeSet = false
+        if let dueDate = dayActivity.dueDate, calendar.dayFormat(reminderDate) == today {
+          isDueTimeSet = dueDate > today
+        }
+
         let shiftDays = [
           reminderDate > date.now ? 0 : nil,
           isDueTimeSet ? 1 : nil
@@ -152,6 +152,12 @@ extension UserNotificationCenterProvider {
 
       for dayActivityTask in dayActivity.dayActivityTasks {
         guard let reminderDate = dayActivityTask.reminderDate else { continue }
+
+        var isDueTimeSet = false
+        if let dueDate = dayActivity.dueDate, calendar.dayFormat(reminderDate) == today {
+          isDueTimeSet = dueDate > today
+        }
+
         let shiftDays = [
           reminderDate > date.now ? 0 : nil,
           isDueTimeSet ? 1 : nil
