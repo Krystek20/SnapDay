@@ -9,6 +9,8 @@ public struct DaysSelectorView: View {
 
   @Binding private var selectedDay: Day?
   @Binding private var newActivity: DayNewActivity
+  @Binding private var newActivityTask: DayNewActivityTask
+  private var focus: FocusState<DayNewField?>.Binding
   private let dayActivities: [DayActivity]
   private let daySummary: DaySummary?
   private let dayViewShowButtonState: DayViewShowButtonState
@@ -16,13 +18,15 @@ public struct DaysSelectorView: View {
   private let dayActivityAction: (DayActivityActionType) -> Void
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
-  private let cancelNewActivity: () -> Void
+  private let newActivityAction: (DayNewActivityAction) -> Void
 
   // MARK: - Initialization
 
   public init(
     selectedDay: Binding<Day?>,
     newActivity: Binding<DayNewActivity>,
+    newActivityTask: Binding<DayNewActivityTask>,
+    focus: FocusState<DayNewField?>.Binding,
     dayActivities: [DayActivity],
     daySummary: DaySummary?,
     dayViewShowButtonState: DayViewShowButtonState,
@@ -30,10 +34,12 @@ public struct DaysSelectorView: View {
     dayActivityAction: @escaping (DayActivityActionType) -> Void,
     showCompletedTapped: @escaping () -> Void,
     hideCompletedTapped: @escaping () -> Void,
-    cancelNewActivity: @escaping () -> Void
+    newActivityAction: @escaping (DayNewActivityAction) -> Void
   ) {
     self._selectedDay = selectedDay
     self._newActivity = newActivity
+    self._newActivityTask = newActivityTask
+    self.focus = focus
     self.dayActivities = dayActivities
     self.daySummary = daySummary
     self.dayViewShowButtonState = dayViewShowButtonState
@@ -41,7 +47,7 @@ public struct DaysSelectorView: View {
     self.dayActivityAction = dayActivityAction
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
-    self.cancelNewActivity = cancelNewActivity
+    self.newActivityAction = newActivityAction
   }
 
   // MARK: - Views
@@ -73,13 +79,15 @@ public struct DaysSelectorView: View {
     DayView(
       isPastDay: day.isOlderThenToday ?? false, 
       newActivity: $newActivity,
+      newActivityTask: $newActivityTask,
+      focus: focus,
       activities: dayActivities,
       completedActivities: day.completedActivities,
       dayViewShowButtonState: dayViewShowButtonState,
       dayActivityAction: dayActivityAction,
       showCompletedTapped: showCompletedTapped,
       hideCompletedTapped: hideCompletedTapped,
-      cancelNewActivity: cancelNewActivity
+      newActivityAction: newActivityAction
     )
   }
 

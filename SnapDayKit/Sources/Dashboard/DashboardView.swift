@@ -13,7 +13,7 @@ public struct DashboardView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<DashboardFeature>
-  @FocusState private var focus: DashboardFeature.State.Field?
+  @FocusState private var focus: DayNewField?
 
   // MARK: - Initialization
 
@@ -135,6 +135,8 @@ public struct DashboardView: View {
       DaysSelectorView(
         selectedDay: $store.selectedDay,
         newActivity: $store.newActivity,
+        newActivityTask: $store.newActivityTask,
+        focus: $focus,
         dayActivities: store.activities,
         daySummary: store.daySummary,
         dayViewShowButtonState: store.dayViewShowButtonState,
@@ -148,14 +150,10 @@ public struct DashboardView: View {
         hideCompletedTapped: {
           store.send(.view(.hideCompletedActivitiesTapped))
         },
-        cancelNewActivity: {
-          store.send(.view(.cancelNewButtonTapped))
+        newActivityAction: { action in
+          store.send(.view(.newActivityActionPerformed(action)))
         }
       )
-      .focused($focus, equals: .name)
-      .onSubmit {
-        store.send(.view(.doneNewButtonTapped))
-      }
       .formBackgroundModifier(padding: EdgeInsets(.zero))
     }
   }

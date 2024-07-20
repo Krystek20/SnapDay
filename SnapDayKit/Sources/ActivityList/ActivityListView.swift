@@ -10,6 +10,7 @@ public struct ActivityListView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<ActivityListFeature>
+  @FocusState private var focus: DayNewField?
   private let columns: [GridItem] = [
     GridItem(.flexible(), spacing: 15.0, alignment: nil),
     GridItem(.flexible(), spacing: 15.0, alignment: nil),
@@ -37,6 +38,7 @@ public struct ActivityListView: View {
         .onAppear {
           store.send(.view(.appeared))
         }
+        .bind($store.focus, to: $focus)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
               Button(
@@ -64,8 +66,8 @@ public struct ActivityListView: View {
       VStack(spacing: 15.0) {
         ScrollView {
           activityList
-          .padding(.bottom, 15.0)
-          .padding(.horizontal, 15.0)
+            .padding(.bottom, 15.0)
+            .padding(.horizontal, 15.0)
         }
         .scrollIndicators(.hidden)
 
@@ -79,6 +81,7 @@ public struct ActivityListView: View {
   private var activityList: some View {
     WithPerceptionTracking {
       VStack(spacing: .zero) {
+        newActivityFormIfNeeded
         ForEach(store.displayedActivities) { activity in
           HStack(spacing: .zero) {
             if store.selectedActivities.contains(activity) {
@@ -94,6 +97,42 @@ public struct ActivityListView: View {
       .formBackgroundModifier(padding: EdgeInsets(.zero))
     }
   }
+
+  @ViewBuilder
+  private var newActivityFormIfNeeded: some View {
+    if store.newActivity.isFormVisible {
+      VStack(spacing: .zero) {
+        HStack(spacing: 5.0) {
+          ActivityImageView(
+            data: nil,
+            size: 30.0,
+            cornerRadius: 15.0
+          )
+          TextField("", text: $store.newActivity.name)
+            .font(.system(size: 14.0, weight: .medium))
+            .foregroundStyle(Color.sectionText)
+            .submitLabel(.done)
+            .focused($focus, equals: .activityName)
+          Spacer()
+          if !store.newActivity.name.isEmpty {
+            Button(String(localized: "Cancel", bundle: .module), action: {
+              store.send(.view(.newActivityActionPerformed(.dayActivity(.cancelled))))
+            })
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          }
+        }
+        .padding(.all, 10.0)
+        if !store.displayedActivities.isEmpty {
+          Divider()
+        }
+      }
+      .onSubmit {
+        store.send(.view(.newActivityActionPerformed(.dayActivity(.submitted))))
+      }
+    }
+  }
+
 
   private func activityRow(for activity: Activity) -> some View {
     WithPerceptionTracking {

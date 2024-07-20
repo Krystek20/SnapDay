@@ -45,7 +45,7 @@ public final class DeveloperToolsLogger {
       let intCounter = Int(counter) ?? 1
       allEvents[allEvents.count - 1] = String(intCounter + 1) + separation + date + separation + event.stringValue
     } else {
-      allEvents.insert("1" + separation + date + separation + event.stringValue, at: .zero)
+      allEvents.append("1" + separation + date + separation + event.stringValue)
     }
     userDefaults.setValue(Array(allEvents.suffix(5)), forKey: key)
   }

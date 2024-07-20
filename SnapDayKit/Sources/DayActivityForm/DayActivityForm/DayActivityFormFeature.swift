@@ -24,13 +24,13 @@ public struct DayActivityFormFeature {
   public struct State: Equatable, TodayProvidable {
 
     public enum DayActivityFormType {
-      case new
       case edit
     }
 
     public enum Field: Hashable {
       case name
       case tag
+      case newTask
     }
 
     var form: DayActivityForm
@@ -44,24 +44,27 @@ public struct DayActivityFormFeature {
 
     var title: String {
       switch type {
-      case .new:
-        form.newTitle
       case .edit:
         form.editTitle
       }
     }
 
-    let type: DayActivityFormType
-    var newTag = String.empty
-    var newLabel = String.empty
-    
-    var isPhotoPickerPresented: Bool = false
-    var photoItem: PhotoItem?
-    var editDate: Date
-
     var canShowDateForms: Bool {
       editDate >= today && !form.completed
     }
+
+    var weekdays: [Weekday] {
+      @Dependency(\.calendar) var calendar
+      return WeekdaysProvider(calendar: calendar).weekdays
+    }
+
+    let type: DayActivityFormType
+    var newTag = String.empty
+    var newLabel = String.empty
+
+    var isPhotoPickerPresented: Bool = false
+    var photoItem: PhotoItem?
+    var editDate: Date
 
     var showFrequencyOptions: Bool { form.isRepeatable }
     var showWeekdaysView: Bool { form.areWeekdaysRequried }
@@ -70,10 +73,7 @@ public struct DayActivityFormFeature {
     var showMonthWeekdays: Bool { form.areMonthWeekdaysRequried }
     var isSaveButtonDisabled: Bool { !form.validated }
 
-    var weekdays: [Weekday] {
-      @Dependency(\.calendar) var calendar
-      return WeekdaysProvider(calendar: calendar).weekdays
-    }
+    var newActivityTask = DayNewActivityTask.empty
 
     @Presents var emojiPicker: EmojiPickerFeature.State?
     @Presents var addMarker: MarkerFormFeature.State?
@@ -113,6 +113,7 @@ public struct DayActivityFormFeature {
         case selectButtonTapped(DayActivityForm)
         case editButtonTapped(DayActivityForm)
         case removeButtonTapped(DayActivityForm)
+        case newActivityActionPerformed(DayNewActivityAction)
       }
 
       case appeared
@@ -136,7 +137,6 @@ public struct DayActivityFormFeature {
       case setImageDate(_ date: Data?)
     }
     public enum DelegateAction: Equatable {
-      case activityCreated(DayActivityForm)
       case activityDeleted(DayActivityForm)
       case activityUpdated(DayActivityForm)
     }
@@ -211,8 +211,6 @@ public struct DayActivityFormFeature {
     case .saveButtonTapped:
       return .run { [form = state.form, type = state.type] send in
         switch type {
-        case .new:
-          await send(.delegate(.activityCreated(form)))
         case .edit:
           await send(.delegate(.activityUpdated(form)))
         }
@@ -303,12 +301,9 @@ public struct DayActivityFormFeature {
   private func handleViewTaskAction(_ action: Action.ViewAction.TaskAction, state: inout State) -> Effect<Action> {
     switch action {
     case .addButtonTapped:
-      guard let newTaskForm = state.form.newTaskForm(newId: uuid()) else { return .none }
-      state.dayActivityTaskForm = DayActivityFormFeature.State(
-        form: newTaskForm,
-        type: .new,
-        editDate: state.editDate
-      )
+      state.newActivityTask.activityId = state.form.id
+      state.newActivityTask.isFormVisible = true
+      state.focus = .newTask
       return .none
     case .selectButtonTapped(let dayActivityTaskForm):
       state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }).map { index in
@@ -325,6 +320,23 @@ public struct DayActivityFormFeature {
     case .removeButtonTapped(let dayActivityTaskForm):
       guard let index = state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }) else { return .none }
       state.form.tasks.remove(at: index)
+      return .none
+    case .newActivityActionPerformed(.dayActivityTask(let action)):
+      switch action {
+      case .cancelled:
+        state.newActivityTask = .empty
+        state.focus = nil
+        return .none
+      case .submitted:
+        let name = state.newActivityTask.name
+        state.newActivityTask = .empty
+        state.focus = nil
+        guard !name.isEmpty, var taskForm = state.form.newTaskForm(newId: uuid()) else { return .none }
+        taskForm.name = name
+        state.form.tasks.append(taskForm)
+        return .none
+      }
+    case .newActivityActionPerformed(.dayActivity):
       return .none
     }
   }
@@ -392,9 +404,6 @@ public struct DayActivityFormFeature {
       state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }).map { index in
         state.form.tasks[index] = dayActivityTaskForm
       }
-      return .none
-    case .presented(.delegate(.activityCreated(let dayActivityTaskForm))):
-      state.form.tasks.append(dayActivityTaskForm)
       return .none
     default:
       return .none

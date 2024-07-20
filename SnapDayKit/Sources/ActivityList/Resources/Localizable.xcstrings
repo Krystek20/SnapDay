@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "Add (%lld)" : {
       "localizations" : {
         "pl" : {
@@ -10,6 +13,9 @@
           }
         }
       }
+    },
+    "Cancel" : {
+
     },
     "Saved Activities" : {
       "localizations" : {

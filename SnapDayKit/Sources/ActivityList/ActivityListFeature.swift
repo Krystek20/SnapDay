@@ -34,6 +34,9 @@ public struct ActivityListFeature: TodayProvidable {
     @Presents var templateForm: DayActivityFormFeature.State?
     @Presents var dayActivityForm: DayActivityFormFeature.State?
 
+    var newActivity = DayNewActivity.empty
+    var focus: DayNewField?
+
     let day: Day
 
     public init(day: Day) {
@@ -48,6 +51,7 @@ public struct ActivityListFeature: TodayProvidable {
       case addButtonTapped
       case activityTapped(Activity)
       case activityEditTapped(Activity)
+      case newActivityActionPerformed(DayNewActivityAction)
     }
     public enum InternalAction: Equatable {
       case loadOnStart
@@ -86,16 +90,11 @@ public struct ActivityListFeature: TodayProvidable {
           await dismiss()
         }
       case .view(.newButtonTapped):
-        state.templateForm = DayActivityFormFeature.State(
-          form: DayActivityForm(
-            activity: Activity(
-              id: uuid()
-            )
-          ),
-          type: .new,
-          editDate: state.day.date
-        )
+        state.newActivity.isFormVisible = true
+        state.focus = .activityName
         return .none
+      case .view(.newActivityActionPerformed(let action)):
+        return handleNewActivityAction(action, state: &state)
       case .view(.activityTapped(let activity)):
         if let index = state.selectedActivities.firstIndex(where: { $0.id == activity.id }) {
           state.selectedActivities.remove(at: index)
@@ -126,6 +125,11 @@ public struct ActivityListFeature: TodayProvidable {
         return handleTemplateForm(action, state: &state)
       case .delegate:
         return .none
+      case .binding(\.focus):
+        if state.focus == nil {
+          state.newActivity = .empty
+        }
+        return .none
       case .binding:
         return .none
       }
@@ -139,13 +143,6 @@ public struct ActivityListFeature: TodayProvidable {
     switch action {
     case .dismiss:
       return .none
-    case .presented(.delegate(.activityCreated(let activityForm))):
-      return .run { [activityForm] send in
-        let activity = Activity(form: activityForm, startDate: today)
-        try await activityRepository.saveActivity(activity)
-        await send(.delegate(.activityAdded(activity)))
-        await send(.internal(.loadActivities))
-      }
     case .presented(.delegate(.activityUpdated(let activityForm))):
       guard var toUpdate = state.activities.first(where: { $0.id == activityForm.id }) else { return .none }
       let tasksToDelete = toUpdate.tasks.filter { task in
@@ -171,6 +168,36 @@ public struct ActivityListFeature: TodayProvidable {
       return .none
     }
   }
+
+  private func handleNewActivityAction(_ action: DayNewActivityAction, state: inout State) -> Effect<Action> {
+    switch action {
+    case .dayActivity(.cancelled):
+      state.newActivity = .empty
+      state.focus = nil
+      return .none
+    case .dayActivity(.submitted):
+      let name = state.newActivity.name
+      state.newActivity = .empty
+      state.focus = nil
+
+      guard !name.isEmpty else { return .none }
+
+      let activity = Activity(
+        id: uuid(),
+        name: name,
+        startDate: today
+      )
+
+      return .run { [activity] send in
+        try await activityRepository.saveActivity(activity)
+        await send(.delegate(.activityAdded(activity)))
+        await send(.internal(.loadActivities))
+      }
+    case .dayActivityTask:
+      return .none
+    }
+  }
+
 
   // MARK: - Initialization
 

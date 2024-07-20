@@ -34,21 +34,25 @@ public struct DayActivityRow: View, DurationFormatting {
       VStack(alignment: .leading, spacing: 2.0) {
         Text(activity.name)
           .font(.system(size: 14.0, weight: .medium))
+          .lineLimit(1)
           .foregroundStyle(Color.sectionText)
           .strikethrough(isStrikethrough, color: .sectionText)
         subtitleView
       }
-      Spacer()
-      HStack(spacing: 10.0) {
+      Spacer(minLength: 5.0)
+      HStack(spacing: .zero) {
         dueDateIconIfNeeded
         reminderIconIfNeeded
         view(for: trailingIcon)
+          .contentShape(Rectangle())
           .onTapGesture {
             trailingViewTapped?()
           }
       }
     }
-    .padding(.all, 10.0)
+    .padding(
+      EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 5.0)
+    )
   }
 
   @ViewBuilder
@@ -111,5 +115,6 @@ public struct DayActivityRow: View, DurationFormatting {
       .frame(width: 15.0, height: 15.0)
       .foregroundStyle(Color.sectionText)
       .imageScale(.medium)
+      .padding(.all, 5.0)
   }
 }

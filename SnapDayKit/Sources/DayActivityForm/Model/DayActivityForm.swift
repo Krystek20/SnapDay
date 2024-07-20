@@ -91,19 +91,6 @@ extension DayActivityForm {
     }
   }
 
-  var newTitle: String {
-    switch type {
-    case .activity:
-      String(localized: "New Activity", bundle: .module)
-    case .activityTask:
-      String(localized: "New Activity Task", bundle: .module)
-    case .template:
-      String(localized: "New Template", bundle: .module)
-    case .templateTask:
-      String(localized: "New Template Task", bundle: .module)
-    }
-  }
-
   var editTitle: String {
     switch type {
     case .activity:

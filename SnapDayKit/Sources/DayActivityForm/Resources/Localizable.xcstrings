@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "-" : {
 
     },
@@ -24,6 +27,9 @@
 
     },
     "Add task" : {
+
+    },
+    "Cancel" : {
 
     },
     "Change icon" : {
@@ -78,18 +84,6 @@
 
     },
     "Name" : {
-
-    },
-    "New Activity" : {
-
-    },
-    "New Activity Task" : {
-
-    },
-    "New Template" : {
-
-    },
-    "New Template Task" : {
 
     },
     "Overview" : {

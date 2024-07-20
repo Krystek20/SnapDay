@@ -476,7 +476,11 @@ public struct DayActivityFormView: View {
   @ViewBuilder
   private var taskContentView: some View {
     WithPerceptionTracking {
-      LazyVStack(spacing: 10.0) {
+      VStack(spacing: 10.0) {
+        if store.newActivityTask.isFormVisible {
+          newActivityTaskForm
+          Divider()
+        }
         ForEach(store.form.tasks) { task in
           DayActivityTaskRowView(
             dayActivityTask: task,
@@ -493,6 +497,35 @@ public struct DayActivityFormView: View {
           Divider()
         }
         addTaskButton
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var newActivityTaskForm: some View {
+    WithPerceptionTracking {
+      HStack(spacing: 5.0) {
+        ActivityImageView(
+          data: nil,
+          size: 30.0,
+          cornerRadius: 15.0
+        )
+        TextField("", text: $store.newActivityTask.name)
+          .font(.system(size: 14.0, weight: .medium))
+          .foregroundStyle(Color.sectionText)
+          .submitLabel(.done)
+          .focused($focus, equals: .newTask)
+        Spacer()
+        if !store.newActivityTask.name.isEmpty {
+          Button(String(localized: "Cancel", bundle: .module), action: {
+            store.send(.view(.task(.newActivityActionPerformed(.dayActivityTask(.cancelled)))))
+          })
+          .font(.system(size: 12.0, weight: .bold))
+          .foregroundStyle(Color.actionBlue)
+        }
+      }
+      .onSubmit {
+        store.send(.view(.task(.newActivityActionPerformed(.dayActivityTask(.submitted)))))
       }
     }
   }
