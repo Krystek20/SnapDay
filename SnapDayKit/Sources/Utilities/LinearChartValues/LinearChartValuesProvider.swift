@@ -17,7 +17,7 @@ public struct LinearChartValuesProvider {
     LinearChartValues(
       points: completedDaysValues(for: days, until: date),
       expectedPoints: days.count,
-      currentPoint: days.lastIndex(where: { $0.activities.contains(where: { $0.isDone }) }) ?? .zero
+      currentPoint: days.firstIndex(where: { $0.date == date })
     )
   }
 

@@ -40,6 +40,12 @@
         }
       }
     },
+    "%lld day" : {
+
+    },
+    "%lld days" : {
+
+    },
     "%lld hours" : {
       "localizations" : {
         "pl" : {

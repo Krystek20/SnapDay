@@ -80,6 +80,7 @@ public struct DayActivityFormView: View {
         prepareView(for: .frequency)
         prepareView(for: .duration)
         prepareView(for: .dueDate)
+        prepareView(for: .dueDaysCount)
         prepareView(for: .reminder)
         prepareView(for: .overview)
         prepareView(for: .labels)
@@ -112,6 +113,8 @@ public struct DayActivityFormView: View {
           reminderView
         case .dueDate:
           dueDateView
+        case .dueDaysCount:
+          dueDaysCountView
         case .overview:
           overviewView
         case .tasks:
@@ -424,6 +427,30 @@ public struct DayActivityFormView: View {
           dateBinding: $store.form.dueDate
         )
       }
+    }
+  }
+
+  // MARK: - DueDaysCount View
+
+  @ViewBuilder
+  private var dueDaysCountView: some View {
+    WithPerceptionTracking {
+      HStack(spacing: 10.0) {
+        Text("Set day limit", bundle: .module)
+          .formTitleTextStyle
+        Spacer()
+        DueDayLimitPickerView(
+          selectedDaysCount: Binding(
+            get: {
+              store.form.dueDaysCount ?? .zero
+            },
+            set: {
+              $store.form.wrappedValue.dueDaysCount = $0
+            }
+          )
+        )
+      }
+      .formBackgroundModifier()
     }
   }
 

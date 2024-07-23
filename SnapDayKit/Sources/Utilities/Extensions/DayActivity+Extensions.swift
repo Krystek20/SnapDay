@@ -17,6 +17,9 @@ extension DayActivity {
       activity: activity,
       name: activity.name,
       icon: activity.icon,
+      dueDate: activity.dueDaysCount.flatMap { date in
+        calendar().date(byAdding: .day, value: date, to: dayDate)
+      },
       doneDate: nil,
       duration: activity.defaultDuration ?? .zero,
       overview: nil,
@@ -54,6 +57,7 @@ extension DayActivity {
       activity: dayActivity.activity,
       name: dayActivity.name,
       icon: dayActivity.icon,
+      dueDate: nil,
       doneDate: nil,
       duration: dayActivity.duration,
       isGeneratedAutomatically: false,

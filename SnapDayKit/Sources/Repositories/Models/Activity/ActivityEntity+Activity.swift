@@ -14,6 +14,7 @@ extension ActivityEntity {
     }
     isDefaultDuration = activity.defaultDuration != nil
     defaultDuration = Int32(activity.defaultDuration ?? .zero)
+    dueDaysCount = Int32(activity.dueDaysCount ?? .zero)
     startDate = activity.startDate
     tags = Set(
       try activity.tags.map { tag in

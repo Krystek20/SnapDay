@@ -12,7 +12,6 @@ public struct ActivityListFeature: TodayProvidable {
   // MARK: - Dependencies
 
   @Dependency(\.activityRepository) var activityRepository
-  @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dismiss) private var dismiss
   @Dependency(\.calendar) private var calendar
   @Dependency(\.uuid) private var uuid

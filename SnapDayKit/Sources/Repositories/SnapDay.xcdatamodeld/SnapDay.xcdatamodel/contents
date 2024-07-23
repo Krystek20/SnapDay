@@ -3,6 +3,7 @@
     <entity name="ActivityEntity" representedClassName="ActivityEntity" syncable="YES" codeGenerationType="class">
         <attribute name="defaultDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="defaultReminderDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dueDaysCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="frequencyJson" optional="YES" attributeType="Binary" customClassName="ActivityFrequency"/>
         <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isDefaultDuration" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>

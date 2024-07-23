@@ -25,6 +25,7 @@ public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, Freque
   public var frequency: ActivityFrequency?
   public var duration: Int
   public var dueDate: Date?
+  public var dueDaysCount: Int?
   public var reminderDate: Date?
   public var overview: String
   public var tasks: [DayActivityForm]
@@ -64,6 +65,7 @@ extension DayActivityForm {
         .tags,
         .frequency,
         .duration,
+        .dueDaysCount,
         .reminder,
         .overview,
         .tasks
@@ -163,6 +165,7 @@ extension DayActivityForm {
     self.duration = dayActivity.duration
     self.reminderDate = dayActivity.reminderDate
     self.dueDate = dayActivity.dueDate
+    self.dueDaysCount = nil
     self.overview = dayActivity.overview ?? ""
     self.tasks = dayActivity.dayActivityTasks.map { dayActivityTask in
       DayActivityForm(dayActivityTask: dayActivityTask, showCompleted: showCompleted)
@@ -279,6 +282,7 @@ extension DayActivityForm {
     self.tags = activity.tags
     self.duration = activity.duration
     self.reminderDate = activity.reminderDate
+    self.dueDaysCount = activity.dueDaysCount
     self.overview = activity.overview ?? ""
     self.tasks = activity.tasks.map(DayActivityForm.init)
     self.labels = activity.labels
@@ -296,6 +300,7 @@ extension Activity {
       tags: form.tags,
       frequency: form.frequency,
       defaultDuration: form.duration,
+      dueDaysCount: form.dueDaysCount,
       startDate: startDate,
       labels: form.labels,
       tasks: form.tasks.compactMap(ActivityTask.init),
@@ -310,6 +315,7 @@ extension Activity {
     self.tags = form.tags
     self.frequency = form.frequency
     self.defaultDuration = form.duration
+    self.dueDaysCount = form.dueDaysCount
     self.startDate = startDate
     self.labels = form.labels
     self.tasks = form.tasks.compactMap(ActivityTask.init)
@@ -368,6 +374,7 @@ extension DayActivityForm {
       case .tags: !tags.isEmpty
       case .frequency: isFrequencyValid
       case .dueDate: dueDate != nil
+      case .dueDaysCount: dueDaysCount != nil
       case .duration: duration > .zero
       case .reminder: reminderDate != nil
       case .overview: !overview.isEmpty

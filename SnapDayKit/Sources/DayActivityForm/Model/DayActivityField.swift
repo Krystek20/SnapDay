@@ -6,6 +6,7 @@ public enum DayActivityField {
   case name
   case tags
   case dueDate
+  case dueDaysCount
   case frequency
   case duration
   case reminder

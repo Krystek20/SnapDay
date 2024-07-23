@@ -21,6 +21,7 @@ extension Activity {
       tags: try tags.map(Tag.init),
       frequency: frequency,
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
+      dueDaysCount: Int(entity.dueDaysCount),
       startDate: entity.startDate,
       labels: try labels.map(ActivityLabel.init),
       tasks: try tasks.map(ActivityTask.init),
