@@ -47,15 +47,6 @@ extension Day {
   }
 }
 
-extension Day {
-  public var sortedDayActivities: [DayActivity] {
-    activities.sorted(by: {
-      if $0.isDone == $1.isDone { return $0.name < $1.name }
-      return !$0.isDone && $1.isDone
-    })
-  }
-}
-
 public extension [Day] {
   var plannedCount: Int {
     reduce(into: Int.zero) { result, day in

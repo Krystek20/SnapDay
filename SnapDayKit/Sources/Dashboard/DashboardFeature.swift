@@ -10,6 +10,7 @@ import CalendarPicker
 import Combine
 import enum UiComponents.DayViewShowButtonState
 import protocol UiComponents.InformationViewConfigurable
+import WidgetKit
 
 @Reducer
 public struct DashboardFeature: TodayProvidable {
@@ -23,6 +24,7 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.date) private var date
   @Dependency(\.calendar) private var calendar
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
+  @Dependency(\.deeplinkService) private var deeplinkService
   private let dayProvider = DayProvider()
 
   // MARK: - State & Action
@@ -33,7 +35,7 @@ public struct DashboardFeature: TodayProvidable {
     var title: String {
       let formatter = DateFormatter()
       formatter.dateFormat = "EEEE, d MMM yyyy"
-      return formatter.string(from: date ?? today)
+      return formatter.string(from: date)
     }
 
     var daySummary: DaySummary? {
@@ -44,9 +46,9 @@ public struct DashboardFeature: TodayProvidable {
     var activities: [DayActivity] {
       switch activityListOption {
       case .collapsed:
-        selectedDay?.sortedDayActivities.filter { !$0.isDone } ?? []
+        selectedDay?.activities.sorted.filter { !$0.isDone } ?? []
       case .extended:
-        selectedDay?.sortedDayActivities ?? []
+        selectedDay?.activities.sorted ?? []
       }
     }
 
@@ -65,10 +67,11 @@ public struct DashboardFeature: TodayProvidable {
       let emptyDayConfiguration: EmptyDayConfiguration = selectedDay?.isOlderThenToday == true 
       ? .pastDay
       : .todayOrFuture
-      return selectedDay?.activities.isEmpty == true ? emptyDayConfiguration : nil
+      let showEmptyView = selectedDay?.activities.isEmpty == true && !newActivity.isFormVisible
+      return showEmptyView ? emptyDayConfiguration : nil
     }
 
-    var date: Date?
+    var date: Date
     var selectedDay: Day?
     var streamSetup: Bool = false
     var newActivity = DayNewActivity.empty
@@ -83,7 +86,9 @@ public struct DashboardFeature: TodayProvidable {
     @Presents var dayActivityAlert: AlertState<Action.DayActivityAlert>?
     @Presents var dayActivityTaskAlert: AlertState<Action.DayActivityTaskAlert>?
 
-    public init() { }
+    public init(date: Date) {
+      self.date = date
+    }
   }
 
   public enum Action: BindableAction, Equatable {
@@ -107,10 +112,12 @@ public struct DashboardFeature: TodayProvidable {
       case setDate(_ date: Date)
       case setDay(_ day: Day)
       case calendarDayChanged
+      case handleDeepLink(DeeplinkService.DashboardAction?)
       case dayActivityAction(DayActivityAction)
       case dayActivityTaskAction(DayActivityTaskAction)
 
       public enum DayActivityAction: Equatable {
+        case showNewForm
         case showEditForm(DayActivity)
         case select(DayActivity)
         case create(DayActivity)
@@ -237,13 +244,16 @@ public struct DashboardFeature: TodayProvidable {
           for await _ in NotificationCenter.default.publisher(for: .NSCalendarDayChanged).values {
             await send(.internal(.calendarDayChanged))
           }
+        },
+        .run { send in
+          for await deeplink in deeplinkService.deeplinkPublisher.values {
+            guard let deeplink, case .dashboard(let action) = deeplink else { continue }
+            await send(.internal(.handleDeepLink(action)))
+          }
         }
       )
     case .newButtonTapped:
-      state.newActivityTask = .empty
-      state.newActivity.isFormVisible = true
-      state.focus = .activityName
-      return .none
+      return .send(.internal(.dayActivityAction(.showNewForm)))
     case .newActivityActionPerformed(let action):
       return handleDayNewActivityAction(action, state: &state)
     case .calendarButtonTapped:
@@ -261,15 +271,13 @@ public struct DashboardFeature: TodayProvidable {
       state.activityListOption = .collapsed
       return .none
     case .increaseButtonTapped:
-      let currentDate = state.date ?? today
-      state.date = calendar.date(byAdding: .day, value: 1, to: currentDate)
+      state.date = calendar.date(byAdding: .day, value: 1, to: state.date) ?? state.date
       return .send(.internal(.loadDay))
     case .decreaseButtonTapped:
-      let currentDate = state.date ?? today
-      state.date = calendar.date(byAdding: .day, value: -1, to: currentDate)
+      state.date = calendar.date(byAdding: .day, value: -1, to: state.date) ?? state.date
       return .send(.internal(.loadDay))
     case .todayButtonTapped:
-      state.date = nil
+      state.date = today
       state.selectedDay = nil
       return .send(.internal(.loadDay))
     }
@@ -295,8 +303,11 @@ public struct DashboardFeature: TodayProvidable {
     case .loadDay:
       return .run { [date = state.date] send in
         do {
-          let day = try await dayProvider.day(date ?? today)
+          let day = try await dayProvider.day(date)
           await send(.internal(.setDay(day)))
+          if date == today {
+            WidgetCenter.shared.reloadAllTimelines()
+          }
         } catch {
           print("error: \(error)")
         }
@@ -318,6 +329,19 @@ public struct DashboardFeature: TodayProvidable {
         actionIdentifier: CalendarActivityAction.changeDate.rawValue
       )
       return .none
+    case .handleDeepLink(let deeplink):
+      deeplinkService.consume()
+      guard let deeplink else { return .none }
+      state.activityList = nil
+      state.editDayActivity = nil
+      state.dayActivityTaskForm = nil
+      state.calendarPicker = nil
+      state.dayActivityAlert = nil
+      state.dayActivityTaskAlert = nil
+      switch deeplink {
+      case .addActivity:
+        return .send(.internal(.dayActivityAction(.showNewForm)))
+      }
     }
   }
 
@@ -354,6 +378,11 @@ public struct DashboardFeature: TodayProvidable {
 
   private func handleDayActivityAction(_ action: Action.InternalAction.DayActivityAction, state: inout State) -> Effect<Action> {
     switch action {
+    case .showNewForm:
+      state.newActivityTask = .empty
+      state.newActivity.isFormVisible = true
+      state.focus = .activityName
+      return .none
     case .showEditForm(let dayActivity):
       guard let selectedDay = state.selectedDay else { return .none }
       state.editDayActivity = DayActivityFormFeature.State(

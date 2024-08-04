@@ -136,7 +136,10 @@ public struct ActivityListView: View {
 
   private func activityRow(for activity: Activity) -> some View {
     WithPerceptionTracking {
-      DayActivityRow(activity: activity, trailingIcon: .more) {
+      DayActivityRow(
+        activityItem: DayActivityItem(activityType: activity),
+        trailingIcon: .more
+      ) {
         store.send(.view(.activityEditTapped(activity)))
       }
       .contentShape(Rectangle())

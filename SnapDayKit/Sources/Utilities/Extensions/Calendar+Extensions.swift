@@ -1,6 +1,14 @@
 import Foundation
+import Dependencies
 
 extension Calendar {
+    
+  public static var today: Date {
+    @Dependency(\.calendar) var calendar
+    @Dependency(\.date.now) var now
+    return calendar.dayFormat(now)
+  }
+
   public func dayFormat(_ fromDate: Date) -> Date {
     let components = dateComponents([.year, .month, .day], from: fromDate)
     return date(from: components) ?? fromDate

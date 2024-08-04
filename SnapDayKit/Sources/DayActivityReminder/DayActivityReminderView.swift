@@ -26,19 +26,19 @@ public struct DayActivityReminderView: View {
           switch type {
           case .activity(let dayActivity):
             DayActivityRow(
-              activity: dayActivity,
+              activityItem: DayActivityItem(activityType: dayActivity),
               trailingIcon: .none
             )
           case .activityTask(let dayActivity, let dayActivityTask):
             VStack(spacing: .zero) {
               DayActivityRow(
-                activity: dayActivity,
+                activityItem: DayActivityItem(activityType: dayActivity),
                 trailingIcon: .none
               )
               Divider()
                 .padding(.leading, 20.0)
               DayActivityRow(
-                activity: dayActivityTask,
+                activityItem: DayActivityItem(activityType: dayActivityTask),
                 trailingIcon: .none
               )
               .padding(.leading, 10.0)

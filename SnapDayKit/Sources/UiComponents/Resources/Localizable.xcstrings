@@ -5,6 +5,7 @@
 
     },
     "-" : {
+      "extractionState" : "stale",
       "localizations" : {
         "pl" : {
           "stringUnit" : {

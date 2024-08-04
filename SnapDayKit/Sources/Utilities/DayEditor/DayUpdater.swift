@@ -50,24 +50,7 @@ final class DayUpdater {
           days.append(newDay)
           daysToSave.append(newDay)
         case 1:
-          var day = groupedDay[0]
-          
-          let activitiesToGenerateExist = activitiesWithDates.first(where: { (_, dates: [Date]) in
-            dates.contains(day.date)
-          }) != nil
-          let activitiesNotGeneratedYet = day.activities.filter { $0.isGeneratedAutomatically }.isEmpty
-          let shouldGenerateActivities = activitiesNotGeneratedYet && activitiesToGenerateExist
-
-          if shouldGenerateActivities {
-            let dayActivities = createDayActivities(
-              dayId: day.id,
-              date: day.date,
-              activitiesWithDates: activitiesWithDates
-            )
-            day.activities.append(contentsOf: dayActivities)
-            daysToSave.append(day)
-          }
-          days.append(day)
+          days.append(groupedDay[0])
         default:
           let deduplicatedDays = deduplicatedDays(groupedDay)
           daysToSave.append(deduplicatedDays.winner)

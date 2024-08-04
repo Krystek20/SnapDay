@@ -4,63 +4,78 @@ import Models
 
 public struct DayView: View {
 
+  public struct NewForms {
+    var newActivityBinding: Binding<DayNewActivity>
+    var newActivityTaskBinding: Binding<DayNewActivityTask>
+    var focus: FocusState<DayNewField?>.Binding
+    let newActivityAction: (DayNewActivityAction) -> Void
+
+    var newActivity: DayNewActivity {
+      newActivityBinding.wrappedValue
+    }
+
+    var newActivityTask: DayNewActivityTask {
+      newActivityTaskBinding.wrappedValue
+    }
+
+    public init(
+      newActivity: Binding<DayNewActivity>,
+      newActivityTask: Binding<DayNewActivityTask>,
+      focus: FocusState<DayNewField?>.Binding,
+      newActivityAction: @escaping (DayNewActivityAction) -> Void
+    ) {
+      self.newActivityBinding = newActivity
+      self.newActivityTaskBinding = newActivityTask
+      self.focus = focus
+      self.newActivityAction = newActivityAction
+    }
+  }
+
   // MARK: - Properties
 
   private let isPastDay: Bool
-  @Binding private var newActivity: DayNewActivity
-  @Binding private var newActivityTask: DayNewActivityTask
-  private var focus: FocusState<DayNewField?>.Binding
   private let activities: [DayActivity]
+  private let newForms: NewForms?
   private let completedActivities: CompletedActivities
   private let dayViewShowButtonState: DayViewShowButtonState
   private let dayActivityAction: (DayActivityActionType) -> Void
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
-  private let newActivityAction: (DayNewActivityAction) -> Void
 
   // MARK: - Initialization
 
   public init(
     isPastDay: Bool,
-    newActivity: Binding<DayNewActivity>,
-    newActivityTask: Binding<DayNewActivityTask>,
-    focus: FocusState<DayNewField?>.Binding,
+    newForms: NewForms? = nil,
     activities: [DayActivity],
     completedActivities: CompletedActivities,
     dayViewShowButtonState: DayViewShowButtonState,
     dayActivityAction: @escaping (DayActivityActionType) -> Void,
     showCompletedTapped: @escaping () -> Void,
-    hideCompletedTapped: @escaping () -> Void,
-    newActivityAction: @escaping (DayNewActivityAction) -> Void
+    hideCompletedTapped: @escaping () -> Void
   ) {
     self.isPastDay = isPastDay
-    self._newActivity = newActivity
-    self._newActivityTask = newActivityTask
-    self.focus = focus
+    self.newForms = newForms
     self.activities = activities
     self.completedActivities = completedActivities
     self.dayViewShowButtonState = dayViewShowButtonState
     self.dayActivityAction = dayActivityAction
     self.showCompletedTapped = showCompletedTapped
     self.hideCompletedTapped = hideCompletedTapped
-    self.newActivityAction = newActivityAction
   }
 
   // MARK: - Views
 
   public var body: some View {
     VStack(spacing: .zero) {
-      newActivityFormIfNeeded
+      if let newForms {
+        newActivityFormIfNeeded(newForm: newForms)
+      }
       ForEach(activities) { dayActivity in
         menuActivityView(dayActivity)
-        let isTaskFormAvailable = newActivityTask.isFormVisible && dayActivity.id == newActivityTask.activityId
-        let addPadding = !dayActivity.dayActivityTasks.isEmpty || isTaskFormAvailable
-        divider(addPadding: addPadding)
 
-        if newActivityTask.activityId == dayActivity.id {
-          newActivityTaskFormIfNeeded(addPadding: !dayActivity.dayActivityTasks.isEmpty)
-            .padding(.leading, 10.0)
-          divider(addPadding: !dayActivity.dayActivityTasks.isEmpty)
+        if let newForms {
+          newActivityTaskFormIfNeeded(newForms: newForms, dayActivity: dayActivity)
         }
 
         ForEach(tasks(for: dayActivity)) { activityTask in
@@ -75,8 +90,8 @@ public struct DayView: View {
   }
 
   @ViewBuilder
-  private var newActivityFormIfNeeded: some View {
-    if newActivity.isFormVisible {
+  private func newActivityFormIfNeeded(newForm: NewForms) -> some View {
+    if newForm.newActivity.isFormVisible {
       VStack(spacing: .zero) {
         HStack(spacing: 5.0) {
           ActivityImageView(
@@ -84,15 +99,15 @@ public struct DayView: View {
             size: 30.0,
             cornerRadius: 15.0
           )
-          TextField("", text: $newActivity.name)
+          TextField("", text: newForm.newActivityBinding.name)
             .font(.system(size: 14.0, weight: .medium))
             .foregroundStyle(Color.sectionText)
             .submitLabel(.done)
-            .focused(focus, equals: .activityName)
+            .focused(newForm.focus, equals: .activityName)
           Spacer()
-          if !newActivity.name.isEmpty {
+          if !newForm.newActivity.name.isEmpty {
             Button(String(localized: "Cancel", bundle: .module), action: {
-              newActivityAction(.dayActivity(.cancelled))
+              newForm.newActivityAction(.dayActivity(.cancelled))
             })
             .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Color.actionBlue)
@@ -104,14 +119,16 @@ public struct DayView: View {
         }
       }
       .onSubmit {
-        newActivityAction(.dayActivity(.submitted))
+        newForm.newActivityAction(.dayActivity(.submitted))
       }
     }
   }
 
   @ViewBuilder
-  private func newActivityTaskFormIfNeeded(addPadding: Bool) -> some View {
-    if newActivityTask.isFormVisible {
+  private func newActivityTaskFormIfNeeded(newForms: NewForms, dayActivity: DayActivity) -> some View {
+    let showNewTaskForm = newForms.newActivityTask.activityId == dayActivity.id && newForms.newActivityTask.isFormVisible
+    divider(addPadding: showNewTaskForm || !dayActivity.dayActivityTasks.isEmpty)
+    if showNewTaskForm {
       VStack(spacing: .zero) {
         HStack(spacing: 5.0) {
           ActivityImageView(
@@ -119,15 +136,15 @@ public struct DayView: View {
             size: 30.0,
             cornerRadius: 15.0
           )
-          TextField("", text: $newActivityTask.name)
+          TextField("", text: newForms.newActivityTaskBinding.name)
             .font(.system(size: 14.0, weight: .medium))
             .foregroundStyle(Color.sectionText)
             .submitLabel(.done)
-            .focused(focus, equals: .taskName(identifier: newActivityTask.activityId?.uuidString ?? ""))
+            .focused(newForms.focus, equals: .taskName(identifier: newForms.newActivityTask.activityId?.uuidString ?? ""))
           Spacer()
-          if !newActivityTask.name.isEmpty {
+          if !newForms.newActivityTask.name.isEmpty {
             Button(String(localized: "Cancel", bundle: .module), action: {
-              newActivityAction(.dayActivityTask(.cancelled))
+              newForms.newActivityAction(.dayActivityTask(.cancelled))
             })
             .font(.system(size: 12.0, weight: .bold))
             .foregroundStyle(Color.actionBlue)
@@ -136,8 +153,10 @@ public struct DayView: View {
         .padding(.all, 10.0)
       }
       .onSubmit {
-        newActivityAction(.dayActivityTask(.submitted))
+        newForms.newActivityAction(.dayActivityTask(.submitted))
       }
+      .padding(.leading, 10.0)
+      divider(addPadding: !dayActivity.dayActivityTasks.isEmpty)
     }
   }
 
@@ -215,7 +234,7 @@ public struct DayView: View {
       )
     } label: {
       DayActivityRow(
-        activity: dayActivity,
+        activityItem: DayActivityItem(activityType: dayActivity),
         trailingIcon: .more
       )
     }
@@ -315,7 +334,7 @@ public struct DayView: View {
       )
     } label: {
       DayActivityRow(
-        activity: dayActivityTask,
+        activityItem: DayActivityItem(activityType: dayActivityTask),
         trailingIcon: .more
       )
     }

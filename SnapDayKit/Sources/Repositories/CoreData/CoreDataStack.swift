@@ -1,6 +1,7 @@
 import Foundation
 import CoreData
 import Dependencies
+import Common
 
 final class CoreDataStack {
 
@@ -72,6 +73,8 @@ final class CoreDataStack {
     } catch {
         fatalError("Failed to pin viewContext to the current generation:\(error)")
     }
+
+    guard Bundle.main.isMainApp else { return }
 
     do {
       try coreDataBackupService.scheduleBackups(

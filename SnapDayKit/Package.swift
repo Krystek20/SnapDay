@@ -18,22 +18,9 @@ let package = Package(
 @ProductsBuilder
 private var products: [Product] {
   Module.application
-  Module.dashboard
-  Module.activityList
-  Module.markerForm
-  Module.dayActivityForm
-  Module.emojiPicker
-  Module.calendarPicker
-  Module.reports
-  Module.selectableList
   Module.eveningSummary
   Module.dayActivityReminder
-  Module.repositories
-  Module.common
-  Module.models
-  Module.previews
-  Module.resources
-  Module.uiComponents
+  Module.widgetActivityList
 }
 
 @PackageDependenciesBuilder
@@ -85,13 +72,17 @@ private var targets: [Target] {
     dependencies: sceneDependecies
   )
   TargetParamenters(
+    module: .widgetActivityList,
+    dependencies: sceneDependecies
+  )
+  TargetParamenters(
     module: .developerTools,
     dependencies: sceneDependecies
   )
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .calendarPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
-  TargetParamenters(module: .repositories, dependencies: [.models, .composableArchitecture])
+  TargetParamenters(module: .repositories, dependencies: [.common, .models, .composableArchitecture])
   TargetParamenters(module: .common, dependencies: [.composableArchitecture])
   TargetParamenters(module: .models)
   TargetParamenters(module: .previews, dependencies: [.application])
@@ -123,6 +114,7 @@ private enum Module: String {
   case reports
   case selectableList
   case eveningSummary
+  case widgetActivityList
   case dayActivityReminder
   case developerTools
   case utilities

@@ -10,6 +10,7 @@ public protocol ActivityType {
   var overview: String? { get }
   var reminderDate: Date? { get }
   var dueDate: Date? { get }
+  var dueDaysCount: Int? { get }
 }
 
 extension ActivityType {
@@ -18,9 +19,12 @@ extension ActivityType {
   }
 }
 
-extension DayActivity: ActivityType { }
+extension DayActivity: ActivityType { 
+  public var dueDaysCount: Int? { nil }
+}
 extension DayActivityTask: ActivityType { 
   public var dueDate: Date? { nil }
+  public var dueDaysCount: Int? { nil }
 }
 extension Activity: ActivityType {
   public var doneDate: Date? { nil }
@@ -28,4 +32,13 @@ extension Activity: ActivityType {
   public var duration: Int { defaultDuration ?? .zero }
   public var overview: String? { nil }
   public var reminderDate: Date? { defaultReminderDate }
+}
+
+extension Array where Element: ActivityType {
+  public var sorted: [Element] {
+    sorted(by: {
+      if $0.isDone == $1.isDone { return $0.name < $1.name }
+      return !$0.isDone && $1.isDone
+    })
+  }
 }

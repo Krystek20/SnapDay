@@ -8,6 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		D432465C2AD0820100D3E8F9 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = D432465B2AD0820100D3E8F9 /* Application */; };
+		D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418332C50D34A005920E1 /* WidgetKit.framework */; };
+		D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418352C50D34A005920E1 /* SwiftUI.framework */; };
+		D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */; };
+		D464183B2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183A2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift */; };
+		D464183D2C50D34A005920E1 /* ActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183C2C50D34A005920E1 /* ActivityWidget.swift */; };
+		D464183F2C50D34A005920E1 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183E2C50D34A005920E1 /* AppIntent.swift */; };
+		D46418412C50D34B005920E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D46418402C50D34B005920E1 /* Assets.xcassets */; };
+		D46418452C50D34B005920E1 /* ActivityWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D464184A2C50D59E005920E1 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418492C50D59E005920E1 /* CloudKit.framework */; };
 		D4779AC72B6043280067E3AC /* SnapDayKit in Resources */ = {isa = PBXBuildFile; fileRef = D4779ABD2B6043270067E3AC /* SnapDayKit */; };
 		D4779ACA2B6043280067E3AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4779AC22B6043280067E3AC /* Assets.xcassets */; };
 		D4779ACB2B6043280067E3AC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4779AC42B6043280067E3AC /* Preview Assets.xcassets */; };
@@ -20,6 +29,8 @@
 		D4CCE62D2BC7B4BB00C198C5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = D4CCE62C2BC7B4BB00C198C5 /* Base */; };
 		D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */ = {isa = PBXBuildFile; productRef = D4CCE63C2BCACB8E00C198C5 /* EveningSummary */; };
+		D4D658782C56D122007E61EB /* AppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D658772C56D122007E61EB /* AppIntents.swift */; };
+		D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */ = {isa = PBXBuildFile; productRef = D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */; };
 		D4FE9FC32BF5342B003305A9 /* DayActivityReminder in Frameworks */ = {isa = PBXBuildFile; productRef = D4FE9FC22BF5342B003305A9 /* DayActivityReminder */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +41,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = D443ECED2AD0771C002225CF;
 			remoteInfo = SnapToday;
+		};
+		D46418432C50D34B005920E1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D443ECE62AD0771C002225CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D46418312C50D34A005920E1;
+			remoteInfo = ActivityWidgetExtension;
 		};
 		D4CCE62F2BC7B4BB00C198C5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -48,6 +66,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */,
+				D46418452C50D34B005920E1 /* ActivityWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -57,6 +76,16 @@
 /* Begin PBXFileReference section */
 		D443ECEE2AD0771C002225CF /* SnapDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D443ED082AD0771D002225CF /* SnapDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ActivityWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D46418332C50D34A005920E1 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		D46418352C50D34A005920E1 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidgetBundle.swift; sourceTree = "<group>"; };
+		D464183A2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidgetLiveActivity.swift; sourceTree = "<group>"; };
+		D464183C2C50D34A005920E1 /* ActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidget.swift; sourceTree = "<group>"; };
+		D464183E2C50D34A005920E1 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
+		D46418402C50D34B005920E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D46418422C50D34B005920E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D46418492C50D59E005920E1 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		D4779ABD2B6043270067E3AC /* SnapDayKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SnapDayKit; sourceTree = "<group>"; };
 		D4779ABF2B6043270067E3AC /* SnapDayUITestsLaunchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapDayUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		D4779AC02B6043270067E3AC /* SnapDayUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapDayUITests.swift; sourceTree = "<group>"; };
@@ -72,6 +101,8 @@
 		D4CCE62E2BC7B4BB00C198C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4CCE63E2BCAD13800C198C5 /* SnapDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnapDay.entitlements; sourceTree = "<group>"; };
 		D4CCE63F2BCAD27900C198C5 /* Notification Content.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Notification Content.entitlements"; sourceTree = "<group>"; };
+		D4D658772C56D122007E61EB /* AppIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntents.swift; sourceTree = "<group>"; };
+		D4EE7DB62C5562A7007A0B4F /* ActivityWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ActivityWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +111,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D432465C2AD0820100D3E8F9 /* Application in Frameworks */,
+				D464184A2C50D59E005920E1 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +119,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D464182F2C50D34A005920E1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */,
+				D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */,
+				D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,8 +149,11 @@
 		D432465A2AD0820100D3E8F9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D46418492C50D59E005920E1 /* CloudKit.framework */,
 				D4CCE6242BC7B4BB00C198C5 /* UserNotifications.framework */,
 				D4CCE6262BC7B4BB00C198C5 /* UserNotificationsUI.framework */,
+				D46418332C50D34A005920E1 /* WidgetKit.framework */,
+				D46418352C50D34A005920E1 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -120,6 +165,7 @@
 				D4779AC12B6043280067E3AC /* SnapDay */,
 				D4779ABE2B6043270067E3AC /* SnapDayUITests */,
 				D4CCE6282BC7B4BB00C198C5 /* Notification Content */,
+				D46418372C50D34A005920E1 /* ActivityWidget */,
 				D443ECEF2AD0771C002225CF /* Products */,
 				D432465A2AD0820100D3E8F9 /* Frameworks */,
 			);
@@ -131,8 +177,24 @@
 				D443ECEE2AD0771C002225CF /* SnapDay.app */,
 				D443ED082AD0771D002225CF /* SnapDayUITests.xctest */,
 				D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */,
+				D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D46418372C50D34A005920E1 /* ActivityWidget */ = {
+			isa = PBXGroup;
+			children = (
+				D4D658772C56D122007E61EB /* AppIntents.swift */,
+				D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */,
+				D464183A2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift */,
+				D464183C2C50D34A005920E1 /* ActivityWidget.swift */,
+				D464183E2C50D34A005920E1 /* AppIntent.swift */,
+				D4EE7DB62C5562A7007A0B4F /* ActivityWidgetExtension.entitlements */,
+				D46418402C50D34B005920E1 /* Assets.xcassets */,
+				D46418422C50D34B005920E1 /* Info.plist */,
+			);
+			path = ActivityWidget;
 			sourceTree = "<group>";
 		};
 		D4779ABE2B6043270067E3AC /* SnapDayUITests */ = {
@@ -191,6 +253,7 @@
 			);
 			dependencies = (
 				D4CCE6302BC7B4BB00C198C5 /* PBXTargetDependency */,
+				D46418442C50D34B005920E1 /* PBXTargetDependency */,
 			);
 			name = SnapDay;
 			packageProductDependencies = (
@@ -217,6 +280,26 @@
 			productName = SnapTodayUITests;
 			productReference = D443ED082AD0771D002225CF /* SnapDayUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		D46418312C50D34A005920E1 /* ActivityWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D46418482C50D34B005920E1 /* Build configuration list for PBXNativeTarget "ActivityWidgetExtension" */;
+			buildPhases = (
+				D464182E2C50D34A005920E1 /* Sources */,
+				D464182F2C50D34A005920E1 /* Frameworks */,
+				D46418302C50D34A005920E1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ActivityWidgetExtension;
+			packageProductDependencies = (
+				D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */,
+			);
+			productName = ActivityWidgetExtension;
+			productReference = D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		D4CCE6222BC7B4BB00C198C5 /* Notification Content */ = {
 			isa = PBXNativeTarget;
@@ -246,7 +329,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1530;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					D443ECED2AD0771C002225CF = {
@@ -255,6 +338,9 @@
 					D443ED072AD0771D002225CF = {
 						CreatedOnToolsVersion = 15.0;
 						TestTargetID = D443ECED2AD0771C002225CF;
+					};
+					D46418312C50D34A005920E1 = {
+						CreatedOnToolsVersion = 15.4;
 					};
 					D4CCE6222BC7B4BB00C198C5 = {
 						CreatedOnToolsVersion = 15.3;
@@ -278,6 +364,7 @@
 				D443ECED2AD0771C002225CF /* SnapDay */,
 				D443ED072AD0771D002225CF /* SnapDayUITests */,
 				D4CCE6222BC7B4BB00C198C5 /* Notification Content */,
+				D46418312C50D34A005920E1 /* ActivityWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -297,6 +384,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D46418302C50D34A005920E1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D46418412C50D34B005920E1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,6 +423,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D464182E2C50D34A005920E1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D464183D2C50D34A005920E1 /* ActivityWidget.swift in Sources */,
+				D464183F2C50D34A005920E1 /* AppIntent.swift in Sources */,
+				D4D658782C56D122007E61EB /* AppIntents.swift in Sources */,
+				D464183B2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift in Sources */,
+				D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D4CCE61F2BC7B4BB00C198C5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -343,6 +450,11 @@
 			isa = PBXTargetDependency;
 			target = D443ECED2AD0771C002225CF /* SnapDay */;
 			targetProxy = D443ED092AD0771D002225CF /* PBXContainerItemProxy */;
+		};
+		D46418442C50D34B005920E1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D46418312C50D34A005920E1 /* ActivityWidgetExtension */;
+			targetProxy = D46418432C50D34B005920E1 /* PBXContainerItemProxy */;
 		};
 		D4CCE6302BC7B4BB00C198C5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -508,7 +620,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.34;
+				MARKETING_VERSION = 0.0.36;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -545,7 +657,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.34;
+				MARKETING_VERSION = 0.0.36;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -592,6 +704,72 @@
 			};
 			name = Release;
 		};
+		D46418462C50D34B005920E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ActivityWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ActivityWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.0.36;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Activity Widget - Development";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D46418472C50D34B005920E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ActivityWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ActivityWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.0.36;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Activity Widget - Distribution";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		D4CCE6332BC7B4BB00C198C5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -611,7 +789,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.34;
+				MARKETING_VERSION = 0.0.36;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -642,7 +820,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.34;
+				MARKETING_VERSION = 0.0.36;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -684,6 +862,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		D46418482C50D34B005920E1 /* Build configuration list for PBXNativeTarget "ActivityWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D46418462C50D34B005920E1 /* Debug */,
+				D46418472C50D34B005920E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D4CCE6352BC7B4BB00C198C5 /* Build configuration list for PBXNativeTarget "Notification Content" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -703,6 +890,10 @@
 		D4CCE63C2BCACB8E00C198C5 /* EveningSummary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EveningSummary;
+		};
+		D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WidgetActivityList;
 		};
 		D4FE9FC22BF5342B003305A9 /* DayActivityReminder */ = {
 			isa = XCSwiftPackageProductDependency;

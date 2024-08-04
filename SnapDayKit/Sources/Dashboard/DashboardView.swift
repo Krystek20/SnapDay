@@ -23,14 +23,15 @@ public struct DashboardView: View {
 
   // MARK: - Views
 
-
   public var body: some View {
     WithPerceptionTracking {
       ZStack(alignment: .top) {
         ScrollView {
+          Spacer()
+            .frame(height: 50.0)
           dayList
             .padding(.horizontal, 15.0)
-            .padding(.top, 65.0)
+            .padding(.top, 15.0)
             .padding(.bottom, 15.0)
         }
         .maxWidth()
@@ -53,7 +54,6 @@ public struct DashboardView: View {
           ActivityListView(store: store)
         }
         .presentationDetents([.large])
-
       }
       .sheet(item: $store.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
         NavigationStack {
@@ -134,9 +134,14 @@ public struct DashboardView: View {
     WithPerceptionTracking {
       DaysSelectorView(
         selectedDay: $store.selectedDay,
-        newActivity: $store.newActivity,
-        newActivityTask: $store.newActivityTask,
-        focus: $focus,
+        newForms: DayView.NewForms(
+          newActivity: $store.newActivity,
+          newActivityTask: $store.newActivityTask,
+          focus: $focus,
+          newActivityAction: { action in
+            store.send(.view(.newActivityActionPerformed(action)))
+          }
+        ),
         dayActivities: store.activities,
         daySummary: store.daySummary,
         dayViewShowButtonState: store.dayViewShowButtonState,
@@ -149,9 +154,6 @@ public struct DashboardView: View {
         },
         hideCompletedTapped: {
           store.send(.view(.hideCompletedActivitiesTapped))
-        },
-        newActivityAction: { action in
-          store.send(.view(.newActivityActionPerformed(action)))
         }
       )
       .formBackgroundModifier(padding: EdgeInsets(.zero))

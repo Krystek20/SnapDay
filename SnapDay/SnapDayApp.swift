@@ -14,6 +14,9 @@ struct SnapDayApp: App {
   var body: some Scene {
     WindowGroup {
       ApplicationView(store: store)
+        .onOpenURL { url in
+          store.send(.handleUrl(url))
+        }
     }
     .backgroundTask(.appRefresh(BackgroundUpdaterIdentifier.createDay.rawValue)) { @MainActor in
         store.send(.createDayBackgroundTaskCalled)

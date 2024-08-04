@@ -1,25 +1,44 @@
 import SwiftUI
 import Models
 
-public struct DayActivityRow: View, DurationFormatting {
+public struct DayActivityRow: View {
 
-  private let activity: ActivityType
-  private let shouldIgnoreDone: Bool
+  public enum Size {
+    case small
+    case medium
+  }
+
+  private let activityItem: DayActivityItem
+  private let size: Size
   private let trailingIcon: TrailingIcon
   private let trailingViewTapped: (() -> Void)?
 
-  private var isStrikethrough: Bool {
-    activity.isDone && !shouldIgnoreDone
+  private var imageSize: (size: CGFloat, cornerRadius: CGFloat) {
+    switch size {
+    case .small:
+      (20.0, 10.0)
+    case .medium:
+      (30.0, 15.0)
+    }
+  }
+
+  private var fontSize: (titleSize: CGFloat, subtitleSize: CGFloat) {
+    switch size {
+    case .small:
+      (12.0, 10.0)
+    case .medium:
+      (14.0, 12.0)
+    }
   }
 
   public init(
-    activity: ActivityType,
-    shouldIgnoreDone: Bool = false,
+    activityItem: DayActivityItem,
+    size: Size = .medium,
     trailingIcon: TrailingIcon = .none,
     trailingViewTapped: (() -> Void)? = nil
   ) {
-    self.activity = activity
-    self.shouldIgnoreDone = shouldIgnoreDone
+    self.activityItem = activityItem
+    self.size = size
     self.trailingIcon = trailingIcon
     self.trailingViewTapped = trailingViewTapped
   }
@@ -27,72 +46,56 @@ public struct DayActivityRow: View, DurationFormatting {
   public var body: some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
-        data: activity.icon?.data,
-        size: 30.0,
-        cornerRadius: 15.0
+        data: activityItem.iconData,
+        size: imageSize.size,
+        cornerRadius: imageSize.cornerRadius
       )
       VStack(alignment: .leading, spacing: 2.0) {
-        Text(activity.name)
-          .font(.system(size: 14.0, weight: .medium))
-          .lineLimit(1)
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(isStrikethrough, color: .sectionText)
-        subtitleView
+        titleView
+        switch size {
+        case .small:
+          EmptyView()
+        case .medium:
+          subtitleView
+        }
       }
       Spacer(minLength: 5.0)
-      HStack(spacing: .zero) {
-        dueDateIconIfNeeded
-        reminderIconIfNeeded
+      HStack(spacing: 10.0) {
+        ForEach(activityItem.displayedIcons, content: dayActivityItem)
         view(for: trailingIcon)
           .contentShape(Rectangle())
           .onTapGesture {
             trailingViewTapped?()
           }
       }
+      .padding(.trailing, 5.0)
     }
     .padding(
       EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 5.0)
     )
   }
 
+  private var titleView: some View {
+    Text(activityItem.title)
+      .font(.system(size: fontSize.titleSize, weight: .medium))
+      .lineLimit(1)
+      .foregroundStyle(Color.sectionText)
+      .strikethrough(activityItem.isStrikethrough, color: .sectionText)
+  }
+
   @ViewBuilder
   private var subtitleView: some View {
-    HStack(spacing: 5.0) {
-      if let overview = activity.overview, !overview.isEmpty {
-        Text(overview)
-          .font(.system(size: 12.0, weight: .regular))
-          .lineLimit(1)
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(isStrikethrough, color: .sectionText)
-      }
-
-      if let textDuration = duration(for: activity.duration) {
-        if activity.overview != nil && activity.overview?.isEmpty == false {
-          Text("-")
-            .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.sectionText)
-        }
-
-        Text(textDuration)
-          .font(.system(size: 12.0, weight: .regular))
-          .foregroundStyle(Color.sectionText)
-          .strikethrough(isStrikethrough, color: .sectionText)
-      }
+    if !activityItem.subtitle.isEmpty {
+      Text(activityItem.subtitle)
+        .font(.system(size: fontSize.subtitleSize, weight: .regular))
+        .lineLimit(1)
+        .foregroundStyle(Color.sectionText)
+        .strikethrough(activityItem.isStrikethrough, color: .sectionText)
     }
   }
 
-  @ViewBuilder
-  private var reminderIconIfNeeded: some View {
-    if activity.reminderDate != nil {
-      prepareIcon("bell")
-    }
-  }
-
-  @ViewBuilder
-  private var dueDateIconIfNeeded: some View {
-    if activity.dueDate != nil {
-      prepareIcon("hourglass")
-    }
+  private func dayActivityItem(icon: DayActivityItem.Icon) -> some View {
+    prepareIcon(icon.rawValue)
   }
 
   private func view(for trailingIcon: TrailingIcon) -> AnyView {
@@ -105,6 +108,8 @@ public struct DayActivityRow: View, DurationFormatting {
       AnyView(
         prepareIcon("ellipsis")
       )
+    case .customView(let view):
+      AnyView(view)
     }
   }
 
@@ -115,6 +120,5 @@ public struct DayActivityRow: View, DurationFormatting {
       .frame(width: 15.0, height: 15.0)
       .foregroundStyle(Color.sectionText)
       .imageScale(.medium)
-      .padding(.all, 5.0)
   }
 }

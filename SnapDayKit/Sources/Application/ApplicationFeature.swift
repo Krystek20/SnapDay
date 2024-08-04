@@ -10,6 +10,7 @@ public struct ApplicationFeature: TodayProvidable {
 
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.backgroundUpdater) private var backgroundUpdater
+  @Dependency(\.deeplinkService) private var deeplinkService
   private let dayProvider = DayProvider()
 
   // MARK: - State & Action
@@ -18,7 +19,7 @@ public struct ApplicationFeature: TodayProvidable {
   public struct State: Equatable {
     var selectedTab = Tab.dashboard
 
-    var dashboard = DashboardFeature.State()
+    var dashboard = DashboardFeature.State(date: Calendar.today)
     var reports = ReportsFeature.State()
 
     @Presents var developerTools: DeveloperToolsFeature.State?
@@ -30,6 +31,8 @@ public struct ApplicationFeature: TodayProvidable {
     case appeared
     case createDayBackgroundTaskCalled
     case deviceShaked
+    case handleUrl(URL)
+    case setTab(Tab)
     case dashboard(DashboardFeature.Action)
     case reports(ReportsFeature.Action)
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
@@ -75,6 +78,16 @@ public struct ApplicationFeature: TodayProvidable {
           .run { _ in
             DeveloperToolsLogger.shared.append(.refresh(.setup))
             try await backgroundUpdater.scheduleCreatingDayBackgroundTask()
+          },
+          .run { send in
+            for await deeplink in deeplinkService.deeplinkPublisher.values {
+              switch deeplink {
+              case .dashboard:
+                await send(.setTab(.dashboard))
+              case .none:
+                break
+              }
+            }
           }
         )
       case .createDayBackgroundTaskCalled:
@@ -88,6 +101,13 @@ public struct ApplicationFeature: TodayProvidable {
         }
       case .deviceShaked:
         state.developerTools = DeveloperToolsFeature.State()
+        return .none
+      case .handleUrl(let url):
+        deeplinkService.handleUrl(url)
+        return .none
+      case .setTab(let tab):
+        guard state.selectedTab != tab else { return .none }
+        state.selectedTab = tab
         return .none
       case .dashboard:
         return .none
