@@ -2,38 +2,10 @@ import Foundation
 
 public protocol FrequencyProtocol {
   var frequency: ActivityFrequency? { get set }
+  var isFrequentEnabled: Bool { get set }
 }
 
 public extension FrequencyProtocol {
-
-  var isFrequencyValid: Bool {
-    switch frequency {
-    case .daily:
-      true
-    case .weekly(let days):
-      !days.isEmpty
-    case .biweekly(let days, _):
-      !days.isEmpty
-    case .monthly(.monthlySpecificDate(let days)):
-      !days.isEmpty
-    case .monthly(monthlySchedule: .weekdayOrdinal(let weekdayOrdinals)):
-      !weekdayOrdinals.reduce(into: [Int](), { result, weekdayOrdinal in
-        result.append(contentsOf: weekdayOrdinal.weekdays)
-      }).isEmpty
-    case .monthly:
-      true
-    case .none:
-      true
-    }
-  }
-
-  var isRepeatable: Bool {
-    frequency != nil
-  }
-
-  mutating func setIsRepeatable(_ isRepeatable: Bool) {
-    frequency = isRepeatable ? .daily : nil
-  }
 
   var areWeekdaysRequried: Bool {
     switch frequency {

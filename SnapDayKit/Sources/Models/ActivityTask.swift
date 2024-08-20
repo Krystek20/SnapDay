@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ActivityTask: Identifiable, Equatable, Hashable {
+public struct ActivityTask: Identifiable, Equatable, Hashable, Decodable {
 
   // MARK: - Properties
 

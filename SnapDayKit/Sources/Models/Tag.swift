@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Tag: Identifiable, Equatable, Hashable {
+public struct Tag: Identifiable, Equatable, Hashable, Decodable {
 
   // MARK: - Properties
 

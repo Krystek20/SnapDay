@@ -44,7 +44,7 @@ public struct ActivitiesByTagView: View {
         durationType: .custom(timePeriodActivity.duration)
       )
 
-      if timePeriodActivity.activity.frequency != nil {
+      if timePeriodActivity.activity.isFrequentEnabled {
         ProgressView(value: timePeriodActivity.completedValue) {
           HStack(alignment: .bottom) {
             Text("\(timePeriodActivity.percent)%", bundle: .module)

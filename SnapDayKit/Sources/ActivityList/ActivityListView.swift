@@ -28,6 +28,7 @@ public struct ActivityListView: View {
   public var body: some View {
     WithPerceptionTracking {
       content
+        .maxWidth()
         .activityBackground
         .navigationTitle(String(localized: "Saved Activities", bundle: .module))
         .searchable(
@@ -62,39 +63,36 @@ public struct ActivityListView: View {
   }
 
   private var content: some View {
-    WithPerceptionTracking {
-      VStack(spacing: 15.0) {
-        ScrollView {
-          activityList
-            .padding(.bottom, 15.0)
-            .padding(.horizontal, 15.0)
-        }
-        .scrollIndicators(.hidden)
-
-        addButton
-          .padding(.bottom, 15.0)
-          .padding(.horizontal, 15.0)
-      }
+    ScrollView {
+      activityList
+        .padding(.bottom, 15.0)
+        .padding(.horizontal, 15.0)
     }
+    .scrollIndicators(.hidden)
   }
 
   private var activityList: some View {
     WithPerceptionTracking {
       VStack(spacing: .zero) {
+        informationViewIfNeeded
         newActivityFormIfNeeded
         ForEach(store.displayedActivities) { activity in
-          HStack(spacing: .zero) {
-            if store.selectedActivities.contains(activity) {
-              selectionIcon
-            }
-            activityRow(for: activity)
-          }
+          menuView(for: activity)
           if activity.id != store.displayedActivities.last?.id {
             Divider()
           }
         }
       }
       .formBackgroundModifier(padding: EdgeInsets(.zero))
+    }
+  }
+
+  @ViewBuilder
+  private var informationViewIfNeeded: some View {
+    WithPerceptionTracking {
+      if let informationConfiguration = store.information {
+        InformationView(configuration: informationConfiguration)
+      }
     }
   }
 
@@ -133,42 +131,82 @@ public struct ActivityListView: View {
     }
   }
 
-
-  private func activityRow(for activity: Activity) -> some View {
-    WithPerceptionTracking {
-      DayActivityRow(
-        activityItem: DayActivityItem(activityType: activity),
-        trailingIcon: .more
-      ) {
-        store.send(.view(.activityEditTapped(activity)))
-      }
-      .contentShape(Rectangle())
-      .onTapGesture {
-        store.send(.view(.activityTapped(activity)))
-      }
+  private func menuView(for activity: Activity) -> some View {
+    Menu {
+      selectButton(activity: activity)
+      editButton(activity: activity)
+      enableButton(activity: activity)
+      removeButton(activity: activity)
+    } label: {
+      activityRow(for: activity)
     }
   }
 
-  private var selectionIcon: some View {
-    Image(systemName: "checkmark.circle.fill")
-      .resizable()
-      .scaledToFill()
-      .fontWeight(.light)
-      .frame(width: 20.0, height: 20.0)
-      .foregroundStyle(Color.actionBlue)
-      .padding(.leading, 10.0)
-  }
-
-  private var addButton: some View {
+  private func selectButton(activity: Activity) -> some View {
     WithPerceptionTracking {
       Button(
-        action: { store.send(.view(.addButtonTapped)) },
+        action: {
+          store.send(.view(.addToDayButtonTapped(activity)))
+        },
         label: {
-          Text("Add (\(store.selectedActivities.count))", bundle: .module)
+          Text("Add to day", bundle: .module)
+          Image(systemName: "plus.circle")
         }
       )
-      .disabled(store.selectedActivities.isEmpty)
-      .buttonStyle(PrimaryButtonStyle(disabled: store.selectedActivities.isEmpty))
     }
+  }
+
+  private func editButton(activity: Activity) -> some View {
+    WithPerceptionTracking {
+      Button(
+        action: {
+          store.send(.view(.activityEditTapped(activity)))
+        },
+        label: {
+          Text("Edit", bundle: .module)
+          Image(systemName: "pencil.circle")
+        }
+      )
+    }
+  }
+
+  private func enableButton(activity: Activity) -> some View {
+    WithPerceptionTracking {
+      Button(
+        action: {
+          store.send(.view(.enableButtonTapped(activity)))
+        },
+        label: {
+          if activity.isFrequentEnabled {
+            Text("Disable Repeat", bundle: .module)
+            Image(systemName: "repeat.circle.fill")
+          } else {
+            Text("Enable Repeat", bundle: .module)
+            Image(systemName: "repeat.circle")
+          }
+        }
+      )
+    }
+  }
+
+  private func removeButton(activity: Activity) -> some View {
+    WithPerceptionTracking {
+      Button(
+        action: {
+          store.send(.view(.removeButtonTapped(activity)))
+        },
+        label: {
+          Text("Remove", bundle: .module)
+          Image(systemName: "trash")
+        }
+      )
+    }
+  }
+
+  private func activityRow(for activity: Activity) -> some View {
+    DayActivityRow(
+      activityItem: DayActivityItem(activityType: activity),
+      trailingIcon: .more
+    )
   }
 }

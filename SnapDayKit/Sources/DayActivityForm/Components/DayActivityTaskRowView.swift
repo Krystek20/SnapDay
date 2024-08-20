@@ -29,6 +29,17 @@ struct DayActivityTaskRowView: View {
 
   var body: some View {
     Menu {
+      selectButtonIfNeeded
+      editButtonIfNeeded
+      removeButtonIfNeeded
+    } label: {
+      dayActivityTaskView(dayActivityTask)
+    }
+  }
+
+  @ViewBuilder
+  private var selectButtonIfNeeded: some View {
+    if dayActivityTask.menuActions.contains(.select) {
       Button(
         action: {
           selectTapped(dayActivityTask)
@@ -43,6 +54,12 @@ struct DayActivityTaskRowView: View {
           }
         }
       )
+    }
+  }
+
+  @ViewBuilder
+  private var editButtonIfNeeded: some View {
+    if dayActivityTask.menuActions.contains(.edit) {
       Button(
         action: {
           editTapped(dayActivityTask)
@@ -52,6 +69,12 @@ struct DayActivityTaskRowView: View {
           Image(systemName: "pencil.circle")
         }
       )
+    }
+  }
+
+  @ViewBuilder
+  private var removeButtonIfNeeded: some View {
+    if dayActivityTask.menuActions.contains(.remove) {
       Button(
         action: {
           removeTapped(dayActivityTask)
@@ -61,8 +84,6 @@ struct DayActivityTaskRowView: View {
           Image(systemName: "trash")
         }
       )
-    } label: {
-      dayActivityTaskView(dayActivityTask)
     }
   }
 

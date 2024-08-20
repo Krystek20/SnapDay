@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉" : {
+
+    },
     "A blank canvas awaits your plans or spontaneous joys." : {
 
     },
@@ -114,6 +117,9 @@
           }
         }
       }
+    },
+    "Success!" : {
+
     },
     "This activity has incomplete subtasks. Would you like to mark the activity and all its subtasks as done?" : {
 

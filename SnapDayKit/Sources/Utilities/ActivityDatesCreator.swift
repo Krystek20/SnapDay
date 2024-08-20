@@ -11,7 +11,8 @@ struct ActivityDatesCreator {
   // MARK: - Public
 
   func createsDates(for activity: Activity, dateRange: ClosedRange<Date>) throws -> [Date] {
-    switch activity.frequency {
+    guard activity.isFrequentEnabled else { return [] }
+    return switch activity.frequency {
     case .daily:
       createDailyDates(dateRange: dateRange)
     case .weekly(let days):
@@ -25,8 +26,6 @@ struct ActivityDatesCreator {
       }
     case .monthly(let monthlySchedule):
       try findDates(for: monthlySchedule, dateRange: dateRange)
-    case .none:
-      []
     }
   }
 

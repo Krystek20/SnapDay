@@ -146,22 +146,27 @@ public struct ReportsView: View {
     }
   }
 
+  @ViewBuilder
   private var filtersSection: some View {
-    SectionView(
-      name: String(localized: "Filters", bundle: .module),
-      rightContent: { EmptyView() },
-      content: {
-        VStack(spacing: 10.0) {
-          filterByTagsView
-          filterByActivitiesView
-          filterByLabelsView
-        }
-        .formBackgroundModifier()
+    WithPerceptionTracking {
+      if store.selectedTag != nil {
+        SectionView(
+          name: String(localized: "Filters", bundle: .module),
+          rightContent: { EmptyView() },
+          content: {
+            VStack(spacing: 10.0) {
+              filterByTagsView
+              filterByActivitiesView
+              filterByLabelsView
+            }
+            .formBackgroundModifier()
+          }
+        )
       }
-    )
+    }
   }
 
-  @ViewBuilder
+
   private var filterByTagsView: some View {
     WithPerceptionTracking {
       if let selectedTag = store.selectedTag {

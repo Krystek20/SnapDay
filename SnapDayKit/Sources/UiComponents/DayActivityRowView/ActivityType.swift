@@ -11,6 +11,7 @@ public protocol ActivityType {
   var reminderDate: Date? { get }
   var dueDate: Date? { get }
   var dueDaysCount: Int? { get }
+  var isFrequentEnabled: Bool { get }
 }
 
 extension ActivityType {
@@ -21,10 +22,12 @@ extension ActivityType {
 
 extension DayActivity: ActivityType { 
   public var dueDaysCount: Int? { nil }
+  public var isFrequentEnabled: Bool { false }
 }
 extension DayActivityTask: ActivityType { 
   public var dueDate: Date? { nil }
   public var dueDaysCount: Int? { nil }
+  public var isFrequentEnabled: Bool { false }
 }
 extension Activity: ActivityType {
   public var doneDate: Date? { nil }

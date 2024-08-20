@@ -33,7 +33,6 @@ public struct DayView: View {
 
   // MARK: - Properties
 
-  private let isPastDay: Bool
   private let activities: [DayActivity]
   private let newForms: NewForms?
   private let completedActivities: CompletedActivities
@@ -45,7 +44,6 @@ public struct DayView: View {
   // MARK: - Initialization
 
   public init(
-    isPastDay: Bool,
     newForms: NewForms? = nil,
     activities: [DayActivity],
     completedActivities: CompletedActivities,
@@ -54,7 +52,6 @@ public struct DayView: View {
     showCompletedTapped: @escaping () -> Void,
     hideCompletedTapped: @escaping () -> Void
   ) {
-    self.isPastDay = isPastDay
     self.newForms = newForms
     self.activities = activities
     self.completedActivities = completedActivities

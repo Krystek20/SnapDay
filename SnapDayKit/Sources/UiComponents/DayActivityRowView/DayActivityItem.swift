@@ -6,6 +6,7 @@ public struct DayActivityItem: Equatable, Identifiable {
   public enum Icon: String, Identifiable {
     case bell
     case hourglass
+    case `repeat`
 
     public var id: String { rawValue }
   }
@@ -37,7 +38,8 @@ extension DayActivityItem {
       isStrikethrough: activityType.isDone,
       displayedIcons: [
         showHourglass ? .hourglass : nil,
-        activityType.reminderDate != nil ? .bell : nil
+        activityType.reminderDate != nil ? .bell : nil,
+        activityType.isFrequentEnabled ? .repeat : nil
       ].compactMap { $0 }
     )
   }

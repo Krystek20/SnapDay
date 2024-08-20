@@ -211,11 +211,21 @@ final class DayUpdater {
 
   /// it removes existing day activities from days starting from provided date if this day is not current day and activity in this day is not done
   func updateDaysByUpdatedActivity(_ activity: Activity, from date: Date) async throws {
+    var (days, dateRange) = try await daysWithRemoved(activity, from: date)
+    try updateDays(by: activity, in: dateRange, days: &days)
+    try await saveDays(days)
+  }
+
+  func updateDaysByRemovedActivity(_ activity: Activity, from date: Date) async throws {
+    let (days, _) = try await daysWithRemoved(activity, from: date)
+    try await saveDays(days)
+  }
+
+  private func daysWithRemoved(_ activity: Activity, from date: Date) async throws -> ([Day], ClosedRange<Date>) {
     let dateRange = try await dateRangeToUpdate(date: date)
     var days = try await dayRepository.loadDays(dateRange)
     try await removeDayActivities(with: activity, in: &days, startDate: date)
-    try updateDays(by: activity, in: dateRange, days: &days)
-    try await saveDays(days)
+    return (days, dateRange)
   }
 
   func addDayActivity(_ dayActivity: DayActivity, to date: Date) async throws {

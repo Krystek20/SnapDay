@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Activity: Identifiable, Equatable, Hashable {
+public struct Activity: Identifiable, Equatable, Hashable, Decodable {
 
   // MARK: - Properties
 
@@ -8,7 +8,8 @@ public struct Activity: Identifiable, Equatable, Hashable {
   public var name: String
   public var icon: Icon?
   public var tags: [Tag]
-  public var frequency: ActivityFrequency?
+  public var frequency: ActivityFrequency
+  public var isFrequentEnabled: Bool
   public var defaultDuration: Int?
   public var dueDaysCount: Int?
   public var startDate: Date?
@@ -23,7 +24,8 @@ public struct Activity: Identifiable, Equatable, Hashable {
     name: String = "",
     icon: Icon? = nil,
     tags: [Tag] = [],
-    frequency: ActivityFrequency? = nil,
+    frequency: ActivityFrequency = .daily,
+    isFrequentEnabled: Bool = false,
     defaultDuration: Int? = nil,
     dueDaysCount: Int? = nil,
     startDate: Date? = nil,
@@ -36,6 +38,7 @@ public struct Activity: Identifiable, Equatable, Hashable {
     self.icon = icon
     self.tags = tags
     self.frequency = frequency
+    self.isFrequentEnabled = isFrequentEnabled
     self.defaultDuration = defaultDuration
     self.dueDaysCount = dueDaysCount
     self.startDate = startDate

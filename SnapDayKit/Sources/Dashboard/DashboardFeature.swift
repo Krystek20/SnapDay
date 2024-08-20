@@ -63,17 +63,22 @@ public struct DashboardFeature: TodayProvidable {
       }
     }
 
-    var dayInformation: InformationViewConfigurable? {
-      let emptyDayConfiguration: EmptyDayConfiguration = selectedDay?.isOlderThenToday == true 
-      ? .pastDay
-      : .todayOrFuture
-      let showEmptyView = selectedDay?.activities.isEmpty == true && !newActivity.isFormVisible
-      return showEmptyView ? emptyDayConfiguration : nil
+    var dayInformation: InformationViewConfiguration? {
+      guard let selectedDay, !newActivity.isFormVisible, !loading else { return nil }
+      if selectedDay.activities.allSatisfy(\.isDone) && !selectedDay.activities.isEmpty {
+        return .todaySuccess
+      } else if selectedDay.activities.isEmpty {
+        return selectedDay.date < today
+        ? .pastDay
+        : .todayOrFuture
+      }
+      return nil
     }
 
+    var loading = false
     var date: Date
     var selectedDay: Day?
-    var streamSetup: Bool = false
+    var streamSetup = false
     var newActivity = DayNewActivity.empty
     var newActivityTask = DayNewActivityTask.empty
     var activityListOption: ActivityListOption = .collapsed
@@ -220,6 +225,9 @@ public struct DashboardFeature: TodayProvidable {
       state.streamSetup = true
       return .merge(
         .run { send in
+          _ = try await activityRepository.predefinedActivities()
+        },
+        .run { send in
           await send(.internal(.loadDay))
         },
         .run { send in
@@ -301,6 +309,7 @@ public struct DashboardFeature: TodayProvidable {
       state.date = date
       return .send(.internal(.loadDay))
     case .loadDay:
+      state.loading = true
       return .run { [date = state.date] send in
         do {
           let day = try await dayProvider.day(date)
@@ -314,6 +323,7 @@ public struct DashboardFeature: TodayProvidable {
       }
     case .setDay(let day):
       state.selectedDay = day
+      state.loading = false
       return .run { _ in
         try await userNotificationCenterProvider.reloadReminders()
       }
@@ -401,6 +411,7 @@ public struct DashboardFeature: TodayProvidable {
         await send(.internal(.dayActivityAction(.showAlertSelectAll(dayActivity))))
       }
     case .create(let dayActivity):
+      state.loading = true
       return .run { [dayActivity, selectedDay = state.selectedDay] send in
         try await dayEditor.addDayActivity(dayActivity, selectedDay?.date ?? today)
         await send(.internal(.loadDay))
@@ -551,34 +562,8 @@ public struct DashboardFeature: TodayProvidable {
 
   private func handleActivityListAction(_ action: PresentationAction<ActivityListFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
-    case .presented(.delegate(.activityAdded(let activity))):
-      return .run { [activity, dayToUpdate = state.selectedDay] send in
-        try await dayEditor.updateDayActivities(activity, dayToUpdate?.date ?? today)
-        await send(.internal(.loadDay))
-      }
-    case .presented(.delegate(.activityUpdated(let activity))):
-      return .run { [activity, dayToUpdate = state.selectedDay] send in
-        try await dayEditor.updateDayActivities(activity, dayToUpdate?.date ?? today)
-        await send(.internal(.loadDay))
-      }
-    case .presented(.delegate(.activityDeleted)):
+    case .presented(.delegate(.daysUpdated)):
       return .send(.internal(.loadDay))
-    case .presented(.delegate(.activitiesSelected(let activities))):
-      guard let selectedDay = state.selectedDay else { return .none }
-      return .run { [activities, dayToUpdate = selectedDay] send in
-        for activity in activities {
-          let dayActivity = DayActivity.create(
-            from: activity,
-            uuid: { uuid() },
-            calendar: { calendar },
-            dayId: dayToUpdate.id,
-            dayDate: dayToUpdate.date,
-            createdByUser: true
-          )
-          try await dayEditor.addDayActivity(dayActivity, dayToUpdate.date)
-        }
-        await send(.internal(.loadDay))
-      }
     default:
       return .none
     }
@@ -664,17 +649,19 @@ public struct DashboardFeature: TodayProvidable {
       state.focus = nil
       return .none
     case .dayActivity(.submitted):
-      let name = state.newActivity.name
-      state.newActivity = .empty
-      state.focus = nil
-      guard !name.isEmpty, let day = state.selectedDay else { return .none }
+      guard !state.newActivity.name.isEmpty, let day = state.selectedDay else {
+        return .send(.view(.newActivityActionPerformed(.dayActivity(.cancelled))))
+      }
       let dayActivity = DayActivity(
         id: uuid(),
         dayId: day.id,
-        name: name,
+        name: state.newActivity.name,
         isGeneratedAutomatically: false
       )
-      return .send(.internal(.dayActivityAction(.create(dayActivity))))
+      return .concatenate(
+        .send(.internal(.dayActivityAction(.create(dayActivity)))),
+        .send(.view(.newActivityActionPerformed(.dayActivity(.cancelled))))
+      )
     case .dayActivityTask(.cancelled):
       state.newActivityTask = .empty
       state.focus = nil

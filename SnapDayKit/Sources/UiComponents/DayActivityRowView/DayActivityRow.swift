@@ -11,7 +11,6 @@ public struct DayActivityRow: View {
   private let activityItem: DayActivityItem
   private let size: Size
   private let trailingIcon: TrailingIcon
-  private let trailingViewTapped: (() -> Void)?
 
   private var imageSize: (size: CGFloat, cornerRadius: CGFloat) {
     switch size {
@@ -34,13 +33,11 @@ public struct DayActivityRow: View {
   public init(
     activityItem: DayActivityItem,
     size: Size = .medium,
-    trailingIcon: TrailingIcon = .none,
-    trailingViewTapped: (() -> Void)? = nil
+    trailingIcon: TrailingIcon = .none
   ) {
     self.activityItem = activityItem
     self.size = size
     self.trailingIcon = trailingIcon
-    self.trailingViewTapped = trailingViewTapped
   }
 
   public var body: some View {
@@ -63,10 +60,6 @@ public struct DayActivityRow: View {
       HStack(spacing: 10.0) {
         ForEach(activityItem.displayedIcons, content: dayActivityItem)
         view(for: trailingIcon)
-          .contentShape(Rectangle())
-          .onTapGesture {
-            trailingViewTapped?()
-          }
       }
       .padding(.trailing, 5.0)
     }
@@ -101,13 +94,9 @@ public struct DayActivityRow: View {
   private func view(for trailingIcon: TrailingIcon) -> AnyView {
     switch trailingIcon {
     case .none:
-      AnyView(
-        EmptyView()
-      )
+      AnyView(EmptyView())
     case .more:
-      AnyView(
-        prepareIcon("ellipsis")
-      )
+      AnyView(prepareIcon("ellipsis"))
     case .customView(let view):
       AnyView(view)
     }

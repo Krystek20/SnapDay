@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "activity_list_empty.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

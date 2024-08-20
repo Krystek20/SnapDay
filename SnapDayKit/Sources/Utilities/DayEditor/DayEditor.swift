@@ -10,6 +10,7 @@ public struct DayEditor {
   public var addDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
   public var removeDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
   public var updateDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
+  public var removeDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
   public var updateDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
   public var applyChanges: @Sendable (_ transactions: Transactions) async throws -> AppliedChanges
   public var moveDayActivity: @Sendable (_ dayActivity: DayActivity, _ toDate: Date) async throws -> ()
@@ -41,8 +42,11 @@ extension DayEditor: DependencyKey {
       removeDayActivity: { dayActivity, date in
         try await DayUpdater().remove(dayActivity, date: date)
       },
-      updateDayActivities: { dayActivity, date in
-        try await DayUpdater().updateDaysByUpdatedActivity(dayActivity, from: date)
+      updateDayActivities: { activity, date in
+        try await DayUpdater().updateDaysByUpdatedActivity(activity, from: date)
+      },
+      removeDayActivities: { activity, date in
+        try await DayUpdater().updateDaysByRemovedActivity(activity, from: date)
       },
       updateDayActivity: { dayActivity, date in
         try await DayUpdater().updateDayActivity(dayActivity, to: date)

@@ -2,6 +2,7 @@ import WidgetKit
 import AppIntents
 import WidgetActivityList
 import Repositories
+import Utilities
 
 struct ListUp: AppIntent {
   static var title: LocalizedStringResource = "Move list up"
@@ -44,6 +45,7 @@ struct ToggleItemIntent: AppIntent {
   func perform() async throws -> some IntentResult {
     guard let identifier else { return .result() }
     let dayActivityRepository = DayActivityRepository.liveValue
+    let userNotificationCenterProvider = UserNotificationCenterProvider.liveValue
     do {
       if var dayActivity = try await dayActivityRepository.activity(identifier) {
         dayActivity.doneDate = dayActivity.doneDate == nil ? Date() : nil
@@ -52,6 +54,7 @@ struct ToggleItemIntent: AppIntent {
         dayActivityTask.doneDate = dayActivityTask.doneDate == nil ? Date() : nil
         try await dayActivityRepository.saveDayActivityTask(dayActivityTask)
       }
+      try await userNotificationCenterProvider.reloadReminders()
       WidgetCenter.shared.reloadAllTimelines()
     } catch {
       print(error.localizedDescription)

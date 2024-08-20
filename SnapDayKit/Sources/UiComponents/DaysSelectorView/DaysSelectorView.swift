@@ -45,6 +45,7 @@ public struct DaysSelectorView: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: .zero) {
+      informationView
       dayActivityList
       timeSummary
     }
@@ -53,22 +54,19 @@ public struct DaysSelectorView: View {
   @ViewBuilder
   private var dayActivityList: some View {
     if let selectedDay {
-      dayViewList(selectedDay)
+      listDayView(selectedDay)
     }
   }
 
   @ViewBuilder
-  private func dayViewList(_ day: Day) -> some View {
+  private var informationView: some View {
     if let informationConfiguration {
       InformationView(configuration: informationConfiguration)
-    } else {
-      listDayView(day)
     }
   }
 
   private func listDayView(_ day: Day) -> some View {
     DayView(
-      isPastDay: day.isOlderThenToday ?? false, 
       newForms: newForms,
       activities: dayActivities,
       completedActivities: day.completedActivities,

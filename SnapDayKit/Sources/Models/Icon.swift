@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Icon: Identifiable, Equatable, Hashable {
+public struct Icon: Identifiable, Equatable, Hashable, Decodable {
 
   // MARK: - Properties
 

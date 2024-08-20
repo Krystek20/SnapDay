@@ -7,6 +7,7 @@
         <attribute name="frequencyJson" optional="YES" attributeType="Binary" customClassName="ActivityFrequency"/>
         <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isDefaultDuration" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isFrequentEnabled" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
         <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="activityTasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ActivityTaskEntity" inverseName="activity" inverseEntity="ActivityTaskEntity"/>

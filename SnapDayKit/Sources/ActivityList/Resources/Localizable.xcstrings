@@ -5,6 +5,7 @@
 
     },
     "Add (%lld)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "pl" : {
           "stringUnit" : {
@@ -14,7 +15,28 @@
         }
       }
     },
+    "Add to day" : {
+
+    },
     "Cancel" : {
+
+    },
+    "Disable Repeat" : {
+
+    },
+    "Easily save your favorite activities for quick access in the future." : {
+
+    },
+    "Edit" : {
+
+    },
+    "Enable Repeat" : {
+
+    },
+    "No Saved Activities Yet" : {
+
+    },
+    "Remove" : {
 
     },
     "Saved Activities" : {

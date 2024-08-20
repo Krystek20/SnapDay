@@ -9,23 +9,22 @@ public extension Activity {
   ) {
     let id = uuid()
     self.init(
-        id: id,
-        name: dayActivity.name,
-        icon: dayActivity.icon,
-        tags: dayActivity.tags,
-        frequency: nil,
-        defaultDuration: dayActivity.duration,
-        startDate: startDate,
-        labels: dayActivity.labels,
-        tasks: dayActivity.dayActivityTasks.compactMap { dayActivityTask in
-          ActivityTask(
-            uuid: uuid,
-            activityId: id,
-            dayActivity: dayActivityTask
-          )
-        },
-        defaultReminderDate: dayActivity.reminderDate
-      )
+      id: id,
+      name: dayActivity.name,
+      icon: dayActivity.icon,
+      tags: dayActivity.tags,
+      defaultDuration: dayActivity.duration,
+      startDate: startDate,
+      labels: dayActivity.labels,
+      tasks: dayActivity.dayActivityTasks.compactMap { dayActivityTask in
+        ActivityTask(
+          uuid: uuid,
+          activityId: id,
+          dayActivity: dayActivityTask
+        )
+      },
+      defaultReminderDate: dayActivity.reminderDate
+    )
   }
 }
 

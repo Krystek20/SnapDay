@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct RGBColor: Equatable, Hashable, Identifiable {
+public struct RGBColor: Equatable, Hashable, Identifiable, Decodable {
 
   // MARK: - Properties
 

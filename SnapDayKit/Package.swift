@@ -166,6 +166,17 @@ private enum Module: String {
       [.source, .tests]
     }
   }
+
+  var resources: [Resource] {
+    switch self {
+    case .repositories:
+      [
+        .process("Resources/PredefinedActivities.json")
+      ]
+    default:
+      []
+    }
+  }
 }
 
 // MARK: - Product
@@ -221,7 +232,8 @@ private extension Target {
   static func target(_ name: Module, dependencies: [Module]) -> Target {
     .target(
       name: name.name,
-      dependencies: dependencies.compactMap(\.dependency)
+      dependencies: dependencies.compactMap(\.dependency),
+      resources: name.resources
     )
   }
 

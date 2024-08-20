@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ActivityLabel: Identifiable, Equatable, Hashable {
+public struct ActivityLabel: Identifiable, Equatable, Hashable, Decodable {
 
   // MARK: - Properties
 

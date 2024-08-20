@@ -7,11 +7,8 @@ extension ActivityEntity {
     identifier = activity.id
     name = activity.name
     icon = try activity.icon?.managedObject(context)
-    if let frequency = activity.frequency {
-      frequencyJson = try JSONEncoder().encode(frequency)
-    } else {
-      frequencyJson = nil
-    }
+    frequencyJson = try JSONEncoder().encode(activity.frequency)
+    isFrequentEnabled = activity.isFrequentEnabled
     isDefaultDuration = activity.defaultDuration != nil
     defaultDuration = Int32(activity.defaultDuration ?? .zero)
     dueDaysCount = Int32(activity.dueDaysCount ?? .zero)

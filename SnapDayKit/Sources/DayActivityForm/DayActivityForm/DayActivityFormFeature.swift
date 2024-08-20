@@ -66,7 +66,7 @@ public struct DayActivityFormFeature {
     var photoItem: PhotoItem?
     var editDate: Date
 
-    var showFrequencyOptions: Bool { form.isRepeatable }
+    var showFrequencyOptions: Bool { form.frequency != nil }
     var showWeekdaysView: Bool { form.areWeekdaysRequried }
     var showMonthlyView: Bool { form.areMonthlyScheduleRequried }
     var showMonthDays: Bool { form.areMonthDaysRequried }

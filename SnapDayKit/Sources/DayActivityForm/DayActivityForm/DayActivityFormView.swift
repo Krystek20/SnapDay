@@ -232,18 +232,16 @@ public struct DayActivityFormView: View {
   private var frequencyView: some View {
     WithPerceptionTracking {
       ScrollViewReader { reader in
-        WithPerceptionTracking {
-          VStack(spacing: 10.0) {
-            toggleView
-            frequencyOptionsIfNeeded(reader: reader)
-            weekdaysViewIfNeeded(reader: reader)
-            monthlyScheduleViewIfNeeded(reader: reader)
-            monthGridIfNeeded(reader: reader)
-            monthlyWeekdaysViewIfNeeded(reader: reader)
-          }
-          .formBackgroundModifier()
-          .id("RecurrencyView")
+        VStack(spacing: 10.0) {
+          toggleView
+          frequencyOptionsIfNeeded(reader: reader)
+          weekdaysViewIfNeeded(reader: reader)
+          monthlyScheduleViewIfNeeded(reader: reader)
+          monthGridIfNeeded(reader: reader)
+          monthlyWeekdaysViewIfNeeded(reader: reader)
         }
+        .formBackgroundModifier()
+        .id("RecurrencyView")
       }
     }
   }
@@ -252,12 +250,9 @@ public struct DayActivityFormView: View {
   private var toggleView: some View {
     WithPerceptionTracking {
       Toggle(
-        isOn: Binding(
-          get: { store.form.isRepeatable },
-          set: { value in $store.form.wrappedValue.setIsRepeatable(value) }
-        )
+        isOn: $store.form.isFrequentEnabled
       ) {
-        Text("Repeatable", bundle: .module)
+        Text("Repeat", bundle: .module)
           .formTitleTextStyle
       }
       .toggleStyle(CheckToggleStyle())

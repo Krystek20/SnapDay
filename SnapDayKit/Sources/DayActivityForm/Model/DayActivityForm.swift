@@ -15,6 +15,12 @@ public enum DayActivityFormType: Equatable {
   case activityTask(showCompleted: Bool)
 }
 
+public enum DayActivityFormMenuAction: Equatable {
+  case select
+  case edit
+  case remove
+}
+
 public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, FrequencyProtocol {
   public var id: UUID
   public var ids: [DayActivityFormId: UUID]
@@ -23,6 +29,7 @@ public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, Freque
   public var name: String
   public var tags: [Tag]
   public var frequency: ActivityFrequency?
+  public var isFrequentEnabled: Bool
   public var duration: Int
   public var dueDate: Date?
   public var dueDaysCount: Int?
@@ -87,7 +94,7 @@ extension DayActivityForm {
     case .activityTask:
       [.name]
     case .template:
-      [.name, .frequency]
+      [.name]
     case .templateTask:
       [.name]
     }
@@ -103,6 +110,17 @@ extension DayActivityForm {
       String(localized: "Edit Template", bundle: .module)
     case .templateTask:
       String(localized: "Edit Template Task", bundle: .module)
+    }
+  }
+
+  var menuActions: [DayActivityFormMenuAction] {
+    switch type {
+    case .activity, .template:
+      []
+    case .activityTask:
+      [.select, .edit, .remove]
+    case .templateTask:
+      [.edit, .remove]
     }
   }
 }
@@ -140,6 +158,7 @@ extension DayActivityForm {
       completed: false,
       name: .empty,
       tags: [],
+      isFrequentEnabled: false,
       duration: .zero,
       overview: .empty,
       tasks: [],
@@ -172,6 +191,7 @@ extension DayActivityForm {
     }
     self.labels = dayActivity.labels
     self.frequency = nil
+    self.isFrequentEnabled = false
     self.type = .activity(showCompleted: showCompleted)
   }
 }
@@ -236,6 +256,7 @@ extension DayActivityForm {
     self.tasks = []
     self.labels = []
     self.frequency = nil
+    self.isFrequentEnabled = false
     self.type = .activityTask(showCompleted: showCompleted)
   }
 }
@@ -287,6 +308,7 @@ extension DayActivityForm {
     self.tasks = activity.tasks.map(DayActivityForm.init)
     self.labels = activity.labels
     self.frequency = activity.frequency
+    self.isFrequentEnabled = activity.isFrequentEnabled
     self.type = .template
   }
 }
@@ -298,7 +320,8 @@ extension Activity {
       name: form.name,
       icon: form.icon,
       tags: form.tags,
-      frequency: form.frequency,
+      frequency: form.frequency ?? .daily,
+      isFrequentEnabled: form.isFrequentEnabled,
       defaultDuration: form.duration,
       dueDaysCount: form.dueDaysCount,
       startDate: startDate,
@@ -313,7 +336,8 @@ extension Activity {
     self.name = form.name
     self.icon = form.icon
     self.tags = form.tags
-    self.frequency = form.frequency
+    self.frequency = form.frequency ?? .daily
+    self.isFrequentEnabled = form.isFrequentEnabled
     self.defaultDuration = form.duration
     self.dueDaysCount = form.dueDaysCount
     self.startDate = startDate
@@ -339,6 +363,7 @@ extension DayActivityForm {
     self.tasks = []
     self.labels = []
     self.frequency = nil
+    self.isFrequentEnabled = false
     self.type = .templateTask
   }
 }
@@ -372,7 +397,7 @@ extension DayActivityForm {
       case .icon: icon != nil
       case .name: !name.isEmpty
       case .tags: !tags.isEmpty
-      case .frequency: isFrequencyValid
+      case .frequency: frequency != nil
       case .dueDate: dueDate != nil
       case .dueDaysCount: dueDaysCount != nil
       case .duration: duration > .zero
