@@ -67,8 +67,12 @@ extension DayActivity {
     })
   }
 
-  public var toDoTasks: [DayActivityTask] {
-    dayActivityTasks.filter { !$0.isDone }
+  public func ordered(hideCompleted: Bool) -> [DayActivityTask] {
+    dayActivityTasks
+      .sorted(by: { $0.position < $1.position })
+      .filter {
+        hideCompleted ? !$0.isDone : true
+      }
   }
 }
 

@@ -10,5 +10,6 @@ extension ActivityTaskEntity {
     isDefaultDuration = activityTask.defaultDuration != nil
     defaultDuration = Int32(activityTask.defaultDuration ?? .zero)
     defaultReminderDate = activityTask.defaultReminderDate
+    defaultPosition = Int32(activityTask.defaultPosition)
   }
 }

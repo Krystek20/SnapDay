@@ -40,7 +40,8 @@ public extension ActivityTask {
       name: dayActivity.name,
       icon: dayActivity.icon,
       defaultDuration: dayActivity.duration,
-      defaultReminderDate: dayActivity.reminderDate
+      defaultReminderDate: dayActivity.reminderDate,
+      defaultPosition: dayActivity.position
     )
   }
 }

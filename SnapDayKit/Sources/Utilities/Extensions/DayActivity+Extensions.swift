@@ -37,7 +37,8 @@ extension DayActivity {
           doneDate: nil,
           duration: $0.defaultDuration ?? .zero,
           overview: nil,
-          reminderDate: calendar().reminderDate(from: $0.defaultReminderDate, dayDate: dayDate)
+          reminderDate: calendar().reminderDate(from: $0.defaultReminderDate, dayDate: dayDate),
+          position: $0.defaultPosition
         )
       },
       reminderDate: calendar().reminderDate(from: activity.defaultReminderDate, dayDate: dayDate)

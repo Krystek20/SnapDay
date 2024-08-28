@@ -342,9 +342,9 @@ public struct DayView: View {
   private func tasks(for dayActivity: DayActivity) -> [DayActivityTask] {
     switch dayViewShowButtonState {
     case .show:
-      dayActivity.toDoTasks
+      dayActivity.ordered(hideCompleted: true)
     case .hide, .none:
-      dayActivity.dayActivityTasks
+      dayActivity.ordered(hideCompleted: false)
     }
   }
 }

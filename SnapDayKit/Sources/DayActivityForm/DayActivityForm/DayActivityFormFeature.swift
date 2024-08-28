@@ -372,11 +372,9 @@ public struct DayActivityFormFeature {
   private func handleEmojiPickerAction(_ action: PresentationAction<EmojiPickerFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
     case .presented(.delegate(.dataSelected(let data))):
-      return .run { [data] send in
-        await send(.internal(.setImageDate(data)))
-      }
+      .send(.internal(.setImageDate(data)))
     case .presented, .dismiss:
-      return .none
+      .none
     }
   }
 

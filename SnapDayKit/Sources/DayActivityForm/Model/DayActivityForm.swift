@@ -38,6 +38,7 @@ public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, Freque
   public var tasks: [DayActivityForm]
   public var labels: [ActivityLabel]
   public let type: DayActivityFormType
+  public let position: Int
 }
 
 extension DayActivityForm {
@@ -163,7 +164,8 @@ extension DayActivityForm {
       overview: .empty,
       tasks: [],
       labels: [],
-      type: type
+      type: type,
+      position: .zero
     )
   }
 }
@@ -186,13 +188,17 @@ extension DayActivityForm {
     self.dueDate = dayActivity.dueDate
     self.dueDaysCount = nil
     self.overview = dayActivity.overview ?? ""
-    self.tasks = dayActivity.dayActivityTasks.map { dayActivityTask in
-      DayActivityForm(dayActivityTask: dayActivityTask, showCompleted: showCompleted)
-    }
+    self.tasks = dayActivity
+      .dayActivityTasks
+      .map { dayActivityTask in
+        DayActivityForm(dayActivityTask: dayActivityTask, showCompleted: showCompleted)
+      }
+      .sorted(by: { $0.position < $1.position })
     self.labels = dayActivity.labels
     self.frequency = nil
     self.isFrequentEnabled = false
     self.type = .activity(showCompleted: showCompleted)
+    self.position = .zero
   }
 }
 
@@ -258,6 +264,7 @@ extension DayActivityForm {
     self.frequency = nil
     self.isFrequentEnabled = false
     self.type = .activityTask(showCompleted: showCompleted)
+    self.position = dayActivityTask.position
   }
 }
 
@@ -305,11 +312,15 @@ extension DayActivityForm {
     self.reminderDate = activity.reminderDate
     self.dueDaysCount = activity.dueDaysCount
     self.overview = activity.overview ?? ""
-    self.tasks = activity.tasks.map(DayActivityForm.init)
+    self.tasks = activity
+      .tasks
+      .map(DayActivityForm.init)
+      .sorted(by: { $0.position < $1.position })
     self.labels = activity.labels
     self.frequency = activity.frequency
     self.isFrequentEnabled = activity.isFrequentEnabled
     self.type = .template
+    self.position = .zero
   }
 }
 
@@ -342,7 +353,10 @@ extension Activity {
     self.dueDaysCount = form.dueDaysCount
     self.startDate = startDate
     self.labels = form.labels
-    self.tasks = form.tasks.compactMap(ActivityTask.init)
+    self.tasks = form
+      .tasks
+      .compactMap(ActivityTask.init)
+      .sorted(by: { $0.defaultPosition < $1.defaultPosition })
     self.defaultReminderDate = form.reminderDate
   }
 }
@@ -365,6 +379,7 @@ extension DayActivityForm {
     self.frequency = nil
     self.isFrequentEnabled = false
     self.type = .templateTask
+    self.position = activityTask.defaultPosition
   }
 }
 
@@ -377,7 +392,8 @@ extension ActivityTask {
       name: form.name,
       icon: form.icon,
       defaultDuration: form.duration,
-      defaultReminderDate: form.reminderDate
+      defaultReminderDate: form.reminderDate,
+      defaultPosition: form.position
     )
   }
 

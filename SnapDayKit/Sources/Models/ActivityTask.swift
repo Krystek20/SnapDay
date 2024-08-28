@@ -10,6 +10,7 @@ public struct ActivityTask: Identifiable, Equatable, Hashable, Decodable {
   public var icon: Icon?
   public var defaultDuration: Int?
   public var defaultReminderDate: Date?
+  public var defaultPosition: Int
 
   // MARK: - Initialization
 
@@ -19,7 +20,8 @@ public struct ActivityTask: Identifiable, Equatable, Hashable, Decodable {
     name: String = "",
     icon: Icon? = nil,
     defaultDuration: Int? = nil,
-    defaultReminderDate: Date? = nil
+    defaultReminderDate: Date? = nil,
+    defaultPosition: Int
   ) {
     self.id = id
     self.activityId = activityId
@@ -27,5 +29,6 @@ public struct ActivityTask: Identifiable, Equatable, Hashable, Decodable {
     self.icon = icon
     self.defaultDuration = defaultDuration
     self.defaultReminderDate = defaultReminderDate
+    self.defaultPosition = defaultPosition
   }
 }

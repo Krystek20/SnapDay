@@ -18,7 +18,8 @@ extension DayActivityTask {
       doneDate: entity.doneDate,
       duration: Int(entity.duration),
       overview: entity.overview,
-      reminderDate: entity.reminderDate
+      reminderDate: entity.reminderDate,
+      position: Int(entity.position)
     )
   }
 }

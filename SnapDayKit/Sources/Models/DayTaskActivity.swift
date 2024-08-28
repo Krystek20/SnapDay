@@ -13,6 +13,7 @@ public struct DayActivityTask: Identifiable, Equatable, Hashable {
   public var duration: Int
   public var overview: String?
   public var reminderDate: Date?
+  public var position: Int
 
   // MARK: - Initialization
 
@@ -25,7 +26,8 @@ public struct DayActivityTask: Identifiable, Equatable, Hashable {
     doneDate: Date? = nil,
     duration: Int = .zero,
     overview: String? = nil,
-    reminderDate: Date? = nil
+    reminderDate: Date? = nil,
+    position: Int = .zero
   ) {
     self.id = id
     self.dayActivityId = dayActivityId
@@ -36,6 +38,7 @@ public struct DayActivityTask: Identifiable, Equatable, Hashable {
     self.duration = duration
     self.overview = overview
     self.reminderDate = reminderDate
+    self.position = position
   }
 }
 

@@ -1,0 +1,1127 @@
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Morning Exercise Routine",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "emoji": "🏋️"
+    },
+    "tags": [
+      {
+        "id": "57e04cb7-42eb-43e9-8be8-5b9f4b08b24f",
+        "name": "Fitness",
+        "rgbColor": {
+          "red": 1.0,
+          "green": 0.0,
+          "blue": 0.0,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "f3411ed7-0bca-45f5-a2f8-7e15a8f0f7d1",
+        "name": "Health",
+        "rgbColor": {
+          "red": 0.0,
+          "green": 1.0,
+          "blue": 0.0,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "daily": { }
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 30,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T06:00:00Z",
+    "labels": [
+      {
+        "id": "Exercise",
+        "name": "Exercise",
+        "rgbColor": {
+          "red": 1.0,
+          "green": 0.5,
+          "blue": 0.0,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "overview": "The Morning Exercise Routine boosts energy and fitness with a balanced mix of stretches, cardio, and strength exercises to start the day right.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440002",
+        "activityId": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Warm-up",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440002",
+          "emoji": "🔥"
+        },
+        "defaultDuration": 5,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440003",
+        "activityId": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Cardio",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440003",
+          "emoji": "🏃"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440004",
+        "activityId": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Strength Training",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440004",
+          "emoji": "💪"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440005",
+        "activityId": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Cool-down",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440005",
+          "emoji": "🧘"
+        },
+        "defaultDuration": 5,
+        "defaultReminderDate": null,
+        "defaultPosition": 3
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T06:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440009",
+    "name": "Weekly Team Meeting",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440009",
+      "emoji": "📅"
+    },
+    "tags": [
+      {
+        "name": "Work",
+        "rgbColor": {
+          "red": 255,
+          "green": 255,
+          "blue": 0,
+          "alpha": 1.0
+        }
+      },
+      {
+        "name": "Team",
+        "rgbColor": {
+          "red": 0,
+          "green": 255,
+          "blue": 255,
+          "alpha": 1.0
+        }
+      },
+      {
+        "name": "Meeting",
+        "rgbColor": {
+          "red": 255,
+          "green": 0,
+          "blue": 255,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "weekly": {
+        "days": [
+          2
+        ]
+      }
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 60,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T06:00:00Z",
+    "labels": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440011",
+        "name": "Progress",
+        "rgbColor": {
+          "red": 0,
+          "green": 128,
+          "blue": 0,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440012",
+        "name": "Challenges",
+        "rgbColor": {
+          "red": 255,
+          "green": 69,
+          "blue": 0,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440013",
+        "name": "Action Items",
+        "rgbColor": {
+          "red": 30,
+          "green": 144,
+          "blue": 255,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440014",
+        "name": "Feedback",
+        "rgbColor": {
+          "red": 75,
+          "green": 0,
+          "blue": 130,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "overview": "Regular team meetings to discuss progress, address concerns, and plan for the upcoming week.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440011",
+        "activityId": "550e8400-e29b-41d4-a716-446655440009",
+        "name": "Prepare agenda",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440011",
+          "emoji": "📝"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440012",
+        "activityId": "550e8400-e29b-41d4-a716-446655440009",
+        "name": "Discuss ongoing projects",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440012",
+          "emoji": "💬"
+        },
+        "defaultDuration": 30,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440013",
+        "activityId": "550e8400-e29b-41d4-a716-446655440009",
+        "name": "Address team concerns",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440013",
+          "emoji": "🤔"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440014",
+        "activityId": "550e8400-e29b-41d4-a716-446655440009",
+        "name": "Plan for the week",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440014",
+          "emoji": "🗓️"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 3
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T09:00:00Z"
+  },
+  {
+      "id": "550e8400-e29b-41d4-a716-446655440006",
+      "name": "Reading Time",
+      "icon": {
+        "id": "550e8400-e29b-41d4-a716-446655440007",
+        "emoji": "📚"
+      },
+      "tags": [
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440118",
+          "name": "Learning",
+          "rgbColor": {
+            "red": 0.0,
+            "green": 0.5,
+            "blue": 0.5,
+            "alpha": 1.0
+          }
+        },
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440218",
+          "name": "Relaxation",
+          "rgbColor": {
+            "red": 0.5,
+            "green": 0.0,
+            "blue": 0.5,
+            "alpha": 1.0
+          }
+        },
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440318",
+          "name": "Personal",
+          "rgbColor": {
+            "red": 0.5,
+            "green": 0.5,
+            "blue": 0.0,
+            "alpha": 1.0
+          }
+        }
+      ],
+      "frequency": {
+        "daily": { }
+      },
+      "isFrequentEnabled": false,
+      "defaultDuration": 30,
+      "dueDaysCount": 0,
+      "startDate": "1970-01-01T06:00:00Z",
+      "labels": [],
+      "overview": "A dedicated time for reading to enhance knowledge, relax, and enjoy personal growth through books or articles.",
+      "tasks": [
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440008",
+          "activityId": "550e8400-e29b-41d4-a716-446655440006",
+          "name": "Choose a Book",
+          "icon": {
+            "id": "550e8400-e29b-41d4-a716-446655440008",
+            "emoji": "📖"
+          },
+          "defaultDuration": 5,
+          "defaultReminderDate": null,
+          "defaultPosition": 0
+        },
+        {
+          "id": "550e8400-e29b-41d4-a716-146655440009",
+          "activityId": "550e8400-e29b-41d4-a716-446655440006",
+          "name": "Read",
+          "icon": {
+            "id": "550e8400-e29b-41d4-a716-146655440009",
+            "emoji": "📚"
+          },
+          "defaultDuration": 20,
+          "defaultReminderDate": null,
+          "defaultPosition": 1
+        },
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440010",
+          "activityId": "550e8400-e29b-41d4-a716-446655440006",
+          "name": "Reflect on Reading",
+          "icon": {
+            "id": "550e8400-e29b-41d4-a716-446655440010",
+            "emoji": "🧠"
+          },
+          "defaultDuration": 5,
+          "defaultReminderDate": null,
+          "defaultPosition": 2
+        }
+      ],
+      "defaultReminderDate": "1970-01-01T06:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440020",
+    "name": "Grocery Shopping",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440021",
+      "emoji": "🛒"
+    },
+    "tags": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440122",
+        "name": "Errands",
+        "rgbColor": {
+          "red": 0.0,
+          "green": 0.5,
+          "blue": 0.0,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440222",
+        "name": "Shopping",
+        "rgbColor": {
+          "red": 0.5,
+          "green": 0.0,
+          "blue": 0.0,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "weekly": {
+        "days": [
+          6
+        ]
+      }
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 60,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T10:00:00Z",
+    "labels": [],
+    "overview": "A weekly task to stock up on groceries and essential household items.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440022",
+        "activityId": "550e8400-e29b-41d4-a716-446655440020",
+        "name": "Prepare Shopping List",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440022",
+          "emoji": "📝"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440023",
+        "activityId": "550e8400-e29b-41d4-a716-446655440020",
+        "name": "Go Shopping",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440023",
+          "emoji": "🛒"
+        },
+        "defaultDuration": 40,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440024",
+        "activityId": "550e8400-e29b-41d4-a716-446655440020",
+        "name": "Organize Groceries",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440024",
+          "emoji": "🏠"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T10:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440030",
+    "name": "Study Session",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440031",
+      "emoji": "📖"
+    },
+    "tags": [
+      {
+        "id": "c7e53e9b-1bbf-4b8a-9ef5-cc7a4d785db5",
+        "name": "Education",
+        "rgbColor": {
+          "red": 0.0,
+          "green": 0.5,
+          "blue": 0.8,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440118",
+        "name": "Learning",
+        "rgbColor": {
+          "red": 0.8,
+          "green": 0.5,
+          "blue": 0.0,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "daily": {}
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 120,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T18:00:00Z",
+    "labels": [
+      {
+        "id": "2fbd0e95-809e-4e68-921b-e2cb194c57a2",
+        "name": "Topics Covered",
+        "rgbColor": {
+          "red": 0.6,
+          "green": 0.2,
+          "blue": 0.8,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "1ed746d5-618b-4e71-8d18-719a1e526f9c",
+        "name": "Challenges Faced",
+        "rgbColor": {
+          "red": 0.9,
+          "green": 0.3,
+          "blue": 0.2,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "3fd8de47-3d5d-46c2-a91e-c4d7c9b8c598",
+        "name": "Progress Made",
+        "rgbColor": {
+          "red": 0.2,
+          "green": 0.7,
+          "blue": 0.4,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "overview": "A focused study session to learn and review material, track progress, and overcome learning challenges.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440032",
+        "activityId": "550e8400-e29b-41d4-a716-446655440030",
+        "name": "Set Study Goals",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440032",
+          "emoji": "🎯"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440033",
+        "activityId": "550e8400-e29b-41d4-a716-446655440030",
+        "name": "Study Material",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440033",
+          "emoji": "📚"
+        },
+        "defaultDuration": 90,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440034",
+        "activityId": "550e8400-e29b-41d4-a716-446655440030",
+        "name": "Review and Reflect",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440034",
+          "emoji": "🧠"
+        },
+        "defaultDuration": 20,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T18:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440040",
+    "name": "Cleaning House",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440041",
+      "emoji": "🧹"
+    },
+    "tags": [
+      {
+        "id": "65e29a10-4f71-4c93-a345-8c1b17b2fbee",
+        "name": "Chores",
+        "rgbColor": {
+          "red": 0.9,
+          "green": 0.8,
+          "blue": 0.2,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "82a6de69-1d2b-4e5c-a8f3-89ecb4c6c2b9",
+        "name": "Home",
+        "rgbColor": {
+          "red": 0.4,
+          "green": 0.6,
+          "blue": 0.7,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "weekly": {
+        "days": [
+          1
+        ]
+      }
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 90,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T09:00:00Z",
+    "labels": [],
+    "overview": "A scheduled task to clean and organize living spaces for a tidy and comfortable home environment.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440042",
+        "activityId": "550e8400-e29b-41d4-a716-446655440040",
+        "name": "Dust and Wipe Surfaces",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440042",
+          "emoji": "🧽"
+        },
+        "defaultDuration": 20,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440043",
+        "activityId": "550e8400-e29b-41d4-a716-446655440040",
+        "name": "Vacuum and Mop Floors",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440043",
+          "emoji": "🧼"
+        },
+        "defaultDuration": 40,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440044",
+        "activityId": "550e8400-e29b-41d4-a716-446655440040",
+        "name": "Organize and Declutter",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440044",
+          "emoji": "📦"
+        },
+        "defaultDuration": 30,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T09:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440050",
+    "name": "Family Time",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440051",
+      "emoji": "❤️"
+    },
+    "tags": [
+      {
+        "id": "3b9f1b24-6d9e-44b5-b837-c96e8e33ff9a",
+        "name": "Family",
+        "rgbColor": {
+          "red": 0.9,
+          "green": 0.4,
+          "blue": 0.2,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "8d5d8e68-d9d9-4ae5-9dc1-d42f5fa6a20c",
+        "name": "Quality Time",
+        "rgbColor": {
+          "red": 0.6,
+          "green": 0.8,
+          "blue": 0.3,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "weekly": {
+        "days": [5]
+      }
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 120,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T18:00:00Z",
+    "labels": [],
+    "overview": "Dedicated time to connect with family members, engage in shared activities, and strengthen relationships.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440052",
+        "activityId": "550e8400-e29b-41d4-a716-446655440050",
+        "name": "Plan Activities",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440052",
+          "emoji": "📝"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440053",
+        "activityId": "550e8400-e29b-41d4-a716-446655440050",
+        "name": "Enjoy Activities Together",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440053",
+          "emoji": "🎉"
+        },
+        "defaultDuration": 90,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440054",
+        "activityId": "550e8400-e29b-41d4-a716-446655440050",
+        "name": "Reflect on Time Spent",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440054",
+          "emoji": "💬"
+        },
+        "defaultDuration": 20,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T18:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440060",
+    "name": "Personal Development",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440061",
+      "emoji": "💡"
+    },
+    "tags": [
+      {
+        "id": "a8eec254-50d7-4a4c-a569-90a8a0b7a1c2",
+        "name": "Growth",
+        "rgbColor": {
+          "red": 0.4,
+          "green": 0.7,
+          "blue": 0.2,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440118",
+        "name": "Learning",
+        "rgbColor": {
+          "red": 0.2,
+          "green": 0.6,
+          "blue": 0.8,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "weekly": {
+        "days": [2]
+      }
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 60,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T19:00:00Z",
+    "labels": [],
+    "overview": "Time dedicated to improving personal skills, learning new concepts, and focusing on self-growth.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440062",
+        "activityId": "550e8400-e29b-41d4-a716-446655440060",
+        "name": "Set Goals",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440062",
+          "emoji": "🎯"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440063",
+        "activityId": "550e8400-e29b-41d4-a716-446655440060",
+        "name": "Learn and Practice",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440063",
+          "emoji": "📚"
+        },
+        "defaultDuration": 40,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440064",
+        "activityId": "550e8400-e29b-41d4-a716-446655440060",
+        "name": "Reflect and Review",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440064",
+          "emoji": "🧠"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T19:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440070",
+    "name": "Meditation and Relaxation",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440071",
+      "emoji": "🧘‍♂️"
+    },
+    "tags": [
+      {
+        "id": "5a7f8a2d-94cb-4d4b-a7b2-b68b21ec4e87",
+        "name": "Wellness",
+        "rgbColor": {
+          "red": 0.4,
+          "green": 0.8,
+          "blue": 0.6,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "b5c6f9e9-1e8f-4d91-b1b1-97d2b6d2f73f",
+        "name": "Mindfulness",
+        "rgbColor": {
+          "red": 0.7,
+          "green": 0.7,
+          "blue": 0.3,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "daily": {}
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 20,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T07:00:00Z",
+    "labels": [],
+    "overview": "A daily practice focused on calming the mind, reducing stress, and improving mental clarity through meditation and relaxation techniques.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440072",
+        "activityId": "550e8400-e29b-41d4-a716-446655440070",
+        "name": "Find a Quiet Space",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440072",
+          "emoji": "🌿"
+        },
+        "defaultDuration": 5,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440073",
+        "activityId": "550e8400-e29b-41d4-a716-446655440070",
+        "name": "Meditate and Relax",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440073",
+          "emoji": "🧘‍♀️"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440074",
+        "activityId": "550e8400-e29b-41d4-a716-446655440070",
+        "name": "Reflect on Experience",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440074",
+          "emoji": "💭"
+        },
+        "defaultDuration": 5,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T07:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440080",
+    "name": "Social Media Check",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440081",
+      "emoji": "📱"
+    },
+    "tags": [],
+    "frequency": {
+      "daily": {}
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 15,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T08:00:00Z",
+    "labels": [],
+    "overview": "A quick check of social media platforms to stay updated, engage with content, and connect with others.",
+    "tasks": [],
+    "defaultReminderDate": "1970-01-01T08:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440090",
+    "name": "Hydration Reminder",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440091",
+      "emoji": "💧"
+    },
+    "tags": [
+      {
+        "id": "f3411ed7-0bca-45f5-a2f8-7e15a8f0f7d1",
+        "name": "Health",
+        "rgbColor": {
+          "red": 0.2,
+          "green": 0.7,
+          "blue": 0.9,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "5a7f8a2d-94cb-4d4b-a7b2-b68b21ec4e87",
+        "name": "Wellness",
+        "rgbColor": {
+          "red": 0.1,
+          "green": 0.8,
+          "blue": 0.5,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "daily": {}
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 2,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T09:00:00Z",
+    "labels": [],
+    "overview": "A daily reminder to stay hydrated by drinking enough water throughout the day.",
+    "tasks": [],
+    "defaultReminderDate": "1970-01-01T09:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440100",
+    "name": "Stretch Break",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440101",
+      "emoji": "🧘‍♂️"
+    },
+    "tags": [
+      {
+        "id": "5a7f8a2d-94cb-4d4b-a7b2-b68b21ec4e87",
+        "name": "Wellness",
+        "rgbColor": {
+          "red": 0.2,
+          "green": 0.7,
+          "blue": 0.9,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "57e04cb7-42eb-43e9-8be8-5b9f4b08b24f",
+        "name": "Fitness",
+        "rgbColor": {
+          "red": 0.7,
+          "green": 0.3,
+          "blue": 0.6,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "daily": {}
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 5,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T11:00:00Z",
+    "labels": [],
+    "overview": "A short break to stretch and improve flexibility, relieve tension, and boost energy levels.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440102",
+        "activityId": "550e8400-e29b-41d4-a716-446655440100",
+        "name": "Stretch Arms and Shoulders",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440102",
+          "emoji": "💪"
+        },
+        "defaultDuration": 2,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440103",
+        "activityId": "550e8400-e29b-41d4-a716-446655440100",
+        "name": "Stretch Legs and Back",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440103",
+          "emoji": "🦵"
+        },
+        "defaultDuration": 3,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T11:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440110",
+    "name": "Lunch Break",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440111",
+      "emoji": "🍴"
+    },
+    "tags": [
+      {
+        "id": "f3411ed7-0bca-45f5-a2f8-7e15a8f0f7d1",
+        "name": "Health",
+        "rgbColor": {
+          "red": 0.6,
+          "green": 0.8,
+          "blue": 0.4,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "7f38f02a-b993-44c8-bf0f-24fa4d05b421",
+        "name": "Nutrition",
+        "rgbColor": {
+          "red": 0.9,
+          "green": 0.6,
+          "blue": 0.2,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "daily": {}
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 60,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T12:00:00Z",
+    "labels": [],
+    "overview": "A break to enjoy a nutritious meal, relax, and recharge for the rest of the day.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440112",
+        "activityId": "550e8400-e29b-41d4-a716-446655440110",
+        "name": "Prepare or Buy Lunch",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440112",
+          "emoji": "🥗"
+        },
+        "defaultDuration": 20,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440113",
+        "activityId": "550e8400-e29b-41d4-a716-446655440110",
+        "name": "Eat Lunch",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440113",
+          "emoji": "🍽️"
+        },
+        "defaultDuration": 30,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440114",
+        "activityId": "550e8400-e29b-41d4-a716-446655440110",
+        "name": "Relax and Unwind",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440114",
+          "emoji": "😌"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T12:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440120",
+    "name": "Evening Wind Down",
+    "icon": {
+      "id": "550e8400-e29b-41d4-a716-446655440121",
+      "emoji": "🌙"
+    },
+    "tags": [
+      {
+        "id": "0f938109-5d13-49a2-a6ed-6768282c4459",
+        "name": "Relaxation",
+        "rgbColor": {
+          "red": 0.5,
+          "green": 0.5,
+          "blue": 0.7,
+          "alpha": 1.0
+        }
+      },
+      {
+        "id": "319cc189-24a2-4210-8e70-2a14c8de02c4",
+        "name": "Sleep Preparation",
+        "rgbColor": {
+          "red": 0.7,
+          "green": 0.8,
+          "blue": 0.9,
+          "alpha": 1.0
+        }
+      }
+    ],
+    "frequency": {
+      "daily": {}
+    },
+    "isFrequentEnabled": false,
+    "defaultDuration": 30,
+    "dueDaysCount": 0,
+    "startDate": "1970-01-01T21:00:00Z",
+    "labels": [],
+    "overview": "A calming routine to help transition from a busy day to a restful night, improving sleep quality and relaxation.",
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655441122",
+        "activityId": "550e8400-e29b-41d4-a716-446655440120",
+        "name": "Dim the Lights",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655441122",
+          "emoji": "🕯️"
+        },
+        "defaultDuration": 5,
+        "defaultReminderDate": null,
+        "defaultPosition": 0
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440123",
+        "activityId": "550e8400-e29b-41d4-a716-446655440120",
+        "name": "Unplug and Disconnect",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440123",
+          "emoji": "📴"
+        },
+        "defaultDuration": 10,
+        "defaultReminderDate": null,
+        "defaultPosition": 1
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440124",
+        "activityId": "550e8400-e29b-41d4-a716-446655440120",
+        "name": "Relaxation Activity",
+        "icon": {
+          "id": "550e8400-e29b-41d4-a716-446655440124",
+          "emoji": "🛀"
+        },
+        "defaultDuration": 15,
+        "defaultReminderDate": null,
+        "defaultPosition": 2
+      }
+    ],
+    "defaultReminderDate": "1970-01-01T21:00:00Z"
+  }
+]

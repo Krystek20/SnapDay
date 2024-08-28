@@ -168,14 +168,7 @@ private enum Module: String {
   }
 
   var resources: [Resource] {
-    switch self {
-    case .repositories:
-      [
-        .process("Resources/PredefinedActivities.json")
-      ]
-    default:
-      []
-    }
+    []
   }
 }
 

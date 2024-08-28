@@ -14,7 +14,8 @@ extension ActivityTask {
       name: name,
       icon: try entity.icon.map(Icon.init),
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
-      defaultReminderDate: entity.defaultReminderDate
+      defaultReminderDate: entity.defaultReminderDate,
+      defaultPosition: Int(entity.defaultPosition)
     )
   }
 }

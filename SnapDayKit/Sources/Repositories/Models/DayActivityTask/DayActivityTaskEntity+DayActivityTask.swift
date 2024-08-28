@@ -11,6 +11,7 @@ extension DayActivityTaskEntity {
     doneDate = dayActivityTask.doneDate
     overview = dayActivityTask.overview
     reminderDate = dayActivityTask.reminderDate
+    position = Int32(dayActivityTask.position)
 
     if let task = dayActivityTask.activityTask {
       activityTask = try ActivityTaskEntity.object(
