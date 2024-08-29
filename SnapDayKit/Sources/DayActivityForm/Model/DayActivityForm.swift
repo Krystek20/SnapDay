@@ -75,7 +75,6 @@ extension DayActivityForm {
         .duration,
         .dueDaysCount,
         .reminder,
-        .overview,
         .tasks
       ]
     case .templateTask:

@@ -1,7 +1,7 @@
 [
   {
     "id": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "Morning Exercise Routine",
+    "name": "Poranna Rutyna Ćwiczeń",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440001",
       "emoji": "🏋️"
@@ -20,7 +20,7 @@
       },
       {
         "id": "f3411ed7-0bca-45f5-a2f8-7e15a8f0f7d1",
-        "name": "Health",
+        "name": "Zdrowie",
         "rgbColor": {
           "red": 0.0,
           "green": 1.0,
@@ -40,7 +40,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440002",
         "activityId": "550e8400-e29b-41d4-a716-446655440000",
-        "name": "Warm-up",
+        "name": "Rozgrzewka",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440002",
           "emoji": "🔥"
@@ -64,7 +64,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440004",
         "activityId": "550e8400-e29b-41d4-a716-446655440000",
-        "name": "Strength Training",
+        "name": "Trening siłowy",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440004",
           "emoji": "💪"
@@ -76,7 +76,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440005",
         "activityId": "550e8400-e29b-41d4-a716-446655440000",
-        "name": "Cool-down",
+        "name": "Ochłonięcie",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440005",
           "emoji": "🧘"
@@ -90,7 +90,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440009",
-    "name": "Weekly Team Meeting",
+    "name": "Cotygodniowe Spotkanie Zespołu",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440009",
       "emoji": "📅"
@@ -98,7 +98,7 @@
     "labels": [],
     "tags": [
       {
-        "name": "Work",
+        "name": "Praca",
         "rgbColor": {
           "red": 255,
           "green": 255,
@@ -107,7 +107,7 @@
         }
       },
       {
-        "name": "Team",
+        "name": "Zespół",
         "rgbColor": {
           "red": 0,
           "green": 255,
@@ -116,7 +116,7 @@
         }
       },
       {
-        "name": "Meeting",
+        "name": "Spotkanie",
         "rgbColor": {
           "red": 255,
           "green": 0,
@@ -140,7 +140,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440011",
         "activityId": "550e8400-e29b-41d4-a716-446655440009",
-        "name": "Prepare agenda",
+        "name": "Przygotowanie agendy",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440011",
           "emoji": "📝"
@@ -152,7 +152,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440012",
         "activityId": "550e8400-e29b-41d4-a716-446655440009",
-        "name": "Discuss ongoing projects",
+        "name": "Omówienie bieżących projektów",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440012",
           "emoji": "💬"
@@ -164,7 +164,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440013",
         "activityId": "550e8400-e29b-41d4-a716-446655440009",
-        "name": "Address team concerns",
+        "name": "Rozwiązanie problemów zespołu",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440013",
           "emoji": "🤔"
@@ -176,7 +176,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440014",
         "activityId": "550e8400-e29b-41d4-a716-446655440009",
-        "name": "Plan for the week",
+        "name": "Planowanie tygodnia",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440014",
           "emoji": "🗓️"
@@ -190,7 +190,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440006",
-    "name": "Reading Time",
+    "name": "Czas na Czytanie",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440007",
       "emoji": "📚"
@@ -199,7 +199,7 @@
     "tags": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440118",
-        "name": "Learning",
+        "name": "Nauka",
         "rgbColor": {
           "red": 0.0,
           "green": 0.5,
@@ -209,7 +209,7 @@
       },
       {
         "id": "550e8400-e29b-41d4-a716-446655440218",
-        "name": "Relaxation",
+        "name": "Relaks",
         "rgbColor": {
           "red": 0.5,
           "green": 0.0,
@@ -219,7 +219,7 @@
       },
       {
         "id": "550e8400-e29b-41d4-a716-446655440318",
-        "name": "Personal",
+        "name": "Osobiste",
         "rgbColor": {
           "red": 0.5,
           "green": 0.5,
@@ -239,7 +239,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440008",
         "activityId": "550e8400-e29b-41d4-a716-446655440006",
-        "name": "Choose a Book",
+        "name": "Wybierz książkę",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440008",
           "emoji": "📖"
@@ -251,7 +251,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-146655440009",
         "activityId": "550e8400-e29b-41d4-a716-446655440006",
-        "name": "Read",
+        "name": "Czytaj",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-146655440009",
           "emoji": "📚"
@@ -263,7 +263,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440010",
         "activityId": "550e8400-e29b-41d4-a716-446655440006",
-        "name": "Reflect on Reading",
+        "name": "Refleksja nad przeczytanym",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440010",
           "emoji": "🧠"
@@ -277,7 +277,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440020",
-    "name": "Grocery Shopping",
+    "name": "Zakupy Spożywcze",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440021",
       "emoji": "🛒"
@@ -286,7 +286,7 @@
     "tags": [
       {
         "id": "550e8400-e29b-41d4-a716-446655440122",
-        "name": "Errands",
+        "name": "Zakupy",
         "rgbColor": {
           "red": 0.0,
           "green": 0.5,
@@ -296,7 +296,7 @@
       },
       {
         "id": "550e8400-e29b-41d4-a716-446655440222",
-        "name": "Shopping",
+        "name": "Sprawunki",
         "rgbColor": {
           "red": 0.5,
           "green": 0.0,
@@ -320,7 +320,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440022",
         "activityId": "550e8400-e29b-41d4-a716-446655440020",
-        "name": "Prepare Shopping List",
+        "name": "Przygotuj listę zakupów",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440022",
           "emoji": "📝"
@@ -332,7 +332,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440023",
         "activityId": "550e8400-e29b-41d4-a716-446655440020",
-        "name": "Go Shopping",
+        "name": "Zrób zakupy",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440023",
           "emoji": "🛒"
@@ -344,7 +344,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440024",
         "activityId": "550e8400-e29b-41d4-a716-446655440020",
-        "name": "Organize Groceries",
+        "name": "Rozpakuj zakupy",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440024",
           "emoji": "🏠"
@@ -358,7 +358,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440030",
-    "name": "Study Session",
+    "name": "Sesja Nauki",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440031",
       "emoji": "📖"
@@ -367,7 +367,7 @@
     "tags": [
       {
         "id": "c7e53e9b-1bbf-4b8a-9ef5-cc7a4d785db5",
-        "name": "Education",
+        "name": "Edukacja",
         "rgbColor": {
           "red": 0.0,
           "green": 0.5,
@@ -377,7 +377,7 @@
       },
       {
         "id": "550e8400-e29b-41d4-a716-446655440118",
-        "name": "Learning",
+        "name": "Nauka",
         "rgbColor": {
           "red": 0.8,
           "green": 0.5,
@@ -397,7 +397,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440032",
         "activityId": "550e8400-e29b-41d4-a716-446655440030",
-        "name": "Set Study Goals",
+        "name": "Ustal cele nauki",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440032",
           "emoji": "🎯"
@@ -409,7 +409,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440033",
         "activityId": "550e8400-e29b-41d4-a716-446655440030",
-        "name": "Study Material",
+        "name": "Ucz się materiału",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440033",
           "emoji": "📚"
@@ -421,7 +421,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440034",
         "activityId": "550e8400-e29b-41d4-a716-446655440030",
-        "name": "Review and Reflect",
+        "name": "Przegląd i refleksja",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440034",
           "emoji": "🧠"
@@ -435,7 +435,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440040",
-    "name": "Cleaning House",
+    "name": "Sprzątanie Domu",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440041",
       "emoji": "🧹"
@@ -444,7 +444,7 @@
     "tags": [
       {
         "id": "65e29a10-4f71-4c93-a345-8c1b17b2fbee",
-        "name": "Chores",
+        "name": "Obowiązki",
         "rgbColor": {
           "red": 0.9,
           "green": 0.8,
@@ -454,7 +454,7 @@
       },
       {
         "id": "82a6de69-1d2b-4e5c-a8f3-89ecb4c6c2b9",
-        "name": "Home",
+        "name": "Dom",
         "rgbColor": {
           "red": 0.4,
           "green": 0.6,
@@ -478,7 +478,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440042",
         "activityId": "550e8400-e29b-41d4-a716-446655440040",
-        "name": "Dust and Wipe Surfaces",
+        "name": "Odkurzanie i mycie powierzchni",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440042",
           "emoji": "🧽"
@@ -490,7 +490,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440043",
         "activityId": "550e8400-e29b-41d4-a716-446655440040",
-        "name": "Vacuum and Mop Floors",
+        "name": "Odkurzanie i mopowanie podłóg",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440043",
           "emoji": "🧼"
@@ -502,7 +502,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440044",
         "activityId": "550e8400-e29b-41d4-a716-446655440040",
-        "name": "Organize and Declutter",
+        "name": "Organizacja i porządkowanie",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440044",
           "emoji": "📦"
@@ -516,7 +516,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440050",
-    "name": "Family Time",
+    "name": "Czas z Rodziną",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440051",
       "emoji": "❤️"
@@ -525,7 +525,7 @@
     "tags": [
       {
         "id": "3b9f1b24-6d9e-44b5-b837-c96e8e33ff9a",
-        "name": "Family",
+        "name": "Rodzina",
         "rgbColor": {
           "red": 0.9,
           "green": 0.4,
@@ -535,7 +535,7 @@
       },
       {
         "id": "8d5d8e68-d9d9-4ae5-9dc1-d42f5fa6a20c",
-        "name": "Quality Time",
+        "name": "Czas Wolny",
         "rgbColor": {
           "red": 0.6,
           "green": 0.8,
@@ -559,7 +559,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440052",
         "activityId": "550e8400-e29b-41d4-a716-446655440050",
-        "name": "Plan Activities",
+        "name": "Planowanie aktywności",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440052",
           "emoji": "📝"
@@ -571,7 +571,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440053",
         "activityId": "550e8400-e29b-41d4-a716-446655440050",
-        "name": "Enjoy Activities Together",
+        "name": "Wspólne spędzanie czasu",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440053",
           "emoji": "🎉"
@@ -583,7 +583,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440054",
         "activityId": "550e8400-e29b-41d4-a716-446655440050",
-        "name": "Reflect on Time Spent",
+        "name": "Refleksja nad spędzonym czasem",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440054",
           "emoji": "💬"
@@ -597,7 +597,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440060",
-    "name": "Personal Development",
+    "name": "Rozwój Osobisty",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440061",
       "emoji": "💡"
@@ -606,7 +606,7 @@
     "tags": [
       {
         "id": "a8eec254-50d7-4a4c-a569-90a8a0b7a1c2",
-        "name": "Growth",
+        "name": "Rozwój",
         "rgbColor": {
           "red": 0.4,
           "green": 0.7,
@@ -616,7 +616,7 @@
       },
       {
         "id": "550e8400-e29b-41d4-a716-446655440118",
-        "name": "Learning",
+        "name": "Nauka",
         "rgbColor": {
           "red": 0.2,
           "green": 0.6,
@@ -640,7 +640,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440062",
         "activityId": "550e8400-e29b-41d4-a716-446655440060",
-        "name": "Set Goals",
+        "name": "Ustal cele",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440062",
           "emoji": "🎯"
@@ -652,7 +652,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440063",
         "activityId": "550e8400-e29b-41d4-a716-446655440060",
-        "name": "Learn and Practice",
+        "name": "Ucz się i praktykuj",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440063",
           "emoji": "📚"
@@ -664,7 +664,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440064",
         "activityId": "550e8400-e29b-41d4-a716-446655440060",
-        "name": "Reflect and Review",
+        "name": "Refleksja i przegląd",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440064",
           "emoji": "🧠"
@@ -678,7 +678,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440070",
-    "name": "Meditation and Relaxation",
+    "name": "Medytacja i Relaksacja",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440071",
       "emoji": "🧘‍♂️"
@@ -687,7 +687,7 @@
     "tags": [
       {
         "id": "5a7f8a2d-94cb-4d4b-a7b2-b68b21ec4e87",
-        "name": "Wellness",
+        "name": "Dobrostan",
         "rgbColor": {
           "red": 0.4,
           "green": 0.8,
@@ -697,7 +697,7 @@
       },
       {
         "id": "b5c6f9e9-1e8f-4d91-b1b1-97d2b6d2f73f",
-        "name": "Mindfulness",
+        "name": "Uważność",
         "rgbColor": {
           "red": 0.7,
           "green": 0.7,
@@ -717,7 +717,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440072",
         "activityId": "550e8400-e29b-41d4-a716-446655440070",
-        "name": "Find a Quiet Space",
+        "name": "Znajdź ciche miejsce",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440072",
           "emoji": "🌿"
@@ -729,7 +729,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440073",
         "activityId": "550e8400-e29b-41d4-a716-446655440070",
-        "name": "Meditate and Relax",
+        "name": "Medytuj i relaksuj się",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440073",
           "emoji": "🧘‍♀️"
@@ -741,7 +741,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440074",
         "activityId": "550e8400-e29b-41d4-a716-446655440070",
-        "name": "Reflect on Experience",
+        "name": "Refleksja nad doświadczeniem",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440074",
           "emoji": "💭"
@@ -755,7 +755,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440080",
-    "name": "Social Media Check",
+    "name": "Sprawdzanie Mediów Społecznościowych",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440081",
       "emoji": "📱"
@@ -764,7 +764,7 @@
     "tags": [
       {
         "id": "b5c6f9e9-1e8f-4d91-b1b1-z7d2b6d2f73f",
-        "name": "Entertainment",
+        "name": "Rozrywka",
         "rgbColor": {
           "red": 0.3,
           "green": 0.1,
@@ -785,7 +785,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440090",
-    "name": "Hydration Reminder",
+    "name": "Przypomnienie o Nawodnieniu",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440091",
       "emoji": "💧"
@@ -794,7 +794,7 @@
     "tags": [
       {
         "id": "f3411ed7-0bca-45f5-a2f8-7e15a8f0f7d1",
-        "name": "Health",
+        "name": "Zdrowie",
         "rgbColor": {
           "red": 0.2,
           "green": 0.7,
@@ -804,7 +804,7 @@
       },
       {
         "id": "5a7f8a2d-94cb-4d4b-a7b2-b68b21ec4e87",
-        "name": "Wellness",
+        "name": "Dobrostan",
         "rgbColor": {
           "red": 0.1,
           "green": 0.8,
@@ -825,7 +825,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440100",
-    "name": "Stretch Break",
+    "name": "Przerwa na Rozciąganie",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440101",
       "emoji": "🧘‍♂️"
@@ -834,7 +834,7 @@
     "tags": [
       {
         "id": "5a7f8a2d-94cb-4d4b-a7b2-b68b21ec4e87",
-        "name": "Wellness",
+        "name": "Dobrostan",
         "rgbColor": {
           "red": 0.2,
           "green": 0.7,
@@ -864,7 +864,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440102",
         "activityId": "550e8400-e29b-41d4-a716-446655440100",
-        "name": "Stretch Arms and Shoulders",
+        "name": "Rozciąganie ramion i barków",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440102",
           "emoji": "💪"
@@ -876,7 +876,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440103",
         "activityId": "550e8400-e29b-41d4-a716-446655440100",
-        "name": "Stretch Legs and Back",
+        "name": "Rozciąganie nóg i pleców",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440103",
           "emoji": "🦵"
@@ -890,7 +890,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440110",
-    "name": "Lunch Break",
+    "name": "Przerwa na Lunch",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440111",
       "emoji": "🍴"
@@ -899,7 +899,7 @@
     "tags": [
       {
         "id": "f3411ed7-0bca-45f5-a2f8-7e15a8f0f7d1",
-        "name": "Health",
+        "name": "Zdrowie",
         "rgbColor": {
           "red": 0.6,
           "green": 0.8,
@@ -909,7 +909,7 @@
       },
       {
         "id": "7f38f02a-b993-44c8-bf0f-24fa4d05b421",
-        "name": "Nutrition",
+        "name": "Odżywianie",
         "rgbColor": {
           "red": 0.9,
           "green": 0.6,
@@ -929,7 +929,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440112",
         "activityId": "550e8400-e29b-41d4-a716-446655440110",
-        "name": "Prepare or Buy Lunch",
+        "name": "Przygotuj lub kup lunch",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440112",
           "emoji": "🥗"
@@ -941,7 +941,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440113",
         "activityId": "550e8400-e29b-41d4-a716-446655440110",
-        "name": "Eat Lunch",
+        "name": "Zjedz lunch",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440113",
           "emoji": "🍽️"
@@ -953,7 +953,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440114",
         "activityId": "550e8400-e29b-41d4-a716-446655440110",
-        "name": "Relax and Unwind",
+        "name": "Zrelaksuj się",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440114",
           "emoji": "😌"
@@ -967,7 +967,7 @@
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440120",
-    "name": "Evening Wind Down",
+    "name": "Wieczorne Wyciszenie",
     "icon": {
       "id": "550e8400-e29b-41d4-a716-446655440121",
       "emoji": "🌙"
@@ -976,7 +976,7 @@
     "tags": [
       {
         "id": "0f938109-5d13-49a2-a6ed-6768282c4459",
-        "name": "Relaxation",
+        "name": "Relaks",
         "rgbColor": {
           "red": 0.5,
           "green": 0.5,
@@ -986,7 +986,7 @@
       },
       {
         "id": "319cc189-24a2-4210-8e70-2a14c8de02c4",
-        "name": "Sleep Preparation",
+        "name": "Przygotowanie do Snu",
         "rgbColor": {
           "red": 0.7,
           "green": 0.8,
@@ -1006,7 +1006,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655441122",
         "activityId": "550e8400-e29b-41d4-a716-446655440120",
-        "name": "Dim the Lights",
+        "name": "Przyciemnij światła",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655441122",
           "emoji": "🕯️"
@@ -1018,7 +1018,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440123",
         "activityId": "550e8400-e29b-41d4-a716-446655440120",
-        "name": "Unplug and Disconnect",
+        "name": "Odłącz się od urządzeń",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440123",
           "emoji": "📴"
@@ -1030,7 +1030,7 @@
       {
         "id": "550e8400-e29b-41d4-a716-446655440124",
         "activityId": "550e8400-e29b-41d4-a716-446655440120",
-        "name": "Relaxation Activity",
+        "name": "Aktywność relaksacyjna",
         "icon": {
           "id": "550e8400-e29b-41d4-a716-446655440124",
           "emoji": "🛀"

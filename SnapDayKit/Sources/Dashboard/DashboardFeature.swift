@@ -26,6 +26,7 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.deeplinkService) private var deeplinkService
   private let dayProvider = DayProvider()
+  private let firstLaunchCreator = FirstLaunchCreator()
 
   // MARK: - State & Action
 
@@ -225,7 +226,7 @@ public struct DashboardFeature: TodayProvidable {
       state.streamSetup = true
       return .merge(
         .run { send in
-          _ = try await activityRepository.predefinedActivities()
+          try await firstLaunchCreator.configure()
         },
         .run { send in
           await send(.internal(.loadDay))

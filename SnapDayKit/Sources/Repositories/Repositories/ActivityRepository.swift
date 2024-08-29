@@ -8,7 +8,6 @@ public struct ActivityRepository {
   public var saveActivity: @Sendable (Activity) async throws -> ()
   public var deleteActivity: @Sendable (Activity) async throws -> ()
   public var deleteActivityTask: @Sendable (ActivityTask) async throws -> ()
-  public var predefinedActivities: @Sendable () async throws -> [Activity]
 }
 
 extension DependencyValues {
@@ -46,19 +45,6 @@ extension ActivityRepository: DependencyKey {
       },
       deleteActivityTask: { activityTask in
         try await EntityHandler().delete(activityTask)
-      },
-      predefinedActivities: {
-//        if let path = Bundle.module.path(forResource: "PredefinedActivities", ofType: "json") {
-//          let data = try Data(contentsOf: URL(filePath: path))
-//          let jsonDecoder = JSONDecoder()
-//          jsonDecoder.dateDecodingStrategy = .iso8601
-//          let decoded = try jsonDecoder.decode([Activity].self, from: data)
-//
-//          for activity in decoded {
-//            try await EntityHandler().save(activity)
-//          }
-//        }
-        return []
       }
     )
   }
