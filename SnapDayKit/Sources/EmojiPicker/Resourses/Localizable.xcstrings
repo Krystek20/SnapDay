@@ -1,17 +1,93 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Cancel" : {
-
+    "Cancel": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anuluj"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
+          }
+        }
+      }
     },
-    "Pick an emoji to make your activity uniquely yours." : {
-
+    "Pick an emoji to make your activity uniquely yours.": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz emotikonę, aby uczynić swoją aktywność wyjątkową."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle ein Emoji, um deine Aktivität einzigartig zu machen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige un emoji para que tu actividad sea única."
+          }
+        }
+      }
     },
-    "Save" : {
-
+    "Save": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapisz"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speichern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar"
+          }
+        }
+      }
     },
-    "Set Your Activity Emoji" : {
-
+    "Set Your Activity Emoji": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ustaw emotikonę swojej aktywności"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setze dein Aktivitäts-Emoji"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura el emoji de tu actividad"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

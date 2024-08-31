@@ -8,6 +8,18 @@
             "state" : "translated",
             "value" : "Pulpit nawigacyjny"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dashboard"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tablero"
+          }
         }
       }
     },
@@ -17,6 +29,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Raporty"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berichte"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Informes"
           }
         }
       }

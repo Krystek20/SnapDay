@@ -2,143 +2,510 @@
   "sourceLanguage" : "en",
   "strings" : {
     "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉" : {
-
-    },
-    "A blank canvas awaits your plans or spontaneous joys." : {
-
-    },
-    "A Day of Unplanned Possibilities" : {
-
-    },
-    "Activity Saved!" : {
-
-    },
-    "Complete Activity" : {
-
-    },
-    "Complete Activity?" : {
-
-    },
-    "Copy" : {
-
-    },
-    "Dashboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🎉 Gute Arbeit! Jetzt ruhe dich aus und genieße den Rest deines Tages mit einem Lächeln! 🎉"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🎉 ¡Gran trabajo! Ahora, descansa y disfruta el resto de tu día con una sonrisa. 🎉"
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pulpit nawigacyjny"
+            "value" : "🎉 Świetna robota! Teraz odpocznij i ciesz się resztą dnia z uśmiechem! 🎉"
           }
         }
       }
     },
-    "Day" : {
+    "A blank canvas awaits your plans or spontaneous joys." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine leere Leinwand erwartet deine Pläne oder spontanen Freuden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lienzo en blanco espera tus planes o alegrías espontáneas."
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dzień"
+            "value" : "Pusta karta czeka na Twoje plany lub spontaniczne radości."
+          }
+        }
+      }
+    },
+    "A Day of Unplanned Possibilities" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Tag voller ungeplanter Möglichkeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un día de posibilidades no planificadas"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzień nieplanowanych możliwości"
+          }
+        }
+      }
+    },
+    "Activity Saved!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität gespeichert!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Actividad guardada!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktywność zapisana!"
+          }
+        }
+      }
+    },
+    "Complete Activity" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität abschließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completar actividad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ aktywność"
+          }
+        }
+      }
+    },
+    "Complete Activity?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität abschließen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Completar actividad?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończyć aktywność?"
+          }
+        }
+      }
+    },
+    "Copy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiuj"
+          }
+        }
+      }
+    },
+    "Dashboard": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dashboard"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tablero"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulpit"
+          }
+        }
+      }
+    },
+    "Day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Día"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dzień"
           }
         }
       }
     },
     "Great job! Your activity has been successfully saved to your activity list. You can find it under the 'Activity List' button. From there, you can make your saved activities frequently and manage them easily. Keep up the good work!" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gute Arbeit! Deine Aktivität wurde erfolgreich in deiner Aktivitätsliste gespeichert. Du findest sie unter dem 'Aktivitätsliste'-Button. Von dort aus kannst du deine gespeicherten Aktivitäten regelmäßig machen und einfach verwalten. Weiter so!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Gran trabajo! Tu actividad se ha guardado exitosamente en tu lista de actividades. Puedes encontrarla bajo el botón 'Lista de Actividades'. Desde allí, puedes realizar tus actividades guardadas con frecuencia y gestionarlas fácilmente. ¡Sigue con el buen trabajo!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Świetna robota! Twoja aktywność została pomyślnie zapisana na liście aktywności. Możesz ją znaleźć pod przyciskiem 'Lista Aktywności'. Stamtąd możesz często wykonywać zapisane aktywności i łatwo nimi zarządzać. Kontynuuj dobrą pracę!"
+          }
+        }
+      }
     },
     "Hope it was enjoyable!" : {
-
-    },
-    "Incomplete Subtasks" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoffentlich war es angenehm!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Espero que haya sido agradable!"
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie skończone zadania"
+            "value" : "Mamy nadzieję, że było przyjemnie!"
           }
         }
       }
     },
-    "Mark Activity Only" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oznacz tylko aktywność "
+    "Incomplete Subtasks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unvollständige Unteraufgaben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subtareas incompletas"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nieukończone zadania"
           }
         }
       }
     },
-    "Mark All as Done" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oznacz wszystkie jako wykonane"
+    "Mark Activity Only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Aktivität markieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marcar solo actividad"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oznacz tylko aktywność"
           }
         }
       }
     },
-    "Month" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Miesiąc"
+    "Mark All as Done": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles als erledigt markieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marcar todo como hecho"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oznacz wszystkie jako wykonane"
           }
         }
       }
     },
-    "Move" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Przenieś"
+    "Month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monat"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mes"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miesiąc"
           }
         }
       }
     },
-    "Not Yet" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jeszcze nie"
+    "Move": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewegen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przenieś"
           }
         }
       }
     },
-    "Quarter" : {
-      "localizations" : {
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kwartał"
+    "Not Yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nicht"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeszcze nie"
+          }
+        }
+      }
+    },
+    "Quarter": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quartal"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trimestre"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kwartał"
           }
         }
       }
     },
     "Success!" : {
-
-    },
-    "This activity has incomplete subtasks. Would you like to mark the activity and all its subtasks as done?" : {
-
-    },
-    "This is the last task for this activity. Would you like to mark the activity as complete?" : {
-
-    },
-    "Week" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolg!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Éxito!"
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tydzień"
+            "value" : "Sukces!"
+          }
+        }
+      }
+    },
+    "This activity has incomplete subtasks. Would you like to mark the activity and all its subtasks as done?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Aktivität hat unvollständige Unteraufgaben. Möchtest du die Aktivität und alle ihre Unteraufgaben als erledigt markieren?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta actividad tiene subtareas incompletas. ¿Te gustaría marcar la actividad y todas sus subtareas como hechas?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta aktywność ma nieskończone zadania. Czy chcesz oznaczyć aktywność i wszystkie jej zadania jako wykonane?"
+          }
+        }
+      }
+    },
+    "This is the last task for this activity. Would you like to mark the activity as complete?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies ist die letzte Aufgabe für diese Aktivität. Möchtest du die Aktivität als abgeschlossen markieren?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta es la última tarea de esta actividad. ¿Te gustaría marcar la actividad como completa?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To jest ostatnie zadanie tej aktywności. Czy chcesz oznaczyć aktywność jako zakończoną?"
+          }
+        }
+      }
+    },
+    "Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semana"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tydzień"
           }
         }
       }
     },
     "Your Day, Your Way!" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Tag, dein Weg!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Tu día, tu camino!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twój dzień, Twoja droga!"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

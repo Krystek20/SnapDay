@@ -1,17 +1,93 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉" : {
-
+    "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Świetna robota! Teraz odpocznij i ciesz się resztą dnia z uśmiechem! 🎉"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Gute Arbeit! Jetzt ruhe dich aus und genieße den Rest deines Tages mit einem Lächeln! 🎉"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 ¡Gran trabajo! Ahora, descansa y disfruta el resto de tu día con una sonrisa. 🎉"
+          }
+        }
+      }
     },
-    "A blank canvas awaits your plans or spontaneous joys." : {
-
+    "A blank canvas awaits your plans or spontaneous joys.": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pusta karta czeka na Twoje plany lub spontaniczne radości."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine leere Leinwand erwartet deine Pläne oder spontanen Freuden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un lienzo en blanco espera tus planes o alegrías espontáneas."
+          }
+        }
+      }
     },
-    "Add Activity" : {
-
+    "Add Activity": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dodaj aktywność"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktivität hinzufügen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar actividad"
+          }
+        }
+      }
     },
-    "Your Day, Your Way" : {
-
+    "Your Day, Your Way": {
+      "localizations": {
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twój dzień, Twoja droga"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Tag, dein Weg"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu día, tu camino"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -109,18 +109,22 @@ public struct DeveloperToolsFeature: TodayProvidable {
       }
     case .sendDayActivityTaskReminderNotificationButtonTapped:
         .run { send in
-          let day = try await dayRepository.loadDay(today)
-          let dayActivityTask = day?.activities.reduce(into: [DayActivityTask](), { result, dayActivity in
-            result.append(contentsOf: dayActivity.dayActivityTasks)
-          }).randomElement() ?? DayActivityTask(id: uuid(), dayActivityId: uuid())
+          guard
+            let day = try await dayRepository.loadDay(today),
+            let dayActivity = day.activities.first(where: { !$0.dayActivityTasks.isEmpty }),
+            let dayActivityTask = dayActivity.dayActivityTasks.randomElement()
+          else { return }
+
           let dayActivityTaskNotification = DayActivityNotification(
-            type: .activityTask(dayActivityTask),
+            type: .activityTask(dayActivity, dayActivityTask),
             calendar: calendar
           )
+
           let notification = DeveloperNotificiation(
             identifier: uuid().uuidString,
             content: dayActivityTaskNotification.content
           )
+
           await send(.internal(.schedule(notification: notification)))
         }
     case .sendEveningSummaryReminderNotificationButtonTapped:

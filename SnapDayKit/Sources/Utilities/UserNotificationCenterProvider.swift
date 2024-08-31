@@ -166,7 +166,7 @@ extension UserNotificationCenterProvider {
         for shiftDay in shiftDays {
           try await userNotificationCenterProvider.schedule(
             userNotification: DayActivityNotification(
-              type: .activityTask(dayActivityTask),
+              type: .activityTask(dayActivity, dayActivityTask),
               calendar: calendar,
               shiftDay: shiftDay
             )
@@ -258,10 +258,13 @@ extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
       try await dayActivityRepository.saveDayActivity(dayActivity)
       notification = DayActivityNotification(type: .activity(dayActivity), calendar: calendar)
     case .activityTask:
-      guard var dayActivityTask = try await dayActivityRepository.activityTask(identifier) else { return }
+      guard 
+        var dayActivityTask = try await dayActivityRepository.activityTask(identifier),
+        let dayActivity = try await dayActivityRepository.activity(dayActivityTask.dayActivityId.uuidString)
+      else { return }
       dayActivityTask.reminderDate = calendar.date(byAdding: .minute, value: minutes, to: date.now)
       try await dayActivityRepository.saveDayActivityTask(dayActivityTask)
-      notification = DayActivityNotification(type: .activityTask(dayActivityTask), calendar: calendar)
+      notification = DayActivityNotification(type: .activityTask(dayActivity, dayActivityTask), calendar: calendar)
     }
     guard let notification else { return }
     await remove(userNotification: notification)

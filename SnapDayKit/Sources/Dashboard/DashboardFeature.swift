@@ -112,7 +112,6 @@ public struct DashboardFeature: TodayProvidable {
       case decreaseButtonTapped
     }
     public enum InternalAction: Equatable {
-      case showDatePicker
       case changesApplied(AppliedChanges)
       case loadDay
       case setDate(_ date: Date)
@@ -266,7 +265,8 @@ public struct DashboardFeature: TodayProvidable {
     case .newActivityActionPerformed(let action):
       return handleDayNewActivityAction(action, state: &state)
     case .calendarButtonTapped:
-      return .send(.internal(.showDatePicker))
+      showDatePicker(state: &state)
+      return .none
     case .activityListButtonTapped:
       guard let selectedDay = state.selectedDay else { return .none }
       state.activityList = ActivityListFeature.State(day: selectedDay)
@@ -298,12 +298,10 @@ public struct DashboardFeature: TodayProvidable {
       let shouldReload = appliedChanges.dates.contains { date in
         state.date == date
       }
-      return .merge(
-        .run { [shouldReload] send in
+      return .run { [shouldReload] send in
           guard shouldReload else { return }
           await send(.internal(.loadDay))
         }
-      )
     case .calendarDayChanged:
       return .send(.internal(.loadDay))
     case .setDate(let date):
@@ -332,14 +330,6 @@ public struct DashboardFeature: TodayProvidable {
       return handleDayActivityAction(action, state: &state)
     case .dayActivityTaskAction(let action):
       return handleDayActivityTaskAction(action, state: &state)
-    case .showDatePicker:
-      guard let selectedDay = state.selectedDay else { return .none }
-      state.calendarPicker = CalendarPickerFeature.State(
-        type: .singleSelection(.noConfirmation),
-        date: selectedDay.date,
-        actionIdentifier: CalendarActivityAction.changeDate.rawValue
-      )
-      return .none
     case .handleDeepLink(let deeplink):
       deeplinkService.consume()
       guard let deeplink else { return .none }
@@ -680,6 +670,15 @@ public struct DashboardFeature: TodayProvidable {
       )
       return .send(.internal(.dayActivityTaskAction(.create(dayActivityTask))))
     }
+  }
+
+  private func showDatePicker(state: inout State) {
+    guard let selectedDay = state.selectedDay else { return }
+    state.calendarPicker = CalendarPickerFeature.State(
+      type: .singleSelection(.noConfirmation),
+      date: selectedDay.date,
+      actionIdentifier: CalendarActivityAction.changeDate.rawValue
+    )
   }
 
   private func findActivityTask(form: DayActivityForm, state: State) -> DayActivityTask? {

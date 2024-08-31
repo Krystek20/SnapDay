@@ -13,7 +13,7 @@ public enum DayActivityNotificationKind: String {
 
 public enum ActivityNotificationType: Equatable {
   case activity(DayActivity)
-  case activityTask(DayActivityTask)
+  case activityTask(DayActivity, DayActivityTask)
 }
 
 public struct DayActivityNotification: UserNotification {
@@ -28,7 +28,7 @@ public struct DayActivityNotification: UserNotification {
     let identifier = switch type {
     case .activity(let dayActivity):
       dayActivity.id.uuidString
-    case .activityTask(let dayActivityTask):
+    case .activityTask(_, let dayActivityTask):
       dayActivityTask.id.uuidString
     }
     return notificationIdentifierPrefix + identifier + "_\(shiftDay)"
@@ -38,7 +38,7 @@ public struct DayActivityNotification: UserNotification {
     switch type {
     case .activity(let dayActivity):
       dayActivity.reminderDate != nil
-    case .activityTask(let dayActivityTask):
+    case .activityTask(_, let dayActivityTask):
       dayActivityTask.reminderDate != nil
     }
   }
@@ -64,8 +64,8 @@ public struct DayActivityNotification: UserNotification {
     switch type {
     case .activity(let dayActivity):
       dayActivity.name
-    case .activityTask(let dayActivityTask):
-      dayActivityTask.name
+    case .activityTask(let dayActivity, let dayActivityTask):
+      dayActivity.name + " - " + dayActivityTask.name
     }
   }
 
@@ -73,7 +73,7 @@ public struct DayActivityNotification: UserNotification {
     switch type {
     case .activity(let dayActivity):
       dayActivity.reminderDate
-    case .activityTask(let dayActivityTask):
+    case .activityTask(_, let dayActivityTask):
       dayActivityTask.reminderDate
     }
   }
@@ -85,7 +85,7 @@ public struct DayActivityNotification: UserNotification {
         DayActivityNotificationKey.identifier.rawValue: dayActivity.id.uuidString,
         DayActivityNotificationKey.kind.rawValue: DayActivityNotificationKind.activity.rawValue
       ]
-    case .activityTask(let dayActivityTask):
+    case .activityTask(_, let dayActivityTask):
       [
         DayActivityNotificationKey.identifier.rawValue: dayActivityTask.id.uuidString,
         DayActivityNotificationKey.kind.rawValue: DayActivityNotificationKind.activityTask.rawValue
