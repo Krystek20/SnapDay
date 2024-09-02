@@ -32,7 +32,7 @@ extension TimePeriodActivity {
       doneCount: isDone
       ? doneCount + 1
       : doneCount,
-      duration: isDone 
+      duration: isDone
       ? self.duration + duration
       : self.duration
     )

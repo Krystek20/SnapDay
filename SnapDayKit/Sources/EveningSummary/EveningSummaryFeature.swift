@@ -51,7 +51,7 @@ public struct EveningSummaryFeature: TodayProvidable {
 
     let date: Date
 
-    public init(date: Date) { 
+    public init(date: Date) {
       self.date = date
     }
   }

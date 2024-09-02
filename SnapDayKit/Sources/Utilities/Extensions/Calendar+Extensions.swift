@@ -2,7 +2,7 @@ import Foundation
 import Dependencies
 
 extension Calendar {
-    
+
   public static var today: Date {
     @Dependency(\.calendar) var calendar
     @Dependency(\.date.now) var now

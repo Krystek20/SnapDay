@@ -3,7 +3,7 @@ import ComposableArchitecture
 import Models
 
 struct ActivityDatesCreator {
-  
+
   // MARK: - Dependecies
 
   @Dependency(\.calendar) private var calendar
@@ -214,7 +214,11 @@ struct ActivityDatesCreator {
     }
   }
 
-  private func addIf(in dateRange: ClosedRange<Date>, initial: (Date) throws -> Date, next: (Date) throws -> Date) throws -> [Date] {
+  private func addIf(
+    in dateRange: ClosedRange<Date>,
+    initial: (Date) throws -> Date,
+    next: (Date) throws -> Date
+  ) throws -> [Date] {
     var currentDate = try initial(dateRange.lowerBound)
     var dates = [Date]()
     while currentDate <= dateRange.upperBound {

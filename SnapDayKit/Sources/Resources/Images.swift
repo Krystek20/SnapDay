@@ -12,4 +12,3 @@ public extension Image {
     self.init(images.rawValue, bundle: .module)
   }
 }
-

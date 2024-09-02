@@ -35,7 +35,7 @@ public struct EmojiPickerFeature {
     public enum DelegateAction: Equatable {
       case dataSelected(Data?)
     }
-    
+
     case binding(BindingAction<State>)
 
     case view(ViewAction)
@@ -55,14 +55,14 @@ public struct EmojiPickerFeature {
       switch action {
       case .view(.saveButtonTapped):
         return .run { [emoji = state.emoji] send in
-          let data = emoji.isEmpty 
+          let data = emoji.isEmpty
           ? nil
           : emoji.emojiToImage(size: 140.0).pngData()
           await send(.delegate(.dataSelected(data)))
           await dismiss()
         }
       case .view(.cancelButtonTapped):
-        return .run { send in
+        return .run { _ in
           await dismiss()
         }
       case .delegate(.dataSelected):

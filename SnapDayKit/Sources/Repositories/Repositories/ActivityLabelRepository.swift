@@ -3,8 +3,8 @@ import Dependencies
 import Models
 
 public struct ActivityLabelRepository {
-  public var saveLabel: @Sendable (ActivityLabel) async throws -> ()
-  public var deleteLabel: @Sendable (ActivityLabel) async throws -> ()
+  public var saveLabel: @Sendable (ActivityLabel) async throws -> Void
+  public var deleteLabel: @Sendable (ActivityLabel) async throws -> Void
   public var loadLabels: @Sendable (_ activityId: UUID, _ excludedLabels: [ActivityLabel]) async throws -> [ActivityLabel]
 }
 

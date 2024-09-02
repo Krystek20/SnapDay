@@ -36,7 +36,10 @@ public struct TagSectionsProvider {
     }
   }
 
-  private func reduceIntoTimePeriodActivitySections(_ result: inout [TagActivitySection], timePeriodActivity: TimePeriodActivity) {
+  private func reduceIntoTimePeriodActivitySections(
+    _ result: inout [TagActivitySection],
+    timePeriodActivity: TimePeriodActivity
+  ) {
     timePeriodActivity.activity.tags.forEach { tag in
       if let index = result.firstIndex(where: { $0.tag == tag }) {
         result[index].timePeriodActivities.append(timePeriodActivity)

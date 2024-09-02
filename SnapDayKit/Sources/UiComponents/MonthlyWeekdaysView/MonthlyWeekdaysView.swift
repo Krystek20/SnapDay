@@ -41,7 +41,7 @@ public struct MonthlyWeekdaysView: View {
                   )
                 }
               }
-            ), 
+            ),
             weekdays: weekdays
           )
         }

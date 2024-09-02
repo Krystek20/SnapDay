@@ -18,7 +18,7 @@ public struct Activity: Identifiable, Equatable, Hashable, Decodable {
   public var defaultReminderDate: Date?
 
   // MARK: - Initialization
-  
+
   public init(
     id: UUID,
     name: String = "",

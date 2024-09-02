@@ -78,7 +78,7 @@ public struct DayActivityNotification: UserNotification {
     }
   }
 
-  private var userInfo: [AnyHashable : Any] {
+  private var userInfo: [AnyHashable: Any] {
     switch type {
     case .activity(let dayActivity):
       [

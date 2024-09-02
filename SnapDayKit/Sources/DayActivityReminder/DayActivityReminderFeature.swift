@@ -29,7 +29,7 @@ public struct DayActivityReminderFeature: TodayProvidable {
     let type: DayActivityReminderType
     var viewType: DayActivityViewType?
 
-    public init(type: DayActivityReminderType) { 
+    public init(type: DayActivityReminderType) {
       self.type = type
     }
   }

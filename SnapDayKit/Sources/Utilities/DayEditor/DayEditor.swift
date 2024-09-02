@@ -5,16 +5,16 @@ import struct Repositories.Transactions
 
 public struct DayEditor {
   public var prepareDays: @Sendable (_ activities: [Activity], _ dateRange: ClosedRange<Date>) async throws -> [Day]
-  public var updateDays: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
-  public var addActivity: @Sendable (_ activity: Activity, _ date: Date) async throws -> ()
-  public var addDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
-  public var removeDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
-  public var updateDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
-  public var removeDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> ()
-  public var updateDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> ()
+  public var updateDays: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> Void
+  public var addActivity: @Sendable (_ activity: Activity, _ date: Date) async throws -> Void
+  public var addDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> Void
+  public var removeDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> Void
+  public var updateDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> Void
+  public var removeDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> Void
+  public var updateDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> Void
   public var applyChanges: @Sendable (_ transactions: Transactions) async throws -> AppliedChanges
-  public var moveDayActivity: @Sendable (_ dayActivity: DayActivity, _ toDate: Date) async throws -> ()
-  public var copyDayActivity: @Sendable (_ dayActivity: DayActivity, _ dates: [Date]) async throws -> ()
+  public var moveDayActivity: @Sendable (_ dayActivity: DayActivity, _ toDate: Date) async throws -> Void
+  public var copyDayActivity: @Sendable (_ dayActivity: DayActivity, _ dates: [Date]) async throws -> Void
 }
 
 extension DependencyValues {

@@ -37,7 +37,7 @@ public struct DayProvider: TodayProvidable {
     guard date == today else { return }
     let predicates = [
       NSPredicate(format: "day.date < %@", date as NSDate),
-      NSPredicate(format: "dueDate >= %@", date as NSDate),
+      NSPredicate(format: "dueDate >= %@", date as NSDate)
     ]
     let activities = try await dayActivityRepository.activities(
       ActivitiesFetchConfiguration(done: false, predicates: predicates)

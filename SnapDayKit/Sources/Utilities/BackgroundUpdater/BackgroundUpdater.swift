@@ -24,7 +24,9 @@ public final class BackgroundUpdater {
 
   public func scheduleCreatingDayBackgroundTask() async throws {
     let pendingTasks = await taskScheduler.pendingTaskRequests()
-    guard !pendingTasks.contains(where: { $0.identifier == BackgroundUpdaterIdentifier.createDay.rawValue }) else { return }
+    guard
+      !pendingTasks.contains(where: { $0.identifier == BackgroundUpdaterIdentifier.createDay.rawValue })
+    else { return }
     let request = BGAppRefreshTaskRequest(identifier: BackgroundUpdaterIdentifier.createDay.rawValue)
     request.earliestBeginDate = calendar.date(byAdding: .hour, value: 1, to: date.now)
     try taskScheduler.submit(request)

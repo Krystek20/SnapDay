@@ -53,7 +53,7 @@ public struct WidgetActivityListView: View {
           .foregroundStyle(Color.standardText)
 
         Spacer()
-        
+
         if store.isButtonSectionShown {
           buttonSection
         }

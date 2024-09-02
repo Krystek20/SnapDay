@@ -22,10 +22,10 @@ public struct DayActivityRepository {
   public var activity: @Sendable (String) async throws -> DayActivity?
   public var activityTask: @Sendable (String) async throws -> DayActivityTask?
   public var activities: @Sendable (ActivitiesFetchConfiguration) async throws -> [DayActivity]
-  public var saveDayActivity: @Sendable (DayActivity) async throws -> ()
-  public var saveDayActivityTask: @Sendable (DayActivityTask) async throws -> ()
-  public var removeDayActivity: @Sendable (DayActivity) async throws -> ()
-  public var removeDayActivityTask: @Sendable (DayActivityTask) async throws -> ()
+  public var saveDayActivity: @Sendable (DayActivity) async throws -> Void
+  public var saveDayActivityTask: @Sendable (DayActivityTask) async throws -> Void
+  public var removeDayActivity: @Sendable (DayActivity) async throws -> Void
+  public var removeDayActivityTask: @Sendable (DayActivityTask) async throws -> Void
 }
 
 extension DependencyValues {

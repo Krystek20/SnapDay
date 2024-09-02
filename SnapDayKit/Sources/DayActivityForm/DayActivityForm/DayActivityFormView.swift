@@ -17,7 +17,7 @@ public struct DayActivityFormView: View {
   private let padding = EdgeInsets(
     top: 10.0,
     leading: 15.0,
-    bottom:  .zero,
+    bottom: .zero,
     trailing: 15.0
   )
 
@@ -245,7 +245,7 @@ public struct DayActivityFormView: View {
       }
     }
   }
-  
+
   @ViewBuilder
   private var toggleView: some View {
     WithPerceptionTracking {
@@ -278,7 +278,7 @@ public struct DayActivityFormView: View {
     WithPerceptionTracking {
       if store.showWeekdaysView {
         WeekdaysView(
-          selectedWeekdays:  Binding(
+          selectedWeekdays: Binding(
             get: { store.form.weekdays },
             set: { value in $store.form.wrappedValue.setWeekdays(value) }
           ),

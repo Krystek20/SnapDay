@@ -14,7 +14,7 @@ struct EmojiTextField: UIViewRepresentable {
       let canAddOneEmoji = textField.text?.isEmpty == true
       && string.count == 1
       && !string.unicodeScalars.filter({ $0.properties.isEmoji }).isEmpty
-      
+
       guard canAddOneEmoji || string.isEmpty else { return false }
       parent.text = string
       return true
@@ -31,7 +31,7 @@ struct EmojiTextField: UIViewRepresentable {
     emojiTextField.delegate = context.coordinator
     return emojiTextField
   }
-  
+
   func updateUIView(_ uiView: UIEmojiTextField, context: Context) {
     uiView.text = text
   }

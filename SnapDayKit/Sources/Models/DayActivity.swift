@@ -77,7 +77,7 @@ extension DayActivity {
 }
 
 extension DayActivity {
-  
+
   public var hasCompletedSubtasksAndNotDone: Bool {
     doneDate == nil && hasCompletedSubtasks
   }

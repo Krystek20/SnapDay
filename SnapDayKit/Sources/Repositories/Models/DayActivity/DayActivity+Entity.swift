@@ -7,12 +7,12 @@ extension DayActivity: Entity {
   public static var fetchRequest: NSFetchRequest<DayActivityEntity> {
     ManagedObject.fetchRequest()
   }
-  
+
   public init?(object: DayActivityEntity?) throws {
     guard let object else { return nil }
     try self.init(object)
   }
-  
+
   public func managedObject(_ context: NSManagedObjectContext) throws -> DayActivityEntity {
     let dayActivityEntity = try DayActivityEntity.object(
       identifier: id.uuidString,

@@ -224,7 +224,7 @@ public struct DashboardFeature: TodayProvidable {
       guard !state.streamSetup else { return .none }
       state.streamSetup = true
       return .merge(
-        .run { send in
+        .run { _ in
           try await firstLaunchCreator.configure()
         },
         .run { send in
@@ -243,7 +243,7 @@ public struct DashboardFeature: TodayProvidable {
             await send(.internal(.loadDay))
           }
         },
-        .run { send in
+        .run { _ in
           try await userNotificationCenterProvider.schedule(
             userNotification: EveningSummary(calendar: calendar)
           )

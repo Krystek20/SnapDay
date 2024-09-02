@@ -20,11 +20,12 @@ extension ActivityType {
   }
 }
 
-extension DayActivity: ActivityType { 
+extension DayActivity: ActivityType {
   public var dueDaysCount: Int? { nil }
   public var isFrequentEnabled: Bool { false }
 }
-extension DayActivityTask: ActivityType { 
+
+extension DayActivityTask: ActivityType {
   public var dueDate: Date? { nil }
   public var dueDaysCount: Int? { nil }
   public var isFrequentEnabled: Bool { false }

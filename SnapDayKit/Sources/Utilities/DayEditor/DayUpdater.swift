@@ -345,7 +345,7 @@ final class DayUpdater {
         && (!isToday || !$0.isDone)
       }
       try await removeDayActivities(activitiesToRemove)
-      
+
       days[index].activities.removeAll(where: {
         activitiesToRemove.contains($0)
       })

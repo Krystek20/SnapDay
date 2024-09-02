@@ -220,7 +220,6 @@ public struct ActivityListFeature: TodayProvidable {
     }
   }
 
-
   // MARK: - Initialization
 
   public init() { }

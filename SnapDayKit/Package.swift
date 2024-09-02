@@ -84,7 +84,7 @@ private var targets: [Target] {
   TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
   TargetParamenters(module: .repositories, dependencies: [.common, .models, .composableArchitecture])
   TargetParamenters(module: .common, dependencies: [.composableArchitecture])
-  TargetParamenters(module: .models)
+  TargetParamenters(module: .models, dependencies: [.common])
   TargetParamenters(module: .previews, dependencies: [.application])
   TargetParamenters(module: .uiComponents, dependencies: [.resources, .composableArchitecture, .utilities])
   TargetParamenters(module: .resources)

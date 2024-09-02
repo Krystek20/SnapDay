@@ -81,7 +81,7 @@ public struct CalendarPickerFeature {
           await dismiss()
         }
       case .view(.cancelButtonTapped):
-        return .run { send in
+        return .run { _ in
           await dismiss()
         }
       case .delegate:

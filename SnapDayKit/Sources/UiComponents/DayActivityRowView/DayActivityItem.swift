@@ -48,7 +48,7 @@ extension DayActivityItem {
 private extension ActivityType {
   var subtitle: String {
     var subtitle = ""
-    if let overview = overview, !overview.isEmpty {
+    if let overview, !overview.isEmpty {
       subtitle += overview
     }
     if let duration {

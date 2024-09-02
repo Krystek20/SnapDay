@@ -9,7 +9,7 @@ enum InformationViewConfiguration {
 }
 
 extension InformationViewConfiguration: InformationViewConfigurable {
-  
+
   var images: Images {
     switch self {
     case .pastDay:
@@ -31,7 +31,7 @@ extension InformationViewConfiguration: InformationViewConfigurable {
       String(localized: "Success!", bundle: .module)
     }
   }
-  
+
   var subtitle: String {
     switch self {
     case .pastDay:

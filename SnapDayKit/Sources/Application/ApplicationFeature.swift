@@ -54,11 +54,11 @@ public struct ApplicationFeature: TodayProvidable {
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    
+
     Scope(state: \.dashboard, action: \.dashboard) {
       DashboardFeature()
     }
-    
+
     Scope(state: \.reports, action: \.reports) {
       ReportsFeature()
     }

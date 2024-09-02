@@ -7,7 +7,7 @@ extension Day: Entity {
   public static var fetchRequest: NSFetchRequest<DayEntity> {
     ManagedObject.fetchRequest()
   }
-  
+
   public init?(object: DayEntity?) throws {
     guard let object else { return nil }
     try self.init(object)

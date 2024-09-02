@@ -53,7 +53,7 @@ public struct ReportsFeature: TodayProvidable {
       selectedActivity?.labels.isEmpty == false
     }
     var selectedLabel: ActivityLabel?
-    
+
     var periods: [PeriodViewModel] {
       guard selectedFilterPeriod == .quarter else { return [] }
       let provider = PeriodViewModelProvider()
@@ -77,7 +77,7 @@ public struct ReportsFeature: TodayProvidable {
         switcherTitle = title
       }
     }
-    
+
     var showCustomDate: Bool {
       selectedFilterPeriod == .custom
     }

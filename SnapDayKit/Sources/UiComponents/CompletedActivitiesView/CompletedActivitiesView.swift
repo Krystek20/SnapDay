@@ -2,7 +2,7 @@ import SwiftUI
 import Models
 
 public struct CompletedActivitiesView: View {
-  
+
   // MARK: - Properties
 
   private let completedActivities: CompletedActivities

@@ -20,9 +20,9 @@ public struct DayRepository: Repository {
   public var loadAllDays: @Sendable () async throws -> [Day]
   public var loadDays: @Sendable (_ dateRange: ClosedRange<Date>) async throws -> [Day]
   public var loadDay: @Sendable (_ date: Date) async throws -> Day?
-  public var saveDay: @Sendable (_ day: Day) async throws -> ()
-  public var saveDays: @Sendable (_ days: [Day]) async throws -> ()
-  public var removeDay: @Sendable (_ day: Day) async throws -> ()
+  public var saveDay: @Sendable (_ day: Day) async throws -> Void
+  public var saveDays: @Sendable (_ days: [Day]) async throws -> Void
+  public var removeDay: @Sendable (_ day: Day) async throws -> Void
 }
 
 extension DependencyValues {

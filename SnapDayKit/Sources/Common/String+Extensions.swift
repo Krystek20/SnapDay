@@ -33,7 +33,7 @@ public extension String {
     style.lineBreakMode = NSLineBreakMode.byClipping
 
     let attr: [NSAttributedString.Key: Any] = [
-      NSAttributedString.Key.font : font,
+      NSAttributedString.Key.font: font,
       NSAttributedString.Key.paragraphStyle: style,
       NSAttributedString.Key.backgroundColor: UIColor.clear
     ]

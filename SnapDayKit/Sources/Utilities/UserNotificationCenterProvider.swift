@@ -177,7 +177,7 @@ extension UserNotificationCenterProvider {
   }
 }
 
-//#if DEBUG
+// #if DEBUG
 extension UserNotificationCenterProvider {
   public var pendingRequests: [String] {
     get async {
@@ -203,7 +203,7 @@ extension UserNotificationCenterProvider {
     try await userNotificationCenter.add(request)
   }
 }
-//#endif
+// #endif
 
 extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
@@ -258,7 +258,7 @@ extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
       try await dayActivityRepository.saveDayActivity(dayActivity)
       notification = DayActivityNotification(type: .activity(dayActivity), calendar: calendar)
     case .activityTask:
-      guard 
+      guard
         var dayActivityTask = try await dayActivityRepository.activityTask(identifier),
         let dayActivity = try await dayActivityRepository.activity(dayActivityTask.dayActivityId.uuidString)
       else { return }

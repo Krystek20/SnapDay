@@ -36,7 +36,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
   }
 
   public enum Action: BindableAction, Equatable {
-    public enum ViewAction: Equatable { 
+    public enum ViewAction: Equatable {
       case appeared
       case sendDayActivityReminderNotificationButtonTapped
       case sendDayActivityTaskReminderNotificationButtonTapped
@@ -142,7 +142,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
   private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
     switch action {
     case .schedule(let notification):
-      return .run { send in
+      return .run { _ in
         try await userNotificationCenterProvider.schedule(
           userNotification: notification
         )

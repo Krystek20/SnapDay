@@ -5,9 +5,9 @@ import Models
 public struct ActivityRepository {
   public var activity: @Sendable (UUID) async throws -> Activity?
   public var loadActivities: @Sendable () async throws -> [Activity]
-  public var saveActivity: @Sendable (Activity) async throws -> ()
-  public var deleteActivity: @Sendable (Activity) async throws -> ()
-  public var deleteActivityTask: @Sendable (ActivityTask) async throws -> ()
+  public var saveActivity: @Sendable (Activity) async throws -> Void
+  public var deleteActivity: @Sendable (Activity) async throws -> Void
+  public var deleteActivityTask: @Sendable (ActivityTask) async throws -> Void
 }
 
 extension DependencyValues {

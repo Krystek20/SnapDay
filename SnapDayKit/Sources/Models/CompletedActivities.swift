@@ -1,7 +1,7 @@
 import Foundation
 
 public struct CompletedActivities {
-  
+
   public let doneCount: Int
   public let totalCount: Int
   public let percent: Double

@@ -21,7 +21,7 @@ extension View {
 }
 
 extension View {
-  public func scrollOnAppear<ID>(_ id: ID, anchor: UnitPoint? = nil, reader: ScrollViewProxy) -> some View where ID : Hashable {
+  public func scrollOnAppear<ID>(_ id: ID, anchor: UnitPoint? = nil, reader: ScrollViewProxy) -> some View where ID: Hashable {
     onAppear {
       withAnimation {
         reader.scrollTo(id, anchor: anchor)

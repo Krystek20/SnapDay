@@ -16,7 +16,7 @@ struct SaveActivityTip: Tip, Equatable {
 
   var rules: [Rule] {
     [
-      #Rule(Self.$show) { $0 },
+      #Rule(Self.$show) { $0 }
     ]
   }
 

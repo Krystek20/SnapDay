@@ -3,8 +3,8 @@ import Dependencies
 import Models
 
 public struct TagRepository {
-  public var saveTag: @Sendable (Tag) async throws -> ()
-  public var deleteTag: @Sendable (Tag) async throws -> ()
+  public var saveTag: @Sendable (Tag) async throws -> Void
+  public var deleteTag: @Sendable (Tag) async throws -> Void
   public var loadTags: @Sendable (_ excludedTags: [Tag]) async throws -> [Tag]
 }
 
