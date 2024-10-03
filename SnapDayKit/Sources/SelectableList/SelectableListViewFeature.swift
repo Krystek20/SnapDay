@@ -8,7 +8,7 @@ public struct SelectableListViewFeature {
 
   // MARK: - Dependencies
 
-  @Dependency(\.dismiss) var dismiss
+  @Dependency(\.dismiss) private var dismiss
 
   // MARK: - State & Action
 

@@ -155,46 +155,46 @@
         }
       }
     },
-    "Dashboard": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dashboard"
+    "Dashboard" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dashboard"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tablero"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tablero"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pulpit"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulpit"
           }
         }
       }
     },
-    "Day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tag"
+    "Day" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dzień"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzień"
           }
         }
       }
@@ -243,156 +243,156 @@
         }
       }
     },
-    "Incomplete Subtasks": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unvollständige Unteraufgaben"
+    "Incomplete Subtasks" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unvollständige Unteraufgaben"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Subtareas incompletas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtareas incompletas"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nieukończone zadania"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieukończone zadania"
           }
         }
       }
     },
-    "Mark Activity Only": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nur Aktivität markieren"
+    "Mark Activity Only" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Aktivität markieren"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marcar solo actividad"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar solo actividad"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Oznacz tylko aktywność"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oznacz tylko aktywność"
           }
         }
       }
     },
-    "Mark All as Done": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alles als erledigt markieren"
+    "Mark All as Done" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles als erledigt markieren"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marcar todo como hecho"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar todo como hecho"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Oznacz wszystkie jako wykonane"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oznacz wszystkie jako wykonane"
           }
         }
       }
     },
-    "Month": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monat"
+    "Month" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monat"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mes"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Miesiąc"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miesiąc"
           }
         }
       }
     },
-    "Move": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bewegen"
+    "Move" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegen"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mover"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Przenieś"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenieś"
           }
         }
       }
     },
-    "Not Yet": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Noch nicht"
+    "Not Yet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nicht"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aún no"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jeszcze nie"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeszcze nie"
           }
         }
       }
     },
-    "Quarter": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quartal"
+    "Quarter" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quartal"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trimestre"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trimestre"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kwartał"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kwartał"
           }
         }
       }
@@ -463,24 +463,24 @@
         }
       }
     },
-    "Week": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Woche"
+    "Week" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Woche"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semana"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semana"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tydzień"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tydzień"
           }
         }
       }

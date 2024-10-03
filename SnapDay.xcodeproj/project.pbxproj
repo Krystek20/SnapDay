@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D423ACCC2CAD274700591A0D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D423ACCB2CAD274700591A0D /* LaunchScreen.xib */; };
 		D432465C2AD0820100D3E8F9 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = D432465B2AD0820100D3E8F9 /* Application */; };
 		D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418332C50D34A005920E1 /* WidgetKit.framework */; };
 		D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418352C50D34A005920E1 /* SwiftUI.framework */; };
@@ -30,6 +31,7 @@
 		D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */ = {isa = PBXBuildFile; productRef = D4CCE63C2BCACB8E00C198C5 /* EveningSummary */; };
 		D4D658782C56D122007E61EB /* AppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D658772C56D122007E61EB /* AppIntents.swift */; };
+		D4E090EB2C90ACF000E605B2 /* Previews in Frameworks */ = {isa = PBXBuildFile; productRef = D4E090EA2C90ACF000E605B2 /* Previews */; };
 		D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */ = {isa = PBXBuildFile; productRef = D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */; };
 		D4FE9FC32BF5342B003305A9 /* DayActivityReminder in Frameworks */ = {isa = PBXBuildFile; productRef = D4FE9FC22BF5342B003305A9 /* DayActivityReminder */; };
 /* End PBXBuildFile section */
@@ -74,6 +76,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D423ACCB2CAD274700591A0D /* LaunchScreen.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		D443ECEE2AD0771C002225CF /* SnapDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D443ED082AD0771D002225CF /* SnapDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ActivityWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,6 +114,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D432465C2AD0820100D3E8F9 /* Application in Frameworks */,
+				D4E090EB2C90ACF000E605B2 /* Previews in Frameworks */,
 				D464184A2C50D59E005920E1 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -214,6 +218,7 @@
 				D4779AC32B6043280067E3AC /* Preview Content */,
 				D4779AC52B6043280067E3AC /* SnapDayApp.swift */,
 				D4779AC62B6043280067E3AC /* Info.plist */,
+				D423ACCB2CAD274700591A0D /* LaunchScreen.xib */,
 			);
 			path = SnapDay;
 			sourceTree = "<group>";
@@ -258,6 +263,7 @@
 			name = SnapDay;
 			packageProductDependencies = (
 				D432465B2AD0820100D3E8F9 /* Application */,
+				D4E090EA2C90ACF000E605B2 /* Previews */,
 			);
 			productName = SnapToday;
 			productReference = D443ECEE2AD0771C002225CF /* SnapDay.app */;
@@ -374,6 +380,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D423ACCC2CAD274700591A0D /* LaunchScreen.xib in Resources */,
 				D4779ACB2B6043280067E3AC /* Preview Assets.xcassets in Resources */,
 				D4779ACA2B6043280067E3AC /* Assets.xcassets in Resources */,
 				D4779AC72B6043280067E3AC /* SnapDayKit in Resources */,
@@ -612,7 +619,7 @@
 				INFOPLIST_FILE = SnapDay/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.xib;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
@@ -649,7 +656,7 @@
 				INFOPLIST_FILE = SnapDay/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.xib;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
@@ -890,6 +897,10 @@
 		D4CCE63C2BCACB8E00C198C5 /* EveningSummary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EveningSummary;
+		};
+		D4E090EA2C90ACF000E605B2 /* Previews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Previews;
 		};
 		D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */ = {
 			isa = XCSwiftPackageProductDependency;

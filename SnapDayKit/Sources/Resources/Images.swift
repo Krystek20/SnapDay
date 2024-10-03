@@ -5,6 +5,12 @@ public enum Images: String {
   case listEmpty = "list_empty"
   case listDone = "list_done"
   case activityListEmpty = "activity_list_empty"
+  case onboardingWelcome = "onboarding_welcome"
+  case onboardingFeatureHabitTracking = "onboarding_feature_habit_tracking"
+  case onboardingFeatureTakeControl = "onboarding_feature_take_control"
+  case onboardingFeatureAchieveGoals = "onboarding_feature_achieve_goals"
+  case onboardingIcloud = "onboarding_icloud"
+  case onboardingFeatureNotifications = "onboarding_feature_notifications"
 }
 
 public extension Image {

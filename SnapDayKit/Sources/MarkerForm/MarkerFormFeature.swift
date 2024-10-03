@@ -17,7 +17,7 @@ public struct MarkerFormFeature {
   @Dependency(\.tagRepository.saveTag) var saveTag
   @Dependency(\.activityLabelRepository.saveLabel) var saveLabel
   @Dependency(\.activityRepository) private var activityRepository
-  @Dependency(\.dismiss) var dismiss
+  @Dependency(\.dismiss) private var dismiss
 
   // MARK: - State & Action
 

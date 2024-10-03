@@ -2,6 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 import Dashboard
 import Reports
+import Onboarding
 import Resources
 import DeveloperTools
 import UIKit.UIDevice
@@ -42,6 +43,50 @@ public struct ApplicationView: View {
 
   public var body: some View {
     WithPerceptionTracking {
+      content
+        .onAppear {
+          store.send(.appeared)
+        }
+        .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
+          NavigationStack {
+            DeveloperToolsView(store: store)
+          }
+          .presentationDetents([.medium, .large])
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification)) { _ in
+          //        #if DEBUG
+          store.send(.deviceShaked)
+          //        #endif
+        }
+    }
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    WithPerceptionTracking {
+      if store.showOnboarding {
+        onboardingView
+      } else {
+        tabView
+      }
+    }
+  }
+
+  private var onboardingView: some View {
+    WithPerceptionTracking {
+      NavigationStack {
+        OnboardingView(
+          store: store.scope(
+            state: \.onboarding,
+            action: \.onboarding
+          )
+        )
+      }
+    }
+  }
+
+  private var tabView: some View {
+    WithPerceptionTracking {
       TabView(
         selection: $store.selectedTab,
         content: {
@@ -74,20 +119,6 @@ public struct ApplicationView: View {
           .tag(ApplicationFeature.Tab.reports)
         }
       )
-      .onAppear {
-        store.send(.appeared)
-      }
-      .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
-        NavigationStack {
-          DeveloperToolsView(store: store)
-        }
-        .presentationDetents([.medium, .large])
-      }
-      .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification)) { _ in
-//        #if DEBUG
-        store.send(.deviceShaked)
-//        #endif
-      }
     }
   }
 }

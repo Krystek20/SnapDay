@@ -114,7 +114,7 @@ public struct DashboardView: View {
                   .foregroundStyle(Color.actionBlue)
               }
             )
-            .modifier(TipKitViewModifier())
+            .modifier(SaveActivityTipModifier())
             Button(
               action: {
                 store.send(.view(.newButtonTapped))
@@ -161,7 +161,7 @@ public struct DashboardView: View {
   }
 }
 
-struct TipKitViewModifier: ViewModifier {
+struct SaveActivityTipModifier: ViewModifier {
   func body(content: Content) -> some View {
     if #available(iOS 17.0, *) {
       return content

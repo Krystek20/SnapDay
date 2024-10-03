@@ -1,13 +1,13 @@
 import SwiftUI
 
 extension View {
-  public func maxFrame() -> some View {
+  public func maxFrame(alignment: Alignment = .topLeading) -> some View {
     frame(
       minWidth: .zero,
       maxWidth: .infinity,
       minHeight: .zero,
       maxHeight: .infinity,
-      alignment: .topLeading
+      alignment: alignment
     )
   }
 

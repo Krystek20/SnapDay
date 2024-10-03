@@ -1,5 +1,6 @@
 import Dashboard
 import Reports
+import Onboarding
 import ComposableArchitecture
 import Utilities
 import DeveloperTools
@@ -12,19 +13,33 @@ public struct ApplicationFeature: TodayProvidable {
   @Dependency(\.backgroundUpdater) private var backgroundUpdater
   @Dependency(\.deeplinkService) private var deeplinkService
   private let dayProvider = DayProvider()
+  private static let isOnboardingShownKey = "isOnboardingShown"
 
   // MARK: - State & Action
 
   @ObservableState
   public struct State: Equatable {
+
+    var showOnboarding: Bool {
+      didSet {
+        userDefaults.setValue(!showOnboarding, forKey: ApplicationFeature.isOnboardingShownKey)
+      }
+    }
+
     var selectedTab = Tab.dashboard
 
     var dashboard = DashboardFeature.State(date: Calendar.today)
     var reports = ReportsFeature.State()
+    var onboarding = OnboardingFeature.State()
 
     @Presents var developerTools: DeveloperToolsFeature.State?
+    
+    private let userDefaults: UserDefaults
 
-    public init() { }
+    public init(userDefaults: UserDefaults = .standard) {
+      self.userDefaults = userDefaults
+      self.showOnboarding = !userDefaults.bool(forKey: ApplicationFeature.isOnboardingShownKey)
+    }
   }
 
   public enum Action: BindableAction, Equatable {
@@ -35,6 +50,7 @@ public struct ApplicationFeature: TodayProvidable {
     case setTab(Tab)
     case dashboard(DashboardFeature.Action)
     case reports(ReportsFeature.Action)
+    case onboarding(OnboardingFeature.Action)
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     case binding(BindingAction<State>)
   }
@@ -63,13 +79,14 @@ public struct ApplicationFeature: TodayProvidable {
       ReportsFeature()
     }
 
+    Scope(state: \.onboarding, action: \.onboarding) {
+      OnboardingFeature()
+    }
+
     Reduce { state, action in
       switch action {
       case .appeared:
         return .merge(
-          .run { _ in
-            guard try await userNotificationCenterProvider.requestAuthorization() else { return }
-          },
           .run { _ in
             if #available(iOS 17.0, *) {
               try? Tips.configure()
@@ -112,6 +129,11 @@ public struct ApplicationFeature: TodayProvidable {
       case .dashboard:
         return .none
       case .reports:
+        return .none
+      case .onboarding(.delegate(.finished)):
+        state.showOnboarding = false
+        return .none
+      case .onboarding:
         return .none
       case .developerTools:
         return .none

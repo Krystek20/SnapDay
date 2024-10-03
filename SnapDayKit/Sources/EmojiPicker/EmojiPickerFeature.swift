@@ -7,7 +7,7 @@ public struct EmojiPickerFeature {
 
   // MARK: - Dependecies
 
-  @Dependency(\.dismiss) var dismiss
+  @Dependency(\.dismiss) private var dismiss
 
   // MARK: - State & Action
 

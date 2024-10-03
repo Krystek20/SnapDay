@@ -7,9 +7,9 @@ public struct DayProvider: TodayProvidable {
 
   // MARK: - Dependencies
 
-  @Dependency(\.activityRepository.loadActivities) var loadActivities
-  @Dependency(\.dayActivityRepository) var dayActivityRepository
-  @Dependency(\.dayEditor) var dayEditor
+  @Dependency(\.activityRepository.loadActivities) private var loadActivities
+  @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.dayEditor) private var dayEditor
 
   // MARK: - Initialization
 

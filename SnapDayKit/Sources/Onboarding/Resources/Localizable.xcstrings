@@ -1,0 +1,600 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Achieve Your Goals" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreiche deine Ziele"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logra tus metas"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osiągnij swoje cele"
+          }
+        }
+      }
+    },
+    "Build Better Habits, One Step at a Time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baue bessere Gewohnheiten, \nSchritt für Schritt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea mejores hábitos, un paso a la vez"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buduj lepsze nawyki, krok po kroku"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontynuuj"
+          }
+        }
+      }
+    },
+    "Easily log your habits daily. Track your progress with clear visuals that keep you motivated and focused on your goals." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasse deine Gewohnheiten täglich. Verfolge deinen Fortschritt mit klaren Visualisierungen, die dich motivieren und auf deine Ziele fokussiert halten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registra tus hábitos diariamente. Sigue tu progreso con visualizaciones claras que te mantendrán motivado y enfocado en tus metas."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Łatwo zapisuj swoje nawyki codziennie. Śledź swój postęp za pomocą czytelnych wizualizacji, które utrzymują motywację i skupienie na celach."
+          }
+        }
+      }
+    },
+    "End-to-End Encryption" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ende-zu-Ende-Verschlüsselung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cifrado de extremo a extremo"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szyfrowanie end-to-end"
+          }
+        }
+      }
+    },
+    "Full Control" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volle Kontrolle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control total"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pełna kontrola"
+          }
+        }
+      }
+    },
+    "Get Started" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loslegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zacznij"
+          }
+        }
+      }
+    },
+    "If using iCloud, only you can access your information." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du iCloud verwendest, kannst nur du auf deine Informationen zugreifen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si utilizas iCloud, solo tú puedes acceder a tu información."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli korzystasz z iCloud, tylko Ty masz dostęp do swoich informacji."
+          }
+        }
+      }
+    },
+    "Local Storage" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokaler Speicher"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Almacenamiento local"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pamięć lokalna"
+          }
+        }
+      }
+    },
+    "No one else, not even us, can access your data." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niemand sonst, nicht einmal wir, können auf deine Daten zugreifen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadie más, ni siquiera nosotros, puede acceder a tus datos."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nikt inny, nawet my, nie ma dostępu do Twoich danych."
+          }
+        }
+      }
+    },
+    "Privacy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacidad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prywatność"
+          }
+        }
+      }
+    },
+    "Seamlessly manage your habits and goals with iCloud." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwalte nahtlos deine Gewohnheiten und Ziele mit iCloud."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestiona sin problemas tus hábitos y objetivos con iCloud."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Łatwo zarządzaj swoimi nawykami i celami za pomocą iCloud."
+          }
+        }
+      }
+    },
+    "Set goals, track your progress, and build consistent habits to achieve what matters most." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setze Ziele, verfolge deinen Fortschritt und baue beständige Gewohnheiten auf, um das zu erreichen, was am wichtigsten ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establece metas, sigue tu progreso y construye hábitos consistentes para lograr lo que más importa."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustal cele, śledź postępy i buduj konsekwentne nawyki, aby osiągnąć to, co najważniejsze."
+          }
+        }
+      }
+    },
+    "Simple Habit Tracking" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einfaches Gewohnheits-Tracking"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguimiento simple de hábitos"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proste śledzenie nawyków"
+          }
+        }
+      }
+    },
+    "Skip" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omitir"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pomiń"
+          }
+        }
+      }
+    },
+    "Stay on top of your progress and reach your goals faster—enable notifications to get timely reminders and track your activities effortlessly!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleibe auf dem Laufenden mit deinem Fortschritt und erreiche deine Ziele schneller – aktiviere Benachrichtigungen, um rechtzeitige Erinnerungen zu erhalten und deine Aktivitäten mühelos zu verfolgen!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantente al tanto de tu progreso y alcanza tus metas más rápido: ¡activa las notificaciones para recibir recordatorios oportunos y seguir tus actividades sin esfuerzo!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bądź na bieżąco ze swoimi postępami i osiągaj cele szybciej – włącz powiadomienia, aby otrzymywać przypomnienia i łatwo śledzić swoje działania!"
+          }
+        }
+      }
+    },
+    "Sync Across Devices" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisiere auf allen Geräten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza entre dispositivos"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizuj na różnych urządzeniach"
+          }
+        }
+      }
+    },
+    "Take Control of Your Day" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übernimm die Kontrolle über deinen Tag"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toma el control de tu día"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przejmij kontrolę nad swoim dniem"
+          }
+        }
+      }
+    },
+    "To help you track your habits, achieve goals, and manage your time, all your data is stored securely on your device or in iCloud." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um dir zu helfen, deine Gewohnheiten zu verfolgen, Ziele zu erreichen und deine Zeit zu verwalten, werden alle deine Daten sicher auf deinem Gerät oder in iCloud gespeichert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para ayudarte a hacer un seguimiento de tus hábitos, alcanzar tus metas y gestionar tu tiempo, todos tus datos se almacenan de forma segura en tu dispositivo o en iCloud."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby pomóc Ci śledzić nawyki, osiągać cele i zarządzać czasem, wszystkie Twoje dane są bezpiecznie przechowywane na Twoim urządzeniu lub w iCloud."
+          }
+        }
+      }
+    },
+    "Tracking habits helps you stay focused, build consistency, and prioritize what matters most each day." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gewohnheiten zu verfolgen hilft dir, fokussiert zu bleiben, Beständigkeit aufzubauen und das zu priorisieren, was jeden Tag am wichtigsten ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer un seguimiento de los hábitos te ayuda a mantenerte enfocado, construir consistencia y priorizar lo que más importa cada día."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Śledzenie nawyków pomaga zachować skupienie, budować konsekwencję i priorytetyzować to, co najważniejsze każdego dnia."
+          }
+        }
+      }
+    },
+    "Turn on" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einschalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włącz"
+          }
+        }
+      }
+    },
+    "Turn On Notifications to Reach Your Goals!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviere Benachrichtigungen, um deine Ziele zu erreichen!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Activa las notificaciones para alcanzar tus metas!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włącz powiadomienia, aby osiągnąć swoje cele!"
+          }
+        }
+      }
+    },
+    "We help you track daily activities, set goals, and stay motivated. Start your journey to a better you!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir helfen dir, tägliche Aktivitäten zu verfolgen, Ziele zu setzen und motiviert zu bleiben. Beginne deine Reise zu einem besseren Du!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te ayudamos a hacer un seguimiento de tus actividades diarias, establecer metas y mantenerte motivado. ¡Comienza tu viaje hacia un mejor tú!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pomagamy Ci śledzić codzienne aktywności, ustalać cele i zachować motywację. Rozpocznij swoją podróż do lepszego siebie!"
+          }
+        }
+      }
+    },
+    "Welcome to SnapDay!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei \nSnapDay!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Bienvenido a SnapDay!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Witamy w SnapDay!"
+          }
+        }
+      }
+    },
+    "You decide where your data is stored." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du entscheidest, wo deine Daten gespeichert werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tú decides dónde se almacenan tus datos."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ty decydujesz, gdzie są przechowywane Twoje dane."
+          }
+        }
+      }
+    },
+    "Your activity data stays on your device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Aktivitätsdaten bleiben auf deinem Gerät"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos de actividad se quedan en tu dispositivo"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje dane dotyczące aktywności pozostają na Twoim urządzeniu"
+          }
+        }
+      }
+    },
+    "Your Data, Your Control" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Daten, deine Kontrolle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos, tu control"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje dane, Twoja kontrola"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

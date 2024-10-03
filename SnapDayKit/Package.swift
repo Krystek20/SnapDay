@@ -21,6 +21,7 @@ private var products: [Product] {
   Module.eveningSummary
   Module.dayActivityReminder
   Module.widgetActivityList
+  Module.previews
 }
 
 @PackageDependenciesBuilder
@@ -30,55 +31,18 @@ private var packageDependencies: [Package.Dependency] {
 
 @TargetsBuilder
 private var targets: [Target] {
-  TargetParamenters(
-    module: .application,
-    dependencies: sceneDependecies + [
-      .dashboard,
-      .reports,
-      .developerTools
-    ]
-  )
-  TargetParamenters(
-    module: .dashboard,
-    dependencies: sceneDependecies + [
-      .activityList,
-      .dayActivityForm,
-      .calendarPicker
-    ]
-  )
-  TargetParamenters(
-    module: .activityList,
-    dependencies: sceneDependecies + [.dayActivityForm]
-  )
+  TargetParamenters(module: .application, dependencies: sceneDependecies + [.onboarding, .dashboard, .reports, .developerTools])
+  TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker])
+  TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
-  TargetParamenters(
-    module: .dayActivityForm,
-    dependencies: sceneDependecies + [
-      .markerForm,
-        .emojiPicker
-    ]
-  )
-  TargetParamenters(
-    module: .reports,
-    dependencies: sceneDependecies + [.selectableList]
-  )
+  TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
+  TargetParamenters(module: .reports, dependencies: sceneDependecies + [.selectableList])
   TargetParamenters(module: .selectableList, dependencies: sceneDependecies)
-  TargetParamenters(
-    module: .eveningSummary,
-    dependencies: sceneDependecies
-  )
-  TargetParamenters(
-    module: .dayActivityReminder,
-    dependencies: sceneDependecies
-  )
-  TargetParamenters(
-    module: .widgetActivityList,
-    dependencies: sceneDependecies
-  )
-  TargetParamenters(
-    module: .developerTools,
-    dependencies: sceneDependecies
-  )
+  TargetParamenters(module: .eveningSummary, dependencies: sceneDependecies)
+  TargetParamenters(module: .dayActivityReminder, dependencies: sceneDependecies)
+  TargetParamenters(module: .widgetActivityList, dependencies: sceneDependecies)
+  TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
+  TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .calendarPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
@@ -116,6 +80,7 @@ private enum Module: String {
   case eveningSummary
   case widgetActivityList
   case dayActivityReminder
+  case onboarding
   case developerTools
   case utilities
   case repositories
