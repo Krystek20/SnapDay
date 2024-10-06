@@ -89,24 +89,24 @@
         }
       }
     },
-    "Complete Activity" : {
+    "Cancel" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktivität abschließen"
+            "value" : "Abbrechen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Completar actividad"
+            "value" : "Cancelar"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zakończ aktywność"
+            "value" : "Anuluj"
           }
         }
       }
@@ -129,6 +129,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zakończyć aktywność?"
+          }
+        }
+      }
+    },
+    "Confirm" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potwierdź"
           }
         }
       }
@@ -265,50 +287,6 @@
         }
       }
     },
-    "Mark Activity Only" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nur Aktivität markieren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marcar solo actividad"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oznacz tylko aktywność"
-          }
-        }
-      }
-    },
-    "Mark All as Done" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alles als erledigt markieren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marcar todo como hecho"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oznacz wszystkie jako wykonane"
-          }
-        }
-      }
-    },
     "Month" : {
       "localizations" : {
         "de" : {
@@ -349,28 +327,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Przenieś"
-          }
-        }
-      }
-    },
-    "Not Yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch nicht"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún no"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jeszcze nie"
           }
         }
       }

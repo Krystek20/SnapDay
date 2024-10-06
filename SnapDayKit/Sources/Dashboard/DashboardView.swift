@@ -14,6 +14,12 @@ public struct DashboardView: View {
 
   @Perception.Bindable private var store: StoreOf<DashboardFeature>
   @FocusState private var focus: DayNewField?
+  @State private var alertSize = CGSize.zero
+
+  private var additionalButtomPadding: Double {
+    guard store.alert != nil else { return .zero }
+    return alertSize.height + 15.0
+  }
 
   // MARK: - Initialization
 
@@ -32,7 +38,7 @@ public struct DashboardView: View {
           dayList
             .padding(.horizontal, 15.0)
             .padding(.top, 15.0)
-            .padding(.bottom, 15.0)
+            .padding(.bottom, 15.0 + additionalButtomPadding)
         }
         .maxWidth()
         .scrollIndicators(.hidden)
@@ -46,6 +52,8 @@ public struct DashboardView: View {
             store.send(.view(.increaseButtonTapped))
           }
         )
+
+        alertViewIfVisible
       }
       .activityBackground
       .bind($store.focus, to: $focus)
@@ -73,8 +81,6 @@ public struct DashboardView: View {
         }
         .presentationDetents([.medium])
       }
-      .alert($store.scope(state: \.dayActivityAlert, action: \.dayActivityAlert))
-      .alert($store.scope(state: \.dayActivityTaskAlert, action: \.dayActivityTaskAlert))
       .task {
         store.send(.view(.appeared))
       }
@@ -125,6 +131,28 @@ public struct DashboardView: View {
               }
             )
           }
+        }
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var alertViewIfVisible: some View {
+    WithPerceptionTracking {
+      if let alertConfiguration = store.alert?.configuration {
+        VStack {
+          Spacer()
+          ComplateAlertView(
+            configuration: alertConfiguration,
+            confirmButtonTapped: {
+              store.send(.view(.confirmAlertButtonTapped))
+            },
+            cancelButtonTapped: {
+              store.send(.view(.cancelAlertButtonTapped))
+            }
+          )
+          .extractSize(in: $alertSize)
+          .padding(.all, 15.0)
         }
       }
     }

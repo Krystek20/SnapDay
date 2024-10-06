@@ -11,6 +11,7 @@ public enum Images: String {
   case onboardingFeatureAchieveGoals = "onboarding_feature_achieve_goals"
   case onboardingIcloud = "onboarding_icloud"
   case onboardingFeatureNotifications = "onboarding_feature_notifications"
+  case incompleteIcon = "incomplete_icon"
 }
 
 public extension Image {
