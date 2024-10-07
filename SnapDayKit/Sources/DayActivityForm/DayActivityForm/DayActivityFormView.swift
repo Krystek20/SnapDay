@@ -12,6 +12,7 @@ public struct DayActivityFormView: View {
 
   // MARK: - Properties
 
+  @Environment(\.scenePhase) private var scenePhase
   @FocusState private var focus: DayActivityFormFeature.State.Field?
   @Perception.Bindable private var store: StoreOf<DayActivityFormFeature>
   private let padding = EdgeInsets(
@@ -49,6 +50,10 @@ public struct DayActivityFormView: View {
             DayActivityFormView(store: store)
           }
           .presentationDetents([.large])
+        }
+        .onChange(of: scenePhase) { newPhase in
+          guard newPhase == .active else { return }
+          store.send(.view(.appeared))
         }
     }
   }
@@ -377,7 +382,24 @@ public struct DayActivityFormView: View {
   @ViewBuilder
   private var reminderView: some View {
     WithPerceptionTracking {
-      if store.canShowDateForms {
+      if store.showEnableNotificationButton {
+        HStack(spacing: 10.0) {
+          Text("Reminder", bundle: .module)
+            .formTitleTextStyle
+          Spacer()
+          Button(
+            action: {
+              store.send(.view(.turnNotificationTapped))
+            },
+            label: {
+              Text("Turn on", bundle: .module)
+                .foregroundStyle(Color.actionBlue)
+                .font(.system(size: 12.0, weight: .bold))
+            }
+          )
+        }
+        .formBackgroundModifier()
+      } else if store.canShowDateForms {
         DateFormView(
           configuration: DateFormView.Configuration(
             title: String(localized: "Reminder", bundle: .module),

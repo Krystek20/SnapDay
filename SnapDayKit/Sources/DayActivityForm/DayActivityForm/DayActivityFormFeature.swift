@@ -5,6 +5,7 @@ import Models
 import MarkerForm
 import EmojiPicker
 import Utilities
+import UIKit.UIApplication
 
 @Reducer
 public struct DayActivityFormFeature {
@@ -17,6 +18,8 @@ public struct DayActivityFormFeature {
   @Dependency(\.date) private var date
   @Dependency(\.uuid) private var uuid
   @Dependency(\.calendar) private var calendar
+  @Dependency(\.openURL) private var openURL
+  @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
 
   // MARK: - State & Action
 
@@ -48,6 +51,8 @@ public struct DayActivityFormFeature {
         form.editTitle
       }
     }
+
+    var showEnableNotificationButton: Bool = false
 
     var canShowDateForms: Bool {
       editDate >= today && !form.completed
@@ -128,6 +133,7 @@ public struct DayActivityFormFeature {
       case imageSelected(PhotoItem)
       case remindToggeled(Bool)
       case dueTimeToggeled(Bool)
+      case turnNotificationTapped
     }
     public enum InternalAction: Equatable {
       case setExistingTags([Tag])
@@ -135,6 +141,8 @@ public struct DayActivityFormFeature {
       case setExistingLabels([ActivityLabel])
       case loadLabels
       case setImageDate(_ date: Data?)
+      case determineNotificationStatus
+      case handleNotificationStatus(UserNotificationCenterProvider.Status)
     }
     public enum DelegateAction: Equatable {
       case activityDeleted(DayActivityForm)
@@ -204,10 +212,13 @@ public struct DayActivityFormFeature {
   func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
     switch action {
     case .appeared:
-      return .run(operation: { send in
-        await send(.internal(.loadTags))
-        await send(.internal(.loadLabels))
-      })
+      return .merge(
+        .send(.internal(.determineNotificationStatus)),
+        .run { send in
+          await send(.internal(.loadTags))
+          await send(.internal(.loadLabels))
+        }
+      )
     case .saveButtonTapped:
       return .run { [form = state.form, type = state.type] send in
         switch type {
@@ -251,6 +262,20 @@ public struct DayActivityFormFeature {
       ? calendar.dayFormat(state.editDate)
       : nil
       return .none
+    case .turnNotificationTapped:
+      return .run { send in
+        switch await userNotificationCenterProvider.status {
+        case .notDetermined:
+          let result = try await userNotificationCenterProvider.requestAuthorization()
+          guard result else { return }
+          await send(.internal(.determineNotificationStatus))
+        case .denied:
+          guard let settingsURL = await URL(string: UIApplication.openSettingsURLString) else { return }
+          await openURL(settingsURL)
+        case .authorized:
+          return
+        }
+      }
     }
   }
 
@@ -365,6 +390,18 @@ public struct DayActivityFormFeature {
         id: uuid(),
         data: imageData
       )
+      return .none
+    case .determineNotificationStatus:
+      return .run { send in
+        await send(.internal(.handleNotificationStatus(userNotificationCenterProvider.status)))
+      }
+    case .handleNotificationStatus(let status):
+      state.showEnableNotificationButton = switch status {
+      case .notDetermined, .denied:
+        true
+      case .authorized:
+        false
+      }
       return .none
     }
   }

@@ -11,11 +11,18 @@ public protocol UserNotificationCenter {
   func pendingNotificationRequests() async -> [UNNotificationRequest]
   func setNotificationCategories(_ categories: Set<UNNotificationCategory>)
   func removePendingNotificationRequests(withIdentifiers identifiers: [String])
+  func notificationSettings() async -> UNNotificationSettings
 }
 
 extension UNUserNotificationCenter: UserNotificationCenter { }
 
 public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
+
+  public enum Status {
+    case notDetermined
+    case denied
+    case authorized
+  }
 
   private enum UserAction: String {
     case done = "DONE_ACTION"
@@ -25,6 +32,22 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   }
 
   // MARK: - Properties
+
+  public var status: Status {
+    get async {
+      let authorizationStatus = await userNotificationCenter.notificationSettings().authorizationStatus
+      return switch authorizationStatus {
+      case .notDetermined:
+          .notDetermined
+      case .denied:
+          .denied
+      case .authorized, .provisional, .ephemeral:
+          .authorized
+      @unknown default:
+          .denied
+      }
+    }
+  }
 
   public var userActionStream: AsyncPublisher<AnyPublisher<Void, Never>> {
     userActionSubject.eraseToAnyPublisher().values
