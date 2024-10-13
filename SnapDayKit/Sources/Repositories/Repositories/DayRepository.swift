@@ -16,9 +16,23 @@ extension Repository {
   }
 }
 
+public struct FetchConfiguration {
+  
+  @PredicateBuilder let predicates: () -> [NSPredicate]
+  @SortBuilder let sorts: () -> [NSSortDescriptor]
+
+  public init(
+    @PredicateBuilder predicates: @escaping () -> [NSPredicate] = { [] },
+    @SortBuilder sorts: @escaping () -> [NSSortDescriptor] = { [] }
+  ) {
+    self.predicates = predicates
+    self.sorts = sorts
+  }
+}
+
 public struct DayRepository: Repository {
   public var loadAllDays: @Sendable () async throws -> [Day]
-  public var loadDays: @Sendable (_ dateRange: ClosedRange<Date>) async throws -> [Day]
+  public var loadDays: @Sendable (_ configuration: FetchConfiguration) async throws -> [Day]
   public var loadDay: @Sendable (_ date: Date) async throws -> Day?
   public var saveDay: @Sendable (_ day: Day) async throws -> Void
   public var saveDays: @Sendable (_ days: [Day]) async throws -> Void
@@ -38,10 +52,12 @@ extension DayRepository: DependencyKey {
       loadAllDays: {
         try await EntityHandler().fetch(Day.self)
       },
-      loadDays: { dateRange in
-        try await EntityHandler().fetch(Day.self) {
-          NSPredicate(format: "date >= %@ AND date <= %@", dateRange.lowerBound as CVarArg, dateRange.upperBound as CVarArg)
-        }
+      loadDays: { configuration in
+        try await EntityHandler().fetch(
+          Day.self,
+          predicates: configuration.predicates,
+          sorts: configuration.sorts
+        )
       },
       loadDay: { date in
         try await EntityHandler().fetch(Day.self) {

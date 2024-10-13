@@ -21,6 +21,7 @@ private var products: [Product] {
   Module.eveningSummary
   Module.dayActivityReminder
   Module.widgetActivityList
+  Module.widgetStreak
   Module.previews
 }
 
@@ -41,6 +42,7 @@ private var targets: [Target] {
   TargetParamenters(module: .eveningSummary, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityReminder, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetActivityList, dependencies: sceneDependecies)
+  TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
   TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
@@ -79,6 +81,7 @@ private enum Module: String {
   case selectableList
   case eveningSummary
   case widgetActivityList
+  case widgetStreak
   case dayActivityReminder
   case onboarding
   case developerTools

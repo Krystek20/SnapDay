@@ -30,7 +30,8 @@ final class DayUpdater {
 
   /// it creates days if not exists and adds activities to them, days are saved to database
   func prepareDays(for activities: [Activity], in dateRange: ClosedRange<Date>) async throws -> [Day] {
-    let existingDays = try await dayRepository.loadDays(dateRange)
+    let configuration = FetchConfiguration { NSPredicate(dateRange: dateRange) }
+    let existingDays = try await dayRepository.loadDays(configuration)
     let groupedDays = Dictionary(grouping: existingDays, by: \.date)
     let neededDates = dates(in: dateRange)
     let activitiesWithDates = try createDates(for: activities, dateRange: dateRange)
@@ -79,7 +80,8 @@ final class DayUpdater {
       for insertedDay in inserted.value {
         guard let object: Day = try dayRepository.object(objectID: insertedDay) else { continue }
         dates.insert(object.date)
-        let days = try await dayRepository.loadDays(object.date...object.date)
+        let configuration = FetchConfiguration { NSPredicate(dateRange: object.date...object.date) }
+        let days = try await dayRepository.loadDays(configuration)
         guard days.count > 1 else { continue }
         let deduplicatedDays = deduplicatedDays(days)
         try await removeDays(deduplicatedDays.daysToRemove)
@@ -92,7 +94,8 @@ final class DayUpdater {
       for updatedDay in updated.value {
         guard let object: Day = try dayRepository.object(objectID: updatedDay) else { continue }
         dates.insert(object.date)
-        let days = try await dayRepository.loadDays(object.date...object.date)
+        let configuration = FetchConfiguration { NSPredicate(dateRange: object.date...object.date) }
+        let days = try await dayRepository.loadDays(configuration)
         guard days.count > 1 else { continue }
         let deduplicatedDays = deduplicatedDays(days)
         try await removeDays(deduplicatedDays.daysToRemove)
@@ -172,7 +175,8 @@ final class DayUpdater {
   func addActivity(_ activity: Activity, from date: Date) async throws {
     let dateRange = try await dateRangeToUpdate(date: date)
     let dates = try activityDatesCreator.createsDates(for: activity, dateRange: dateRange)
-    let days = try await dayRepository.loadDays(dateRange)
+    let configuration = FetchConfiguration { NSPredicate(dateRange: dateRange) }
+    let days = try await dayRepository.loadDays(configuration)
     let updatedDays: [Day] = dates.compactMap { date in
       guard var day = days.first(where: { $0.date == date }) else { return nil }
       day.activities.append(
@@ -223,7 +227,8 @@ final class DayUpdater {
 
   private func daysWithRemoved(_ activity: Activity, from date: Date) async throws -> ([Day], ClosedRange<Date>) {
     let dateRange = try await dateRangeToUpdate(date: date)
-    var days = try await dayRepository.loadDays(dateRange)
+    let configuration = FetchConfiguration { NSPredicate(dateRange: dateRange) }
+    var days = try await dayRepository.loadDays(configuration)
     try await removeDayActivities(with: activity, in: &days, startDate: date)
     return (days, dateRange)
   }
@@ -457,5 +462,11 @@ final class DayUpdater {
 
   private func removeDayActivityTask(_ dayActivityTask: DayActivityTask) async throws {
     try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
+  }
+}
+
+private extension NSPredicate {
+  convenience init(dateRange: ClosedRange<Date>) {
+    self.init(format: "date >= %@ AND date <= %@", dateRange.lowerBound as CVarArg, dateRange.upperBound as CVarArg)
   }
 }

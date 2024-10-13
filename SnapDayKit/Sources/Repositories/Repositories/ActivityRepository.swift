@@ -2,8 +2,13 @@ import Foundation
 import Dependencies
 import Models
 
+public enum ActivityBy {
+  case id(UUID)
+  case name(String)
+}
+
 public struct ActivityRepository {
-  public var activity: @Sendable (UUID) async throws -> Activity?
+  public var activity: @Sendable (ActivityBy) async throws -> Activity?
   public var loadActivities: @Sendable () async throws -> [Activity]
   public var saveActivity: @Sendable (Activity) async throws -> Void
   public var deleteActivity: @Sendable (Activity) async throws -> Void
@@ -20,12 +25,16 @@ extension DependencyValues {
 extension ActivityRepository: DependencyKey {
   public static var liveValue: ActivityRepository {
     ActivityRepository(
-      activity: { activityId in
-        try await EntityHandler().fetch(
+      activity: { activityBy in
+        let predicate: NSPredicate = switch activityBy {
+        case .id(let identifier):
+          NSPredicate(format: "identifier == %@", identifier as CVarArg)
+        case .name(let name):
+          NSPredicate(format: "name == %@", name)
+        }
+        return try await EntityHandler().fetch(
           objectType: Activity.self,
-          predicates: [
-            NSPredicate(format: "identifier == %@", activityId as CVarArg)
-          ]
+          predicates: [predicate]
         )
       },
       loadActivities: {

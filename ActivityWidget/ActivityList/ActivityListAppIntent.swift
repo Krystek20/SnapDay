@@ -1,8 +1,8 @@
 import WidgetKit
 import AppIntents
 
-@available(iOSApplicationExtension 17.0, *)
-struct ConfigurationAppIntent: WidgetConfigurationIntent {
+@available(iOS 17.0, *)
+struct ActivityListAppIntent: WidgetConfigurationIntent {
   static var title: LocalizedStringResource = "Configuration"
   static var description = IntentDescription("List of activities widget")
 

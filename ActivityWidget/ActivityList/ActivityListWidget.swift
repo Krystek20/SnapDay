@@ -6,7 +6,7 @@ import Models
 import Utilities
 
 @available(iOSApplicationExtension 17.0, *)
-struct Provider: AppIntentTimelineProvider, TodayProvidable {
+struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
 
   private let dayProvider = DayProvider()
 
@@ -14,11 +14,11 @@ struct Provider: AppIntentTimelineProvider, TodayProvidable {
     DayEntry(
       day: nil,
       date: Date(),
-      configuration: ConfigurationAppIntent()
+      configuration: ActivityListAppIntent()
     )
   }
 
-  func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> DayEntry {
+  func snapshot(for configuration: ActivityListAppIntent, in context: Context) async -> DayEntry {
     DayEntry(
       day: nil,
       date: Date(),
@@ -26,7 +26,7 @@ struct Provider: AppIntentTimelineProvider, TodayProvidable {
     )
   }
 
-  func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<DayEntry> {
+  func timeline(for configuration: ActivityListAppIntent, in context: Context) async -> Timeline<DayEntry> {
     var entries = [DayEntry]()
     let reloadPolicy: TimelineReloadPolicy
     do {
@@ -50,12 +50,12 @@ struct Provider: AppIntentTimelineProvider, TodayProvidable {
 struct DayEntry: TimelineEntry {
   let day: Day?
   let date: Date
-  let configuration: ConfigurationAppIntent
+  let configuration: ActivityListAppIntent
 }
 
 @available(iOSApplicationExtension 17.0, *)
-struct ActivityWidgetEntryView : View {
-  var entry: Provider.Entry
+struct ActivityListWidgetEntryView : View {
+  var entry: ActivityListProvider.Entry
 
   var body: some View {
     WidgetActivityListView(
@@ -74,12 +74,12 @@ struct ActivityWidgetEntryView : View {
 }
 
 @available(iOSApplicationExtension 17.0, *)
-struct ActivityWidget: Widget {
-  let kind: String = "ActivityWidget"
+struct ActivityListWidget: Widget {
+  let kind: String = "ActivityListWidget"
 
   var body: some WidgetConfiguration {
-    AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
-      ActivityWidgetEntryView(entry: entry)
+    AppIntentConfiguration(kind: kind, intent: ActivityListAppIntent.self, provider: ActivityListProvider()) { entry in
+      ActivityListWidgetEntryView(entry: entry)
         .containerBackground(.fill.tertiary, for: .widget)
     }
     .contentMarginsDisabled()

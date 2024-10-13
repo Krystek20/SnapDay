@@ -80,7 +80,7 @@ public struct MarkerFormFeature {
             try await saveTag(tag)
             await send(.delegate(.tagCreated(tag)))
           case .label(let activityId):
-            guard var activity = try await activityRepository.activity(activityId) else { return }
+            guard var activity = try await activityRepository.activity(.id(activityId)) else { return }
             let label = ActivityLabel(name: name, color: color)
             try await saveLabel(label)
             activity.labels.append(label)

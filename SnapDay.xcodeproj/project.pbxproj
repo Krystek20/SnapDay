@@ -8,13 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		D423ACCC2CAD274700591A0D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D423ACCB2CAD274700591A0D /* LaunchScreen.xib */; };
+		D423ACD32CB5A39E00591A0D /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACCE2CB5A04200591A0D /* StreakWidget.swift */; };
+		D423ACD42CB5A3A400591A0D /* StreakAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */; };
+		D423ACD62CB6559E00591A0D /* WidgetStreak in Frameworks */ = {isa = PBXBuildFile; productRef = D423ACD52CB6559E00591A0D /* WidgetStreak */; };
 		D432465C2AD0820100D3E8F9 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = D432465B2AD0820100D3E8F9 /* Application */; };
 		D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418332C50D34A005920E1 /* WidgetKit.framework */; };
 		D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418352C50D34A005920E1 /* SwiftUI.framework */; };
 		D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */; };
-		D464183B2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183A2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift */; };
-		D464183D2C50D34A005920E1 /* ActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183C2C50D34A005920E1 /* ActivityWidget.swift */; };
-		D464183F2C50D34A005920E1 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183E2C50D34A005920E1 /* AppIntent.swift */; };
+		D464183D2C50D34A005920E1 /* ActivityListWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183C2C50D34A005920E1 /* ActivityListWidget.swift */; };
+		D464183F2C50D34A005920E1 /* ActivityListAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183E2C50D34A005920E1 /* ActivityListAppIntent.swift */; };
 		D46418412C50D34B005920E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D46418402C50D34B005920E1 /* Assets.xcassets */; };
 		D46418452C50D34B005920E1 /* ActivityWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D464184A2C50D59E005920E1 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418492C50D59E005920E1 /* CloudKit.framework */; };
@@ -30,7 +32,7 @@
 		D4CCE62D2BC7B4BB00C198C5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = D4CCE62C2BC7B4BB00C198C5 /* Base */; };
 		D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */ = {isa = PBXBuildFile; productRef = D4CCE63C2BCACB8E00C198C5 /* EveningSummary */; };
-		D4D658782C56D122007E61EB /* AppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D658772C56D122007E61EB /* AppIntents.swift */; };
+		D4D658782C56D122007E61EB /* ActivityListIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D658772C56D122007E61EB /* ActivityListIntents.swift */; };
 		D4E090EB2C90ACF000E605B2 /* Previews in Frameworks */ = {isa = PBXBuildFile; productRef = D4E090EA2C90ACF000E605B2 /* Previews */; };
 		D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */ = {isa = PBXBuildFile; productRef = D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */; };
 		D4FE9FC32BF5342B003305A9 /* DayActivityReminder in Frameworks */ = {isa = PBXBuildFile; productRef = D4FE9FC22BF5342B003305A9 /* DayActivityReminder */; };
@@ -77,15 +79,16 @@
 
 /* Begin PBXFileReference section */
 		D423ACCB2CAD274700591A0D /* LaunchScreen.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		D423ACCE2CB5A04200591A0D /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
+		D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakAppIntent.swift; sourceTree = "<group>"; };
 		D443ECEE2AD0771C002225CF /* SnapDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D443ED082AD0771D002225CF /* SnapDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ActivityWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D46418332C50D34A005920E1 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D46418352C50D34A005920E1 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidgetBundle.swift; sourceTree = "<group>"; };
-		D464183A2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidgetLiveActivity.swift; sourceTree = "<group>"; };
-		D464183C2C50D34A005920E1 /* ActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidget.swift; sourceTree = "<group>"; };
-		D464183E2C50D34A005920E1 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
+		D464183C2C50D34A005920E1 /* ActivityListWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListWidget.swift; sourceTree = "<group>"; };
+		D464183E2C50D34A005920E1 /* ActivityListAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListAppIntent.swift; sourceTree = "<group>"; };
 		D46418402C50D34B005920E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D46418422C50D34B005920E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D46418492C50D59E005920E1 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -104,7 +107,7 @@
 		D4CCE62E2BC7B4BB00C198C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4CCE63E2BCAD13800C198C5 /* SnapDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnapDay.entitlements; sourceTree = "<group>"; };
 		D4CCE63F2BCAD27900C198C5 /* Notification Content.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Notification Content.entitlements"; sourceTree = "<group>"; };
-		D4D658772C56D122007E61EB /* AppIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntents.swift; sourceTree = "<group>"; };
+		D4D658772C56D122007E61EB /* ActivityListIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListIntents.swift; sourceTree = "<group>"; };
 		D4EE7DB62C5562A7007A0B4F /* ActivityWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ActivityWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -132,6 +135,7 @@
 			files = (
 				D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */,
 				D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */,
+				D423ACD62CB6559E00591A0D /* WidgetStreak in Frameworks */,
 				D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -150,6 +154,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D423ACCD2CB5A03C00591A0D /* StreakWidget */ = {
+			isa = PBXGroup;
+			children = (
+				D423ACCE2CB5A04200591A0D /* StreakWidget.swift */,
+				D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */,
+			);
+			path = StreakWidget;
+			sourceTree = "<group>";
+		};
+		D423ACD02CB5A14000591A0D /* ActivityList */ = {
+			isa = PBXGroup;
+			children = (
+				D464183C2C50D34A005920E1 /* ActivityListWidget.swift */,
+				D464183E2C50D34A005920E1 /* ActivityListAppIntent.swift */,
+				D4D658772C56D122007E61EB /* ActivityListIntents.swift */,
+			);
+			path = ActivityList;
+			sourceTree = "<group>";
+		};
 		D432465A2AD0820100D3E8F9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -189,11 +212,9 @@
 		D46418372C50D34A005920E1 /* ActivityWidget */ = {
 			isa = PBXGroup;
 			children = (
-				D4D658772C56D122007E61EB /* AppIntents.swift */,
+				D423ACD02CB5A14000591A0D /* ActivityList */,
+				D423ACCD2CB5A03C00591A0D /* StreakWidget */,
 				D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */,
-				D464183A2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift */,
-				D464183C2C50D34A005920E1 /* ActivityWidget.swift */,
-				D464183E2C50D34A005920E1 /* AppIntent.swift */,
 				D4EE7DB62C5562A7007A0B4F /* ActivityWidgetExtension.entitlements */,
 				D46418402C50D34B005920E1 /* Assets.xcassets */,
 				D46418422C50D34B005920E1 /* Info.plist */,
@@ -302,6 +323,7 @@
 			name = ActivityWidgetExtension;
 			packageProductDependencies = (
 				D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */,
+				D423ACD52CB6559E00591A0D /* WidgetStreak */,
 			);
 			productName = ActivityWidgetExtension;
 			productReference = D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */;
@@ -434,10 +456,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D464183D2C50D34A005920E1 /* ActivityWidget.swift in Sources */,
-				D464183F2C50D34A005920E1 /* AppIntent.swift in Sources */,
-				D4D658782C56D122007E61EB /* AppIntents.swift in Sources */,
-				D464183B2C50D34A005920E1 /* ActivityWidgetLiveActivity.swift in Sources */,
+				D464183D2C50D34A005920E1 /* ActivityListWidget.swift in Sources */,
+				D423ACD32CB5A39E00591A0D /* StreakWidget.swift in Sources */,
+				D464183F2C50D34A005920E1 /* ActivityListAppIntent.swift in Sources */,
+				D4D658782C56D122007E61EB /* ActivityListIntents.swift in Sources */,
+				D423ACD42CB5A3A400591A0D /* StreakAppIntent.swift in Sources */,
 				D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -627,7 +650,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.40;
+				MARKETING_VERSION = 0.0.41;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -664,7 +687,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.40;
+				MARKETING_VERSION = 0.0.41;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -732,7 +755,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.40;
+				MARKETING_VERSION = 0.0.41;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -765,7 +788,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.40;
+				MARKETING_VERSION = 0.0.41;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -796,7 +819,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.40;
+				MARKETING_VERSION = 0.0.41;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -827,7 +850,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.40;
+				MARKETING_VERSION = 0.0.41;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -890,6 +913,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D423ACD52CB6559E00591A0D /* WidgetStreak */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WidgetStreak;
+		};
 		D432465B2AD0820100D3E8F9 /* Application */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Application;
