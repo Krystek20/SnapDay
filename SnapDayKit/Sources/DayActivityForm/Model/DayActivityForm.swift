@@ -39,6 +39,7 @@ public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, Freque
   public var labels: [ActivityLabel]
   public let type: DayActivityFormType
   public let position: Int
+  public var important: Bool
 }
 
 extension DayActivityForm {
@@ -47,6 +48,7 @@ extension DayActivityForm {
     case .activity(let showCompleted):
       [
         showCompleted ? .completed : nil,
+        .important,
         .icon,
         .name,
         .tags,
@@ -69,6 +71,7 @@ extension DayActivityForm {
     case .template:
       [
         .icon,
+        .important,
         .name,
         .tags,
         .frequency,
@@ -164,7 +167,8 @@ extension DayActivityForm {
       tasks: [],
       labels: [],
       type: type,
-      position: .zero
+      position: .zero,
+      important: false
     )
   }
 }
@@ -198,6 +202,7 @@ extension DayActivityForm {
     self.isFrequentEnabled = false
     self.type = .activity(showCompleted: showCompleted)
     self.position = .zero
+    self.important = dayActivity.important
   }
 }
 
@@ -219,7 +224,8 @@ extension DayActivity {
       tags: form.tags,
       labels: form.labels,
       dayActivityTasks: form.tasks.compactMap(DayActivityTask.init),
-      reminderDate: form.reminderDate
+      reminderDate: form.reminderDate,
+      important: form.important
     )
   }
 
@@ -239,6 +245,7 @@ extension DayActivity {
     self.dayActivityTasks = form.tasks.compactMap(DayActivityTask.init)
     self.reminderDate = form.reminderDate
     self.dueDate = form.dueDate
+    self.important = form.important
   }
 }
 
@@ -264,6 +271,7 @@ extension DayActivityForm {
     self.isFrequentEnabled = false
     self.type = .activityTask(showCompleted: showCompleted)
     self.position = dayActivityTask.position
+    self.important = false
   }
 }
 
@@ -320,6 +328,7 @@ extension DayActivityForm {
     self.isFrequentEnabled = activity.isFrequentEnabled
     self.type = .template
     self.position = .zero
+    self.important = activity.important
   }
 }
 
@@ -337,7 +346,8 @@ extension Activity {
       startDate: startDate,
       labels: form.labels,
       tasks: form.tasks.compactMap(ActivityTask.init),
-      defaultReminderDate: form.reminderDate
+      defaultReminderDate: form.reminderDate,
+      important: form.important
     )
   }
 
@@ -357,6 +367,7 @@ extension Activity {
       .compactMap(ActivityTask.init)
       .sorted(by: { $0.defaultPosition < $1.defaultPosition })
     self.defaultReminderDate = form.reminderDate
+    self.important = form.important
   }
 }
 
@@ -379,6 +390,7 @@ extension DayActivityForm {
     self.isFrequentEnabled = false
     self.type = .templateTask
     self.position = activityTask.defaultPosition
+    self.important = false
   }
 }
 
@@ -420,6 +432,7 @@ extension DayActivityForm {
       case .overview: !overview.isEmpty
       case .tasks: !tasks.isEmpty
       case .labels: !labels.isEmpty
+      case .important: true
       }
     }
   }

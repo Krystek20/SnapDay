@@ -29,5 +29,6 @@ extension ActivityEntity {
       }
     ) as NSSet
     defaultReminderDate = activity.defaultReminderDate
+    important = activity.important
   }
 }

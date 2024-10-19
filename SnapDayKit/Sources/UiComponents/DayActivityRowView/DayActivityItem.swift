@@ -7,6 +7,7 @@ public struct DayActivityItem: Equatable, Identifiable {
     case bell
     case hourglass
     case `repeat`
+    case exclamationmark = "exclamationmark.circle.fill"
 
     public var id: String { rawValue }
   }
@@ -37,6 +38,7 @@ extension DayActivityItem {
       iconData: activityType.icon?.data,
       isStrikethrough: activityType.isDone,
       displayedIcons: [
+        activityType.important ? .exclamationmark : nil,
         showHourglass ? .hourglass : nil,
         activityType.reminderDate != nil ? .bell : nil,
         activityType.isFrequentEnabled ? .repeat : nil

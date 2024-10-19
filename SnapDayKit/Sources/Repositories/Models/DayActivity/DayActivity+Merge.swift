@@ -22,6 +22,12 @@ extension DayActivity {
       if overview == nil || overview?.isEmpty == true {
         overview = dayActivity.overview
       }
+      if !important && dayActivity.important {
+        important = dayActivity.important
+      }
+      if position == -1 && dayActivity.position >= .zero {
+        position = dayActivity.position
+      }
     }
   }
 }

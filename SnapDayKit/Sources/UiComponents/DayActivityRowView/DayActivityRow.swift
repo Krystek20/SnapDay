@@ -95,8 +95,6 @@ public struct DayActivityRow: View {
     switch trailingIcon {
     case .none:
       AnyView(EmptyView())
-    case .more:
-      AnyView(prepareIcon("ellipsis"))
     case .customView(let view):
       AnyView(view)
     }

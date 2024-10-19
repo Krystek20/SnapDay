@@ -270,7 +270,7 @@ public struct DayActivityFormFeature {
           guard result else { return }
           await send(.internal(.determineNotificationStatus))
         case .denied:
-          guard let settingsURL = await URL(string: UIApplication.openSettingsURLString) else { return }
+          guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
           await openURL(settingsURL)
         case .authorized:
           return

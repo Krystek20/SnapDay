@@ -26,7 +26,8 @@ extension Activity {
       startDate: entity.startDate,
       labels: try labels.map(ActivityLabel.init),
       tasks: try tasks.map(ActivityTask.init),
-      defaultReminderDate: entity.defaultReminderDate
+      defaultReminderDate: entity.defaultReminderDate,
+      important: entity.important
     )
   }
 }

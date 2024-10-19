@@ -41,6 +41,8 @@ public struct DayView: View {
   private let showCompletedTapped: () -> Void
   private let hideCompletedTapped: () -> Void
 
+  @State private var draggedActivity: DayActivity?
+
   // MARK: - Initialization
 
   public init(
@@ -69,17 +71,7 @@ public struct DayView: View {
         newActivityFormIfNeeded(newForm: newForms)
       }
       ForEach(activities) { dayActivity in
-        menuActivityView(dayActivity)
-
-        if let newForms {
-          newActivityTaskFormIfNeeded(newForms: newForms, dayActivity: dayActivity)
-        }
-
-        ForEach(tasks(for: dayActivity)) { activityTask in
-          menuActivityTaskView(activityTask)
-            .padding(.leading, 10.0)
-          divider(addPadding: dayActivity.dayActivityTasks.last?.id != activityTask.id)
-        }
+        menuActivityView(dayActivity, newForms: newForms)
       }
       doneRowViewIfNeeded()
       showOrHideDoneActivitiesViewIfNeeded()
@@ -157,84 +149,80 @@ public struct DayView: View {
     }
   }
 
-  private func menuActivityView(_ dayActivity: DayActivity) -> some View {
-    Menu {
-      Button(
-        action: {
-          dayActivityAction(.dayActivity(.tapped, dayActivity))
-        },
-        label: {
-          if dayActivity.isDone {
-            Text("Deselect", bundle: .module)
-            Image(systemName: "x.circle")
-          } else {
-            Text("Select", bundle: .module)
-            Image(systemName: "checkmark.circle")
-          }
-        }
-      )
-      Button(
-        action: {
-          dayActivityAction(.dayActivity(.edit, dayActivity))
-        },
-        label: {
-          Text("Edit", bundle: .module)
-          Image(systemName: "pencil.circle")
-        }
-      )
-      Button(
-        action: {
-          dayActivityAction(.dayActivity(.addActivityTask, dayActivity))
-        },
-        label: {
-          Text("Add task", bundle: .module)
-          Image(systemName: "plus.circle")
-        }
-      )
-      if dayActivity.activity == nil {
-        Button(
-          action: {
-            dayActivityAction(.dayActivity(.save, dayActivity))
-          },
-          label: {
-            Text("Save", bundle: .module)
-            Image(systemName: "square.and.arrow.down")
-          }
-        )
-      }
-      Button(
-        action: {
-          dayActivityAction(.dayActivity(.move, dayActivity))
-        },
-        label: {
-          Text("Move", bundle: .module)
-          Image(systemName: "arrow.left.and.right")
-        }
-      )
-      Button(
-        action: {
-          dayActivityAction(.dayActivity(.copy, dayActivity))
-        },
-        label: {
-          Text("Copy", bundle: .module)
-          Image(systemName: "doc.on.doc")
-        }
-      )
-      Button(
-        action: {
-          dayActivityAction(.dayActivity(.remove, dayActivity))
-        },
-        label: {
-          Text("Remove", bundle: .module)
-          Image(systemName: "trash")
-        }
-      )
-    } label: {
+  private func menuActivityView(_ dayActivity: DayActivity, newForms: NewForms?) -> some View {
+    VStack(spacing: .zero) {
       DayActivityRow(
         activityItem: DayActivityItem(activityType: dayActivity),
-        trailingIcon: .more
+        trailingIcon: .customView(
+          TrailingIcon.moreIcon
+            .overlay {
+              dayActivityMenuView(dayActivity: dayActivity)
+            }
+        )
       )
+
+      if let newForms {
+        newActivityTaskFormIfNeeded(newForms: newForms, dayActivity: dayActivity)
+      }
+
+      ForEach(tasks(for: dayActivity)) { activityTask in
+        menuActivityTaskView(activityTask)
+          .padding(.leading, 10.0)
+        divider(addPadding: dayActivity.dayActivityTasks.last?.id != activityTask.id)
+      }
     }
+    .contentShape(Rectangle())
+    .drag(if: !dayActivity.isDone, data: {
+      draggedActivity = dayActivity
+      return NSItemProvider()
+    })
+    .onDrop(
+      of: [.text],
+      delegate: ItemDropDelegate(
+        destinationItem: dayActivity,
+        draggedItem: $draggedActivity,
+        moveAction: { draggedActivity in
+          dayActivityAction(.dayActivity(.reorder(.perform(destination: dayActivity)), draggedActivity))
+        },
+        performDrop: {
+          dayActivityAction(.dayActivity(.reorder(.drop), dayActivity))
+        }
+      )
+    )
+  }
+
+  private func dayActivityMenuView(dayActivity: DayActivity) -> some View {
+    Menu {
+      dayActivity.isDone
+      ? menuItem(for: .deselect, dayActivity: dayActivity)
+      : menuItem(for: .select, dayActivity: dayActivity)
+      menuItem(for: .edit, dayActivity: dayActivity)
+      menuItem(for: .addTask, dayActivity: dayActivity)
+      dayActivity.important
+      ? menuItem(for: .unmarkImortant, dayActivity: dayActivity)
+      : menuItem(for: .markImportant, dayActivity: dayActivity)
+      if dayActivity.activity == nil {
+        menuItem(for: .save, dayActivity: dayActivity)
+      }
+      menuItem(for: .move, dayActivity: dayActivity)
+      menuItem(for: .copy, dayActivity: dayActivity)
+      menuItem(for: .remove, dayActivity: dayActivity)
+    } label: {
+      Color.clear
+        .frame(width: 30.0, height: 30.0)
+    }
+  }
+
+  private func menuItem(for menuItem: DayActivityMenuItem, dayActivity: DayActivity) -> some View {
+    Button(
+      action: {
+        dayActivityAction(.dayActivity(menuItem.dayActivityAction, dayActivity))
+      },
+      label: {
+        Text(menuItem.title)
+        Image(systemName: menuItem.imageName)
+      }
+    )
   }
 
   private func divider(addPadding: Bool) -> some View {
@@ -296,45 +284,40 @@ public struct DayView: View {
   }
 
   private func menuActivityTaskView(_ dayActivityTask: DayActivityTask) -> some View {
-    Menu {
-      Button(
-        action: {
-          dayActivityAction(.dayActivityTask(.tapped, dayActivityTask))
-        },
-        label: {
-          if dayActivityTask.isDone {
-            Text("Deselect", bundle: .module)
-            Image(systemName: "x.circle")
-          } else {
-            Text("Select", bundle: .module)
-            Image(systemName: "checkmark.circle")
+    DayActivityRow(
+      activityItem: DayActivityItem(activityType: dayActivityTask),
+      trailingIcon: .customView(
+        TrailingIcon.moreIcon
+          .overlay {
+            dayActivityTaskMenuView(dayActivityTask: dayActivityTask)
           }
-        }
       )
-      Button(
-        action: {
-          dayActivityAction(.dayActivityTask(.edit, dayActivityTask))
-        },
-        label: {
-          Text("Edit", bundle: .module)
-          Image(systemName: "pencil.circle")
-        }
-      )
-      Button(
-        action: {
-          dayActivityAction(.dayActivityTask(.remove, dayActivityTask))
-        },
-        label: {
-          Text("Remove", bundle: .module)
-          Image(systemName: "trash")
-        }
-      )
+    )
+  }
+
+  private func dayActivityTaskMenuView(dayActivityTask: DayActivityTask) -> some View {
+    Menu {
+      dayActivityTask.isDone
+      ? taskMenuItem(for: .deselect, dayActivityTask: dayActivityTask)
+      : taskMenuItem(for: .select, dayActivityTask: dayActivityTask)
+      taskMenuItem(for: .edit, dayActivityTask: dayActivityTask)
+      taskMenuItem(for: .remove, dayActivityTask: dayActivityTask)
     } label: {
-      DayActivityRow(
-        activityItem: DayActivityItem(activityType: dayActivityTask),
-        trailingIcon: .more
-      )
+      Color.clear
+        .frame(width: 30.0, height: 30.0)
     }
+  }
+
+  private func taskMenuItem(for menuItem: DayActivityTaskMenuItem, dayActivityTask: DayActivityTask) -> some View {
+    Button(
+      action: {
+        dayActivityAction(.dayActivityTask(menuItem.dayActivityTaskAction, dayActivityTask))
+      },
+      label: {
+        Text(menuItem.title)
+        Image(systemName: menuItem.imageName)
+      }
+    )
   }
 
   // MARK: - Helpers

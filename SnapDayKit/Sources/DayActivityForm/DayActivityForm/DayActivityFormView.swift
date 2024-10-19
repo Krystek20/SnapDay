@@ -79,6 +79,7 @@ public struct DayActivityFormView: View {
     ScrollView {
       VStack(spacing: 15.0) {
         prepareView(for: .completed)
+        prepareView(for: .important)
         prepareView(for: .icon)
         prepareView(for: .name)
         prepareView(for: .tags)
@@ -104,6 +105,8 @@ public struct DayActivityFormView: View {
         switch field {
         case .completed:
           completedView
+        case .important:
+          importantView
         case .icon:
           iconView
         case .name:
@@ -135,6 +138,17 @@ public struct DayActivityFormView: View {
     WithPerceptionTracking {
       Toggle(isOn: $store.form.completed) {
         Text("Completed", bundle: .module)
+          .formTitleTextStyle
+      }
+      .toggleStyle(CheckToggleStyle())
+      .formBackgroundModifier()
+    }
+  }
+
+  private var importantView: some View {
+    WithPerceptionTracking {
+      Toggle(isOn: $store.form.important) {
+        Text("Important", bundle: .module)
           .formTitleTextStyle
       }
       .toggleStyle(CheckToggleStyle())

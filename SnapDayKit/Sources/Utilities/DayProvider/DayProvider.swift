@@ -10,6 +10,8 @@ public struct DayProvider: TodayProvidable {
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dayEditor) private var dayEditor
+  @Dependency(\.calendar) private var calendar
+  @Dependency(\.dayRepository) private var dayRepository
 
   // MARK: - Initialization
 
@@ -20,10 +22,13 @@ public struct DayProvider: TodayProvidable {
   public func day(_ date: Date) async throws -> Day {
     try await moveDayActivitiesIfDueTime(date: date)
     let days = try await dayEditor.prepareDays(try await loadActivities(), date...date)
-    guard let day = days.first else {
+    guard var day = days.first else {
       struct CanNotCreateDayError: Error { }
       throw CanNotCreateDayError()
     }
+    day.activities = day.activities.sorted(calendar: calendar)
+    try await dayRepository.saveDay(day)
+
     return day
   }
 

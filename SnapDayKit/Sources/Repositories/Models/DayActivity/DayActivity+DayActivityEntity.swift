@@ -32,7 +32,9 @@ extension DayActivity {
       labels: try labels.map(ActivityLabel.init),
       dayActivityTasks: try dayActivityTasks.map(DayActivityTask.init)
         .sorted(by: { $0.name < $1.name }),
-      reminderDate: entity.reminderDate
+      reminderDate: entity.reminderDate,
+      important: entity.important,
+      position: Int(entity.position)
     )
   }
 }

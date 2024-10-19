@@ -2,6 +2,7 @@ import Foundation
 
 public enum DayActivityField {
   case completed
+  case important
   case icon
   case name
   case tags

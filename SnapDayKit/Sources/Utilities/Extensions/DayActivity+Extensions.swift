@@ -41,7 +41,8 @@ extension DayActivity {
           position: $0.defaultPosition
         )
       },
-      reminderDate: calendar().reminderDate(from: activity.defaultReminderDate, dayDate: dayDate)
+      reminderDate: calendar().reminderDate(from: activity.defaultReminderDate, dayDate: dayDate),
+      important: activity.important
     )
   }
 
@@ -78,7 +79,8 @@ extension DayActivity {
           reminderDate: calendar().reminderDate(from: dayActivityTask.reminderDate, dayDate: dayDate)
         )
       },
-      reminderDate: calendar().reminderDate(from: dayActivity.reminderDate, dayDate: dayDate)
+      reminderDate: calendar().reminderDate(from: dayActivity.reminderDate, dayDate: dayDate),
+      important: dayActivity.important
     )
   }
 }

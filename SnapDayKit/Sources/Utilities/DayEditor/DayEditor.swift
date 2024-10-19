@@ -15,6 +15,7 @@ public struct DayEditor {
   public var applyChanges: @Sendable (_ transactions: Transactions) async throws -> AppliedChanges
   public var moveDayActivity: @Sendable (_ dayActivity: DayActivity, _ toDate: Date) async throws -> Void
   public var copyDayActivity: @Sendable (_ dayActivity: DayActivity, _ dates: [Date]) async throws -> Void
+  public var saveDay: @Sendable (_ Day: Day) async throws -> Void
 }
 
 extension DependencyValues {
@@ -59,6 +60,9 @@ extension DayEditor: DependencyKey {
       },
       copyDayActivity: { dayActivity, dates in
         try await DayUpdater().copyDayActivity(dayActivity, to: dates)
+      },
+      saveDay: { day in
+        try await DayUpdater().saveDay(day)
       }
     )
   }

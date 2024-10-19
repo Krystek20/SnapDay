@@ -61,6 +61,7 @@ public struct WidgetActivityListFeature: TodayProvidable {
     }
 
     private var allDayActivityItems: [DayActivityItem] {
+      @Dependency(\.calendar) var calendar
       guard let selectedDay else { return [] }
       return selectedDay
         .activities
@@ -74,7 +75,7 @@ public struct WidgetActivityListFeature: TodayProvidable {
           }
 
           result.append(
-            contentsOf: dayActivity.dayActivityTasks.sorted.compactMap { dayActivityTask in
+            contentsOf: dayActivity.dayActivityTasks.sorted(calendar: calendar).compactMap { dayActivityTask in
               let ignoreTask = hideCompleted && dayActivityTask.isDone
               guard !ignoreActivity && !ignoreTask else {
                 return nil

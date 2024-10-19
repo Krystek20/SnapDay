@@ -27,7 +27,7 @@ public struct DayActivityTask: Identifiable, Equatable, Hashable {
     duration: Int = .zero,
     overview: String? = nil,
     reminderDate: Date? = nil,
-    position: Int = .zero
+    position: Int = -1
   ) {
     self.id = id
     self.dayActivityId = dayActivityId

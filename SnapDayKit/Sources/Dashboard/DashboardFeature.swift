@@ -44,11 +44,12 @@ public struct DashboardFeature: TodayProvidable {
     }
 
     var activities: [DayActivity] {
-      switch activityListOption {
+      @Dependency(\.calendar) var calendar
+      return switch activityListOption {
       case .collapsed:
-        selectedDay?.activities.sorted.filter { !$0.isDone } ?? []
+        selectedDay?.activities.filter { !$0.isDone } ?? []
       case .extended:
-        selectedDay?.activities.sorted ?? []
+        selectedDay?.activities ?? []
       }
     }
 
@@ -120,6 +121,7 @@ public struct DashboardFeature: TodayProvidable {
       case handleDeepLink(DeeplinkService.DashboardAction?)
       case dayActivityAction(DayActivityAction)
       case dayActivityTaskAction(DayActivityTaskAction)
+      case saveOrder
 
       public enum DayActivityAction: Equatable {
         case showNewForm
@@ -135,6 +137,8 @@ public struct DashboardFeature: TodayProvidable {
         case showAlertSelectAll(DayActivity)
         case showAlertSelectActivity(DayActivity)
         case save(DayActivity)
+        case reorder(DayActivity, DayActivity)
+        case setImportant(Bool, DayActivity)
       }
 
       public enum DayActivityTaskAction: Equatable {
@@ -341,6 +345,16 @@ public struct DashboardFeature: TodayProvidable {
       case .addActivity:
         return .send(.internal(.dayActivityAction(.showNewForm)))
       }
+    case .saveOrder:
+      guard var selectedDay = state.selectedDay else { return .none }
+      for index in selectedDay.activities.indices {
+        selectedDay.activities[index].position = index
+      }
+
+      return .run { [selectedDay] send in
+        try await dayEditor.saveDay(selectedDay)
+        await send(.internal(.loadDay))
+      }
     }
   }
 
@@ -362,6 +376,17 @@ public struct DashboardFeature: TodayProvidable {
         .send(.internal(.dayActivityTaskAction(.showNewForm(dayActivity))))
       case .save:
         .send(.internal(.dayActivityAction(.save(dayActivity))))
+      case .reorder(let action):
+        switch action {
+        case .perform(let destination):
+          .send(.internal(.dayActivityAction(.reorder(dayActivity, destination))))
+        case .drop:
+          .send(.internal(.saveOrder))
+        }
+      case .markImportant:
+        .send(.internal(.dayActivityAction(.setImportant(true, dayActivity))))
+      case .unmarkImportant:
+        .send(.internal(.dayActivityAction(.setImportant(false, dayActivity))))
       }
     case .dayActivityTask(let dayActivityTaskAction, let dayActivityTask):
       switch dayActivityTaskAction {
@@ -476,6 +501,24 @@ public struct DashboardFeature: TodayProvidable {
         if #available(iOS 17.0, *) {
           SaveActivityTip.show = true
         }
+        try await dayActivityRepository.saveDayActivity(dayActivity)
+        await send(.internal(.loadDay))
+      }
+    case .reorder(let dayActivity, let destinationDayActivity):
+      guard dayActivity.priority(calendar: calendar) == destinationDayActivity.priority(calendar: calendar),
+            let fromIndex = state.selectedDay?.activities.firstIndex(of: dayActivity),
+            let toIndex = state.selectedDay?.activities.firstIndex(of: destinationDayActivity),
+            fromIndex != toIndex else { return .none }
+
+      state.selectedDay?.activities.move(
+        fromOffsets: IndexSet(integer: fromIndex),
+        toOffset: (toIndex > fromIndex ? (toIndex + 1) : toIndex)
+      )
+      return .none
+    case .setImportant(let isImportant, let dayActivity):
+      guard var dayActivity = findActivity(id: dayActivity.id, state: state) else { return .none }
+      dayActivity.important = isImportant
+      return .run { [dayActivity] send in
         try await dayActivityRepository.saveDayActivity(dayActivity)
         await send(.internal(.loadDay))
       }

@@ -35,5 +35,7 @@ extension DayActivityEntity {
       }
     ) as NSSet
     reminderDate = dayActivity.reminderDate
+    important = dayActivity.important
+    position = Int32(dayActivity.position)
   }
 }

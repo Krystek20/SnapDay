@@ -298,6 +298,10 @@ final class DayUpdater {
     }
   }
 
+  func saveDay(_ day: Day) async throws {
+    try await dayRepository.saveDay(day)
+  }
+
   // MARK: - Private
 
   private func createDates(for activities: [Activity], dateRange: ClosedRange<Date>) throws -> [Activity: [Date]] {
@@ -434,10 +438,6 @@ final class DayUpdater {
     for day in days {
       try await saveDay(day)
     }
-  }
-
-  private func saveDay(_ day: Day) async throws {
-    try await dayRepository.saveDay(day)
   }
 
   private func removeDays(_ days: [Day]) async throws {

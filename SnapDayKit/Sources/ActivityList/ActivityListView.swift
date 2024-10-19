@@ -77,7 +77,7 @@ public struct ActivityListView: View {
         informationViewIfNeeded
         newActivityFormIfNeeded
         ForEach(store.displayedActivities) { activity in
-          menuView(for: activity)
+          activityView(for: activity)
           if activity.id != store.displayedActivities.last?.id {
             Divider()
           }
@@ -131,14 +131,27 @@ public struct ActivityListView: View {
     }
   }
 
-  private func menuView(for activity: Activity) -> some View {
+  private func activityView(for activity: Activity) -> some View {
+    DayActivityRow(
+      activityItem: DayActivityItem(activityType: activity),
+      trailingIcon: .customView(
+        TrailingIcon.moreIcon
+          .overlay {
+            activityMenuView(activity: activity)
+          }
+      )
+    )
+  }
+
+  private func activityMenuView(activity: Activity) -> some View {
     Menu {
       selectButton(activity: activity)
       editButton(activity: activity)
       enableButton(activity: activity)
       removeButton(activity: activity)
     } label: {
-      activityRow(for: activity)
+      Color.clear
+        .frame(width: 30.0, height: 30.0)
     }
   }
 
@@ -201,12 +214,5 @@ public struct ActivityListView: View {
         }
       )
     }
-  }
-
-  private func activityRow(for activity: Activity) -> some View {
-    DayActivityRow(
-      activityItem: DayActivityItem(activityType: activity),
-      trailingIcon: .more
-    )
   }
 }

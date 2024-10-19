@@ -535,6 +535,28 @@
         }
       }
     },
+    "Important" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wichtig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importante"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ważne"
+          }
+        }
+      }
+    },
     "Labels" : {
       "localizations" : {
         "de" : {

@@ -87,7 +87,7 @@ struct StreakEntryView : View {
   }
 }
 
-@available(iOSApplicationExtension 17.0, *)
+@available(iOS 17.0, *)
 struct StreakWidget: Widget {
   let kind: String = "ActivityWidget"
 
