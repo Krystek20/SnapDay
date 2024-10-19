@@ -65,7 +65,7 @@ public struct WidgetActivityListFeature: TodayProvidable {
       guard let selectedDay else { return [] }
       return selectedDay
         .activities
-        .sorted(by: { $0.name < $1.name })
+        .sorted(calendar: calendar)
         .reduce(into: [DayActivityItem](), { result, dayActivity in
           let ignoreActivity = hideCompleted && dayActivity.isDone
           if !ignoreActivity {
