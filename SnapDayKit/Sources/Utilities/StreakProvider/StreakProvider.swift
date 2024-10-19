@@ -55,13 +55,13 @@ public struct StreakProvider: TodayProvidable {
       case .zero:
         .zero
       case 1...3:
-        min(4, maxStreak)
+        lastStreak == maxStreak ? 4 : min(4, maxStreak)
       case 4...7:
-        min(8, maxStreak)
+        lastStreak == maxStreak ? 8 : min(8, maxStreak)
       case 8...14:
-        min(15, maxStreak)
+        lastStreak == maxStreak ? 15 : min(15, maxStreak)
       case 15...30:
-        min(31, maxStreak)
+        lastStreak == maxStreak ? 31 : min(31, maxStreak)
       case 31...:
         lastStreak < maxStreak ? maxStreak : Int(((Double(lastStreak) / 25) + 1) * 25)
       default:
