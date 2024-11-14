@@ -25,7 +25,6 @@ public struct Switcher: View {
 
   public var body: some View {
     VStack(spacing: .zero) {
-      Divider()
       HStack(spacing: 10.0) {
         Button(
           action: leftArrowAction,

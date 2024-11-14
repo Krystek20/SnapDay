@@ -1,17 +1,49 @@
 import Foundation
 import Dependencies
 
+// MARK: - Dependecies
+
+extension DependencyValues {
+  public var utcCalendar: Calendar {
+    get { self[Calendar.self] }
+    set { self[Calendar.self] = newValue }
+  }
+}
+
+extension Calendar: @retroactive DependencyKey {
+  public static var liveValue: Calendar {
+    Calendar.autoupdatingCurrent.utcCalendar
+  }
+}
+
 extension Calendar {
 
   public static var today: Date {
-    @Dependency(\.calendar) var calendar
+    @Dependency(\.utcCalendar) var calendar
     @Dependency(\.date.now) var now
     return calendar.dayFormat(now)
   }
 
+  public var utcCalendar: Calendar {
+    var utcCalendar = Calendar.autoupdatingCurrent
+    utcCalendar.timeZone = TimeZone(secondsFromGMT: .zero) ?? .current
+    return utcCalendar
+  }
+
   public func dayFormat(_ fromDate: Date) -> Date {
-    let components = dateComponents([.year, .month, .day], from: fromDate)
-    return date(from: components) ?? fromDate
+    let utcComponents = dateComponents([.year, .month, .day], from: fromDate)
+    return date(from: utcComponents) ?? fromDate
+  }
+
+  public func convertFromCurrentTimeZoneToUTC(_ fromDate: Date) -> Date {
+    let components = Calendar.autoupdatingCurrent.dateComponents([.year, .month, .day], from: fromDate)
+    let dateComponents = DateComponents(
+      timeZone: TimeZone(abbreviation: "UTC"),
+      year: components.year,
+      month: components.month,
+      day: components.day
+    )
+    return date(from: dateComponents) ?? fromDate
   }
 
   public func monthName(_ fromDate: Date) throws -> String {

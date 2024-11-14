@@ -41,8 +41,8 @@ public extension String {
     UIGraphicsBeginImageContextWithOptions(outputImageSize, false, 0)
     self.draw(
       in: CGRect(
-        x: (size - textSize.width) / 2,
-        y: (size - textSize.height) / 2,
+        x: (size - textSize.width) / 2.0,
+        y: (size - textSize.height) / 2.0,
         width: textSize.width,
         height: textSize.height
       ),

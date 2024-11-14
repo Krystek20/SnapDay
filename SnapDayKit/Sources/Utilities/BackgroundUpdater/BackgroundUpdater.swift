@@ -12,7 +12,7 @@ public final class BackgroundUpdater {
 
   private let taskScheduler: BGTaskScheduler
   @Dependency(\.date) private var date
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
 
   // MARK: - Initialization
 

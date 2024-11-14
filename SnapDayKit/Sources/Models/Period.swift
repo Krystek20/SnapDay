@@ -5,10 +5,11 @@ public enum Period: String, Equatable, Hashable, CaseIterable {
   case week
   case month
   case quarter
+  case year
 }
 
 extension Period: Identifiable {
-  public var id: Self { self }
+  public var id: String { self.rawValue }
 }
 
 extension Period {
@@ -22,6 +23,19 @@ extension Period {
         .month
     case .quarter:
         .quarter
+    case .year:
+        .year
+    }
+  }
+
+  public var unit: Period {
+    switch self {
+    case .day, .week:
+      .day
+    case .month:
+      .week
+    case .quarter, .year:
+      .month
     }
   }
 }

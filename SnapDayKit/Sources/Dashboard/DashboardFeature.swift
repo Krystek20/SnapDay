@@ -22,7 +22,7 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.deeplinkService) private var deeplinkService
   private let dayProvider = DayProvider()
@@ -44,7 +44,7 @@ public struct DashboardFeature: TodayProvidable {
     }
 
     var activities: [DayActivity] {
-      @Dependency(\.calendar) var calendar
+      @Dependency(\.utcCalendar) var calendar
       return switch activityListOption {
       case .collapsed:
         selectedDay?.activities.filter { !$0.isDone } ?? []
@@ -302,9 +302,9 @@ public struct DashboardFeature: TodayProvidable {
         state.date == date
       }
       return .run { [shouldReload] send in
-          guard shouldReload else { return }
-          await send(.internal(.loadDay))
-        }
+        guard shouldReload else { return }
+        await send(.internal(.loadDay))
+      }
     case .calendarDayChanged:
       return .send(.internal(.loadDay))
     case .setDate(let date):

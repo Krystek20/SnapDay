@@ -199,28 +199,6 @@
         }
       }
     },
-    "Day" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tag"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Día"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dzień"
-          }
-        }
-      }
-    },
     "Great job! Your activity has been successfully saved to your activity list. You can find it under the 'Activity List' button. From there, you can make your saved activities frequently and manage them easily. Keep up the good work!" : {
       "localizations" : {
         "de" : {
@@ -287,28 +265,6 @@
         }
       }
     },
-    "Month" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monat"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mes"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Miesiąc"
-          }
-        }
-      }
-    },
     "Move" : {
       "localizations" : {
         "de" : {
@@ -327,28 +283,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Przenieś"
-          }
-        }
-      }
-    },
-    "Quarter" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quartal"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trimestre"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kwartał"
           }
         }
       }
@@ -415,28 +349,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "To jest ostatnie zadanie tej aktywności. Czy chcesz oznaczyć aktywność jako zakończoną?"
-          }
-        }
-      }
-    },
-    "Week" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Woche"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Semana"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tydzień"
           }
         }
       }

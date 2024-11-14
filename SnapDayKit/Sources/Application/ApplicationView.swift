@@ -3,6 +3,7 @@ import SwiftUI
 import Dashboard
 import Reports
 import Onboarding
+import ActivityDetails
 import Resources
 import DeveloperTools
 import UIKit.UIDevice
@@ -103,20 +104,29 @@ public struct ApplicationView: View {
             Image(systemName: "rectangle.grid.2x2")
           }
           .tag(ApplicationFeature.Tab.dashboard)
+          .toolbarBackground(.visible, for: .tabBar)
 
-          NavigationStack {
+          NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
             ReportsView(
               store: store.scope(
                 state: \.reports,
                 action: \.reports
               )
             )
+          } destination: { store in
+            switch store.state {
+            case .activityDetails:
+              if let store = store.scope(state: \.activityDetails, action: \.activityDetails) {
+                ActivityDetailsView(store: store)
+              }
+            }
           }
           .tabItem {
             Text("Reports", bundle: .module)
             Image(systemName: "doc.text")
           }
           .tag(ApplicationFeature.Tab.reports)
+          .toolbarBackground(.visible, for: .tabBar)
         }
       )
     }

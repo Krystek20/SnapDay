@@ -17,6 +17,7 @@ public struct DayActivityFormFeature {
   @Dependency(\.activityLabelRepository) private var activityLabelRepository
   @Dependency(\.date) private var date
   @Dependency(\.uuid) private var uuid
+  @Dependency(\.utcCalendar) private var utcCalendar
   @Dependency(\.calendar) private var calendar
   @Dependency(\.openURL) private var openURL
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
@@ -59,8 +60,7 @@ public struct DayActivityFormFeature {
     }
 
     var weekdays: [Weekday] {
-      @Dependency(\.calendar) var calendar
-      return WeekdaysProvider(calendar: calendar).weekdays
+      WeekdaysProvider().weekdays
     }
 
     let type: DayActivityFormType
@@ -259,7 +259,7 @@ public struct DayActivityFormFeature {
       return .none
     case .dueTimeToggeled(let value):
       state.form.dueDate = value
-      ? calendar.dayFormat(state.editDate)
+      ? utcCalendar.dayFormat(state.editDate)
       : nil
       return .none
     case .turnNotificationTapped:

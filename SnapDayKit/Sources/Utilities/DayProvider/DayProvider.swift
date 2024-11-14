@@ -10,7 +10,7 @@ public struct DayProvider: TodayProvidable {
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dayEditor) private var dayEditor
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
   @Dependency(\.dayRepository) private var dayRepository
 
   // MARK: - Initialization

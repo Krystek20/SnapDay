@@ -42,6 +42,20 @@ extension Day {
     guard plannedCount != .zero else { return .zero }
     return min(Double(completedCount) / Double(plannedCount), 1.0)
   }
+
+  public var totalPlannedDuration: Int {
+    activities.reduce(into: Int.zero) { result, activity in
+      result += activity.totalDuration
+    }
+  }
+
+  public var totalCompletedDuration: Int {
+    activities
+      .filter(\.isDone)
+      .reduce(into: Int.zero) { result, activity in
+        result += activity.totalDuration
+      }
+  }
 }
 
 public extension [Day] {
@@ -64,5 +78,17 @@ public extension [Day] {
 
   var percent: Int {
     Int(completedValue * 100)
+  }
+
+  var totalPlannedDuration: Int {
+    reduce(into: Int.zero) { result, day in
+      result += day.totalPlannedDuration
+    }
+  }
+
+  var totalCompletedDuration: Int {
+    reduce(into: Int.zero) { result, day in
+      result += day.totalCompletedDuration
+    }
   }
 }

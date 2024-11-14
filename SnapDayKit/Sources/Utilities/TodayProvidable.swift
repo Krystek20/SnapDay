@@ -17,7 +17,7 @@ public extension TodayProvidable {
   }
 
   private func nextDay(_ date: Date) throws -> Date {
-    @Dependency(\.calendar) var calendar
+    @Dependency(\.utcCalendar) var calendar
     let nextDay = calendar.date(byAdding: .day, value: 1, to: date)
     return try calendar.dayFormat(nextDay.unwrapped)
   }

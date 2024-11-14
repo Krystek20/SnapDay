@@ -19,7 +19,7 @@ extension DayActivity {
       icon: activity.icon,
       dueDate: activity.dueDaysCount.flatMap { dueDaysCount in
         guard dueDaysCount > .zero else { return nil }
-        return calendar().date(byAdding: .day, value: dueDaysCount, to: dayDate)
+        return calendar().utcCalendar.date(byAdding: .day, value: dueDaysCount, to: dayDate)
       },
       doneDate: nil,
       duration: activity.defaultDuration ?? .zero,

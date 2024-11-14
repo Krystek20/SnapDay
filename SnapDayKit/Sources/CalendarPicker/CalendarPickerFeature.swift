@@ -8,7 +8,7 @@ public struct CalendarPickerFeature {
   // MARK: - Dependecies
 
   @Dependency(\.dismiss) private var dismiss
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
 
   // MARK: - State & Action
 
@@ -102,7 +102,7 @@ public struct CalendarPickerFeature {
   private func prepareDates(state: State) -> [Date] {
     switch state.type {
     case .singleSelection:
-      [state.date]
+      [calendar.convertFromCurrentTimeZoneToUTC(state.date)]
     case .multiSelection:
       state
         .dates

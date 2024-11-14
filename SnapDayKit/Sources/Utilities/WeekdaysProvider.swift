@@ -6,13 +6,11 @@ public struct WeekdaysProvider {
 
   // MARK: - Dependecies
 
-  private var calendar: Calendar
+  @Dependency(\.utcCalendar) private var calendar
 
   // MARK: - Initialization
 
-  public init(calendar: Calendar) {
-    self.calendar = calendar
-  }
+  public init() { }
 
   // MARK: - Public
 

@@ -12,7 +12,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
   // MARK: - Dependencies
 
   @Dependency(\.dayRepository) private var dayRepository
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
@@ -38,6 +38,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
+      case customButtonTapped
       case sendDayActivityReminderNotificationButtonTapped
       case sendDayActivityTaskReminderNotificationButtonTapped
       case sendEveningSummaryReminderNotificationButtonTapped
@@ -89,6 +90,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
         .send(.internal(.loadPendingRequests)),
         .send(.internal(.loadBackgroundPendingRequests))
       )
+    case .customButtonTapped:
+      .none
     case .sendDayActivityReminderNotificationButtonTapped:
       .run { send in
         let day = try await dayRepository.loadDay(today)

@@ -1,6 +1,7 @@
 import Dashboard
 import Reports
 import Onboarding
+import ActivityDetails
 import ComposableArchitecture
 import Utilities
 import DeveloperTools
@@ -19,6 +20,7 @@ public struct ApplicationFeature: TodayProvidable {
 
   @ObservableState
   public struct State: Equatable {
+    var path = StackState<Path.State>()
 
     var showOnboarding: Bool {
       didSet {
@@ -49,10 +51,30 @@ public struct ApplicationFeature: TodayProvidable {
     case handleUrl(URL)
     case setTab(Tab)
     case dashboard(DashboardFeature.Action)
+    case path(StackAction<Path.State, Path.Action>)
     case reports(ReportsFeature.Action)
     case onboarding(OnboardingFeature.Action)
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     case binding(BindingAction<State>)
+  }
+
+  @Reducer
+  public struct Path {
+    
+    @ObservableState
+    public enum State: Equatable {
+      case activityDetails(ActivityDetailsFeature.State)
+    }
+
+    public enum Action: Equatable {
+      case activityDetails(ActivityDetailsFeature.Action)
+    }
+
+    public var body: some ReducerOf<Self> {
+      Scope(state: /State.activityDetails, action: /Action.activityDetails) {
+        ActivityDetailsFeature()
+      }
+    }
   }
 
   public enum Tab: String {
@@ -128,6 +150,8 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       case .dashboard:
         return .none
+      case .reports(.delegate(let action)):
+        return handleReportsDelegate(action: action, state: &state)
       case .reports:
         return .none
       case .onboarding(.delegate(.finished)):
@@ -137,12 +161,47 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       case .developerTools:
         return .none
+      case .path:
+        return .none
       case .binding:
         return .none
       }
     }
     .ifLet(\.$developerTools, action: \.developerTools) {
       DeveloperToolsFeature()
+    }
+    .forEach(\.path, action: \.path) {
+      Path()
+    }
+  }
+
+  // MARK: - Private
+
+  private func handleReportsDelegate(
+    action: ReportsFeature.Action.DelegateAction,
+    state: inout ApplicationFeature.State
+  ) -> EffectOf<Self> {
+    switch action {
+    case .activityTapped(let activity, let activities, let period):
+      state.path.append(
+        .activityDetails(
+          ActivityDetailsFeature.State(
+            reportType: .activity(activity, activities, nil),
+            period: period
+          )
+        )
+      )
+      return .none
+    case .tagTapped(let tag, let tags, let period):
+      state.path.append(
+        .activityDetails(
+          ActivityDetailsFeature.State(
+            reportType: .tag(tag, tags, nil),
+            period: period
+          )
+        )
+      )
+      return .none
     }
   }
 }

@@ -1,7 +1,7 @@
 import Models
 
-extension Period {
-  var name: String {
+extension Period: Optionable {
+  public var name: String {
     switch self {
     case .day:
       String(localized: "Day", bundle: .module)
@@ -11,6 +11,8 @@ extension Period {
       String(localized: "Month", bundle: .module)
     case .quarter:
       String(localized: "Quarter", bundle: .module)
+    case .year:
+      String(localized: "Year", bundle: .module)
     }
   }
 }

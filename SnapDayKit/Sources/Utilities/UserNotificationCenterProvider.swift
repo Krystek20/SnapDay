@@ -59,6 +59,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var utcCalendar
   @Dependency(\.date) private var date
 
   // MARK: - Initialization
@@ -153,7 +154,7 @@ extension UserNotificationCenterProvider {
       if let reminderDate = dayActivity.reminderDate {
 
         var isDueTimeSet = false
-        if let dueDate = dayActivity.dueDate, calendar.dayFormat(reminderDate) == today {
+        if let dueDate = dayActivity.dueDate, utcCalendar.dayFormat(reminderDate) == today {
           isDueTimeSet = dueDate > today
         }
 
@@ -177,7 +178,7 @@ extension UserNotificationCenterProvider {
         guard let reminderDate = dayActivityTask.reminderDate else { continue }
 
         var isDueTimeSet = false
-        if let dueDate = dayActivity.dueDate, calendar.dayFormat(reminderDate) == today {
+        if let dueDate = dayActivity.dueDate, utcCalendar.dayFormat(reminderDate) == today {
           isDueTimeSet = dueDate > today
         }
 

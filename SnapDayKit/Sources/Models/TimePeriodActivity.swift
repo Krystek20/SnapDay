@@ -1,41 +1,39 @@
 import Foundation
 
 public struct TimePeriodActivity: Identifiable, Equatable {
-  public var id: UUID { activity.id }
-  public let activity: Activity
-  public let tags: [Tag]
+
+  public enum HeaderItemType: Equatable {
+    case icon(Icon?)
+    case color(RGBColor)
+  }
+
+  public var id: String
+  public let name: String
+  public let type: HeaderItemType
   public let totalCount: Int
   public let doneCount: Int
   public let duration: Int
+  public let showProgress: Bool
+  public let isImportant: Bool
 
   public init(
-    activity: Activity,
-    tags: [Tag],
+    id: String,
+    name: String,
+    type: HeaderItemType,
     totalCount: Int,
     doneCount: Int,
-    duration: Int
+    duration: Int,
+    showProgress: Bool,
+    isImportant: Bool
   ) {
-    self.activity = activity
-    self.tags = tags
+    self.id = id
+    self.name = name
+    self.type = type
     self.totalCount = totalCount
     self.doneCount = doneCount
     self.duration = duration
-  }
-}
-
-extension TimePeriodActivity {
-  public func increasedCount(_ isDone: Bool, duration: Int) -> TimePeriodActivity {
-    TimePeriodActivity(
-      activity: activity,
-      tags: tags,
-      totalCount: totalCount + 1,
-      doneCount: isDone
-      ? doneCount + 1
-      : doneCount,
-      duration: isDone
-      ? self.duration + duration
-      : self.duration
-    )
+    self.showProgress = showProgress
+    self.isImportant = isImportant
   }
 }
 

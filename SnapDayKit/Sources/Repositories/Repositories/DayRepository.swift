@@ -37,6 +37,7 @@ public struct DayRepository: Repository {
   public var saveDay: @Sendable (_ day: Day) async throws -> Void
   public var saveDays: @Sendable (_ days: [Day]) async throws -> Void
   public var removeDay: @Sendable (_ day: Day) async throws -> Void
+  public var removeDays: @Sendable (_ days: [Day]) async throws -> Void
 }
 
 extension DependencyValues {
@@ -72,6 +73,9 @@ extension DayRepository: DependencyKey {
       },
       removeDay: { day in
         try await EntityHandler().delete(day)
+      },
+      removeDays: { days in
+        try await EntityHandler().delete(days)
       }
     )
   }
@@ -83,7 +87,8 @@ extension DayRepository: DependencyKey {
       loadDay: { _ in nil },
       saveDay: { _ in },
       saveDays: { _ in },
-      removeDay: { _ in }
+      removeDay: { _ in },
+      removeDays: { _ in }
     )
   }
 }

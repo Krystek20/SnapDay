@@ -6,7 +6,7 @@ struct ActivityDatesCreator {
 
   // MARK: - Dependecies
 
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
 
   // MARK: - Public
 

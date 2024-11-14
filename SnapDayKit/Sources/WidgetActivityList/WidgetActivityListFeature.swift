@@ -61,7 +61,7 @@ public struct WidgetActivityListFeature: TodayProvidable {
     }
 
     private var allDayActivityItems: [DayActivityItem] {
-      @Dependency(\.calendar) var calendar
+      @Dependency(\.utcCalendar) var calendar
       guard let selectedDay else { return [] }
       return selectedDay
         .activities

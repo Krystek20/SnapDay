@@ -6,7 +6,7 @@ public struct LinearChartView: View {
   private let points: [Double]
   private let expectedPoints: Int
   private let currentPoint: Int?
-  private let verticalUnits = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+  private let verticalUnits = [0.0, 0.25, 0.5, 0.75, 1.0]
 
   public init(
     points: [Double],

@@ -20,7 +20,7 @@ public struct EveningSummaryFeature: TodayProvidable {
 
   // MARK: - Dependecies
 
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
 
   // MARK: - Properties
 

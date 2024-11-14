@@ -19,6 +19,7 @@ final class DayUpdater {
 
   @Dependency(\.dayRepository) private var dayRepository
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.utcCalendar) private var utcCalendar
   @Dependency(\.calendar) private var calendar
   @Dependency(\.uuid) private var uuid
 
@@ -166,7 +167,7 @@ final class DayUpdater {
     var dates: [Date] = []
     while current <= dateRange.upperBound {
       dates.append(current)
-      current = calendar.date(byAdding: .day, value: 1, to: current) ?? current
+      current = utcCalendar.date(byAdding: .day, value: 1, to: current) ?? current
     }
     return dates
   }

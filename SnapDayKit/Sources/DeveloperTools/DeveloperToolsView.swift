@@ -24,6 +24,11 @@ public struct DeveloperToolsView: View {
     WithPerceptionTracking {
       ScrollView {
         VStack(alignment: .leading, spacing: 10.0) {
+          Text("Helpers")
+            .font(.title2)
+          Button("Custom Action") {
+            store.send(.view(.customButtonTapped))
+          }
           Text("Send notifications")
             .font(.title2)
           Button("Day Activity") {

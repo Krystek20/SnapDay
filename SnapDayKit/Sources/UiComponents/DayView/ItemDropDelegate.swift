@@ -12,7 +12,7 @@ struct ItemDropDelegate: DropDelegate {
 
   // MARK: - Dependecies
 
-  @Dependency(\.calendar) private var calendar
+  @Dependency(\.utcCalendar) private var calendar
 
   func dropUpdated(info: DropInfo) -> DropProposal? {
     guard let draggedItem else { return DropProposal(operation: .cancel) }

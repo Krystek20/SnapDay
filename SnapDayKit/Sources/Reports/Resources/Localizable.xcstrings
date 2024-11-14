@@ -1,513 +1,163 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+    "" : {
+
+    },
+    "Activities" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivitäten"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actividades"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktywności"
           }
         }
       }
     },
-    "Activities": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktywności"
+    "Reports" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berichte"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktivitäten"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informes"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actividades"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raporty"
           }
         }
       }
     },
-    "Activities By Tags": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktywności według tagów"
+    "Scheduling only 80% of your day allows flexibility for unexpected tasks, reduces stress, and helps maintain sustainable productivity." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Planung von nur 80% Ihres Tages ermöglicht Flexibilität für unerwartete Aufgaben, reduziert Stress und hilft, eine nachhaltige Produktivität aufrechtzuerhalten."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktivitäten nach Tags"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programar solo el 80% de tu día permite flexibilidad para tareas inesperadas, reduce el estrés y ayuda a mantener una productividad sostenible."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actividades por etiquetas"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planowanie tylko 80% swojego dnia zapewnia elastyczność na nieprzewidziane zadania, zmniejsza stres i pomaga utrzymać zrównoważoną produktywność."
           }
         }
       }
     },
-    "Activity": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktywność"
+    "Tags" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktivität"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiquetas"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actividad"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagi"
           }
         }
       }
     },
-    "Custom": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Własne"
+    "Total Time Spent on Tracked Activities" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtzeit für verfolgte Aktivitäten"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Benutzerdefiniert"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo total dedicado a las actividades rastreadas"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Personalizado"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Łączny czas spędzony na śledzonych aktywnościach"
           }
         }
       }
     },
-    "Day": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dzień"
+    "Tracking time spent on completed activities versus total planned time helps you assess productivity, identify time management gaps, and improve future planning accuracy." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Nachverfolgen der Zeit für erledigte Aktivitäten im Vergleich zur geplanten Gesamtzeit hilft, die Produktivität zu bewerten, Lücken im Zeitmanagement zu identifizieren und die Genauigkeit der zukünftigen Planung zu verbessern."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tag"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rastrear el tiempo invertido en actividades completadas versus el tiempo total planificado ayuda a evaluar la productividad, identificar brechas en la gestión del tiempo y mejorar la precisión en la planificación futura."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Śledzenie czasu spędzonego na wykonanych zadaniach w porównaniu z planowanym czasem pomaga ocenić produktywność, zidentyfikować luki w zarządzaniu czasem i poprawić dokładność przyszłego planowania."
           }
         }
       }
     },
-    "Done Count": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Liczba ukończonych"
+    "Your Journey of Completed Activities" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Weg abgeschlossener Aktivitäten"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anzahl erledigt"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu recorrido de actividades completadas"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conteo completado"
-          }
-        }
-      }
-    },
-    "End": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Koniec"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ende"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fin"
-          }
-        }
-      }
-    },
-    "Filters": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtry"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filter"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filtros"
-          }
-        }
-      }
-    },
-    "Label": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etykieta"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Label"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etiqueta"
-          }
-        }
-      }
-    },
-    "Labels": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etykiety"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Labels"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etiquetas"
-          }
-        }
-      }
-    },
-    "Month": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Miesiąc"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monat"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mes"
-          }
-        }
-      }
-    },
-    "Not Done Count": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Liczba nieukończonych"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anzahl nicht erledigt"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conteo no completado"
-          }
-        }
-      }
-    },
-    "Progress": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Postęp"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fortschritt"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Progreso"
-          }
-        }
-      }
-    },
-    "Quarter": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kwartał"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quartal"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trimestre"
-          }
-        }
-      }
-    },
-    "Reports": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raporty"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Berichte"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Informes"
-          }
-        }
-      }
-    },
-    "Select": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wybierz"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auswählen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seleccionar"
-          }
-        }
-      }
-    },
-    "Start": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Początek"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inicio"
-          }
-        }
-      }
-    },
-    "Summary": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Podsumowanie"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zusammenfassung"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Resumen"
-          }
-        }
-      }
-    },
-    "Tag": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tag"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tag"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etiqueta"
-          }
-        }
-      }
-    },
-    "Tags": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tagi"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tags"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etiquetas"
-          }
-        }
-      }
-    },
-    "Total Time": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Łączny czas"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gesamtzeit"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tiempo total"
-          }
-        }
-      }
-    },
-    "Week": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tydzień"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Woche"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semana"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoja droga zakończonych aktywności"
           }
         }
       }
     }
-
   },
   "version" : "1.0"
 }

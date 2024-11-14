@@ -5,14 +5,6 @@ public struct LinearChartValuesProvider {
 
   public init() { }
 
-  public func prepareValues(for selectedDay: Day) -> LinearChartValues {
-    LinearChartValues(
-      points: completedDaysValues(for: selectedDay),
-      expectedPoints: selectedDay.activities.count,
-      currentPoint: selectedDay.activities.filter(\.isDone).count - 1
-    )
-  }
-
   public func prepareValues(for days: [Day], until date: Date) -> LinearChartValues {
     LinearChartValues(
       points: completedDaysValues(for: days, until: date),
@@ -38,8 +30,12 @@ public struct LinearChartValuesProvider {
       .filter { $0.date <= date }
       .sorted(by: { $0.date < $1.date })
       .reduce(into: [Double](), { result, day in
-        let value = (result.last ?? .zero) + Double(day.completedCount) / Double(days.plannedCount)
-        result.append(value)
+        if days.plannedCount > .zero {
+          let value = (result.last ?? .zero) + Double(day.completedCount) / Double(days.plannedCount)
+          result.append(value.isNaN ? .zero : value)
+        } else {
+          result.append(.zero)
+        }
       })
   }
 }
