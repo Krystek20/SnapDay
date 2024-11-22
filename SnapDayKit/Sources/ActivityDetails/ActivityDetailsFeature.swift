@@ -39,9 +39,9 @@ public struct ActivityDetailsFeature: TodayProvidable {
     var summary: ReportSummary = .zero
 
     var showHeaderDivider: Bool {
-      (selectedPeriod == .week || selectedPeriod == .month) && reportFilter != .none
+      (selectedPeriod == .week || selectedPeriod == .month) && reportFilter != .empty
     }
-    var reportFilter = ReportFilter.none
+    var reportFilter = ReportFilter.empty
 
     @Presents var selectableList: SelectableListViewFeature.State?
 
@@ -215,9 +215,9 @@ public struct ActivityDetailsFeature: TodayProvidable {
 
       switch state.reportType {
       case .activity(let activity, _, let activityLabel):
-        state.reportFilter = activity.labels.isEmpty ? .none : .activityLabel(activityLabel)
+        state.reportFilter = activity.labels.isEmpty ? .empty : .activityLabel(activityLabel)
       case .tag(let tag, _, let activity):
-        state.reportFilter = activities(filteredBy: tag, state: state).isEmpty ? .none : .activity(activity)
+        state.reportFilter = activities(filteredBy: tag, state: state).isEmpty ? .empty : .activity(activity)
       }
 
       return .none

@@ -28,13 +28,7 @@ struct DayActivityTaskRowView: View {
   // MARK: - Views
 
   var body: some View {
-    Menu {
-      selectButtonIfNeeded
-      editButtonIfNeeded
-      removeButtonIfNeeded
-    } label: {
-      dayActivityTaskView(dayActivityTask)
-    }
+    dayActivityTaskView
   }
 
   @ViewBuilder
@@ -87,7 +81,7 @@ struct DayActivityTaskRowView: View {
     }
   }
 
-  private func dayActivityTaskView(_ dayActivityTask: DayActivityForm) -> some View {
+  private var dayActivityTaskView: some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
         data: dayActivityTask.icon?.data,
@@ -105,6 +99,16 @@ struct DayActivityTaskRowView: View {
       Image(systemName: "ellipsis")
         .foregroundStyle(Color.sectionText)
         .imageScale(.medium)
+        .overlay {
+          Menu {
+            selectButtonIfNeeded
+            editButtonIfNeeded
+            removeButtonIfNeeded
+          } label: {
+            Color.clear
+              .frame(width: 30.0, height: 30.0)
+          }
+        }
     }
   }
 

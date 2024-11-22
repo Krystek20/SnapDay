@@ -108,7 +108,7 @@ public struct ActivityDetailsView: View {
     WithPerceptionTracking {
       LazyVStack(alignment: .leading, spacing: 15.0) {
         switch store.reportFilter {
-        case .none:
+        case .empty:
           EmptyView()
         case .activity(let activity):
           filterByActivitiesView(acitivity: activity)

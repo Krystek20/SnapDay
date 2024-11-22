@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23231" systemVersion="24A348" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23507" systemVersion="24A348" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="ActivityEntity" representedClassName="ActivityEntity" syncable="YES" codeGenerationType="class">
         <attribute name="defaultDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="defaultReminderDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -48,7 +48,7 @@
         <attribute name="reminderDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="activity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ActivityEntity" inverseName="dayActivities" inverseEntity="ActivityEntity"/>
         <relationship name="day" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DayEntity" inverseName="activities" inverseEntity="DayEntity"/>
-        <relationship name="dayActivityTasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DayActivityTaskEntity" inverseName="dayActivity" inverseEntity="DayActivityTaskEntity"/>
+        <relationship name="dayActivityTasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="DayActivityTaskEntity" inverseName="dayActivity" inverseEntity="DayActivityTaskEntity"/>
         <relationship name="icon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IconEntity" inverseName="dayActivities" inverseEntity="IconEntity"/>
         <relationship name="labels" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ActivityLabelEntity" inverseName="dayActivities" inverseEntity="ActivityLabelEntity"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TagEntity" inverseName="dayActivities" inverseEntity="TagEntity"/>
