@@ -2,10 +2,10 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
+      "shouldTranslate" : false
     },
     " " : {
-
+      "shouldTranslate" : false
     },
     "Great work staying on track and pushing your limits!" : {
       "localizations" : {

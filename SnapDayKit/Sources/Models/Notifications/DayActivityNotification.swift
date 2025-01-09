@@ -23,6 +23,7 @@ public struct DayActivityNotification: UserNotification {
   private let type: ActivityNotificationType
   private let calendar: Calendar
   private let shiftDay: Int
+  private let bodyTitle: String
 
   public var identifier: String {
     let identifier = switch type {
@@ -48,7 +49,7 @@ public struct DayActivityNotification: UserNotification {
     content.categoryIdentifier = UserNotificationCategoryIdentifier.dayActivityReminder.rawValue
     content.sound = .default
     content.title = name
-    content.body = "Hey there! Just a gentle nudge to tackle your planned activity today. You’ve got this!"
+    content.body = bodyTitle
     content.userInfo = userInfo
     return content
   }
@@ -98,10 +99,12 @@ public struct DayActivityNotification: UserNotification {
   public init(
     type: ActivityNotificationType,
     calendar: Calendar,
-    shiftDay: Int = .zero
+    shiftDay: Int = .zero,
+    bodyTitle: String
   ) {
     self.type = type
     self.calendar = calendar
     self.shiftDay = shiftDay
+    self.bodyTitle = bodyTitle
   }
 }

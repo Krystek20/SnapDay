@@ -21,6 +21,9 @@ public struct WidgetActivityListFeature: TodayProvidable {
     var title: String {
       let formatter = DateFormatter()
       formatter.dateFormat = "EEEE, d MMM yyyy"
+      if let firstPreferredLanguage = Locale.preferredLanguages.first {
+        formatter.locale = Locale(identifier: firstPreferredLanguage)
+      }
       return formatter.string(from: today)
     }
 

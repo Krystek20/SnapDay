@@ -1,159 +1,184 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-      "shouldTranslate" : false
-    },
-    "Activities" : {
+    "%lldh" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktivitäten"
+            "value" : "%lldStd."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actividades"
+            "value" : "%lldh"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktywności"
+            "value" : "%lldg"
           }
         }
       }
     },
-    "Reports" : {
+    "%lldh %lldmin" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Berichte"
+            "value" : "%1$lldStd. %2$lldMin."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lldh %2$lldmin"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informes"
+            "value" : "%1$lldh %2$lldmin"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Raporty"
+            "value" : "%1$lldg %2$lldmin"
           }
         }
       }
     },
-    "Scheduling only 80% of your day allows flexibility for unexpected tasks, reduces stress, and helps maintain sustainable productivity." : {
+    "%lldmin" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Planung von nur 80% Ihres Tages ermöglicht Flexibilität für unerwartete Aufgaben, reduziert Stress und hilft, eine nachhaltige Produktivität aufrechtzuerhalten."
+            "value" : "%lldMin."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Programar solo el 80% de tu día permite flexibilidad para tareas inesperadas, reduce el estrés y ayuda a mantener una productividad sostenible."
+            "value" : "%lldmin"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Planowanie tylko 80% swojego dnia zapewnia elastyczność na nieprzewidziane zadania, zmniejsza stres i pomaga utrzymać zrównoważoną produktywność."
+            "value" : "%lldmin"
           }
         }
       }
     },
-    "Tags" : {
+    "Hey there! Just a gentle nudge to tackle your planned activity today. You’ve got this!" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tags"
+            "value" : "Hey! Eine kleine Erinnerung, um deine geplante Aktivität heute anzugehen. Du schaffst das!"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Etiquetas"
+            "value" : "¡Hola! Un suave recordatorio para que completes tu actividad planificada de hoy. ¡Tú puedes!"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tagi"
+            "value" : "Hej! Małe przypomnienie, aby zająć się zaplanowaną aktywnością na dziś. Dasz radę!"
           }
         }
       }
     },
-    "Total Time Spent on Tracked Activities" : {
+    "Mark as done" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gesamtzeit für verfolgte Aktivitäten"
+            "value" : "Als erledigt markieren"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tiempo total dedicado a las actividades rastreadas"
+            "value" : "Marcar como hecho"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Łączny czas spędzony na śledzonych aktywnościach"
+            "value" : "Oznacz jako wykonane"
           }
         }
       }
     },
-    "Tracking time spent on completed activities versus total planned time helps you assess productivity, identify time management gaps, and improve future planning accuracy." : {
+    "Remind me in 15 minutes" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Nachverfolgen der Zeit für erledigte Aktivitäten im Vergleich zur geplanten Gesamtzeit hilft, die Produktivität zu bewerten, Lücken im Zeitmanagement zu identifizieren und die Genauigkeit der zukünftigen Planung zu verbessern."
+            "value" : "Erinnere mich in 15 Minuten"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rastrear el tiempo invertido en actividades completadas versus el tiempo total planificado ayuda a evaluar la productividad, identificar brechas en la gestión del tiempo y mejorar la precisión en la planificación futura."
+            "value" : "Recuérdame en 15 minutos"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Śledzenie czasu spędzonego na wykonanych zadaniach w porównaniu z planowanym czasem pomaga ocenić produktywność, zidentyfikować luki w zarządzaniu czasem i poprawić dokładność przyszłego planowania."
+            "value" : "Przypomnij za 15 minut"
           }
         }
       }
     },
-    "Your Journey of Completed Activities" : {
+    "Remind me in 30 minutes" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihr Weg abgeschlossener Aktivitäten"
+            "value" : "Erinnere mich in 30 Minuten"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu recorrido de actividades completadas"
+            "value" : "Recuérdame en 30 minutos"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twoja droga zakończonych aktywności"
+            "value" : "Przypomnij za 30 minut"
+          }
+        }
+      }
+    },
+    "Remind me in 60 minutes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnere mich in 60 Minuten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuérdame en 60 minutos"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przypomnij za 60 minut"
           }
         }
       }

@@ -2,13 +2,13 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
+      "shouldTranslate" : false
     },
     "(%lld%%)" : {
-
+      "shouldTranslate" : false
     },
     "%lf" : {
-
+      "shouldTranslate" : false
     },
     "%lld" : {
       "localizations" : {
@@ -30,7 +30,8 @@
             "value" : "%lld"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%lld / %lld" : {
       "localizations" : {
@@ -58,7 +59,8 @@
             "value" : "%1$lld / %2$lld"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%lld day" : {
       "localizations" : {

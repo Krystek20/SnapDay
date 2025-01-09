@@ -102,7 +102,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
         )
         let dayActivityNotification = DayActivityNotification(
           type: .activity(dayActivity),
-          calendar: calendar
+          calendar: calendar,
+          bodyTitle: "Example body title"
         )
         let notification = DeveloperNotificiation(
           identifier: uuid().uuidString,
@@ -120,7 +121,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
 
           let dayActivityTaskNotification = DayActivityNotification(
             type: .activityTask(dayActivity, dayActivityTask),
-            calendar: calendar
+            calendar: calendar,
+            bodyTitle: "Example body title"
           )
 
           let notification = DeveloperNotificiation(
