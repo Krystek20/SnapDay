@@ -9,6 +9,12 @@
             "value" : "🎉 Gute Arbeit! Jetzt ruhe dich aus und genieße den Rest deines Tages mit einem Lächeln! 🎉"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -29,6 +35,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eine leere Leinwand erwartet deine Pläne oder spontanen Freuden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A blank canvas awaits your plans or spontaneous joys."
           }
         },
         "es" : {
@@ -53,6 +65,12 @@
             "value" : "Ein Tag voller ungeplanter Möglichkeiten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Day of Unplanned Possibilities"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -73,6 +91,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktivität gespeichert!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activity Saved!"
           }
         },
         "es" : {
@@ -97,6 +121,12 @@
             "value" : "Abbrechen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -117,6 +147,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktivität abschließen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete Activity?"
           }
         },
         "es" : {
@@ -141,6 +177,12 @@
             "value" : "Bestätigen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -163,6 +205,12 @@
             "value" : "Kopieren"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -180,6 +228,12 @@
     "Dashboard" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dashboard"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dashboard"
@@ -207,6 +261,12 @@
             "value" : "Gute Arbeit! Deine Aktivität wurde erfolgreich in deiner Aktivitätsliste gespeichert. Du findest sie unter dem 'Aktivitätsliste'-Button. Von dort aus kannst du deine gespeicherten Aktivitäten regelmäßig machen und einfach verwalten. Weiter so!"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Great job! Your activity has been successfully saved to your activity list. You can find it under the 'Activity List' button. From there, you can make your saved activities frequently and manage them easily. Keep up the good work!"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -227,6 +287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hoffentlich war es angenehm!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hope it was enjoyable!"
           }
         },
         "es" : {
@@ -251,6 +317,12 @@
             "value" : "Unvollständige Unteraufgaben"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incomplete Subtasks"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -271,6 +343,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move"
           }
         },
         "es" : {
@@ -295,6 +373,12 @@
             "value" : "Erfolg!"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Success!"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -315,6 +399,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diese Aktivität hat unvollständige Unteraufgaben. Möchtest du die Aktivität und alle ihre Unteraufgaben als erledigt markieren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This activity has incomplete subtasks. Would you like to mark the activity and all its subtasks as done?"
           }
         },
         "es" : {
@@ -339,6 +429,12 @@
             "value" : "Dies ist die letzte Aufgabe für diese Aktivität. Möchtest du die Aktivität als abgeschlossen markieren?"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is the last task for this activity. Would you like to mark the activity as complete?"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -359,6 +455,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dein Tag, dein Weg!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Day, Your Way!"
           }
         },
         "es" : {

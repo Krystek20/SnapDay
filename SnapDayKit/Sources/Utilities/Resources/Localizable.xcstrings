@@ -9,6 +9,12 @@
             "value" : "%lldStd."
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldh"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -33,7 +39,7 @@
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%1$lldh %2$lldmin"
           }
         },
@@ -59,6 +65,12 @@
             "value" : "%lldMin."
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldmin"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -79,6 +91,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hey! Eine kleine Erinnerung, um deine geplante Aktivität heute anzugehen. Du schaffst das!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hey there! Just a gentle nudge to tackle your planned activity today. You’ve got this!"
           }
         },
         "es" : {
@@ -103,6 +121,12 @@
             "value" : "Als erledigt markieren"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark as done"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -123,6 +147,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnere mich in 15 Minuten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind me in 15 minutes"
           }
         },
         "es" : {
@@ -147,6 +177,12 @@
             "value" : "Erinnere mich in 30 Minuten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind me in 30 minutes"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -167,6 +203,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnere mich in 60 Minuten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind me in 60 minutes"
           }
         },
         "es" : {

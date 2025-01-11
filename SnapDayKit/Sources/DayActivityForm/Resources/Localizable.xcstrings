@@ -31,6 +31,12 @@
             "value" : "-"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -55,7 +61,7 @@
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%1$lldh %2$lldmin"
           }
         },
@@ -76,6 +82,12 @@
     "%lldmin" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldmin"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lldmin"
@@ -103,6 +115,12 @@
             "value" : "Label hinzufügen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Label"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -123,6 +141,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tag hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add tag"
           }
         },
         "es" : {
@@ -147,6 +171,12 @@
             "value" : "Aufgabe hinzufügen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add task"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -167,6 +197,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         },
         "es" : {
@@ -191,6 +227,12 @@
             "value" : "Symbol ändern"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change icon"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -211,6 +253,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
           }
         },
         "es" : {
@@ -235,6 +283,12 @@
             "value" : "Löschen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -255,6 +309,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abwählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect"
           }
         },
         "es" : {
@@ -279,6 +339,12 @@
             "value" : "Fälligkeitsdatum"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Due date"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -299,6 +365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
           }
         },
         "es" : {
@@ -323,6 +395,12 @@
             "value" : "Aktivität bearbeiten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Activity"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -343,6 +421,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktivitätsaufgabe bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Activity Task"
           }
         },
         "es" : {
@@ -367,6 +451,12 @@
             "value" : "Vorlage bearbeiten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Template"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -387,6 +477,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vorlagenaufgabe bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Template Task"
           }
         },
         "es" : {
@@ -411,6 +507,12 @@
             "value" : "Label eingeben"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter label"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -431,6 +533,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name eingeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter name"
           }
         },
         "es" : {
@@ -455,6 +563,12 @@
             "value" : "Übersicht eingeben"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter overview"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -475,6 +589,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tag eingeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter tag"
           }
         },
         "es" : {
@@ -499,6 +619,12 @@
             "value" : "Vorhandene Labels"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Existing labels"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -519,6 +645,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vorhandene Tags"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Existing tags"
           }
         },
         "es" : {
@@ -543,6 +675,12 @@
             "value" : "Wichtig"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Important"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -560,6 +698,12 @@
     "Labels" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Labels"
@@ -587,6 +731,12 @@
             "value" : "Name"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -607,6 +757,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Übersicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overview"
           }
         },
         "es" : {
@@ -631,6 +787,12 @@
             "value" : "Foto auswählen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick Photo"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -651,6 +813,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erinnerung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminder"
           }
         },
         "es" : {
@@ -675,6 +843,12 @@
             "value" : "Entfernen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -695,6 +869,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wiederholen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repeat"
           }
         },
         "es" : {
@@ -719,6 +899,12 @@
             "value" : "Speichern"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -739,6 +925,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
           }
         },
         "es" : {
@@ -763,6 +955,12 @@
             "value" : "Emoji auswählen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Emoji"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -783,6 +981,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Datum festlegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set date"
           }
         },
         "es" : {
@@ -807,6 +1011,12 @@
             "value" : "Tageslimit festlegen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set day limit"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -827,6 +1037,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dauer festlegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set duration"
           }
         },
         "es" : {
@@ -851,6 +1067,12 @@
             "value" : "Zeit einstellen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set time"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -868,6 +1090,12 @@
     "Tags" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tags"
@@ -895,6 +1123,12 @@
             "value" : "Aufgaben"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasks"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -915,6 +1149,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einschalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on"
           }
         },
         "es" : {

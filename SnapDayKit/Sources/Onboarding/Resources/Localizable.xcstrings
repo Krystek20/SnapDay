@@ -9,6 +9,12 @@
             "value" : "Erreiche deine Ziele"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achieve Your Goals"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -29,6 +35,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Baue bessere Gewohnheiten, \nSchritt für Schritt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build Better Habits, One Step at a Time"
           }
         },
         "es" : {
@@ -53,6 +65,12 @@
             "value" : "Fortsetzen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -73,6 +91,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erfasse deine Gewohnheiten täglich. Verfolge deinen Fortschritt mit klaren Visualisierungen, die dich motivieren und auf deine Ziele fokussiert halten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Easily log your habits daily. Track your progress with clear visuals that keep you motivated and focused on your goals."
           }
         },
         "es" : {
@@ -97,6 +121,12 @@
             "value" : "Ende-zu-Ende-Verschlüsselung"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End-to-End Encryption"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -117,6 +147,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volle Kontrolle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full Control"
           }
         },
         "es" : {
@@ -141,6 +177,12 @@
             "value" : "Loslegen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -161,6 +203,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wenn du iCloud verwendest, kannst nur du auf deine Informationen zugreifen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If using iCloud, only you can access your information."
           }
         },
         "es" : {
@@ -185,6 +233,12 @@
             "value" : "Lokaler Speicher"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Storage"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -205,6 +259,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Niemand sonst, nicht einmal wir, können auf deine Daten zugreifen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No one else, not even us, can access your data."
           }
         },
         "es" : {
@@ -229,6 +289,12 @@
             "value" : "Datenschutz"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -249,6 +315,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verwalte nahtlos deine Gewohnheiten und Ziele mit iCloud."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seamlessly manage your habits and goals with iCloud."
           }
         },
         "es" : {
@@ -273,6 +345,12 @@
             "value" : "Setze Ziele, verfolge deinen Fortschritt und baue beständige Gewohnheiten auf, um das zu erreichen, was am wichtigsten ist."
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set goals, track your progress, and build consistent habits to achieve what matters most."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -293,6 +371,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einfaches Gewohnheits-Tracking"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simple Habit Tracking"
           }
         },
         "es" : {
@@ -317,6 +401,12 @@
             "value" : "Überspringen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -337,6 +427,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bleibe auf dem Laufenden mit deinem Fortschritt und erreiche deine Ziele schneller – aktiviere Benachrichtigungen, um rechtzeitige Erinnerungen zu erhalten und deine Aktivitäten mühelos zu verfolgen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay on top of your progress and reach your goals faster—enable notifications to get timely reminders and track your activities effortlessly!"
           }
         },
         "es" : {
@@ -361,6 +457,12 @@
             "value" : "Synchronisiere auf allen Geräten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync Across Devices"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -381,6 +483,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Übernimm die Kontrolle über deinen Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Take Control of Your Day"
           }
         },
         "es" : {
@@ -405,6 +513,12 @@
             "value" : "Um dir zu helfen, deine Gewohnheiten zu verfolgen, Ziele zu erreichen und deine Zeit zu verwalten, werden alle deine Daten sicher auf deinem Gerät oder in iCloud gespeichert."
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To help you track your habits, achieve goals, and manage your time, all your data is stored securely on your device or in iCloud."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -425,6 +539,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gewohnheiten zu verfolgen hilft dir, fokussiert zu bleiben, Beständigkeit aufzubauen und das zu priorisieren, was jeden Tag am wichtigsten ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracking habits helps you stay focused, build consistency, and prioritize what matters most each day."
           }
         },
         "es" : {
@@ -449,6 +569,12 @@
             "value" : "Einschalten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -469,6 +595,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktiviere Benachrichtigungen, um deine Ziele zu erreichen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn On Notifications to Reach Your Goals!"
           }
         },
         "es" : {
@@ -493,6 +625,12 @@
             "value" : "Wir helfen dir, tägliche Aktivitäten zu verfolgen, Ziele zu setzen und motiviert zu bleiben. Beginne deine Reise zu einem besseren Du!"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We help you track daily activities, set goals, and stay motivated. Start your journey to a better you!"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -513,6 +651,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Willkommen bei \nSnapDay!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to SnapDay!"
           }
         },
         "es" : {
@@ -537,6 +681,12 @@
             "value" : "Du entscheidest, wo deine Daten gespeichert werden."
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You decide where your data is stored."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -559,6 +709,12 @@
             "value" : "Deine Aktivitätsdaten bleiben auf deinem Gerät"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your activity data stays on your device"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -579,6 +735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deine Daten, deine Kontrolle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Data, Your Control"
           }
         },
         "es" : {

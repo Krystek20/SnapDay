@@ -70,6 +70,12 @@
             "value" : "%lld Tag"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld day"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -90,6 +96,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld Tage"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days"
           }
         },
         "es" : {
@@ -114,6 +126,12 @@
             "value" : "%lld Stunden"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld hours"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -136,6 +154,12 @@
             "value" : "%lld min"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -153,6 +177,12 @@
     "%lld%%" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld%%"
@@ -208,6 +238,12 @@
             "value" : "%lldmin"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldmin"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -228,6 +264,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aufgabe hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add task"
           }
         },
         "es" : {
@@ -252,6 +294,12 @@
             "value" : "Zweiwöchentlich"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biweekly"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -272,6 +320,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         },
         "es" : {
@@ -296,6 +350,12 @@
             "value" : "Abgeschlossene Aktivitäten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed activities"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -316,6 +376,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
           }
         },
         "es" : {
@@ -340,6 +406,12 @@
             "value" : "Täglich"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -360,6 +432,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
           }
         },
         "es" : {
@@ -384,6 +462,12 @@
             "value" : "Abwählen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -404,6 +488,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
           }
         },
         "es" : {
@@ -428,6 +518,12 @@
             "value" : "Erster"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -448,6 +544,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erster Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First day"
           }
         },
         "es" : {
@@ -472,6 +574,12 @@
             "value" : "Vierter"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fourth"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -492,6 +600,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abgeschlossene ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide completed"
           }
         },
         "es" : {
@@ -516,6 +630,12 @@
             "value" : "Letzter"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -536,6 +656,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Letzter Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last day"
           }
         },
         "es" : {
@@ -560,6 +686,12 @@
             "value" : "Mitte des Monats"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mid month"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -580,6 +712,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Month"
           }
         },
         "es" : {
@@ -604,6 +742,12 @@
             "value" : "Monatlich"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -624,6 +768,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monatlich spezifisches Datum"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly specific date"
           }
         },
         "es" : {
@@ -648,6 +798,12 @@
             "value" : "Bewegen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -668,6 +824,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quartal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quarter"
           }
         },
         "es" : {
@@ -692,6 +854,12 @@
             "value" : "Verbleibende Zeit"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remaining Time"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -712,6 +880,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
           }
         },
         "es" : {
@@ -736,6 +910,12 @@
             "value" : "Speichern"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -756,6 +936,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zweiter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second"
           }
         },
         "es" : {
@@ -780,6 +966,12 @@
             "value" : "Zweiter"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second day"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -800,6 +992,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vorletzter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second to last"
           }
         },
         "es" : {
@@ -824,6 +1022,12 @@
             "value" : "Vorletzter Tag"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second to last day"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -844,6 +1048,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
           }
         },
         "es" : {
@@ -868,6 +1078,12 @@
             "value" : "Als wichtig festlegen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set as important"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -888,6 +1104,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Als regulär festlegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set as regular"
           }
         },
         "es" : {
@@ -912,6 +1134,12 @@
             "value" : "Auswählen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show completed"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -932,6 +1160,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bestimmter Wochentag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specific weekday"
           }
         },
         "es" : {
@@ -956,6 +1190,12 @@
             "value" : "Dritter"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Third"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -976,6 +1216,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gesamt verfügbare Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Available Time"
           }
         },
         "es" : {
@@ -1000,6 +1246,12 @@
             "value" : "Gesamt abgeschlossene Zeit"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Completed Time"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1020,6 +1272,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gesamt geplante Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Planned Time"
           }
         },
         "es" : {
@@ -1044,6 +1302,12 @@
             "value" : "Gesamtaufgabenzeit"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Task Time"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1064,6 +1328,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gesamt: %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total: %lld"
           }
         },
         "es" : {
@@ -1088,6 +1358,12 @@
             "value" : "Woche"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1110,6 +1386,12 @@
             "value" : "Wöchentlich"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1130,6 +1412,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jahr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Year"
           }
         },
         "es" : {

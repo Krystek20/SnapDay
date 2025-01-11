@@ -12,6 +12,12 @@
             "value" : "Aktivitäten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activities"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -32,6 +38,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Berichte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reports"
           }
         },
         "es" : {
@@ -56,6 +68,12 @@
             "value" : "Die Planung von nur 80% Ihres Tages ermöglicht Flexibilität für unerwartete Aufgaben, reduziert Stress und hilft, eine nachhaltige Produktivität aufrechtzuerhalten."
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scheduling only 80% of your day allows flexibility for unexpected tasks, reduces stress, and helps maintain sustainable productivity."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -73,6 +91,12 @@
     "Tags" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tags"
@@ -100,6 +124,12 @@
             "value" : "Gesamtzeit für verfolgte Aktivitäten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Time Spent on Tracked Activities"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -122,6 +152,12 @@
             "value" : "Das Nachverfolgen der Zeit für erledigte Aktivitäten im Vergleich zur geplanten Gesamtzeit hilft, die Produktivität zu bewerten, Lücken im Zeitmanagement zu identifizieren und die Genauigkeit der zukünftigen Planung zu verbessern."
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracking time spent on completed activities versus total planned time helps you assess productivity, identify time management gaps, and improve future planning accuracy."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -142,6 +178,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ihr Weg abgeschlossener Aktivitäten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Journey of Completed Activities"
           }
         },
         "es" : {

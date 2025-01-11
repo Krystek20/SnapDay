@@ -12,6 +12,12 @@
             "value" : "Zum Tag hinzufügen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to day"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -32,6 +38,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         },
         "es" : {
@@ -56,6 +68,12 @@
             "value" : "Wiederholung deaktivieren"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable Repeat"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -76,6 +94,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Speichern Sie Ihre Lieblingsaktivitäten ganz einfach für den schnellen Zugriff in der Zukunft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Easily save your favorite activities for quick access in the future."
           }
         },
         "es" : {
@@ -100,6 +124,12 @@
             "value" : "Bearbeiten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -120,6 +150,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wiederholung aktivieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Repeat"
           }
         },
         "es" : {
@@ -144,6 +180,12 @@
             "value" : "Noch keine gespeicherten Aktivitäten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Saved Activities Yet"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -164,6 +206,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
           }
         },
         "es" : {
@@ -188,6 +236,12 @@
             "value" : "Gespeicherte Aktivitäten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Activities"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -208,6 +262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktivität suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for Activity"
           }
         },
         "es" : {

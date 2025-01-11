@@ -1,90 +1,114 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🎉 Świetna robota! Teraz odpocznij i ciesz się resztą dnia z uśmiechem! 🎉"
+    "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🎉 Gute Arbeit! Jetzt ruhe dich aus und genieße den Rest deines Tages mit einem Lächeln! 🎉"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🎉 Gute Arbeit! Jetzt ruhe dich aus und genieße den Rest deines Tages mit einem Lächeln! 🎉"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🎉 ¡Gran trabajo! Ahora, descansa y disfruta el resto de tu día con una sonrisa. 🎉"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🎉 ¡Gran trabajo! Ahora, descansa y disfruta el resto de tu día con una sonrisa. 🎉"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🎉 Świetna robota! Teraz odpocznij i ciesz się resztą dnia z uśmiechem! 🎉"
           }
         }
       }
     },
-    "A blank canvas awaits your plans or spontaneous joys.": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pusta karta czeka na Twoje plany lub spontaniczne radości."
+    "A blank canvas awaits your plans or spontaneous joys." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine leere Leinwand erwartet deine Pläne oder spontanen Freuden."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eine leere Leinwand erwartet deine Pläne oder spontanen Freuden."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A blank canvas awaits your plans or spontaneous joys."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un lienzo en blanco espera tus planes o alegrías espontáneas."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lienzo en blanco espera tus planes o alegrías espontáneas."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pusta karta czeka na Twoje plany lub spontaniczne radości."
           }
         }
       }
     },
-    "Add Activity": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dodaj aktywność"
+    "Add Activity" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität hinzufügen"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktivität hinzufügen"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Activity"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agregar actividad"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar actividad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj aktywność"
           }
         }
       }
     },
-    "Your Day, Your Way": {
-      "localizations": {
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Twój dzień, Twoja droga"
+    "Your Day, Your Way" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Tag, dein Weg"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dein Tag, dein Weg"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Day, Your Way"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu día, tu camino"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu día, tu camino"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twój dzień, Twoja droga"
           }
         }
       }

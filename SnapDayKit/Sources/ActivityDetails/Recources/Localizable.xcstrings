@@ -12,6 +12,12 @@
             "value" : "Aktivitäten"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activities"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -32,6 +38,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Anzahl erledigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done Count"
           }
         },
         "es" : {
@@ -56,6 +68,12 @@
             "value" : "Nach Aktivität filtern"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter By Activity"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -78,6 +96,12 @@
             "value" : "Nach Etikett filtern"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter By Label"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -95,6 +119,12 @@
     "Labels" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Labels"
@@ -122,6 +152,12 @@
             "value" : "Anzahl nicht erledigt"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Done Count"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -144,6 +180,12 @@
             "value" : "Auswählen"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -161,6 +203,12 @@
     "Tags" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tags"
@@ -186,6 +234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gesamtzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Time"
           }
         },
         "es" : {
