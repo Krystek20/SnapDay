@@ -33,6 +33,7 @@
 		D4CCE6312BC7B4BB00C198C5 /* Notification Content.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D4CCE6232BC7B4BB00C198C5 /* Notification Content.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */ = {isa = PBXBuildFile; productRef = D4CCE63C2BCACB8E00C198C5 /* EveningSummary */; };
 		D4D658782C56D122007E61EB /* ActivityListIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D658772C56D122007E61EB /* ActivityListIntents.swift */; };
+		D4D8809E2D33B30B00280B02 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D8809D2D33B30A00280B02 /* AppDelegate.swift */; };
 		D4E090EB2C90ACF000E605B2 /* Previews in Frameworks */ = {isa = PBXBuildFile; productRef = D4E090EA2C90ACF000E605B2 /* Previews */; };
 		D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */ = {isa = PBXBuildFile; productRef = D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */; };
 		D4FE9FC32BF5342B003305A9 /* DayActivityReminder in Frameworks */ = {isa = PBXBuildFile; productRef = D4FE9FC22BF5342B003305A9 /* DayActivityReminder */; };
@@ -108,6 +109,7 @@
 		D4CCE63E2BCAD13800C198C5 /* SnapDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnapDay.entitlements; sourceTree = "<group>"; };
 		D4CCE63F2BCAD27900C198C5 /* Notification Content.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Notification Content.entitlements"; sourceTree = "<group>"; };
 		D4D658772C56D122007E61EB /* ActivityListIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListIntents.swift; sourceTree = "<group>"; };
+		D4D8809D2D33B30A00280B02 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D4EE7DB62C5562A7007A0B4F /* ActivityWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ActivityWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -234,6 +236,7 @@
 		D4779AC12B6043280067E3AC /* SnapDay */ = {
 			isa = PBXGroup;
 			children = (
+				D4D8809D2D33B30A00280B02 /* AppDelegate.swift */,
 				D4CCE63E2BCAD13800C198C5 /* SnapDay.entitlements */,
 				D4779AC22B6043280067E3AC /* Assets.xcassets */,
 				D4779AC32B6043280067E3AC /* Preview Content */,
@@ -439,6 +442,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4D8809E2D33B30B00280B02 /* AppDelegate.swift in Sources */,
 				D4779ACC2B6043280067E3AC /* SnapDayApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -651,7 +655,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -693,7 +697,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -765,7 +769,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -798,7 +802,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -829,7 +833,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -860,7 +864,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

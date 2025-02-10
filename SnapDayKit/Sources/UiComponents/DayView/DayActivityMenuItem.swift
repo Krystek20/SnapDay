@@ -11,6 +11,7 @@ enum DayActivityMenuItem {
   case remove
   case markImportant
   case unmarkImortant
+  case share
 
   var title: String {
     switch self {
@@ -34,6 +35,8 @@ enum DayActivityMenuItem {
       String(localized: "Set as important", bundle: .module)
     case .unmarkImortant:
       String(localized: "Set as regular", bundle: .module)
+    case .share:
+      String(localized: "Share", bundle: .module)
     }
   }
 
@@ -59,6 +62,8 @@ enum DayActivityMenuItem {
       "exclamationmark.circle"
     case .unmarkImortant:
       "exclamationmark.circle.fill"
+    case .share:
+      "square.and.arrow.up"
     }
   }
 
@@ -82,6 +87,8 @@ enum DayActivityMenuItem {
         .markImportant
     case .unmarkImortant:
         .unmarkImportant
+    case .share:
+        .share
     }
   }
 }

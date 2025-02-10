@@ -3,10 +3,10 @@ import Models
 import CoreData
 
 extension ActivityTaskEntity {
-  func setup(by activityTask: ActivityTask, context: NSManagedObjectContext) throws {
+  func setup(by activityTask: ActivityTask) throws {
     identifier = activityTask.id
     name = activityTask.name
-    icon = try activityTask.icon?.managedObject(context)
+    iconIdentifier = activityTask.iconId
     isDefaultDuration = activityTask.defaultDuration != nil
     defaultDuration = Int32(activityTask.defaultDuration ?? .zero)
     defaultReminderDate = activityTask.defaultReminderDate

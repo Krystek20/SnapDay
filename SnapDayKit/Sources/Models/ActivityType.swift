@@ -3,7 +3,7 @@ import Foundation
 public protocol ActivityType {
   var id: UUID { get }
   var name: String { get }
-  var icon: Icon? { get }
+  var iconId: UUID? { get }
   var doneDate: Date? { get }
   var duration: Int { get }
   var overview: String? { get }
@@ -13,6 +13,7 @@ public protocol ActivityType {
   var isFrequentEnabled: Bool { get }
   var important: Bool { get }
   var position: Int { get set }
+  var isShared: Bool { get }
 }
 
 extension ActivityType {
@@ -43,6 +44,7 @@ extension Activity: ActivityType {
     get { -1 }
     set { }
   }
+  public var isShared: Bool { false }
 }
 
 extension Array where Element: ActivityType {

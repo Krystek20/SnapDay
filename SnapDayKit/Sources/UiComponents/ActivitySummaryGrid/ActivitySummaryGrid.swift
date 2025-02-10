@@ -37,9 +37,9 @@ public struct ActivitySummaryGrid: View {
 
         VStack(alignment: .leading, spacing: 2.5) {
           switch timePeriodActivity.type {
-          case .icon(let activityIcon):
+          case .icon(let iconId):
             ActivityImageView(
-              data: activityIcon?.data,
+              type: .iconId(iconId),
               size: 40.0,
               cornerRadius: 20.0
             )

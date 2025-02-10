@@ -43,7 +43,7 @@ public struct DayActivityRow: View {
   public var body: some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
-        data: activityItem.iconData,
+        type: activityItem.iconType,
         size: imageSize.size,
         cornerRadius: imageSize.cornerRadius
       )

@@ -14,6 +14,7 @@ public struct ApplicationFeature: TodayProvidable {
   @Dependency(\.backgroundUpdater) private var backgroundUpdater
   @Dependency(\.deeplinkService) private var deeplinkService
   private let dayProvider = DayProvider()
+  private let iconProvider: IconProviderType = IconProvider()
   private static let isOnboardingShownKey = "isOnboardingShown"
 
   // MARK: - State & Action
@@ -47,6 +48,7 @@ public struct ApplicationFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     case appeared
     case createDayBackgroundTaskCalled
+    case cleanIcons
     case deviceShaked
     case handleUrl(URL)
     case setTab(Tab)
@@ -127,6 +129,11 @@ public struct ApplicationFeature: TodayProvidable {
                 break
               }
             }
+          },
+          .run { send in
+            for await _ in NotificationCenter.default.publisher(for: .snapDayCloudKitChanged).values {
+              await send(.cleanIcons)
+            }
           }
         )
       case .createDayBackgroundTaskCalled:
@@ -137,6 +144,10 @@ public struct ApplicationFeature: TodayProvidable {
           _ = try await dayProvider.day(tomorrow)
           try await userNotificationCenterProvider.reloadReminders()
           try await userNotificationCenterProvider.sendDeveloperMessage("Next day set and reminders scheduled")
+        }
+      case .cleanIcons:
+        return .run { _ in
+          await iconProvider.cleanIcons()
         }
       case .deviceShaked:
         state.developerTools = DeveloperToolsFeature.State()

@@ -6,20 +6,19 @@ extension DayActivity {
     from activity: Activity,
     uuid: () -> UUID,
     calendar: () -> Calendar,
-    dayId: UUID,
-    dayDate: Date,
+    date: Date,
     createdByUser: Bool
   ) -> DayActivity {
     let dayActivityId = uuid()
     return DayActivity(
       id: dayActivityId,
-      dayId: dayId,
+      date: date,
       activity: activity,
       name: activity.name,
-      icon: activity.icon,
+      iconId: activity.iconId,
       dueDate: activity.dueDaysCount.flatMap { dueDaysCount in
         guard dueDaysCount > .zero else { return nil }
-        return calendar().utcCalendar.date(byAdding: .day, value: dueDaysCount, to: dayDate)
+        return calendar().utcCalendar.date(byAdding: .day, value: dueDaysCount, to: date)
       },
       doneDate: nil,
       duration: activity.defaultDuration ?? .zero,
@@ -33,15 +32,15 @@ extension DayActivity {
           dayActivityId: dayActivityId,
           activityTask: $0,
           name: $0.name,
-          icon: $0.icon,
+          iconId: $0.iconId,
           doneDate: nil,
           duration: $0.defaultDuration ?? .zero,
           overview: nil,
-          reminderDate: calendar().reminderDate(from: $0.defaultReminderDate, dayDate: dayDate),
+          reminderDate: calendar().reminderDate(from: $0.defaultReminderDate, dayDate: date),
           position: $0.defaultPosition
         )
       },
-      reminderDate: calendar().reminderDate(from: activity.defaultReminderDate, dayDate: dayDate),
+      reminderDate: calendar().reminderDate(from: activity.defaultReminderDate, dayDate: date),
       important: activity.important
     )
   }
@@ -49,17 +48,16 @@ extension DayActivity {
   public static func copy(
     from dayActivity: DayActivity,
     uuid: () -> UUID,
-    dayId: UUID,
-    dayDate: Date,
+    date: Date,
     calendar: () -> Calendar
   ) -> DayActivity {
     let dayActivityId = uuid()
     return DayActivity(
       id: dayActivityId,
-      dayId: dayId,
+      date: date,
       activity: dayActivity.activity,
       name: dayActivity.name,
-      icon: dayActivity.icon,
+      iconId: dayActivity.iconId,
       dueDate: nil,
       doneDate: nil,
       duration: dayActivity.duration,
@@ -72,14 +70,14 @@ extension DayActivity {
           dayActivityId: dayActivityId,
           activityTask: dayActivityTask.activityTask,
           name: dayActivityTask.name,
-          icon: dayActivityTask.icon,
+          iconId: dayActivityTask.iconId,
           doneDate: nil,
           duration: dayActivityTask.duration,
           overview: dayActivityTask.overview,
-          reminderDate: calendar().reminderDate(from: dayActivityTask.reminderDate, dayDate: dayDate)
+          reminderDate: calendar().reminderDate(from: dayActivityTask.reminderDate, dayDate: date)
         )
       },
-      reminderDate: calendar().reminderDate(from: dayActivity.reminderDate, dayDate: dayDate),
+      reminderDate: calendar().reminderDate(from: dayActivity.reminderDate, dayDate: date),
       important: dayActivity.important
     )
   }

@@ -92,12 +92,11 @@ public struct ActivityListFeature: TodayProvidable {
           from: activity,
           uuid: { uuid() },
           calendar: { calendar },
-          dayId: state.day.id,
-          dayDate: state.day.date,
+          date: state.day.date,
           createdByUser: true
         )
-        return .run { [day = state.day] send in
-          try await dayEditor.addDayActivity(dayActivity, day.date)
+        return .run { send in
+          try await dayEditor.saveDayActivity(dayActivity)
           await send(.delegate(.daysUpdated))
         }
       case .view(.enableButtonTapped(var activity)):

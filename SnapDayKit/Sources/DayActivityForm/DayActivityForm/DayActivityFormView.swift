@@ -180,7 +180,7 @@ public struct DayActivityFormView: View {
       } label: {
         HStack(spacing: 10.0) {
           ActivityImageView(
-            data: store.form.icon?.data,
+            type: .iconId(store.form.iconId),
             size: 30.0,
             cornerRadius: 5.0,
             tintColor: .actionBlue
@@ -564,7 +564,7 @@ public struct DayActivityFormView: View {
     WithPerceptionTracking {
       HStack(spacing: 5.0) {
         ActivityImageView(
-          data: nil,
+          type:. placeholder,
           size: 30.0,
           cornerRadius: 15.0
         )

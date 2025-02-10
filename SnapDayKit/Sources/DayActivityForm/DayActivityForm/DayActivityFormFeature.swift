@@ -14,6 +14,7 @@ public struct DayActivityFormFeature {
 
   @Dependency(\.dismiss) private var dismiss
   @Dependency(\.tagRepository) private var tagRepository
+  @Dependency(\.iconRepository) private var iconRepository
   @Dependency(\.activityLabelRepository) private var activityLabelRepository
   @Dependency(\.date) private var date
   @Dependency(\.uuid) private var uuid
@@ -140,7 +141,8 @@ public struct DayActivityFormFeature {
       case loadTags
       case setExistingLabels([ActivityLabel])
       case loadLabels
-      case setImageDate(_ date: Data?)
+      case saveIconDate(_ date: Data?)
+      case setIconId(_ identifier: UUID?)
       case determineNotificationStatus
       case handleNotificationStatus(UserNotificationCenterProvider.Status)
     }
@@ -245,12 +247,16 @@ public struct DayActivityFormFeature {
       state.isPhotoPickerPresented = true
       return .none
     case .removeImageTapped:
-      state.form.icon = nil
+      state.form.iconId = nil
       return .none
     case .imageSelected(let item):
       return .run { send in
-        let data = try await item.loadImageData(size: 140.0)
-        await send(.internal(.setImageDate(data)))
+        do {
+          let data = try await item.loadImageData(size: 140.0)
+          await send(.internal(.saveIconDate(data)))
+        } catch {
+          print("cannot create data from image: \(error)")
+        }
       }
     case .remindToggeled(let value):
       state.form.reminderDate = value
@@ -385,11 +391,23 @@ public struct DayActivityFormFeature {
         let existingLabels = try await activityLabelRepository.loadLabels(parentId, enteredLabels)
         await send(.internal(.setExistingLabels(existingLabels)))
       }
-    case .setImageDate(let imageData):
-      state.form.icon = Icon(
-        id: uuid(),
-        data: imageData
-      )
+    case .saveIconDate(let imageData):
+      if let imageData {
+        let icon = Icon(
+          id: uuid(),
+          data: imageData
+        )
+        return .run { [icon] send in
+          try await iconRepository.saveIcon(icon)
+          await send(.internal(.setIconId(icon.id)))
+        }
+      } else {
+        return .run { send in
+          await send(.internal(.setIconId(nil)))
+        }
+      }
+    case .setIconId(let iconId):
+      state.form.iconId = iconId
       return .none
     case .determineNotificationStatus:
       return .run { send in
@@ -409,7 +427,7 @@ public struct DayActivityFormFeature {
   private func handleEmojiPickerAction(_ action: PresentationAction<EmojiPickerFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
     case .presented(.delegate(.dataSelected(let data))):
-      .send(.internal(.setImageDate(data)))
+      .send(.internal(.saveIconDate(data)))
     case .presented, .dismiss:
       .none
     }

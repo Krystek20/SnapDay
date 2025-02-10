@@ -1,5 +1,6 @@
 import CoreData
 import Models
+import CloudKit
 
 final class RemoteChangeObserver {
 
@@ -21,32 +22,158 @@ final class RemoteChangeObserver {
   // MARK: - Public
 
   func startObservingRemoteChanges(
-    persistantStoreCoordinator: NSPersistentStoreCoordinator,
-    storeURL: URL,
+    persistentContainer: PersistentContainer,
+    store: NSPersistentStore,
+    sharedStore: NSPersistentStore,
     backgroundContextProvider: () -> NSManagedObjectContext?
   ) async {
-    guard let store = persistantStoreCoordinator.persistentStore(for: storeURL) else { return }
-    let publisher = notificationCenter.publisher(for: .NSPersistentStoreRemoteChange, object: persistantStoreCoordinator)
+    let remoteChangePublisher = notificationCenter.publisher(for: .NSPersistentStoreRemoteChange, object: persistentContainer.persistentStoreCoordinator)
 
-    for await notification in publisher.values {
+    for await notification in remoteChangePublisher.values {
       guard let storeUUID = notification.userInfo?[NSStoreUUIDKey] as? String,
-            storeUUID == store.identifier,
+            [sharedStore.identifier, store.identifier].contains(storeUUID),
             let context = backgroundContextProvider() else { continue }
-      performHistory(
-        store: store,
-        context: context
-      )
+      do {
+        try await performHistory(
+          storeUUID: storeUUID,
+          store: store,
+          sharedStore: sharedStore,
+          context: context,
+          persistentContainer: persistentContainer
+        )
+      } catch {
+        print("Can not perform history \(error)")
+      }
     }
   }
 
-  private func performHistory(
+  func startObservingCloudKitChanges(
+    persistentContainer: PersistentContainer,
+    store: NSPersistentStore,
+    shareStore: NSPersistentStore,
+    backgroundContextProvider: () -> NSManagedObjectContext?
+  ) async {
+    let eventChangedPublisher = notificationCenter.publisher(for: NSPersistentCloudKitContainer.eventChangedNotification, object: persistentContainer)
+
+    for await notification in eventChangedPublisher.values {
+      guard let value = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey],
+            let event = value as? NSPersistentCloudKitContainer.Event else {
+        print("\(#function): Failed to retrieve the container event from notification.userInfo.")
+        continue
+      }
+      guard event.succeeded,
+            let context = backgroundContextProvider() else {
+        if let error = event.error {
+          print("startObservingCloudKitChanges Error: \(error)")
+        }
+        continue
+      }
+      do {
+        try await removeDeduplicatedObjectsIfNeeded(
+          event: event,
+          store: store,
+          context: context
+        )
+      } catch {
+        print("Can not remove deduplicated objects \(error)")
+      }
+
+      if event.type == .import {
+        notificationCenter.post(name: .snapDayCloudKitChanged, object: nil)
+      }
+    }
+  }
+
+  private func removeDeduplicatedObjectsIfNeeded(
+    event: NSPersistentCloudKitContainer.Event,
     store: NSPersistentStore,
     context: NSManagedObjectContext
-  ) {
-    let token = historyToken(storyUUID: store.identifier)
+  ) async throws {
+    let lastExportDateKey = "LastExportDate", lastImportDateKey = "LastImportDate"
+    if let endDate = event.endDate {
+      switch event.type {
+      case .setup:
+        return
+      case .import:
+        UserDefaults.standard.set(endDate, forKey: lastImportDateKey)
+      case .export:
+        UserDefaults.standard.set(endDate, forKey: lastExportDateKey)
+      @unknown default:
+        return
+      }
+    }
+
+    let lastRemoveDeduplicatedObjectsDateKey = "lastRemoveDeduplicatedObjectsDateKey"
+    if let theDate = UserDefaults.standard.value(forKey: lastRemoveDeduplicatedObjectsDateKey) as? Date,
+       Date.now.timeIntervalSince(theDate) < 60 {
+      return
+    }
+
+    if let lastExportDate = UserDefaults.standard.value(forKey: lastExportDateKey) as? Date,
+       let lastImportDate = UserDefaults.standard.value(forKey: lastImportDateKey) as? Date {
+      let earlierDate = min(lastExportDate, lastImportDate)
+      try await removeDeduplicatedObjects(
+        beforeDate: Date(timeInterval: -60, since: earlierDate),
+        store: store,
+        context: context
+      )
+      UserDefaults.standard.set(Date.now, forKey: lastRemoveDeduplicatedObjectsDateKey)
+    }
+  }
+
+  private func removeDeduplicatedObjects(
+    beforeDate: Date,
+    store: NSPersistentStore,
+    context: NSManagedObjectContext
+  ) async throws {
+    try await context.perform { [weak self] in
+      for entity in SupportedDeduplicable.entities {
+        try self?.removeDeduplicatedObjects(
+          entity: entity,
+          beforeDate: beforeDate,
+          store: store,
+          context: context
+        )
+      }
+    }
+  }
+
+  private func removeDeduplicatedObjects<T: Deduplicable>(
+    entity: T.Type,
+    beforeDate: Date,
+    store: NSPersistentStore,
+    context: NSManagedObjectContext
+  ) throws {
+    let fetchRequest = entity.fetchRequest()
+    fetchRequest.affectedStores = [store]
+    let format = "(deduplicatedDate != nil) AND (deduplicatedDate < %@)"
+    fetchRequest.predicate = NSPredicate(format: format, beforeDate as CVarArg)
+
+    guard let objects = try? context.fetch(fetchRequest) as? [Deduplicable], !objects.isEmpty else { return }
+    print("\(#function): Removing deduplicated objects with identifier: \(objects.first?.identifier ?? "nil"), count: \(objects.count).")
+    for object in objects {
+      context.delete(object)
+    }
+    try context.save()
+  }
+
+  private func performHistory(
+    storeUUID: String,
+    store: NSPersistentStore,
+    sharedStore: NSPersistentStore,
+    context: NSManagedObjectContext,
+    persistentContainer: PersistentContainer
+  ) async throws {
+    let token = historyToken(storyUUID: storeUUID)
     let request = NSPersistentHistoryChangeRequest.fetchHistory(after: token)
     request.fetchRequest = NSPersistentHistoryTransaction.fetchRequest
-    request.affectedStores = [store]
+    request.fetchRequest?.predicate = NSPredicate(format: "author != %@", TransactionAuthor.app())
+
+    if store.identifier == store.identifier {
+      request.affectedStores = [store]
+    } else if store.identifier == sharedStore.identifier {
+      request.affectedStores = [sharedStore]
+    }
 
     let historyResult = try? context.execute(request) as? NSPersistentHistoryResult
     guard let transactions = historyResult?.result as? [NSPersistentHistoryTransaction],
@@ -55,15 +182,15 @@ final class RemoteChangeObserver {
     let translationsInfo = Transactions(transactions: transactions)
     guard !translationsInfo.isEmpty else { return }
 
-    let userInfo: [UserInfoKey: Any] = [
-      UserInfoKey.storeUUID: store.identifier as Any,
-      UserInfoKey.transactions: translationsInfo
-    ]
-    notificationCenter.post(name: .snapDayStoreDidChange, object: userInfo)
-
     if let newToken = transactions.last?.token {
-      updateHistoryToken(storyUUID: store.identifier, newToken: newToken)
+      updateHistoryToken(storyUUID: storeUUID, newToken: newToken)
     }
+
+    try await deduplicate(
+      translationsInfo.insertedObjectIDs,
+      context: context,
+      persistentContainer: persistentContainer
+    )
   }
 
   private func historyToken(storyUUID: String) -> NSPersistentHistoryToken? {
@@ -78,5 +205,164 @@ final class RemoteChangeObserver {
 
   private func tokenKey(storyUUID: String) -> String {
     "historyToken:" + storyUUID
+  }
+
+  private func deduplicate(
+    _ inserted: [String?: Set<NSManagedObjectID>],
+    context: NSManagedObjectContext,
+    persistentContainer: PersistentContainer,
+    deduplicationAttempts: Int = 3
+  ) async throws {
+    let lockTimeInterval = 30.0
+    print("[TEST_DEDUPLICATION] - START: \(inserted.count)")
+
+    let deduplicationIdentifier = "Deduplication"
+    guard try await !isLocked(for: deduplicationIdentifier, lockTimeInterval: lockTimeInterval) else {
+      print("[TEST_DEDUPLICATION] - isLocked - deduplicationAttempts: \(deduplicationAttempts)")
+      try await Task.sleep(for: .seconds(lockTimeInterval))
+      if deduplicationAttempts > 1 {
+        try await deduplicate(
+          inserted,
+          context: context,
+          persistentContainer: persistentContainer,
+          deduplicationAttempts: deduplicationAttempts - 1
+        )
+      }
+      return
+    }
+
+    try await createLock(for: deduplicationIdentifier)
+    print("[TEST_DEDUPLICATION] - Locked")
+
+    try await context.perform { [weak self] in
+      for managedObjectIds in inserted.values {
+        print("[TEST_DEDUPLICATION] - managedObjectIdsCount \(managedObjectIds.count)")
+        for managedObjectId in managedObjectIds {
+          self?.deduplicate(managedObjectId, context: context, persistentContainer: persistentContainer)
+        }
+      }
+      try context.save()
+    }
+    print("[TEST_DEDUPLICATION] - Deduplicated")
+
+    try await removeLock(for: deduplicationIdentifier)
+    print("[TEST_DEDUPLICATION] - Remove Lock")
+  }
+
+  private func isLocked(for identifier: String, lockTimeInterval: TimeInterval) async throws -> Bool {
+    let database = CKContainer.default().privateCloudDatabase
+    let predicate = NSPredicate(format: "identifier == %@", identifier)
+    let query = CKQuery(recordType: "Lock", predicate: predicate)
+
+    do {
+      let result = try await database.fetch(withQuery: query)
+      guard let lock = result.matchResults.first else { return false }
+      switch lock.1 {
+      case .success(let record):
+        guard let timestamp = record["timestamp"] as? Date else { return false }
+        return Date().timeIntervalSince(timestamp) < lockTimeInterval
+      case .failure(let error):
+        print(error)
+        return false
+      }
+    } catch {
+      print(error)
+      return false
+    }
+  }
+
+  private func createLock(for identifier: String) async throws {
+    let database = CKContainer.default().privateCloudDatabase
+    let record = CKRecord(recordType: "Lock")
+
+    record["identifier"] = identifier
+    record["lockedByDevice"] = TransactionAuthor.app()
+    record["timestamp"] = Date() as CKRecordValue
+
+    try await database.save(record)
+    print("lock created")
+  }
+
+  private func removeLock(for identifier: String) async throws {
+    let database = CKContainer.default().privateCloudDatabase
+    let predicate = NSPredicate(format: "identifier == %@", identifier)
+    let query = CKQuery(recordType: "Lock", predicate: predicate)
+
+    do {
+      let result = try await database.fetch(withQuery: query)
+      for record in result.matchResults {
+        do {
+          try await database.deleteRecord(withID: record.0)
+        } catch {
+          print("Cannot delete lock record: \(identifier) \(error)")
+        }
+      }
+    } catch {
+      print("Cannot fetch locks: \(identifier) \(error)")
+    }
+  }
+
+  private func deduplicate(
+    _ objectId: NSManagedObjectID,
+    context: NSManagedObjectContext,
+    persistentContainer: PersistentContainer
+  ) {
+    guard let deduplicable = context.object(with: objectId) as? Deduplicable,
+          let identifier = deduplicable.identifier else {
+      print("\(#function): Ignore an object that was deleted: \(objectId)")
+      return
+    }
+
+    guard let name = objectId.entity.name else {
+      print("\(#function): No entity name for: \(objectId)")
+      return
+    }
+
+    let fetchRequest: NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: name)
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: "version", ascending: false),
+      NSSortDescriptor(key: "identifier", ascending: true)
+    ]
+    fetchRequest.predicate = NSCompoundPredicate(
+      andPredicateWithSubpredicates: [
+        NSPredicate(format: "identifier == %@", identifier as CVarArg),
+        NSPredicate(format: "deduplicatedDate == nil")
+      ]
+    )
+
+    guard var duplicated = try? context.fetch(fetchRequest) as? [Deduplicable], duplicated.count > 1 else {
+      return
+    }
+
+    let tagZoneID = persistentContainer.recordID(for: deduplicable.objectID)?.zoneID
+    duplicated = duplicated.filter {
+      persistentContainer.recordID(for: $0.objectID)?.zoneID == tagZoneID
+    }
+
+    guard duplicated.count > 1, let indexToReserve = duplicated.indexToReserve else {
+      return
+    }
+
+    print("\(#function): Deduplicating \(name) with id: \(identifier), count: \(duplicated.count)")
+
+    let objectToReserve = duplicated[indexToReserve]
+    duplicated.remove(at: indexToReserve)
+    duplicated.deduplicate(to: objectToReserve)
+    duplicated.markAsDeduplicated()
+  }
+}
+
+extension CKDatabase {
+  func fetch(withQuery query: CKQuery) async throws -> (matchResults: [(CKRecord.ID, Result<CKRecord, any Error>)], queryCursor: CKQueryOperation.Cursor?) {
+    try await withCheckedThrowingContinuation { continuation in
+      fetch(withQuery: query) { result in
+        switch result {
+        case .success(let success):
+          continuation.resume(returning: success)
+        case .failure(let failure):
+          continuation.resume(throwing: failure)
+        }
+      }
+    }
   }
 }

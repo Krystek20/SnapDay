@@ -8,9 +8,9 @@ extension Activity: Entity {
     ActivityEntity.fetchRequest()
   }
 
-  public init?(object: ActivityEntity?) throws {
+  public init?(object: ActivityEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let object else { return nil }
-    try self.init(object)
+    try self.init(object, context: context, isShared: isShared)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> ActivityEntity {

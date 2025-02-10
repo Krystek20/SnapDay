@@ -1,12 +1,11 @@
 import Foundation
+import CoreData.NSManagedObjectContext
 import Models
 
 extension Activity {
-  init(_ entity: ActivityEntity) throws {
+  init(_ entity: ActivityEntity, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let identifier = entity.identifier,
           let name = entity.name,
-          let tags = entity.tags?.allObjects as? [TagEntity],
-          let labels = entity.labels?.allObjects as? [ActivityLabelEntity],
           let tasks = entity.activityTasks?.allObjects as? [ActivityTaskEntity] else {
       throw EntityError.attributeNil()
     }
@@ -14,17 +13,21 @@ extension Activity {
     if let frequencyJson = entity.frequencyJson {
       frequency = try JSONDecoder().decode(ActivityFrequency.self, from: frequencyJson)
     }
+
+    let tags: [Tag] = try entity.mapArray(for: "tagsIdentifiers", context: context, isShared: isShared)
+    let labels: [ActivityLabel] = try entity.mapArray(for: "labelsIdentifiers", context: context, isShared: isShared)
+
     self.init(
       id: identifier,
       name: name,
-      icon: try entity.icon.map(Icon.init),
-      tags: try tags.map(Tag.init),
+      iconId: entity.iconIdentifier,
+      tags: tags,
       frequency: frequency ?? .daily,
       isFrequentEnabled: entity.isFrequentEnabled,
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
       dueDaysCount: Int(entity.dueDaysCount),
       startDate: entity.startDate,
-      labels: try labels.map(ActivityLabel.init),
+      labels: labels,
       tasks: try tasks.map(ActivityTask.init),
       defaultReminderDate: entity.defaultReminderDate,
       important: entity.important

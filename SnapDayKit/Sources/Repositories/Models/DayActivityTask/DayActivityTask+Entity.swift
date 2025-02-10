@@ -8,9 +8,9 @@ extension DayActivityTask: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public init?(object: DayActivityTaskEntity?) throws {
+  public init?(object: DayActivityTaskEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let object else { return nil }
-    try self.init(object)
+    try self.init(object, context: context, isShared: isShared)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> DayActivityTaskEntity {

@@ -81,6 +81,13 @@ public struct DashboardView: View {
         }
         .presentationDetents([.medium])
       }
+      .sheet(isPresented: $store.isShareViewPresented, content: {
+        WithPerceptionTracking {
+          if let share = store.share {
+            CloudSharingView(share: share)
+          }
+        }
+      })
       .task {
         store.send(.view(.appeared))
       }

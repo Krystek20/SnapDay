@@ -8,6 +8,7 @@ public struct DayActivityItem: Equatable, Identifiable {
     case hourglass
     case `repeat`
     case exclamationmark = "exclamationmark.circle.fill"
+    case shared = "person.crop.rectangle.stack"
 
     public var id: String { rawValue }
   }
@@ -16,7 +17,7 @@ public struct DayActivityItem: Equatable, Identifiable {
   let parentId: UUID?
   let title: String
   let subtitle: String
-  let iconData: Data?
+  let iconType: ActivityImageType
   public let isStrikethrough: Bool
   let displayedIcons: [Icon]
 
@@ -26,22 +27,29 @@ public struct DayActivityItem: Equatable, Identifiable {
 extension DayActivityItem {
   public init(
     activityType: ActivityType,
+    iconData: Data? = nil,
     parentId: UUID? = nil
   ) {
     let isDueDateSet = activityType.dueDaysCount != nil && activityType.dueDaysCount ?? .zero > .zero
     let showHourglass = activityType.dueDate != nil || isDueDateSet
+    let iconType: ActivityImageType = if let iconData {
+      .data(iconData)
+    } else {
+      .iconId(activityType.iconId)
+    }
     self.init(
       id: activityType.id,
       parentId: parentId,
       title: activityType.name,
       subtitle: activityType.subtitle,
-      iconData: activityType.icon?.data,
+      iconType: iconType,
       isStrikethrough: activityType.isDone,
       displayedIcons: [
         activityType.important ? .exclamationmark : nil,
         showHourglass ? .hourglass : nil,
         activityType.reminderDate != nil ? .bell : nil,
-        activityType.isFrequentEnabled ? .repeat : nil
+        activityType.isFrequentEnabled ? .repeat : nil,
+        activityType.isShared ? .shared : nil
       ].compactMap { $0 }
     )
   }

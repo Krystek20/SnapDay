@@ -72,8 +72,16 @@ public struct WidgetActivityListFeature: TodayProvidable {
         .reduce(into: [DayActivityItem](), { result, dayActivity in
           let ignoreActivity = hideCompleted && dayActivity.isDone
           if !ignoreActivity {
+            var iconData: Data?
+            if let iconId = dayActivity.iconId,
+               let icon = icons.first(where: { $0.id == iconId }) {
+              iconData = icon.data
+            }
             result.append(
-              DayActivityItem(activityType: dayActivity)
+              DayActivityItem(
+                activityType: dayActivity,
+                iconData: iconData
+              )
             )
           }
 
@@ -83,8 +91,14 @@ public struct WidgetActivityListFeature: TodayProvidable {
               guard !ignoreActivity && !ignoreTask else {
                 return nil
               }
+              var iconData: Data?
+              if let iconId = dayActivityTask.iconId,
+                  let icon = icons.first(where: { $0.id == iconId }) {
+                iconData = icon.data
+              }
               return DayActivityItem(
                 activityType: dayActivityTask,
+                iconData: iconData,
                 parentId: dayActivity.id
               )
             }
@@ -95,12 +109,15 @@ public struct WidgetActivityListFeature: TodayProvidable {
     private var maxPerPage = 6
     private var selectedDay: Day?
     private let hideCompleted: Bool
+    private let icons: [Icon]
 
     public init(
       day: Day?,
+      icons: [Icon],
       hideCompleted: Bool
     ) {
       self.selectedDay = day
+      self.icons = icons
       self.hideCompleted = hideCompleted
     }
   }

@@ -8,12 +8,13 @@ public struct DayActivityTask: Identifiable, Equatable, Hashable {
   public let dayActivityId: UUID
   public var activityTask: ActivityTask?
   public var name: String
-  public var icon: Icon?
+  public var iconId: UUID?
   public var doneDate: Date?
   public var duration: Int
   public var overview: String?
   public var reminderDate: Date?
   public var position: Int
+  public var isShared: Bool
 
   // MARK: - Initialization
 
@@ -22,23 +23,25 @@ public struct DayActivityTask: Identifiable, Equatable, Hashable {
     dayActivityId: UUID,
     activityTask: ActivityTask? = nil,
     name: String = "",
-    icon: Icon? = nil,
+    iconId: UUID? = nil,
     doneDate: Date? = nil,
     duration: Int = .zero,
     overview: String? = nil,
     reminderDate: Date? = nil,
-    position: Int = -1
+    position: Int = -1,
+    isShared: Bool = false
   ) {
     self.id = id
     self.dayActivityId = dayActivityId
     self.activityTask = activityTask
     self.name = name
-    self.icon = icon
+    self.iconId = iconId
     self.doneDate = doneDate
     self.duration = duration
     self.overview = overview
     self.reminderDate = reminderDate
     self.position = position
+    self.isShared = isShared
   }
 }
 

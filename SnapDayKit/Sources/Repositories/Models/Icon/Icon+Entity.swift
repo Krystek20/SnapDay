@@ -8,7 +8,7 @@ extension Icon: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public init?(object: IconEntity?) throws {
+  public init?(object: IconEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let object else { return nil }
     try self.init(object)
   }

@@ -6,19 +6,12 @@ extension DayActivityTaskEntity {
   func setup(by dayActivityTask: DayActivityTask, context: NSManagedObjectContext) throws {
     identifier = dayActivityTask.id
     name = dayActivityTask.name
-    icon = try dayActivityTask.icon?.managedObject(context)
+    iconIdentifier = dayActivityTask.iconId
     duration = Int32(dayActivityTask.duration)
     doneDate = dayActivityTask.doneDate
     overview = dayActivityTask.overview
     reminderDate = dayActivityTask.reminderDate
     position = Int32(dayActivityTask.position)
-
-    if let task = dayActivityTask.activityTask {
-      activityTask = try ActivityTaskEntity.object(
-        identifier: task.id.uuidString,
-        fetchRequest: ActivityTask.fetchRequest,
-        context: context
-      )
-    }
+    templateIdentifier = dayActivityTask.activityTask?.id
   }
 }

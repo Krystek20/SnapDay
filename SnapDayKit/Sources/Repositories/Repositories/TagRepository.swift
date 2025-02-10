@@ -19,6 +19,7 @@ extension TagRepository: DependencyKey {
   public static var liveValue: TagRepository {
     TagRepository(
       saveTag: { tag in
+        try await EntityHandler().save(tag.rgbColor)
         try await EntityHandler().save(tag)
       },
       deleteTag: { tag in
@@ -26,9 +27,16 @@ extension TagRepository: DependencyKey {
       },
       loadTags: { excludedTags in
         try await EntityHandler().fetch(
-          objectType: Tag.self,
-          predicates: loadTagsPredicate(excludedTags),
-          sorts: loadTagsSorts
+          Tag.self,
+          predicates: {
+            let excludedTagNames = excludedTags.map(\.name)
+            if !excludedTags.isEmpty {
+              NSPredicate(format: "NOT (name IN %@)", excludedTagNames)
+            }
+          },
+          sorts: {
+            NSSortDescriptor(key: "name", ascending: true)
+          }
         )
       }
     )
@@ -40,22 +48,5 @@ extension TagRepository: DependencyKey {
       deleteTag: { _ in },
       loadTags: { _ in [] }
     )
-  }
-}
-
-// MARK: - Helpers
-
-private extension TagRepository {
-  @PredicateBuilder
-  static func loadTagsPredicate(_ excludedTags: [Tag]) -> [NSPredicate] {
-    let excludedTagNames = excludedTags.map(\.name)
-    if !excludedTags.isEmpty {
-      NSPredicate(format: "NOT (name IN %@)", excludedTagNames)
-    }
-  }
-
-  @SortBuilder
-  static var loadTagsSorts: [NSSortDescriptor] {
-    NSSortDescriptor(key: "name", ascending: true)
   }
 }

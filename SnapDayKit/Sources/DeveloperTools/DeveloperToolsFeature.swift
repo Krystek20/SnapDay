@@ -11,7 +11,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
 
   // MARK: - Dependencies
 
-  @Dependency(\.dayRepository) private var dayRepository
+  @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.utcCalendar) private var calendar
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
@@ -38,7 +38,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
-      case customButtonTapped
+      case cleanKeyValueStore
       case sendDayActivityReminderNotificationButtonTapped
       case sendDayActivityTaskReminderNotificationButtonTapped
       case sendEveningSummaryReminderNotificationButtonTapped
@@ -86,18 +86,23 @@ public struct DeveloperToolsFeature: TodayProvidable {
   private func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
     switch action {
     case .appeared:
-      .merge(
+      return .merge(
         .send(.internal(.loadPendingRequests)),
         .send(.internal(.loadBackgroundPendingRequests))
       )
-    case .customButtonTapped:
-      .none
+    case .cleanKeyValueStore:
+      let allKeys = NSUbiquitousKeyValueStore.default.dictionaryRepresentation.keys
+      for key in allKeys {
+          NSUbiquitousKeyValueStore.default.removeObject(forKey: key)
+      }
+      return .none
     case .sendDayActivityReminderNotificationButtonTapped:
-      .run { send in
-        let day = try await dayRepository.loadDay(today)
-        let dayActivity = day?.activities.randomElement() ?? DayActivity(
+      return .run { send in
+        let configuration = ActivitiesFetchConfiguration()
+        let dayActivities = try await dayActivityRepository.activities(configuration)
+        let dayActivity = dayActivities.randomElement() ?? DayActivity(
           id: uuid(),
-          dayId: uuid(),
+          date: today,
           isGeneratedAutomatically: false
         )
         let dayActivityNotification = DayActivityNotification(
@@ -112,35 +117,36 @@ public struct DeveloperToolsFeature: TodayProvidable {
         await send(.internal(.schedule(notification: notification)))
       }
     case .sendDayActivityTaskReminderNotificationButtonTapped:
-        .run { send in
-          guard
-            let day = try await dayRepository.loadDay(today),
-            let dayActivity = day.activities.first(where: { !$0.dayActivityTasks.isEmpty }),
-            let dayActivityTask = dayActivity.dayActivityTasks.randomElement()
-          else { return }
+      return .run { send in
+        let configuration = ActivitiesFetchConfiguration()
+        let dayActivities = try await dayActivityRepository.activities(configuration)
+        guard
+          let dayActivity = dayActivities.first(where: { !$0.dayActivityTasks.isEmpty }),
+          let dayActivityTask = dayActivity.dayActivityTasks.randomElement()
+        else { return }
 
-          let dayActivityTaskNotification = DayActivityNotification(
-            type: .activityTask(dayActivity, dayActivityTask),
-            calendar: calendar,
-            bodyTitle: "Example body title"
-          )
+        let dayActivityTaskNotification = DayActivityNotification(
+          type: .activityTask(dayActivity, dayActivityTask),
+          calendar: calendar,
+          bodyTitle: "Example body title"
+        )
 
-          let notification = DeveloperNotificiation(
-            identifier: uuid().uuidString,
-            content: dayActivityTaskNotification.content
-          )
+        let notification = DeveloperNotificiation(
+          identifier: uuid().uuidString,
+          content: dayActivityTaskNotification.content
+        )
 
-          await send(.internal(.schedule(notification: notification)))
-        }
+        await send(.internal(.schedule(notification: notification)))
+      }
     case .sendEveningSummaryReminderNotificationButtonTapped:
-        .run { send in
-          let eveningSummary = EveningSummary(calendar: calendar)
-          let notification = DeveloperNotificiation(
-            identifier: uuid().uuidString,
-            content: eveningSummary.content
-          )
-          await send(.internal(.schedule(notification: notification)))
-        }
+      return .run { send in
+        let eveningSummary = EveningSummary(calendar: calendar)
+        let notification = DeveloperNotificiation(
+          identifier: uuid().uuidString,
+          content: eveningSummary.content
+        )
+        await send(.internal(.schedule(notification: notification)))
+      }
     }
   }
 

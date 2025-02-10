@@ -4,8 +4,11 @@ extension DayActivity {
   mutating public func merge(_ dayActivities: [DayActivity]) {
     for dayActivity in dayActivities {
       guard activity?.id == dayActivity.activity?.id else { return }
-      if icon == nil {
-        icon = dayActivity.icon
+      if date == nil {
+        date = dayActivity.date
+      }
+      if iconId == nil {
+        iconId = dayActivity.iconId
       }
       if dueDate == nil {
         dueDate = dayActivity.dueDate

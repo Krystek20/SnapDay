@@ -186,7 +186,7 @@ public struct ReportsFeature: TodayProvidable {
         return TimePeriodActivity(
           id: activity.id.uuidString,
           name: activity.name,
-          type: .icon(activity.icon),
+          type: .icon(activity.iconId),
           totalCount: totalCount,
           doneCount: doneCount,
           duration: duration,

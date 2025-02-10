@@ -6,15 +6,21 @@ public struct ActivitiesFetchConfiguration {
   let range: ClosedRange<Date>?
   let done: Bool?
   let predicates: [NSPredicate]
+  let sorts: [NSSortDescriptor]
+  let fetchLimit: Int?
 
   public init(
     range: ClosedRange<Date>? = nil,
     done: Bool? = nil,
-    predicates: [NSPredicate] = []
+    predicates: [NSPredicate] = [],
+    sorts: [NSSortDescriptor] = [],
+    fetchLimit: Int? = nil
   ) {
     self.range = range
     self.done = done
     self.predicates = predicates
+    self.sorts = sorts
+    self.fetchLimit = fetchLimit
   }
 }
 
@@ -26,6 +32,8 @@ public struct DayActivityRepository {
   public var saveDayActivityTask: @Sendable (DayActivityTask) async throws -> Void
   public var removeDayActivity: @Sendable (DayActivity) async throws -> Void
   public var removeDayActivityTask: @Sendable (DayActivityTask) async throws -> Void
+  public var share: @Sendable (DayActivity) async throws -> Share
+  public var accept: @Sendable (Invitation) async throws -> Void
 }
 
 extension DependencyValues {
@@ -39,26 +47,16 @@ extension DayActivityRepository: DependencyKey {
   public static var liveValue: DayActivityRepository {
     DayActivityRepository(
       activity: { dayActivityId in
-        try await EntityHandler().fetch(
-          objectType: DayActivity.self,
-          predicates: [
-            NSPredicate(format: "identifier == %@", dayActivityId)
-          ]
-        )
+        try await EntityHandler().fetch(DayActivity.self, identifier: dayActivityId)
       },
       activityTask: { dayActivityTaskId in
-        try await EntityHandler().fetch(
-          objectType: DayActivityTask.self,
-          predicates: [
-            NSPredicate(format: "identifier == %@", dayActivityTaskId)
-          ]
-        )
+        try await EntityHandler().fetch(DayActivityTask.self, identifier: dayActivityTaskId)
       },
       activities: { configuration in
         var predicates: [NSPredicate] = []
         if let range = configuration.range {
           predicates.append(
-            NSPredicate(format: "day.date >= %@ AND day.date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)
+            NSPredicate(format: "date >= %@ AND date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)
           )
         }
         if let done = configuration.done {
@@ -68,10 +66,16 @@ extension DayActivityRepository: DependencyKey {
           predicates.append(predicate)
         }
         predicates.append(contentsOf: configuration.predicates)
+
+        let sorts = configuration.sorts.isEmpty
+        ? [NSSortDescriptor(key: "name", ascending: true)]
+        : configuration.sorts
+
         return try await EntityHandler().fetch(
-          objectType: DayActivity.self,
-          predicates: predicates,
-          sorts: loadActivitiesSorts
+          DayActivity.self,
+          predicates: { predicates },
+          sorts: { sorts },
+          fetchLimit: configuration.fetchLimit
         )
       },
       saveDayActivity: { dayActivity in
@@ -88,14 +92,38 @@ extension DayActivityRepository: DependencyKey {
       },
       removeDayActivityTask: { dayActivityTask in
         try await EntityHandler().delete(dayActivityTask)
+      },
+      share: { dayActivity in
+        var thumbnailImageData: Data?
+        var dependecies: [any Entity] = []
+        if let iconId = dayActivity.iconId,
+           let icon = try await EntityHandler().fetch(Icon.self, identifier: iconId as CVarArg) {
+          thumbnailImageData = icon.data
+          dependecies.append(icon)
+        }
+        let taskIconsIds = dayActivity.dayActivityTasks.compactMap(\.iconId)
+        for taskIconId in taskIconsIds {
+          guard let icon = try await EntityHandler().fetch(Icon.self, identifier: taskIconId as CVarArg) else { continue }
+          dependecies.append(icon)
+        }
+        dependecies.append(contentsOf: dayActivity.tags)
+        dependecies.append(contentsOf: dayActivity.tags.map(\.rgbColor))
+        dependecies.append(contentsOf: dayActivity.labels)
+        dependecies.append(contentsOf: dayActivity.labels.map(\.rgbColor))
+        let share = try await EntityHandler().share(
+          dayActivity,
+          dependecies: dependecies,
+          title: dayActivity.name,
+          thumbnailImageData: thumbnailImageData
+        )
+        Task { @MainActor in
+          ShareViewWrapper.shared.presentCloudSharingController(share: share)
+        }
+        return share
+      },
+      accept: { invitation in
+        try await EntityHandler().accept(invitation: invitation)
       }
     )
-  }
-}
-
-private extension DayActivityRepository {
-  @SortBuilder
-  static var loadActivitiesSorts: [NSSortDescriptor] {
-    NSSortDescriptor(key: "name", ascending: true)
   }
 }

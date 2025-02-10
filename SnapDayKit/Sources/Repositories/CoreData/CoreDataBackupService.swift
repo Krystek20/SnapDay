@@ -91,7 +91,7 @@ final class CoreDataBackupService {
 }
 
 extension FileManager {
-  var storeURL: URL {
+  var storeUrl: URL {
     get throws {
       guard let groupURL = containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroup) else {
         throw CoreDataStackError.securityApplicationDirectoryNotExist
@@ -162,36 +162,5 @@ extension FileManager {
     case (false, false):
       throw CoreDataStackError.backupNotExist
     }
-  }
-}
-
-extension FileManager {
-  func folderSize(at folderURL: URL) -> Int64? {
-    let keys: [URLResourceKey] = [.isRegularFileKey, .fileSizeKey]
-    let options: FileManager.DirectoryEnumerationOptions = [.skipsHiddenFiles]
-
-    guard let enumerator = self.enumerator(at: folderURL, includingPropertiesForKeys: keys, options: options) else {
-      return nil
-    }
-
-    var totalSize: Int64 = 0
-    var abc = Int.zero
-
-    for case let fileURL as URL in enumerator {
-      do {
-        abc += 1
-        let resourceValues = try fileURL.resourceValues(forKeys: Set(keys))
-        if resourceValues.isRegularFile ?? false {
-          let size = Int64(resourceValues.fileSize ?? 0)
-          totalSize += size
-          print("Plik: \(abc) size: \(size) at path: \(fileURL.path())")
-        }
-      } catch {
-        print("Error retrieving resource values for URL \(fileURL): \(error.localizedDescription)")
-        return nil
-      }
-    }
-
-    return totalSize
   }
 }

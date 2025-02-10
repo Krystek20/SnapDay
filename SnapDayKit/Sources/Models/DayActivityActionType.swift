@@ -13,6 +13,7 @@ public enum DayActivityActionType: Equatable {
     case reorder(ReorderAction)
     case markImportant
     case unmarkImportant
+    case share
   }
 
   public enum DayActivityTaskAction: Equatable {

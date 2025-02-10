@@ -5,17 +5,13 @@ import struct Repositories.Transactions
 
 public struct DayEditor {
   public var prepareDays: @Sendable (_ activities: [Activity], _ dateRange: ClosedRange<Date>) async throws -> [Day]
-  public var updateDays: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> Void
-  public var addActivity: @Sendable (_ activity: Activity, _ date: Date) async throws -> Void
-  public var addDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> Void
-  public var removeDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> Void
+  public var saveDayActivity: @Sendable (_ dayActivity: DayActivity) async throws -> Void
+  public var saveDayActivities: @Sendable (_ dayActivities: [DayActivity]) async throws -> Void
+  public var removeDayActivity: @Sendable (_ dayActivity: DayActivity) async throws -> Void
   public var updateDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> Void
   public var removeDayActivities: @Sendable (_ activity: Activity, _ fromDate: Date) async throws -> Void
-  public var updateDayActivity: @Sendable (_ dayActivity: DayActivity, _ date: Date) async throws -> Void
-  public var applyChanges: @Sendable (_ transactions: Transactions) async throws -> AppliedChanges
   public var moveDayActivity: @Sendable (_ dayActivity: DayActivity, _ toDate: Date) async throws -> Void
   public var copyDayActivity: @Sendable (_ dayActivity: DayActivity, _ dates: [Date]) async throws -> Void
-  public var saveDay: @Sendable (_ Day: Day) async throws -> Void
 }
 
 extension DependencyValues {
@@ -31,17 +27,14 @@ extension DayEditor: DependencyKey {
       prepareDays: { activities, dateRange in
         try await DayUpdater().prepareDays(for: activities, in: dateRange)
       },
-      updateDays: { activity, date in
-        try await DayUpdater().addActivity(activity, from: date)
+      saveDayActivity: { dayActivity in
+        try await DayUpdater().saveDayActivity(dayActivity)
       },
-      addActivity: { activity, date in
-        try await DayUpdater().addActivity(activity, to: date, createdByUser: true)
+      saveDayActivities: { dayActivities in
+        try await DayUpdater().saveDayActivities(dayActivities)
       },
-      addDayActivity: { dayActivity, date in
-        try await DayUpdater().addDayActivity(dayActivity, to: date)
-      },
-      removeDayActivity: { dayActivity, date in
-        try await DayUpdater().remove(dayActivity, date: date)
+      removeDayActivity: { dayActivity in
+        try await DayUpdater().removeDayActivity(dayActivity)
       },
       updateDayActivities: { activity, date in
         try await DayUpdater().updateDaysByUpdatedActivity(activity, from: date)
@@ -49,20 +42,11 @@ extension DayEditor: DependencyKey {
       removeDayActivities: { activity, date in
         try await DayUpdater().updateDaysByRemovedActivity(activity, from: date)
       },
-      updateDayActivity: { dayActivity, date in
-        try await DayUpdater().updateDayActivity(dayActivity, to: date)
-      },
-      applyChanges: { transactions in
-        try await DayUpdater().applyChanges(transactions)
-      },
       moveDayActivity: { dayActivity, toDate in
         try await DayUpdater().moveDayActivity(dayActivity, toDate: toDate)
       },
       copyDayActivity: { dayActivity, dates in
         try await DayUpdater().copyDayActivity(dayActivity, to: dates)
-      },
-      saveDay: { day in
-        try await DayUpdater().saveDay(day)
       }
     )
   }

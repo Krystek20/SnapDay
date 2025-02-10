@@ -13,7 +13,7 @@ public struct StreakProvider: TodayProvidable {
 
   // MARK: - Dependecies
 
-  @Dependency(\.dayRepository) private var dayRepository
+  @Dependency(\.dayActivityRepository) private var dayActivityRepository
 
   // MARK: - Initialization
 
@@ -22,32 +22,40 @@ public struct StreakProvider: TodayProvidable {
   // MARK: - Public
 
   public func streak(for activity: Activity) async throws -> Streak {
-    let configuration = FetchConfiguration(
-      predicates: {
-        NSPredicate(format: "SUBQUERY(activities, $activity, $activity.activity.name == %@).@count > 0", activity.name)
+    let configuration = ActivitiesFetchConfiguration(
+      predicates: [
+        NSPredicate(format: "templateIdentifier == %@", activity.id as CVarArg),
         NSPredicate(format: "date <= %@", today as NSDate)
-      },
-      sorts: {
+      ],
+      sorts: [
         NSSortDescriptor(key: "date", ascending: false)
-      }
+      ]
     )
-    var days = try await dayRepository.loadDays(configuration)
-    let firstDay = days.removeFirst()
+    let past = Date.distantPast
+    let dayActivities = try await dayActivityRepository.activities(configuration)
+    var groupedByDate = Dictionary(grouping: dayActivities, by: { $0.date ?? past })
+      .filter { $0.key != past }
+      .sorted { $0.key < $1.key }
+    var currentStreak = Int.zero
 
-    var currentStreak = firstDay.activities.first(where: { $0.activity?.id == activity.id && $0.isDone }) != nil ? 1 : Int.zero
-    var maxStreak = firstDay.activities.first(where: { $0.activity?.id == activity.id && $0.isDone }) != nil ? 1 : Int.zero
+    if !groupedByDate.isEmpty {
+      let firstGroup = groupedByDate.removeFirst()
+      currentStreak = firstGroup.value.first(where: { $0.activity?.id == activity.id && $0.isDone }) != nil ? 1 : Int.zero
+    }
+
+    var maxStreak = currentStreak
     var lastStreak: Int?
-    for day in days {
-      if day.activities.first(where: { $0.activity?.id == activity.id && $0.isDone }) != nil {
+    for group in groupedByDate {
+      if group.value.first(where: { $0.activity?.id == activity.id && $0.isDone }) != nil {
         currentStreak += 1
-      } else {
-        if lastStreak == nil { lastStreak = currentStreak }
+      } else if group.key < today {
+        lastStreak = currentStreak
         maxStreak = max(maxStreak, currentStreak)
         currentStreak = .zero
       }
     }
     maxStreak = max(maxStreak, currentStreak)
-    if lastStreak == nil { lastStreak = currentStreak }
+    lastStreak = currentStreak
 
     var next = Int.zero
     if let lastStreak {

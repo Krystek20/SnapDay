@@ -8,9 +8,11 @@ extension DayActivity: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public init?(object: DayActivityEntity?) throws {
+  public var title: String { name }
+  public var iconIdentifier: UUID? { iconId }
+  public init?(object: DayActivityEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let object else { return nil }
-    try self.init(object)
+    try self.init(object, context: context, isShared: isShared)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> DayActivityEntity {

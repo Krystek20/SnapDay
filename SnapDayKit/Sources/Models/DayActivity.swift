@@ -5,10 +5,10 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   // MARK: - Properties
 
   public let id: UUID
-  public var dayId: UUID
+  public var date: Date?
   public var activity: Activity?
   public var name: String
-  public var icon: Icon?
+  public var iconId: UUID?
   public var dueDate: Date?
   public var doneDate: Date?
   public var duration: Int
@@ -20,15 +20,16 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   public var reminderDate: Date?
   public var important: Bool
   public var position: Int
+  public var isShared: Bool
 
   // MARK: - Initialization
 
   public init(
     id: UUID,
-    dayId: UUID,
+    date: Date?,
     activity: Activity? = nil,
     name: String = "",
-    icon: Icon? = nil,
+    iconId: UUID? = nil,
     dueDate: Date? = nil,
     doneDate: Date? = nil,
     duration: Int = .zero,
@@ -39,13 +40,14 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     dayActivityTasks: [DayActivityTask] = [],
     reminderDate: Date? = nil,
     important: Bool = false,
-    position: Int = -1
+    position: Int = -1,
+    isShared: Bool = false
   ) {
     self.id = id
-    self.dayId = dayId
+    self.date = date
     self.activity = activity
     self.name = name
-    self.icon = icon
+    self.iconId = iconId
     self.dueDate = dueDate
     self.doneDate = doneDate
     self.duration = duration
@@ -57,6 +59,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     self.reminderDate = reminderDate
     self.important = important
     self.position = position
+    self.isShared = isShared
   }
 }
 

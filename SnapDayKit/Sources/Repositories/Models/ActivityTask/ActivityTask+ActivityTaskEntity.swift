@@ -8,11 +8,12 @@ extension ActivityTask {
           let name = entity.name else {
       throw EntityError.attributeNil()
     }
+
     self.init(
       id: identifier,
       activityId: activityId,
       name: name,
-      icon: try entity.icon.map(Icon.init),
+      iconId: entity.iconIdentifier,
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
       defaultReminderDate: entity.defaultReminderDate,
       defaultPosition: Int(entity.defaultPosition)

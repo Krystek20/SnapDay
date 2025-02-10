@@ -8,7 +8,7 @@ extension ActivityTask: Entity {
     ActivityTaskEntity.fetchRequest()
   }
 
-  public init?(object: ActivityTaskEntity?) throws {
+  public init?(object: ActivityTaskEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let object else { return nil }
     try self.init(object)
   }
@@ -19,7 +19,7 @@ extension ActivityTask: Entity {
       fetchRequest: ActivityTask.fetchRequest,
       context: context
     )
-    try activityTaskEntity.setup(by: self, context: context)
+    try activityTaskEntity.setup(by: self)
     return activityTaskEntity
   }
 }

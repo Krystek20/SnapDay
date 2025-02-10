@@ -19,17 +19,27 @@ extension ActivityLabelRepository: DependencyKey {
   public static var liveValue: ActivityLabelRepository {
     ActivityLabelRepository(
       saveLabel: { label in
+        try await EntityHandler().save(label.rgbColor)
         try await EntityHandler().save(label)
       },
       deleteLabel: { label in
         try await EntityHandler().delete(label)
       },
-      loadLabels: { activityId, excludedTags in
-        try await EntityHandler().fetch(
-          objectType: ActivityLabel.self,
-          predicates: loadLabelsPredicate(activityId: activityId, excludedTags),
-          sorts: loadLabelsSorts
+      loadLabels: { activityId, excludedLabels in
+        let activity = try await EntityHandler().fetch(Activity.self, identifier: activityId as CVarArg)
+        guard let activity else { return [] }
+
+        let labels = try await EntityHandler().fetch(
+          ActivityLabel.self,
+          predicates: {
+            NSPredicate(format: "NOT (name IN %@)", excludedLabels.map(\.name))
+          },
+          sorts: {
+            NSSortDescriptor(key: "name", ascending: true)
+          }
         )
+
+        return labels.filter(activity.labels.contains)
       }
     )
   }
@@ -40,20 +50,5 @@ extension ActivityLabelRepository: DependencyKey {
       deleteLabel: { _ in },
       loadLabels: { _,_ in [] }
     )
-  }
-}
-
-// MARK: - Helpers
-
-private extension ActivityLabelRepository {
-  @PredicateBuilder
-  static func loadLabelsPredicate(activityId: UUID, _ excludedLabels: [ActivityLabel]) -> [NSPredicate] {
-    let excludedLabelsNames = excludedLabels.map(\.name)
-    NSPredicate(format: "activity.identifier == %@ AND NOT (name IN %@)", activityId as CVarArg, excludedLabelsNames)
-  }
-
-  @SortBuilder
-  static var loadLabelsSorts: [NSSortDescriptor] {
-    NSSortDescriptor(key: "name", ascending: true)
   }
 }

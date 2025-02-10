@@ -9,10 +9,12 @@ import Utilities
 struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
 
   private let dayProvider = DayProvider()
+  private let iconProvider = IconProvider()
 
   func placeholder(in context: Context) -> DayEntry {
     DayEntry(
       day: nil,
+      icons: [],
       date: Date(),
       configuration: ActivityListAppIntent()
     )
@@ -21,6 +23,7 @@ struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
   func snapshot(for configuration: ActivityListAppIntent, in context: Context) async -> DayEntry {
     DayEntry(
       day: nil,
+      icons: [],
       date: Date(),
       configuration: configuration
     )
@@ -30,9 +33,12 @@ struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
     var entries = [DayEntry]()
     let reloadPolicy: TimelineReloadPolicy
     do {
+      let day = try await dayProvider.day(today)
+      let icons = await iconProvider.getIcons(ids: day.iconIds)
       entries.append(
         DayEntry(
-          day: try await dayProvider.day(today), 
+          day: day,
+          icons: icons,
           date: today,
           configuration: configuration
         )
@@ -49,6 +55,7 @@ struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
 @available(iOSApplicationExtension 17.0, *)
 struct DayEntry: TimelineEntry {
   let day: Day?
+  let icons: [Icon]
   let date: Date
   let configuration: ActivityListAppIntent
 }
@@ -62,6 +69,7 @@ struct ActivityListWidgetEntryView : View {
       store: Store(
         initialState: WidgetActivityListFeature.State(
           day: entry.day,
+          icons: entry.icons,
           hideCompleted: entry.configuration.hideCompleted
         ),
         reducer: { WidgetActivityListFeature() }

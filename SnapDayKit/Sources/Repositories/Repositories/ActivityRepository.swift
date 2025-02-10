@@ -33,14 +33,16 @@ extension ActivityRepository: DependencyKey {
           NSPredicate(format: "name == %@", name)
         }
         return try await EntityHandler().fetch(
-          objectType: Activity.self,
-          predicates: [predicate]
+          Activity.self,
+          predicates: { predicate }
         )
       },
       loadActivities: {
         try await EntityHandler().fetch(
-          objectType: Activity.self,
-          sorts: loadActivitiesSorts
+          Activity.self,
+          sorts: {
+            NSSortDescriptor(key: "name", ascending: true)
+          }
         )
       },
       saveActivity: { activity in
@@ -56,14 +58,5 @@ extension ActivityRepository: DependencyKey {
         try await EntityHandler().delete(activityTask)
       }
     )
-  }
-}
-
-// MARK: - Helpers
-
-private extension ActivityRepository {
-  @SortBuilder
-  static var loadActivitiesSorts: [NSSortDescriptor] {
-    NSSortDescriptor(key: "name", ascending: true)
   }
 }

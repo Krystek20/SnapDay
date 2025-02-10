@@ -3,7 +3,7 @@ import Foundation
 public struct TimePeriodActivity: Identifiable, Equatable {
 
   public enum HeaderItemType: Equatable {
-    case icon(Icon?)
+    case icon(UUID?)
     case color(RGBColor)
   }
 

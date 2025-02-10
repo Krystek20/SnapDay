@@ -1,40 +1,47 @@
 import Foundation
+import CoreData.NSManagedObjectContext
 import Models
 
 extension DayActivity {
-  init(_ entity: DayActivityEntity) throws {
+  init(_ entity: DayActivityEntity, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let identifier = entity.identifier,
-          let dayId = entity.day?.identifier,
-          let tags = entity.tags?.allObjects as? [TagEntity],
-          let labels = entity.labels?.allObjects as? [ActivityLabelEntity],
           let dayActivityTasks = entity.dayActivityTasks?.allObjects as? [DayActivityTaskEntity] else {
       let message = """
+        let objectID = \(String(describing: entity.objectID)),
         let identifier = \(String(describing: entity.identifier)),
-        let dayId = \(String(describing: entity.day?.identifier)),
-        let tags = \(String(describing: entity.tags?.allObjects as? [TagEntity])),
-        let labels = \(String(describing: entity.labels?.allObjects as? [ActivityLabelEntity])),
         let dayActivityTasks = \(String(describing: entity.dayActivityTasks?.allObjects as? [DayActivityTaskEntity]))
       """
       throw EntityError.attributeNil(message: message)
     }
+
+    let activity = try? Activity(
+      identifier: entity.templateIdentifier?.uuidString,
+      context: context,
+      isShared: isShared
+    )
+    let tags: [Tag] = (try? entity.mapArray(for: "tagsIdentifiers", context: context, isShared: isShared)) ?? []
+    let labels: [ActivityLabel] = (try? entity.mapArray(for: "labelsIdentifiers", context: context, isShared: isShared)) ?? []
+
     self.init(
       id: identifier,
-      dayId: dayId,
-      activity: try entity.activity.map(Activity.init),
+      date: entity.date,
+      activity: activity,
       name: entity.name ?? "",
-      icon: try entity.icon.map(Icon.init),
+      iconId: entity.iconIdentifier,
       dueDate: entity.dueDate,
       doneDate: entity.doneDate,
       duration: Int(entity.duration),
       overview: entity.overview,
       isGeneratedAutomatically: entity.isGeneratedAutomatically,
-      tags: try tags.map(Tag.init),
-      labels: try labels.map(ActivityLabel.init),
-      dayActivityTasks: try dayActivityTasks.map(DayActivityTask.init)
-        .sorted(by: { $0.name < $1.name }),
+      tags: tags,
+      labels: labels,
+      dayActivityTasks: try dayActivityTasks.map {
+        try DayActivityTask($0, context: context, isShared: isShared)
+      }.sorted(by: { $0.name < $1.name }),
       reminderDate: entity.reminderDate,
       important: entity.important,
-      position: Int(entity.position)
+      position: Int(entity.position),
+      isShared: isShared(entity)
     )
   }
 }

@@ -55,9 +55,9 @@ public struct SelectableListView: View {
       ForEach(store.itemsToDisplay) { item in
         HStack(spacing: 5.0) {
           switch item.leftItem {
-          case .icon(let icon):
+          case .icon(let iconId):
             ActivityImageView(
-              data: icon?.data,
+              type: .iconId(iconId),
               size: 30.0,
               cornerRadius: 15.0
             )

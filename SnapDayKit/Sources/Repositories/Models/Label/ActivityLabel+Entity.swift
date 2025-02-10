@@ -8,9 +8,9 @@ extension ActivityLabel: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public init?(object: ActivityLabelEntity?) throws {
+  public init?(object: ActivityLabelEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let object else { return nil }
-    try self.init(object)
+    try self.init(object, context: context, isShared: isShared)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> ActivityLabelEntity {
@@ -19,7 +19,7 @@ extension ActivityLabel: Entity {
       fetchRequest: ActivityLabel.fetchRequest,
       context: context
     )
-    try activityLabelEntity.setup(by: self, context: context)
+    activityLabelEntity.setup(by: self)
     return activityLabelEntity
   }
 }

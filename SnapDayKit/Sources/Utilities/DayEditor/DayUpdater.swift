@@ -2,22 +2,17 @@ import Foundation
 import Dependencies
 import Models
 import Repositories
+import CoreData.NSManagedObjectID
 
 @globalActor actor DayActor {
   static let shared = DayActor()
 }
 
 @DayActor
-final class DayUpdater {
-
-  enum DayUpdaterError: Error {
-    case canNotCreateRange
-    case canNotLoadDay(Date)
-  }
+final class DayUpdater: TodayProvidable {
 
   // MARK: - Dependecies
 
-  @Dependency(\.dayRepository) private var dayRepository
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.utcCalendar) private var utcCalendar
   @Dependency(\.calendar) private var calendar
@@ -26,112 +21,144 @@ final class DayUpdater {
   // MARK: - Properties
 
   private let activityDatesCreator = ActivityDatesCreator()
+  private let iCloudStore =  NSUbiquitousKeyValueStore.default
+  private let dateActivitiesGeneratedKey = "dateActivitiesGeneratedKey"
+
+  private var generatedDates: [String] {
+    guard let generatedDates = iCloudStore.object(forKey: dateActivitiesGeneratedKey) as? [String] else {
+      return []
+    }
+    return generatedDates
+  }
 
   // MARK: - Public
 
-  /// it creates days if not exists and adds activities to them, days are saved to database
   func prepareDays(for activities: [Activity], in dateRange: ClosedRange<Date>) async throws -> [Day] {
-    let configuration = FetchConfiguration { NSPredicate(dateRange: dateRange) }
-    let existingDays = try await dayRepository.loadDays(configuration)
-    let groupedDays = Dictionary(grouping: existingDays, by: \.date)
-    let neededDates = dates(in: dateRange)
-    let activitiesWithDates = try createDates(for: activities, dateRange: dateRange)
     var days: [Day] = []
-    var daysToRemove: [Day] = []
-    var daysToSave: [Day] = []
-    var dayActivitiesToRemove: [DayActivity] = []
-    for neededDate in neededDates {
-      if let groupedDay = groupedDays[neededDate] {
-        switch groupedDay.count {
-        case .zero:
-          let newDay = createPlannedDay(
-            dayId: uuid(),
-            date: neededDate,
-            activitiesWithDates: activitiesWithDates
-          )
-          days.append(newDay)
-          daysToSave.append(newDay)
-        case 1:
-          days.append(groupedDay[0])
-        default:
-          let deduplicatedDays = deduplicatedDays(groupedDay)
-          daysToSave.append(deduplicatedDays.winner)
-          daysToRemove.append(contentsOf: deduplicatedDays.daysToRemove)
-          dayActivitiesToRemove.append(contentsOf: deduplicatedDays.dayActivitiesToRemove)
-        }
-      } else {
-        let newDay = createPlannedDay(
-          dayId: uuid(),
-          date: neededDate,
-          activitiesWithDates: activitiesWithDates
-        )
-        days.append(newDay)
-        daysToSave.append(newDay)
+    for date in dates(in: dateRange) {
+      var dayActivities = try await dayActivityRepository.activities(
+        ActivitiesFetchConfiguration(range: date...date)
+      )
+      if date >= today, !isDayActivitiesGenerated(date: date) {
+        let activitiesWithDates = try createActivitiesWithDates(for: activities, dateRange: dateRange)
+        dayActivities += try await createDayActivities(date: date, activitiesWithDates: activitiesWithDates)
+        setDateActivitiesGenerated(date: date)
       }
+      dayActivities = try await removeDeduplicatedDayActivitiesByDate(dayActivities)
+      let day = Day(id: uuid(), date: date, activities: dayActivities)
+      days.append(day)
     }
-    try await removeDays(daysToRemove)
-    try await saveDays(daysToSave)
-    try await removeDayActivities(dayActivitiesToRemove)
     return days
   }
 
-  func applyChanges(_ transactions: Transactions) async throws -> AppliedChanges {
-    var dates = Set<Date>()
-    for inserted in transactions.insertedObjectIDs where inserted.key == Day.entityName {
-      for insertedDay in inserted.value {
-        guard let object: Day = try dayRepository.object(objectID: insertedDay) else { continue }
-        dates.insert(object.date)
-        let configuration = FetchConfiguration { NSPredicate(dateRange: object.date...object.date) }
-        let days = try await dayRepository.loadDays(configuration)
-        guard days.count > 1 else { continue }
-        let deduplicatedDays = deduplicatedDays(days)
-        try await removeDays(deduplicatedDays.daysToRemove)
-        try await saveDay(deduplicatedDays.winner)
-        try await removeDayActivities(deduplicatedDays.dayActivitiesToRemove)
-      }
-    }
-
-    for updated in transactions.updatedObjectIDs where updated.key == Day.entityName {
-      for updatedDay in updated.value {
-        guard let object: Day = try dayRepository.object(objectID: updatedDay) else { continue }
-        dates.insert(object.date)
-        let configuration = FetchConfiguration { NSPredicate(dateRange: object.date...object.date) }
-        let days = try await dayRepository.loadDays(configuration)
-        guard days.count > 1 else { continue }
-        let deduplicatedDays = deduplicatedDays(days)
-        try await removeDays(deduplicatedDays.daysToRemove)
-        try await saveDay(deduplicatedDays.winner)
-        try await removeDayActivities(deduplicatedDays.dayActivitiesToRemove)
-      }
-    }
-
-    for updated in transactions.updatedObjectIDs where updated.key == DayActivity.entityName {
-      for updatedDayActivity in updated.value {
-        guard let dayActivity: DayActivity = try dayRepository.object(objectID: updatedDayActivity),
-              let day: Day = try await dayRepository.object(identifier: dayActivity.dayId) else { continue }
-        dates.insert(day.date)
-      }
-    }
-
-    for updated in transactions.updatedObjectIDs where updated.key == DayActivityTask.entityName {
-      for updatedDayActivityTask in updated.value {
-        guard let dayActivityTask: DayActivityTask = try dayRepository.object(objectID: updatedDayActivityTask),
-              let dayActivity: DayActivity = try await dayRepository.object(identifier: dayActivityTask.dayActivityId),
-              let day: Day = try await dayRepository.object(identifier: dayActivity.dayId) else { continue }
-        dates.insert(day.date)
-      }
-    }
-
-    return AppliedChanges(dates: Array(dates))
+  func updateDaysByUpdatedActivity(_ activity: Activity, from date: Date) async throws {
+    let dateRange = try await daysWithRemoved(activity, from: date)
+    try await updateDays(by: activity, in: dateRange)
   }
 
-  private func deduplicatedDays(_ days: [Day]) -> (
-    winner: Day,
-    daysToRemove: [Day],
-    dayActivitiesToRemove: [DayActivity]
-  ) {
-    var days = days
-    var activitiesToMerge = days.flatMap { $0.activities }
+  func updateDaysByRemovedActivity(_ activity: Activity, from date: Date) async throws {
+    try await daysWithRemoved(activity, from: date)
+  }
+
+  func saveDayActivity(_ dayActivity: DayActivity) async throws {
+    try await dayActivityRepository.saveDayActivity(dayActivity)
+  }
+
+  func saveDayActivities(_ dayActivities: [DayActivity]) async throws {
+    for dayActivity in dayActivities {
+      try await saveDayActivity(dayActivity)
+    }
+  }
+
+  func removeDayActivity(_ dayActivity: DayActivity) async throws {
+    try await dayActivityRepository.removeDayActivity(dayActivity)
+  }
+
+  func moveDayActivity(_ dayActivity: DayActivity, toDate: Date) async throws {
+    var dayActivity = dayActivity
+    dayActivity.date = toDate
+    dayActivity.isGeneratedAutomatically = false
+    dayActivity.reminderDate = calendar.reminderDate(from: dayActivity.reminderDate, dayDate: toDate)
+    try await saveDayActivity(dayActivity)
+  }
+
+  func copyDayActivity(_ dayActivity: DayActivity, to dates: [Date]) async throws {
+    for date in dates {
+      let activity = copy(dayActivity: dayActivity, date: date)
+      try await saveDayActivity(activity)
+    }
+  }
+
+  // MARK: - Private
+
+  private func isDayActivitiesGenerated(date: Date) -> Bool {
+    generatedDates.contains(date.formatted(.iso8601))
+  }
+
+  private func setDateActivitiesGenerated(date: Date) {
+    var generatedDates = generatedDates
+    generatedDates.append(date.formatted(.iso8601))
+    iCloudStore.set(generatedDates, forKey: dateActivitiesGeneratedKey)
+    iCloudStore.synchronize()
+  }
+
+  private func dates(in dateRange: ClosedRange<Date>) -> [Date] {
+    var current = dateRange.lowerBound
+    var dates: [Date] = []
+    while current <= dateRange.upperBound {
+      dates.append(current)
+      current = utcCalendar.date(byAdding: .day, value: 1, to: current) ?? current
+    }
+    return dates
+  }
+
+  private func createActivitiesWithDates(for activities: [Activity], dateRange: ClosedRange<Date>) throws -> [Activity: [Date]] {
+    try activities.reduce(into: [Activity: [Date]]()) { result, activity in
+      guard let alignedDateRange = prepareAlignedDateRange(for: activity, dateRange: dateRange) else { return }
+      let dates = try activityDatesCreator.createsDates(for: activity, dateRange: alignedDateRange)
+      result[activity] = dates
+    }
+  }
+
+  private func prepareAlignedDateRange(for activity: Activity, dateRange: ClosedRange<Date>) -> ClosedRange<Date>? {
+    guard let startDate = activity.startDate else { return dateRange }
+    let lowerBound = max(dateRange.lowerBound, startDate)
+    guard lowerBound <= dateRange.upperBound else { return nil }
+    return lowerBound...dateRange.upperBound
+  }
+
+  private func dateRangeToUpdate(date: Date) async throws -> ClosedRange<Date> {
+    let maxDate = generatedDates
+      .compactMap(ISO8601DateFormatter().date)
+      .sorted(by: { $0 > $1 })
+      .first ?? date
+    return date...maxDate
+  }
+
+  @discardableResult
+  private func daysWithRemoved(_ activity: Activity, from date: Date) async throws -> ClosedRange<Date> {
+    let dateRange = try await dateRangeToUpdate(date: date)
+    let dayActivities = try await dayActivityRepository.activities(
+      ActivitiesFetchConfiguration(range: dateRange)
+    )
+    try await removeDayActivities(with: activity, dayActivities: dayActivities, date: date)
+    return dateRange
+  }
+
+  private func removeDayActivities(with activity: Activity, dayActivities: [DayActivity], date: Date) async throws {
+    for dayActivity in dayActivities {
+      guard let dayActivityDate = dayActivity.date else { continue }
+      let isTodayOrLess = dayActivityDate <= date
+      guard dayActivity.activity?.id == activity.id &&
+            dayActivity.isGeneratedAutomatically &&
+            (!isTodayOrLess || !dayActivity.isDone) else { continue }
+      try await removeDayActivity(dayActivity)
+    }
+  }
+
+  @discardableResult
+  private func removeDeduplicatedDayActivitiesByDate(_ dayActivities: [DayActivity]) async throws -> [DayActivity] {
+    var activitiesToMerge = dayActivities
 
     let groupedGeneratedActivities = activitiesToMerge
       .reduce(into: [String: [DayActivity]](), { result, dayActivity in
@@ -152,303 +179,61 @@ final class DayUpdater {
       activitiesToRemove.contains(where: { $0.id == dayActivity.id })
     })
 
-    var winner = days.removeFirst()
-    winner.activities = activitiesToMerge
-
-    return (
-      winner: winner,
-      daysToRemove: days,
-      dayActivitiesToRemove: activitiesToRemove
-    )
+    try await saveDayActivities(activitiesToMerge)
+    try await removeDayActivities(activitiesToRemove)
+    return activitiesToMerge
   }
 
-  func dates(in dateRange: ClosedRange<Date>) -> [Date] {
-    var current = dateRange.lowerBound
-    var dates: [Date] = []
-    while current <= dateRange.upperBound {
-      dates.append(current)
-      current = utcCalendar.date(byAdding: .day, value: 1, to: current) ?? current
-    }
-    return dates
-  }
-
-  /// it fetches existing days and adds activity to them
-  func addActivity(_ activity: Activity, from date: Date) async throws {
-    let dateRange = try await dateRangeToUpdate(date: date)
-    let dates = try activityDatesCreator.createsDates(for: activity, dateRange: dateRange)
-    let configuration = FetchConfiguration { NSPredicate(dateRange: dateRange) }
-    let days = try await dayRepository.loadDays(configuration)
-    let updatedDays: [Day] = dates.compactMap { date in
-      guard var day = days.first(where: { $0.date == date }) else { return nil }
-      day.activities.append(
-        createDayActivity(
-          dayId: day.id,
-          activity: activity,
-          dayDate: day.date
-        )
-      )
-      return day
-    }
-    try await saveDays(updatedDays)
-  }
-
-  /// it fetches existing day and adds activity generated by user to it
-  func addActivity(_ activity: Activity, to date: Date, createdByUser: Bool = false) async throws {
-    var day = try await loadDay(date)
-    day.activities.append(
-      createDayActivity(
-        dayId: day.id,
-        activity: activity,
-        createdByUser: true,
-        dayDate: day.date
-      )
-    )
-    try await saveDay(day)
-  }
-
-  /// it removes day activity from existing day
-  func remove(_ dayActivity: DayActivity, date: Date) async throws {
-    var day = try await loadDay(date)
-    day.activities.removeAll(where: { $0.id == dayActivity.id })
-    try await saveDay(day)
-    try await removeDayActivity(dayActivity)
-  }
-
-  /// it removes existing day activities from days starting from provided date if this day is not current day and activity in this day is not done
-  func updateDaysByUpdatedActivity(_ activity: Activity, from date: Date) async throws {
-    var (days, dateRange) = try await daysWithRemoved(activity, from: date)
-    try updateDays(by: activity, in: dateRange, days: &days)
-    try await saveDays(days)
-  }
-
-  func updateDaysByRemovedActivity(_ activity: Activity, from date: Date) async throws {
-    let (days, _) = try await daysWithRemoved(activity, from: date)
-    try await saveDays(days)
-  }
-
-  private func daysWithRemoved(_ activity: Activity, from date: Date) async throws -> ([Day], ClosedRange<Date>) {
-    let dateRange = try await dateRangeToUpdate(date: date)
-    let configuration = FetchConfiguration { NSPredicate(dateRange: dateRange) }
-    var days = try await dayRepository.loadDays(configuration)
-    try await removeDayActivities(with: activity, in: &days, startDate: date)
-    return (days, dateRange)
-  }
-
-  func addDayActivity(_ dayActivity: DayActivity, to date: Date) async throws {
-    guard var day = try await dayRepository.loadDay(date) else { return }
-    day.activities.append(dayActivity)
-    try await saveDay(day)
-  }
-
-  func updateDayActivity(_ dayActivity: DayActivity, to date: Date) async throws {
-    guard var day = try await dayRepository.loadDay(date),
-          let index = day.activities.firstIndex(where: { $0.id == dayActivity.id }) else { return }
-    let tasksToRemove = day.activities[index].dayActivityTasks.filter {
-      !dayActivity.dayActivityTasks.contains($0)
-    }
-    for task in tasksToRemove {
-      try await removeDayActivityTask(task)
-    }
-    day.activities[index] = dayActivity
-    try await saveDay(day)
-  }
-
-  func moveDayActivity(_ dayActivity: DayActivity, toDate: Date) async throws {
-    var fromDay: Day? = try await dayRepository.object(identifier: dayActivity.dayId)
-    fromDay?.activities.removeAll(where: { $0.id == dayActivity.id })
-    if let fromDay {
-      try await dayRepository.saveDay(fromDay)
-    }
-    var dayActivity = dayActivity
-    dayActivity.isGeneratedAutomatically = false
-    dayActivity.reminderDate = calendar.reminderDate(from: dayActivity.reminderDate, dayDate: toDate)
-
-    if var day = try await dayRepository.loadDay(toDate) {
-      dayActivity.dayId = day.id
-      day.activities.append(dayActivity)
-      try await dayRepository.saveDay(day)
-    } else {
-      let dayId = uuid()
-      dayActivity.dayId = dayId
-      let day = Day(
-        id: dayId,
-        date: toDate,
-        activities: [dayActivity]
-      )
-      try await dayRepository.saveDay(day)
-    }
-  }
-
-  func copyDayActivity(_ dayActivity: DayActivity, to dates: [Date]) async throws {
-    for date in dates {
-      if var day = try await dayRepository.loadDay(date) {
-        day.activities.append(
-          copy(dayActivity: dayActivity, dayId: day.id, dayDate: date)
-        )
-        try await dayRepository.saveDay(day)
-      } else {
-        let dayId = uuid()
-        let dayActivity = copy(dayActivity: dayActivity, dayId: dayId, dayDate: date)
-        let day = Day(
-          id: dayId,
-          date: date,
-          activities: [dayActivity]
-        )
-        try await dayRepository.saveDay(day)
-      }
-    }
-  }
-
-  func saveDay(_ day: Day) async throws {
-    try await dayRepository.saveDay(day)
-  }
-
-  // MARK: - Private
-
-  private func createDates(for activities: [Activity], dateRange: ClosedRange<Date>) throws -> [Activity: [Date]] {
-    try activities.reduce(into: [Activity: [Date]]()) { result, activity in
-      guard let alignedDateRange = prepareAlignedDateRange(for: activity, dateRange: dateRange) else { return }
-      let dates = try activityDatesCreator.createsDates(for: activity, dateRange: alignedDateRange)
-      result[activity] = dates
-    }
-  }
-
-  private func prepareAlignedDateRange(for activity: Activity, dateRange: ClosedRange<Date>) -> ClosedRange<Date>? {
-    guard let startDate = activity.startDate else { return dateRange }
-    let lowerBound = max(dateRange.lowerBound, startDate)
-    guard lowerBound <= dateRange.upperBound else { return nil }
-    return lowerBound...dateRange.upperBound
-  }
-
-  private func getDay(for date: Date, days: [Day], activitiesWithDates: [Activity: [Date]]) throws -> Day? {
-    guard let day = days.first(where: { $0.date == date }) else {
-      return createPlannedDay(
-        dayId: uuid(),
-        date: date,
-        activitiesWithDates: activitiesWithDates
-      )
-    }
-    return day
-  }
-
-  private func dateRangeToUpdate(date: Date) async throws -> ClosedRange<Date> {
-    let days = try await dayRepository.loadAllDays()
-    guard let max = days.max(by: { $0.date < $1.date }) else {
-      throw DayUpdaterError.canNotCreateRange
-    }
-    return date...max.date
-  }
-
-  private func loadDay(_ date: Date) async throws -> Day {
-    guard let day = try await dayRepository.loadDay(date) else {
-      throw DayUpdaterError.canNotLoadDay(date)
-    }
-    return day
-  }
-
-  private func removeDayActivities(with activity: Activity, in days: inout [Day], startDate: Date) async throws {
-    for index in days.indices {
-      let isToday = days[index].date == startDate
-      let activitiesToRemove = days[index].activities.filter {
-        $0.activity?.id == activity.id
-        && $0.isGeneratedAutomatically
-        && (!isToday || !$0.isDone)
-      }
-      try await removeDayActivities(activitiesToRemove)
-
-      days[index].activities.removeAll(where: {
-        activitiesToRemove.contains($0)
-      })
-    }
-  }
-
-  func updateDays(by activity: Activity, in dateRange: ClosedRange<Date>, days: inout [Day]) throws {
+  private func updateDays(by activity: Activity, in dateRange: ClosedRange<Date>) async throws {
     guard let alignedDateRange = prepareAlignedDateRange(for: activity, dateRange: dateRange) else { return }
-    let dates = try activityDatesCreator.createsDates(for: activity, dateRange: alignedDateRange)
-    days.indices.forEach { index in
-      guard dates.contains(days[index].date),
-            !days[index].activities.contains(where: { $0.activity?.id == activity.id }) else { return }
-      days[index].activities.append(
-        createDayActivity(
-          dayId: days[index].id,
-          activity: activity,
-          dayDate: days[index].date
-        )
-      )
+    let activityDates = try activityDatesCreator.createsDates(for: activity, dateRange: alignedDateRange)
+    for date in dates(in: dateRange) {
+      guard activityDates.contains(date) else { continue }
+      let predicates = [
+        NSPredicate(format: "templateIdentifier == %@", activity.id as CVarArg),
+        NSPredicate(format: "date == %@", date as CVarArg)
+      ]
+      let configuration = ActivitiesFetchConfiguration(predicates: predicates)
+      let dayActivities = try await dayActivityRepository.activities(configuration)
+      guard dayActivities.isEmpty else { continue }
+      try await createAndSaveDayActivity(activity: activity, date: date)
     }
   }
 
-  private func createPlannedDay(
-    dayId: UUID,
-    date: Date,
-    activitiesWithDates: [Activity: [Date]]
-  ) -> Day {
-    Day(
-      id: dayId,
-      date: date,
-      activities: createDayActivities(
-        dayId: dayId,
-        date: date,
-        activitiesWithDates: activitiesWithDates
-      )
-    )
-  }
-
-  private func createDayActivities(
-    dayId: UUID,
-    date: Date,
-    activitiesWithDates: [Activity: [Date]]
-  ) -> [DayActivity] {
-    activitiesWithDates.compactMap { activity, days in
-      guard days.contains(date) else { return nil }
-      return createDayActivity(
-        dayId: dayId,
-        activity: activity,
-        dayDate: date
-      )
+  private func createDayActivities(date: Date, activitiesWithDates: [Activity: [Date]]) async throws -> [DayActivity] {
+    var dayActivities: [DayActivity] = []
+    for (activity, daysDate) in activitiesWithDates {
+      guard daysDate.contains(date) else { continue }
+      let dayActivity = try await createAndSaveDayActivity(activity: activity, date: date)
+      dayActivities.append(dayActivity)
     }
+    return dayActivities
   }
 
-  private func createDayActivity(
-    dayId: UUID,
+  @discardableResult
+  private func createAndSaveDayActivity(
     activity: Activity,
     createdByUser: Bool = false,
-    dayDate: Date
-  ) -> DayActivity {
-    DayActivity.create(
+    date: Date
+  ) async throws -> DayActivity {
+    let dayActivity = DayActivity.create(
       from: activity,
       uuid: { uuid() },
       calendar: { calendar },
-      dayId: dayId,
-      dayDate: dayDate,
+      date: date,
       createdByUser: createdByUser
     )
+    try await saveDayActivity(dayActivity)
+    return dayActivity
   }
 
-  private func copy(dayActivity: DayActivity, dayId: UUID, dayDate: Date) -> DayActivity {
+  private func copy(dayActivity: DayActivity, date: Date) -> DayActivity {
     DayActivity.copy(
       from: dayActivity,
       uuid: { uuid() },
-      dayId: dayId,
-      dayDate: dayDate,
+      date: date,
       calendar: { calendar }
     )
-  }
-
-  private func saveDays(_ days: [Day]) async throws {
-    for day in days {
-      try await saveDay(day)
-    }
-  }
-
-  private func removeDays(_ days: [Day]) async throws {
-    for day in days {
-      try await removeDay(day)
-    }
-  }
-
-  private func removeDay(_ day: Day) async throws {
-    try await dayRepository.removeDay(day)
   }
 
   private func removeDayActivities(_ dayActivities: [DayActivity]) async throws {
@@ -457,17 +242,7 @@ final class DayUpdater {
     }
   }
 
-  private func removeDayActivity(_ dayActivity: DayActivity) async throws {
-    try await dayActivityRepository.removeDayActivity(dayActivity)
-  }
-
   private func removeDayActivityTask(_ dayActivityTask: DayActivityTask) async throws {
     try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
-  }
-}
-
-private extension NSPredicate {
-  convenience init(dateRange: ClosedRange<Date>) {
-    self.init(format: "date >= %@ AND date <= %@", dateRange.lowerBound as CVarArg, dateRange.upperBound as CVarArg)
   }
 }

@@ -102,7 +102,7 @@ public struct ActivityListView: View {
       VStack(spacing: .zero) {
         HStack(spacing: 5.0) {
           ActivityImageView(
-            data: nil,
+            type: .placeholder,
             size: 30.0,
             cornerRadius: 15.0
           )

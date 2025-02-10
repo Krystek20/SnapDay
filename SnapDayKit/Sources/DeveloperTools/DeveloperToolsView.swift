@@ -26,8 +26,8 @@ public struct DeveloperToolsView: View {
         VStack(alignment: .leading, spacing: 10.0) {
           Text("Helpers")
             .font(.title2)
-          Button("Custom Action") {
-            store.send(.view(.customButtonTapped))
+          Button("Clean NSUbiquitousKeyValueStore") {
+            store.send(.view(.cleanKeyValueStore))
           }
           Text("Send notifications")
             .font(.title2)

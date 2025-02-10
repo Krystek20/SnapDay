@@ -84,7 +84,7 @@ struct DayActivityTaskRowView: View {
   private var dayActivityTaskView: some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
-        data: dayActivityTask.icon?.data,
+        type: .iconId(dayActivityTask.iconId),
         size: 30.0,
         cornerRadius: 15.0
       )

@@ -2,9 +2,12 @@ import SwiftUI
 import Application
 import Utilities
 import ComposableArchitecture
+import Repositories
 
 @main
 struct SnapDayApp: App {
+
+  @UIApplicationDelegateAdaptor var appDelegate: AppDelegate
 
   private let store = Store(
     initialState: ApplicationFeature.State(),
@@ -19,7 +22,7 @@ struct SnapDayApp: App {
         }
     }
     .backgroundTask(.appRefresh(BackgroundUpdaterIdentifier.createDay.rawValue)) { @MainActor in
-        store.send(.createDayBackgroundTaskCalled)
+      store.send(.createDayBackgroundTaskCalled)
     }
   }
 }

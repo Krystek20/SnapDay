@@ -11,7 +11,7 @@ public extension Activity {
     self.init(
       id: id,
       name: dayActivity.name,
-      icon: dayActivity.icon,
+      iconId: dayActivity.iconId,
       tags: dayActivity.tags,
       defaultDuration: dayActivity.duration,
       startDate: startDate,
@@ -38,7 +38,7 @@ public extension ActivityTask {
       id: uuid(),
       activityId: activityId,
       name: dayActivity.name,
-      icon: dayActivity.icon,
+      iconId: dayActivity.iconId,
       defaultDuration: dayActivity.duration,
       defaultReminderDate: dayActivity.reminderDate,
       defaultPosition: dayActivity.position

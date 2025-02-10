@@ -6,7 +6,7 @@ extension Activity {
     Item(
       id: id.uuidString,
       name: name,
-      leftItem: .icon(icon)
+      leftItem: .icon(iconId)
     )
   }
 }

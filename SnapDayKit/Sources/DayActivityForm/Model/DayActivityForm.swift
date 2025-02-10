@@ -5,7 +5,6 @@ import Models
 public enum DayActivityFormId: String {
   case parentId
   case templateId
-  case dayId
 }
 
 public enum DayActivityFormType: Equatable {
@@ -24,8 +23,9 @@ public enum DayActivityFormMenuAction: Equatable {
 public struct DayActivityForm: Equatable, Identifiable, DurationProtocol, FrequencyProtocol {
   public var id: UUID
   public var ids: [DayActivityFormId: UUID]
+  public var date: Date?
   public var completed: Bool
-  public var icon: Icon?
+  public var iconId: UUID?
   public var name: String
   public var tags: [Tag]
   public var frequency: ActivityFrequency?
@@ -176,14 +176,13 @@ extension DayActivityForm {
 extension DayActivityForm {
   public init(dayActivity: DayActivity, showCompleted: Bool) {
     self.id = dayActivity.id
-    self.ids = [
-      .dayId: dayActivity.dayId
-    ]
+    self.ids = [:]
+    self.date = dayActivity.date
     if let templateId = dayActivity.activity?.id {
       ids[.templateId] = templateId
     }
     self.completed = dayActivity.doneDate != nil
-    self.icon = dayActivity.icon
+    self.iconId = dayActivity.iconId
     self.name = dayActivity.name
     self.tags = dayActivity.tags
     self.duration = dayActivity.duration
@@ -208,14 +207,14 @@ extension DayActivityForm {
 
 extension DayActivity {
   public init?(form: DayActivityForm) {
-    guard let dayId = form.ids[.dayId] else { return nil }
+    guard let dayDate = form.date else { return nil }
     @Dependency(\.date) var date
     self.init(
       id: form.id,
-      dayId: dayId,
+      date: dayDate,
       activity: nil,
       name: form.name,
-      icon: form.icon,
+      iconId: form.iconId,
       dueDate: form.dueDate,
       doneDate: form.completed ? date.now : nil,
       duration: form.duration,
@@ -232,7 +231,7 @@ extension DayActivity {
   public mutating func update(by form: DayActivityForm) {
     @Dependency(\.date) var date
     self.name = form.name
-    self.icon = form.icon
+    self.iconId = form.iconId
     if doneDate == nil && form.completed {
       doneDate = date.now
     } else if !form.completed {
@@ -259,7 +258,7 @@ extension DayActivityForm {
       ids[.templateId] = templateId
     }
     self.completed = dayActivityTask.doneDate != nil
-    self.icon = dayActivityTask.icon
+    self.iconId = dayActivityTask.iconId
     self.name = dayActivityTask.name
     self.tags = []
     self.duration = dayActivityTask.duration
@@ -284,7 +283,7 @@ extension DayActivityTask {
       dayActivityId: parentId,
       activityTask: nil,
       name: form.name,
-      icon: form.icon,
+      iconId: form.iconId,
       doneDate: form.completed ? date() : nil,
       duration: form.duration,
       overview: form.overview,
@@ -295,7 +294,7 @@ extension DayActivityTask {
   public mutating func update(by form: DayActivityForm) {
     @Dependency(\.date) var date
     name = form.name
-    icon = form.icon
+    iconId = form.iconId
     if doneDate == nil && form.completed {
       doneDate = date.now
     } else if !form.completed {
@@ -312,7 +311,7 @@ extension DayActivityForm {
     self.id = activity.id
     self.ids = [:]
     self.completed = false
-    self.icon = activity.icon
+    self.iconId = activity.iconId
     self.name = activity.name
     self.tags = activity.tags
     self.duration = activity.duration
@@ -337,7 +336,7 @@ extension Activity {
     self.init(
       id: form.id,
       name: form.name,
-      icon: form.icon,
+      iconId: form.iconId,
       tags: form.tags,
       frequency: form.frequency ?? .daily,
       isFrequentEnabled: form.isFrequentEnabled,
@@ -354,7 +353,7 @@ extension Activity {
   public mutating func update(by form: DayActivityForm, startDate: Date) {
     @Dependency(\.date) var date
     self.name = form.name
-    self.icon = form.icon
+    self.iconId = form.iconId
     self.tags = form.tags
     self.frequency = form.frequency ?? .daily
     self.isFrequentEnabled = form.isFrequentEnabled
@@ -378,7 +377,7 @@ extension DayActivityForm {
       .parentId: activityTask.activityId
     ]
     self.completed = false
-    self.icon = activityTask.icon
+    self.iconId = activityTask.iconId
     self.name = activityTask.name
     self.tags = []
     self.duration = activityTask.defaultDuration ?? .zero
@@ -401,7 +400,7 @@ extension ActivityTask {
       id: form.id,
       activityId: parentId,
       name: form.name,
-      icon: form.icon,
+      iconId: form.iconId,
       defaultDuration: form.duration,
       defaultReminderDate: form.reminderDate,
       defaultPosition: form.position
@@ -410,7 +409,7 @@ extension ActivityTask {
 
   public mutating func update(by form: DayActivityForm) {
     self.name = form.name
-    self.icon = form.icon
+    self.iconId = form.iconId
     self.defaultDuration = form.duration
     self.defaultReminderDate = form.reminderDate
   }
@@ -421,7 +420,7 @@ extension DayActivityForm {
     requriedFields.allSatisfy { requriedField in
       switch requriedField {
       case .completed: true
-      case .icon: icon != nil
+      case .icon: iconId != nil
       case .name: !name.isEmpty
       case .tags: !tags.isEmpty
       case .frequency: frequency != nil

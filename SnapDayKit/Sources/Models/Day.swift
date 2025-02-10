@@ -22,6 +22,15 @@ public struct Day: Identifiable, Equatable, Hashable {
 }
 
 extension Day {
+  public var iconIds: [UUID] {
+    activities.reduce(into: [UUID](), { result, next in
+      if let iconId = next.iconId {
+        result.append(iconId)
+      }
+      result += next.dayActivityTasks.compactMap(\.iconId)
+    })
+  }
+
   public var completedActivities: CompletedActivities {
     CompletedActivities(
       doneCount: completedCount,

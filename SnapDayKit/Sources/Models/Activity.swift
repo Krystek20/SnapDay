@@ -6,7 +6,7 @@ public struct Activity: Identifiable, Equatable, Hashable, Decodable {
 
   public let id: UUID
   public var name: String
-  public var icon: Icon?
+  public var iconId: UUID?
   public var tags: [Tag]
   public var frequency: ActivityFrequency
   public var isFrequentEnabled: Bool
@@ -23,7 +23,7 @@ public struct Activity: Identifiable, Equatable, Hashable, Decodable {
   public init(
     id: UUID,
     name: String = "",
-    icon: Icon? = nil,
+    iconId: UUID? = nil,
     tags: [Tag] = [],
     frequency: ActivityFrequency = .daily,
     isFrequentEnabled: Bool = false,
@@ -37,7 +37,7 @@ public struct Activity: Identifiable, Equatable, Hashable, Decodable {
   ) {
     self.id = id
     self.name = name
-    self.icon = icon
+    self.iconId = iconId
     self.tags = tags
     self.frequency = frequency
     self.isFrequentEnabled = isFrequentEnabled

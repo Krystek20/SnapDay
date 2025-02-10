@@ -8,9 +8,9 @@ extension Tag: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public init?(object: TagEntity?) throws {
+  public init?(object: TagEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
     guard let object else { return nil }
-    try self.init(object)
+    try self.init(object, context: context, isShared: isShared)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> TagEntity {
@@ -20,7 +20,7 @@ extension Tag: Entity {
       context: context
     )
     tagEntity.setup(by: self)
-    tagEntity.color = try rgbColor.managedObject(context)
+    tagEntity.colorIdentifier = rgbColor.id
     return tagEntity
   }
 }

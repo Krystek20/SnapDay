@@ -11,7 +11,6 @@ public struct DayProvider: TodayProvidable {
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dayEditor) private var dayEditor
   @Dependency(\.utcCalendar) private var calendar
-  @Dependency(\.dayRepository) private var dayRepository
 
   // MARK: - Initialization
 
@@ -27,8 +26,7 @@ public struct DayProvider: TodayProvidable {
       throw CanNotCreateDayError()
     }
     day.activities = day.activities.sorted(calendar: calendar)
-    try await dayRepository.saveDay(day)
-
+    try await dayEditor.saveDayActivities(day.activities)
     return day
   }
 
@@ -41,7 +39,7 @@ public struct DayProvider: TodayProvidable {
   private func moveDayActivitiesIfDueTime(date: Date) async throws {
     guard date == today else { return }
     let predicates = [
-      NSPredicate(format: "day.date < %@", date as NSDate),
+      NSPredicate(format: "date < %@", date as NSDate),
       NSPredicate(format: "dueDate >= %@", date as NSDate)
     ]
     let activities = try await dayActivityRepository.activities(

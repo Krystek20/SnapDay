@@ -32,12 +32,12 @@ public struct ActivitySummaryRow: View {
     }
   }
 
-  private var iconData: Data? {
+  private var iconIdentifier: UUID? {
     switch activityType {
     case .activity(let activity):
-      activity.icon?.data
+      activity.iconId
     case .dayActivity(let dayActivity):
-      dayActivity.icon?.data
+      dayActivity.iconId
     }
   }
 
@@ -62,7 +62,7 @@ public struct ActivitySummaryRow: View {
   public var body: some View {
     HStack(spacing: 5.0) {
       ActivityImageView(
-        data: iconData,
+        type: .iconId(iconIdentifier),
         size: 30.0,
         cornerRadius: 15.0
       )

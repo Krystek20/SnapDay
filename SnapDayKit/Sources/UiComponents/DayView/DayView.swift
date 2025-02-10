@@ -84,7 +84,7 @@ public struct DayView: View {
       VStack(spacing: .zero) {
         HStack(spacing: 5.0) {
           ActivityImageView(
-            data: nil,
+            type: .placeholder,
             size: 30.0,
             cornerRadius: 15.0
           )
@@ -121,7 +121,7 @@ public struct DayView: View {
       VStack(spacing: .zero) {
         HStack(spacing: 5.0) {
           ActivityImageView(
-            data: nil,
+            type: .placeholder,
             size: 30.0,
             cornerRadius: 15.0
           )
@@ -206,6 +206,7 @@ public struct DayView: View {
       }
       menuItem(for: .move, dayActivity: dayActivity)
       menuItem(for: .copy, dayActivity: dayActivity)
+      menuItem(for: .share, dayActivity: dayActivity)
       menuItem(for: .remove, dayActivity: dayActivity)
     } label: {
       Color.clear

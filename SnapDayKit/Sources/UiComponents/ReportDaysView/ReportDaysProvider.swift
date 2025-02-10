@@ -99,7 +99,7 @@ public struct ReportDaysProvider: TodayProvidable {
       $0.activity?.id == activity.id && (label == nil || $0.labels.contains { $0 == label })
     }
     let state = prepareDayState(date: day.date, activities: activities)
-    return .activity(state, activity.icon)
+    return .activity(state, activity.iconId)
   }
 
   private func prepareTagReportyActivity(

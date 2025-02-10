@@ -4,7 +4,7 @@ import Models
 public struct Item: Identifiable, Equatable {
 
   public enum LeftItem: Equatable {
-    case icon(Icon?)
+    case icon(UUID?)
     case color(RGBColor)
     case none
   }
