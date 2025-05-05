@@ -33,7 +33,7 @@ public struct RGBColor: Equatable, Hashable, Identifiable, Decodable {
 }
 
 public extension RGBColor {
-  func isLight(threshold: Double = 0.5) -> Bool {
+  func isLight(threshold: Double = 0.6) -> Bool {
     let luminance = 0.299 * red + 0.587 * green + 0.114 * blue
     return luminance > threshold
   }

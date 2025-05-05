@@ -13,12 +13,20 @@ public protocol ActivityType {
   var isFrequentEnabled: Bool { get }
   var important: Bool { get }
   var position: Int { get set }
-  var isShared: Bool { get }
+  var share: DayActivityShare? { get }
 }
 
 extension ActivityType {
   public var isDone: Bool {
     doneDate != nil
+  }
+
+  public var isShared: Bool {
+    share?.availableParticipants.filter(\.isShared).isEmpty == false
+  }
+
+  public var participants: [DayActivityParticipant] {
+    share?.participants ?? []
   }
 }
 
@@ -28,10 +36,13 @@ extension DayActivity: ActivityType {
 }
 
 extension DayActivityTask: ActivityType {
+  public var iconId: UUID? { nil }
   public var dueDate: Date? { nil }
   public var dueDaysCount: Int? { nil }
   public var isFrequentEnabled: Bool { false }
   public var important: Bool { false }
+  public var participants: [DayActivityParticipant] { [] }
+  public var share: DayActivityShare? { nil }
 }
 
 extension Activity: ActivityType {
@@ -44,7 +55,7 @@ extension Activity: ActivityType {
     get { -1 }
     set { }
   }
-  public var isShared: Bool { false }
+  public var share: DayActivityShare? { nil }
 }
 
 extension Array where Element: ActivityType {

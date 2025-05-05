@@ -56,7 +56,6 @@ struct StreakWidgetProvider: AppIntentTimelineProvider, TodayProvidable {
       reloadPolicy = .after(try tomorrow)
     } catch {
       reloadPolicy = .never
-      print(error.localizedDescription)
     }
     return Timeline(entries: entries, policy: reloadPolicy)
   }

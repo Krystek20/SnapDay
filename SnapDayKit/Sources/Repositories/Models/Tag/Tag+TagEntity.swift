@@ -3,9 +3,9 @@ import Models
 import CoreData.NSManagedObjectContext
 
 extension Tag {
-  init(_ entity: TagEntity, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
+  init(_ entity: TagEntity, context: NSManagedObjectContext) throws {
     guard let name = entity.name,
-          let color = try RGBColor(identifier: entity.colorIdentifier, context: context, isShared: isShared) else {
+          let color = try RGBColor(identifier: entity.colorIdentifier, context: context) else {
       throw EntityError.attributeNil()
     }
 

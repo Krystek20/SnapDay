@@ -30,6 +30,27 @@ public struct DayActivityRow: View {
     }
   }
 
+  private var trailingSpacing: Double {
+    switch size {
+    case .small:
+      5.0
+    case .medium:
+      10.0
+    }
+  }
+
+  private var padding: EdgeInsets {
+    switch size {
+    case .small:
+      return EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0)
+    case .medium:
+      guard activityItem.iconType != .empty else {
+        return EdgeInsets(top: 15.0, leading: 10.0, bottom: 15.0, trailing: 10.0)
+      }
+      return EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 10.0)
+    }
+  }
+
   public init(
     activityItem: DayActivityItem,
     size: Size = .medium,
@@ -57,15 +78,20 @@ public struct DayActivityRow: View {
         }
       }
       Spacer(minLength: 5.0)
-      HStack(spacing: 10.0) {
-        ForEach(activityItem.displayedIcons, content: dayActivityItem)
+      HStack(spacing: trailingSpacing) {
+        VStack(alignment: .trailing, spacing: 5.0) {
+          HStack(spacing: 5.0) {
+            ForEach(activityItem.displayedIcons, content: dayActivityItem)
+            HStack(spacing: -5.0) {
+              ForEach(activityItem.participants, content: participantItem)
+            }
+          }
+        }
         view(for: trailingIcon)
       }
       .padding(.trailing, 5.0)
     }
-    .padding(
-      EdgeInsets(top: 10.0, leading: 10.0, bottom: 10.0, trailing: 5.0)
-    )
+    .padding(padding)
   }
 
   private var titleView: some View {
@@ -88,7 +114,8 @@ public struct DayActivityRow: View {
   }
 
   private func dayActivityItem(icon: DayActivityItem.Icon) -> some View {
-    prepareIcon(icon.rawValue)
+    Image(systemName: icon.rawValue)
+      .iconable(color: Color.sectionText)
   }
 
   private func view(for trailingIcon: TrailingIcon) -> AnyView {
@@ -100,12 +127,11 @@ public struct DayActivityRow: View {
     }
   }
 
-  private func prepareIcon(_ name: String) -> some View {
-    Image(systemName: name)
-      .resizable()
-      .scaledToFit()
+  private func participantItem(_ participant: DayActivityItem.Participant) -> some View {
+    Text(participant.initials)
+      .font(.system(size: 15.0 / 2.0, weight: .bold))
+      .foregroundColor(participant.backgroundColor.isLight() ? .sectionText : .pureWhite)
       .frame(width: 15.0, height: 15.0)
-      .foregroundStyle(Color.sectionText)
-      .imageScale(.medium)
+      .background(Circle().fill(participant.backgroundColor.color))
   }
 }

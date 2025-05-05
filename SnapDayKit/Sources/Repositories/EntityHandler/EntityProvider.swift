@@ -28,9 +28,7 @@ public struct EntityHandler {
     objectID: NSManagedObjectID
   ) throws -> T? {
     let context = coreDataStack.backgroundContext
-    return try T(object: context.object(with: objectID) as? T.ManagedObject, context: context, isShared: { object in
-      coreDataStack.isShared(object: object)
-    })
+    return try T(object: context.object(with: objectID) as? T.ManagedObject, context: context)
   }
 
   public func delete(
@@ -68,9 +66,7 @@ public struct EntityHandler {
     return try await context.perform {
       try context.fetch(request)
         .compactMap {
-          try objectType.init(object: $0, context: context, isShared: { object in
-            coreDataStack.isShared(object: object)
-          })
+          try objectType.init(object: $0, context: context)
         }
     }
   }
@@ -101,9 +97,7 @@ public struct EntityHandler {
     request.fetchLimit = 1
     let context = coreDataStack.backgroundContext
     return try await context.perform {
-      try T(object: context.fetch(request).first, context: context, isShared: { object in
-        coreDataStack.isShared(object: object)
-      })
+      try T(object: context.fetch(request).first, context: context)
     }
   }
 
@@ -140,32 +134,5 @@ public struct EntityHandler {
       }
       try context.save()
     }
-  }
-
-  public func share(
-    _ entity: any Entity,
-    dependecies: [any Entity],
-    title: String,
-    thumbnailImageData: Data?
-  ) async throws -> Share {
-    let context = coreDataStack.backgroundContext
-    let managedObject = try entity.managedObject(context)
-    let dependeciesObjects = try dependecies.map {
-      try $0.managedObject(context)
-    }
-    do {
-      let share = try await coreDataStack.share(managedObject: managedObject, dependeciesObjects: dependeciesObjects)
-      await context.perform {
-        share.fill(with: title, thumbnailImageData: thumbnailImageData)
-      }
-      return share
-    } catch {
-      print("Error: \(error)")
-      throw error
-    }
-  }
-
-  public func accept(invitation: Invitation) async throws {
-    try await coreDataStack.accept(invitation: invitation)
   }
 }

@@ -6,14 +6,14 @@ public struct SectionView<Content: View, RightContent: View>: View {
   // MARK: - Properties
 
   private let label: any View
-  @ViewBuilder private let rightContent: () -> RightContent?
+  @ViewBuilder private let rightContent: () -> RightContent
   @ViewBuilder private let content: () -> Content
 
   // MARK: - Initialization
 
   public init(
     name: String,
-    @ViewBuilder rightContent: @escaping () -> RightContent?,
+    @ViewBuilder rightContent: @escaping () -> RightContent = { EmptyView() },
     @ViewBuilder content: @escaping () -> Content
   ) {
     self.label = Text(name.uppercased())
@@ -36,12 +36,13 @@ public struct SectionView<Content: View, RightContent: View>: View {
   // MARK: - Views
 
   public var body: some View {
-    VStack(alignment: .center, spacing: 5.0) {
+    VStack(alignment: .leading, spacing: 5.0) {
       HStack(alignment: .center) {
         AnyView(label)
           .padding(.leading, 5.0)
-        Spacer()
-        if let rightContent = rightContent() {
+        let rightContent = rightContent()
+        if rightContent is EmptyView == false {
+          Spacer()
           rightContent
             .padding(.trailing, 5.0)
         }

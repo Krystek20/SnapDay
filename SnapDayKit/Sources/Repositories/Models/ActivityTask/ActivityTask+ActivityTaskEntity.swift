@@ -13,7 +13,6 @@ extension ActivityTask {
       id: identifier,
       activityId: activityId,
       name: name,
-      iconId: entity.iconIdentifier,
       defaultDuration: entity.isDefaultDuration ? Int(entity.defaultDuration) : nil,
       defaultReminderDate: entity.defaultReminderDate,
       defaultPosition: Int(entity.defaultPosition)

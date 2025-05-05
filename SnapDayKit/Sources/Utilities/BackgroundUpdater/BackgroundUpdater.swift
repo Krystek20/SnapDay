@@ -8,6 +8,10 @@ public enum BackgroundUpdaterIdentifier: String {
 
 public final class BackgroundUpdater {
 
+  public enum BackgroundUpdaterError: Error {
+    case notRegistered
+  }
+
   // MARK: - Properties
 
   private let taskScheduler: BGTaskScheduler
@@ -22,11 +26,40 @@ public final class BackgroundUpdater {
 
   // MARK: - Public
 
+  public func registerBackgroundTask(launchHandler: @escaping () async throws -> Void) throws {
+    let isRegistered = taskScheduler.register(
+      forTaskWithIdentifier: BackgroundUpdaterIdentifier.createDay.rawValue,
+      using: nil,
+      launchHandler: { bgTask in
+        guard let bgTask = bgTask as? BGAppRefreshTask else {
+          return bgTask.setTaskCompleted(success: false)
+        }
+
+        let task = Task { [weak self] in
+          guard let self else { throw CancellationError() }
+          do {
+            try await scheduleCreatingDayBackgroundTask()
+            try await launchHandler()
+            bgTask.setTaskCompleted(success: !Task.isCancelled)
+          } catch {
+            bgTask.setTaskCompleted(success: false)
+          }
+        }
+
+        bgTask.expirationHandler = {
+          task.cancel()
+        }
+      }
+    )
+    guard isRegistered else { throw BackgroundUpdaterError.notRegistered }
+    Task {
+      try await scheduleCreatingDayBackgroundTask()
+    }
+  }
+
   public func scheduleCreatingDayBackgroundTask() async throws {
     let pendingTasks = await taskScheduler.pendingTaskRequests()
-    guard
-      !pendingTasks.contains(where: { $0.identifier == BackgroundUpdaterIdentifier.createDay.rawValue })
-    else { return }
+    guard !pendingTasks.contains(where: { $0.identifier == BackgroundUpdaterIdentifier.createDay.rawValue }) else { return }
     let request = BGAppRefreshTaskRequest(identifier: BackgroundUpdaterIdentifier.createDay.rawValue)
     request.earliestBeginDate = calendar.date(byAdding: .hour, value: 1, to: date.now)
     try taskScheduler.submit(request)

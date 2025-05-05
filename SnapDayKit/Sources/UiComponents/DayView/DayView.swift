@@ -120,11 +120,6 @@ public struct DayView: View {
     if showNewTaskForm {
       VStack(spacing: .zero) {
         HStack(spacing: 5.0) {
-          ActivityImageView(
-            type: .placeholder,
-            size: 30.0,
-            cornerRadius: 15.0
-          )
           TextField("", text: newForms.newActivityTaskBinding.name)
             .font(.system(size: 14.0, weight: .medium))
             .foregroundStyle(Color.sectionText)
@@ -139,7 +134,7 @@ public struct DayView: View {
             .foregroundStyle(Color.actionBlue)
           }
         }
-        .padding(.all, 10.0)
+        .padding(EdgeInsets(top: 15.0, leading: 10.0, bottom: 15.0, trailing: 10.0))
       }
       .onSubmit {
         newForms.newActivityAction(.dayActivityTask(.submitted))
@@ -154,10 +149,7 @@ public struct DayView: View {
       DayActivityRow(
         activityItem: DayActivityItem(activityType: dayActivity),
         trailingIcon: .customView(
-          TrailingIcon.moreIcon
-            .overlay {
-              dayActivityMenuView(dayActivity: dayActivity)
-            }
+          trailingView(for: dayActivity)
         )
       )
 
@@ -166,7 +158,7 @@ public struct DayView: View {
       }
 
       ForEach(tasks(for: dayActivity)) { activityTask in
-        menuActivityTaskView(activityTask)
+        menuActivityTaskView(activityTask, isInvitation: dayActivity.isInvitation)
           .padding(.leading, 10.0)
         divider(addPadding: dayActivity.dayActivityTasks.last?.id != activityTask.id)
       }
@@ -191,33 +183,106 @@ public struct DayView: View {
     )
   }
 
+  private func trailingView(for dayActivity: DayActivity) -> some View {
+    dayActivity.isInvitation
+    ? AnyView(invitation(for: dayActivity))
+    : AnyView(dayActivityMenu(for: dayActivity))
+  }
+
+  private func invitation(for dayActivity: DayActivity) -> some View {
+    HStack(spacing: 10.0) {
+      Button {
+        dayActivityAction(.dayActivity(.acceptInvitation, dayActivity))
+      } label: {
+        Image(systemName: "checkmark.circle.fill")
+          .iconable(color: Color.greenSuccess)
+      }
+      Button {
+        dayActivityAction(.dayActivity(.discardInvitation, dayActivity))
+      } label: {
+        Image(systemName: "xmark.circle.fill")
+          .iconable(color: Color.alertText)
+      }
+    }
+  }
+
+  private func dayActivityMenu(for dayActivity: DayActivity) -> some View {
+    TrailingIcon.moreIcon
+      .overlay {
+        dayActivityMenuView(dayActivity: dayActivity)
+      }
+  }
+
   private func dayActivityMenuView(dayActivity: DayActivity) -> some View {
     Menu {
       dayActivity.isDone
-      ? menuItem(for: .deselect, dayActivity: dayActivity)
-      : menuItem(for: .select, dayActivity: dayActivity)
-      menuItem(for: .edit, dayActivity: dayActivity)
-      menuItem(for: .addTask, dayActivity: dayActivity)
+      ? menuItem(for: .deselect, dayActivity: dayActivity, actionType: .tapped)
+      : menuItem(for: .select, dayActivity: dayActivity, actionType: .tapped)
+
+      menuItem(for: .edit, dayActivity: dayActivity, actionType: .edit)
+      menuItem(for: .addTask, dayActivity: dayActivity, actionType: .addActivityTask)
+
       dayActivity.important
-      ? menuItem(for: .unmarkImortant, dayActivity: dayActivity)
-      : menuItem(for: .markImportant, dayActivity: dayActivity)
+      ? menuItem(for: .imortantUnmark, dayActivity: dayActivity, actionType: .unmarkImportant)
+      : menuItem(for: .importantMark, dayActivity: dayActivity, actionType: .markImportant)
+
       if dayActivity.activity == nil {
-        menuItem(for: .save, dayActivity: dayActivity)
+        menuItem(for: .save, dayActivity: dayActivity, actionType: .save)
       }
-      menuItem(for: .move, dayActivity: dayActivity)
-      menuItem(for: .copy, dayActivity: dayActivity)
-      menuItem(for: .share, dayActivity: dayActivity)
-      menuItem(for: .remove, dayActivity: dayActivity)
+
+      menuItem(for: .move, dayActivity: dayActivity, actionType: .move)
+      menuItem(for: .copy, dayActivity: dayActivity, actionType: .copy)
+
+      if let share = dayActivity.share {
+        if share.isOwner {
+          collaborateMenuItem(participants: share.availableParticipants, dayActivity: dayActivity)
+        } else {
+          menuItem(for: .stopCollaboration, dayActivity: dayActivity, actionType: .stopCollaboration)
+        }
+      }
+
+      menuItem(for: .remove, dayActivity: dayActivity, actionType: .remove)
     } label: {
       Color.clear
         .frame(width: 30.0, height: 30.0)
     }
   }
 
-  private func menuItem(for menuItem: DayActivityMenuItem, dayActivity: DayActivity) -> some View {
+  private func collaborateMenuItem(participants: [DayActivityParticipant], dayActivity: DayActivity) -> some View {
+    Menu {
+      ForEach(participants) { participant in
+        Button(
+          action: {
+            participant.isShared
+            ? dayActivityAction(.dayActivity(.removeParticipant(participant), dayActivity))
+            : dayActivityAction(.dayActivity(.addParticipant(participant), dayActivity))
+          },
+          label: {
+            Text(participant.name)
+            participant.isShared
+            ? Image(systemName: "person.badge.minus")
+            : Image(systemName: "person.badge.plus")
+          }
+        )
+      }
+    } label: {
+      dayActivity.isShared
+      ? Text(DayActivityMenuItem.collaborateMarked.title)
+      : Text(DayActivityMenuItem.collaborateUnmarked.title)
+      dayActivity.isShared
+      ? Image(systemName: DayActivityMenuItem.collaborateMarked.imageName)
+      : Image(systemName: DayActivityMenuItem.collaborateUnmarked.imageName)
+    }
+  }
+
+  private func menuItem(
+    for menuItem: DayActivityMenuItem,
+    dayActivity: DayActivity,
+    actionType: DayActivityActionType.DayActivityAction
+  ) -> some View {
     Button(
       action: {
-        dayActivityAction(.dayActivity(menuItem.dayActivityAction, dayActivity))
+        dayActivityAction(.dayActivity(actionType, dayActivity))
       },
       label: {
         Text(menuItem.title)
@@ -269,9 +334,7 @@ public struct DayView: View {
         label: {
           HStack(spacing: 12.5) {
             icon
-              .resizable()
-              .foregroundStyle(Color.actionBlue)
-              .frame(width: 15.0, height: 15.0)
+              .iconable(color: Color.actionBlue)
               .padding(.leading, 2.5)
             Text(title)
               .font(.system(size: 14.0, weight: .medium))
@@ -284,10 +347,12 @@ public struct DayView: View {
     }
   }
 
-  private func menuActivityTaskView(_ dayActivityTask: DayActivityTask) -> some View {
+  private func menuActivityTaskView(_ dayActivityTask: DayActivityTask, isInvitation: Bool) -> some View {
     DayActivityRow(
-      activityItem: DayActivityItem(activityType: dayActivityTask),
-      trailingIcon: .customView(
+      activityItem: DayActivityItem(activityType: dayActivityTask, iconRules: .none),
+      trailingIcon: isInvitation
+      ? .none
+      : .customView(
         TrailingIcon.moreIcon
           .overlay {
             dayActivityTaskMenuView(dayActivityTask: dayActivityTask)

@@ -9,10 +9,6 @@ public enum TrailingIcon {
 extension TrailingIcon {
   public static var moreIcon: some View {
     Image(systemName: "ellipsis")
-      .resizable()
-      .scaledToFit()
-      .frame(width: 15.0, height: 15.0)
-      .foregroundStyle(Color.sectionText)
-      .imageScale(.medium)
+      .iconable(color: Color.sectionText)
   }
 }

@@ -32,13 +32,17 @@ private var packageDependencies: [Package.Dependency] {
 
 @TargetsBuilder
 private var targets: [Target] {
-  TargetParamenters(module: .application, dependencies: sceneDependecies + [.onboarding, .dashboard, .reports, .activityDetails, .developerTools])
-  TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker])
+  TargetParamenters(module: .application, dependencies: sceneDependecies + [
+    .onboarding, .dashboard, .reports, .activityDetails, .developerTools
+  ])
+  TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends])
   TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
   TargetParamenters(module: .reports, dependencies: sceneDependecies)
+  TargetParamenters(module: .friends, dependencies: sceneDependecies + [.contactList])
   TargetParamenters(module: .activityDetails, dependencies: sceneDependecies + [.selectableList])
+  TargetParamenters(module: .contactList, dependencies: sceneDependecies)
   TargetParamenters(module: .selectableList, dependencies: sceneDependecies)
   TargetParamenters(module: .eveningSummary, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityReminder, dependencies: sceneDependecies)
@@ -79,6 +83,8 @@ private enum Module: String {
   case emojiPicker
   case calendarPicker
   case reports
+  case friends
+  case contactList
   case activityDetails
   case selectableList
   case eveningSummary

@@ -21,10 +21,7 @@ public struct EveningSummaryFeature: TodayProvidable {
   // MARK: - Dependecies
 
   @Dependency(\.utcCalendar) private var calendar
-
-  // MARK: - Properties
-
-  private var dayProvider = DayProvider()
+  @Dependency(\.dayUpdater) private var dayUpdater
 
   // MARK: - State & Action
 
@@ -105,7 +102,7 @@ public struct EveningSummaryFeature: TodayProvidable {
     case .loadDay:
       return .run { [date = state.date] send in
         let dayDate = calendar.dayFormat(date)
-        let day = try await dayProvider.day(dayDate)
+        let day = try await dayUpdater.day(dayDate)
         await send(.internal(.setDay(day)))
       }
     case .setDay(let day):

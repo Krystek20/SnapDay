@@ -7,6 +7,7 @@ public final class DeveloperToolsLogger {
       case setup
       case setupInBackground
       case runInBackground
+      case error
     }
     case refresh(RefreshEvent)
 

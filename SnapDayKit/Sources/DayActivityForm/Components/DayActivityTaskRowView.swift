@@ -83,11 +83,6 @@ struct DayActivityTaskRowView: View {
 
   private var dayActivityTaskView: some View {
     HStack(spacing: 5.0) {
-      ActivityImageView(
-        type: .iconId(dayActivityTask.iconId),
-        size: 30.0,
-        cornerRadius: 15.0
-      )
       VStack(alignment: .leading, spacing: .zero) {
         Text(dayActivityTask.name)
           .font(.system(size: 14.0, weight: .medium))

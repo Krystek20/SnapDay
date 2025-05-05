@@ -80,7 +80,7 @@ public struct WidgetActivityListFeature: TodayProvidable {
             result.append(
               DayActivityItem(
                 activityType: dayActivity,
-                iconData: iconData
+                iconRules: .data(iconData)
               )
             )
           }
@@ -91,14 +91,9 @@ public struct WidgetActivityListFeature: TodayProvidable {
               guard !ignoreActivity && !ignoreTask else {
                 return nil
               }
-              var iconData: Data?
-              if let iconId = dayActivityTask.iconId,
-                  let icon = icons.first(where: { $0.id == iconId }) {
-                iconData = icon.data
-              }
               return DayActivityItem(
                 activityType: dayActivityTask,
-                iconData: iconData,
+                iconRules: .none,
                 parentId: dayActivity.id
               )
             }

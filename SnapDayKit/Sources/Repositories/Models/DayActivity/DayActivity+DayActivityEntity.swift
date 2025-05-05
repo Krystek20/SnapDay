@@ -3,7 +3,7 @@ import CoreData.NSManagedObjectContext
 import Models
 
 extension DayActivity {
-  init(_ entity: DayActivityEntity, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
+  init(_ entity: DayActivityEntity, context: NSManagedObjectContext) throws {
     guard let identifier = entity.identifier,
           let dayActivityTasks = entity.dayActivityTasks?.allObjects as? [DayActivityTaskEntity] else {
       let message = """
@@ -16,11 +16,10 @@ extension DayActivity {
 
     let activity = try? Activity(
       identifier: entity.templateIdentifier?.uuidString,
-      context: context,
-      isShared: isShared
+      context: context
     )
-    let tags: [Tag] = (try? entity.mapArray(for: "tagsIdentifiers", context: context, isShared: isShared)) ?? []
-    let labels: [ActivityLabel] = (try? entity.mapArray(for: "labelsIdentifiers", context: context, isShared: isShared)) ?? []
+    let tags: [Tag] = (try? entity.mapIdentifierArray(for: "tagsIdentifiers", context: context)) ?? []
+    let labels: [ActivityLabel] = (try? entity.mapIdentifierArray(for: "labelsIdentifiers", context: context)) ?? []
 
     self.init(
       id: identifier,
@@ -36,12 +35,12 @@ extension DayActivity {
       tags: tags,
       labels: labels,
       dayActivityTasks: try dayActivityTasks.map {
-        try DayActivityTask($0, context: context, isShared: isShared)
+        try DayActivityTask($0, context: context)
       }.sorted(by: { $0.name < $1.name }),
       reminderDate: entity.reminderDate,
       important: entity.important,
       position: Int(entity.position),
-      isShared: isShared(entity)
+      share: nil
     )
   }
 }

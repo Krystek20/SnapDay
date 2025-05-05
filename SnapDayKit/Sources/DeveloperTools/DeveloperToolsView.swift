@@ -60,6 +60,12 @@ public struct DeveloperToolsView: View {
           }
           Toggle("Background updated notification", isOn: $store.backgroundUpdatedNotificationEnabled)
             .font(.title2)
+          Text("Shares:")
+            .font(.title2)
+          ForEach(store.allShared, id: \.self) { share in
+            Text(share)
+              .font(.caption)
+          }
         }
         .maxFrame()
       }

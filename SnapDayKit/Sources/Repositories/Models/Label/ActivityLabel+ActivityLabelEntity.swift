@@ -3,9 +3,9 @@ import Models
 import CoreData.NSManagedObjectContext
 
 extension ActivityLabel {
-  init(_ entity: ActivityLabelEntity, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
+  init(_ entity: ActivityLabelEntity, context: NSManagedObjectContext) throws {
     guard let name = entity.name,
-          let color = try RGBColor(identifier: entity.colorIdentifier, context: context, isShared: isShared) else {
+          let color = try RGBColor(identifier: entity.colorIdentifier, context: context) else {
       throw EntityError.attributeNil()
     }
     self.init(

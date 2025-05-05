@@ -57,10 +57,11 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   private let userActionSubject = PassthroughSubject<Void, Never>()
 
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
-  @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.dayUpdater) private var dayUpdater
   @Dependency(\.calendar) private var calendar
   @Dependency(\.utcCalendar) private var utcCalendar
   @Dependency(\.date) private var date
+  @Dependency(\.cloudService) private var cloudService
 
   // MARK: - Initialization
 
@@ -138,6 +139,11 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
     guard isNotificationScheduled else { return }
     userNotificationCenter.removePendingNotificationRequests(withIdentifiers: [userNotification.identifier])
   }
+
+  public func handleRemoteNotification(_ cloudNotification: CloudNotification) async throws {
+    try await cloudService.handleNotification(cloudNotification)
+    userActionSubject.send()
+  }
 }
 
 extension UserNotificationCenterProvider {
@@ -146,8 +152,8 @@ extension UserNotificationCenterProvider {
       .filter { $0.content.categoryIdentifier == UserNotificationCategoryIdentifier.dayActivityReminder.rawValue }
     userNotificationCenter.removePendingNotificationRequests(withIdentifiers: pendingRequests.map(\.identifier))
 
-    let dayActivities = try await dayActivityRepository.activities(
-      ActivitiesFetchConfiguration(range: today...tomorrow, done: false)
+    let dayActivities = try await dayUpdater.dayActivities(
+      configuration: ActivitiesFetchConfiguration(range: today...tomorrow, done: false)
     )
 
     for dayActivity in dayActivities {
@@ -249,14 +255,14 @@ extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
       case .done:
         switch kind {
         case .activity:
-          guard var dayActivity = try await dayActivityRepository.activity(identifier) else { return }
+          guard var dayActivity = try await dayUpdater.dayActivity(identifier: identifier) else { return }
           dayActivity.doneDate = dayActivity.doneDate == nil ? date() : nil
-          try await dayActivityRepository.saveDayActivity(dayActivity)
+          try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
           userActionSubject.send()
         case .activityTask:
-          guard var dayActivityTask = try await dayActivityRepository.activityTask(identifier) else { return }
+          guard var dayActivityTask = try await dayUpdater.dayActivityTask(identifier: identifier) else { return }
           dayActivityTask.doneDate = dayActivityTask.doneDate == nil ? date() : nil
-          try await dayActivityRepository.saveDayActivityTask(dayActivityTask)
+          try await dayUpdater.saveDayActivityTask(dayActivityTask, syncSharable: true)
           userActionSubject.send()
         }
       case .remindInQuarter:
@@ -279,21 +285,19 @@ extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
     var notification: (any UserNotification)?
     switch kind {
     case .activity:
-      guard var dayActivity = try await dayActivityRepository.activity(identifier) else { return }
+      guard var dayActivity = try await dayUpdater.dayActivity(identifier: identifier) else { return }
       dayActivity.reminderDate = calendar.date(byAdding: .minute, value: minutes, to: date.now)
-      try await dayActivityRepository.saveDayActivity(dayActivity)
+      try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
       notification = DayActivityNotification(
         type: .activity(dayActivity),
         calendar: calendar,
         bodyTitle: bodyTitle
       )
     case .activityTask:
-      guard
-        var dayActivityTask = try await dayActivityRepository.activityTask(identifier),
-        let dayActivity = try await dayActivityRepository.activity(dayActivityTask.dayActivityId.uuidString)
-      else { return }
+      guard var dayActivityTask = try await dayUpdater.dayActivityTask(identifier: identifier),
+            let dayActivity = try await dayUpdater.dayActivity(identifier: dayActivityTask.dayActivityId.uuidString) else { return }
       dayActivityTask.reminderDate = calendar.date(byAdding: .minute, value: minutes, to: date.now)
-      try await dayActivityRepository.saveDayActivityTask(dayActivityTask)
+      try await dayUpdater.saveDayActivityTask(dayActivityTask, syncSharable: false)
       notification = DayActivityNotification(
         type: .activityTask(dayActivity, dayActivityTask),
         calendar: calendar,

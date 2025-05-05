@@ -13,7 +13,7 @@ public struct StreakProvider: TodayProvidable {
 
   // MARK: - Dependecies
 
-  @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.dayUpdater) private var dayUpdater
 
   // MARK: - Initialization
 
@@ -32,7 +32,7 @@ public struct StreakProvider: TodayProvidable {
       ]
     )
     let past = Date.distantPast
-    let dayActivities = try await dayActivityRepository.activities(configuration)
+    let dayActivities = try await dayUpdater.dayActivities(configuration: configuration)
     var groupedByDate = Dictionary(grouping: dayActivities, by: { $0.date ?? past })
       .filter { $0.key != past }
       .sorted { $0.key < $1.key }

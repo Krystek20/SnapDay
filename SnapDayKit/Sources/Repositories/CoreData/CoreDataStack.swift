@@ -4,20 +4,15 @@ import Dependencies
 import Common
 import CloudKit
 
-public final class CoreDataStack {
+final class CoreDataStack {
 
   enum CoreDataStackError: Error {
     case privatePersistentStoreNotExists
     case sharePersistentStoreNotExists
+    case canNotFindPersistentStore(id: CKRecord.ID)
   }
 
   // MARK: - Properties
-
-  func isShared(object: NSManagedObject?) -> Bool {
-    guard let object,
-          let shareSet = try? persistentContainer.fetchShares(matching: [object.objectID]) else { return false }
-    return !shareSet.isEmpty
-  }
 
   var backgroundContext: NSManagedObjectContext {
     let context = persistentContainer.newBackgroundContext()
@@ -96,17 +91,6 @@ public final class CoreDataStack {
       }
     }
 
-//    self.persistentContainer = persistentContainer
-//    DispatchQueue.main.async {
-//      do {
-//        print("\(#function): initializeCloudKitSchema")
-//        try persistentContainer.initializeCloudKitSchema(options: [])
-//      } catch {
-//        print("\(#function): initializeCloudKitSchema: \(error)")
-//      }
-//    }
-
-//    // TU
       self.persistentContainer = persistentContainer
       self.persistentContainer.viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
       self.persistentContainer.viewContext.transactionAuthor = TransactionAuthor.app()
@@ -120,15 +104,15 @@ public final class CoreDataStack {
 
       guard Bundle.main.isMainApp else { return }
 
-//      do {
-//        try coreDataBackupService.scheduleBackups(
-//          persistentContainer: persistentContainer,
-//          storeURL: storeUrl,
-//          description: description
-//        )
-//      } catch {
-//        print("Backup schedule failed: \(error)")
-//      }
+      do {
+        try coreDataBackupService.scheduleBackups(
+          persistentContainer: persistentContainer,
+          storeURL: storeUrl,
+          description: description
+        )
+      } catch {
+        print("Backup schedule failed: \(error)")
+      }
 
       Task {
         await remoteChangeObserver.startObservingRemoteChanges(
@@ -147,57 +131,54 @@ public final class CoreDataStack {
           backgroundContextProvider: { [weak self] in self?.backgroundContext }
         )
       }
-//     //  TU
   }
 
-  func fetchShares(in persistentStores: [NSPersistentStore]) throws -> [CKShare] {
-    var results = [CKShare]()
-    for persistentStore in persistentStores {
-      do {
-        let shares = try persistentContainer.fetchShares(in: persistentStore)
-        results += shares
-      } catch let error {
-        print("Failed to fetch shares in \(persistentStore).")
-        throw error
+  @discardableResult
+  func share(managedObjects: [NSManagedObject], to ckShare: CKShare) async throws -> (Set<NSManagedObjectID>, CKShare, CKContainer) {
+    try await persistentContainer.share(managedObjects, to: ckShare)
+  }
+
+  func fetchShare(matching managedObject: NSManagedObject) throws -> (share: CKShare?, container: CKContainer) {
+    let share = try persistentContainer.fetchShares(matching: [managedObject.objectID])[managedObject.objectID]
+    return (share, CKContainer(identifier: NSPersistentStoreDescription.containerIdentifier))
+  }
+
+  @discardableResult
+  func share(managedObject: NSManagedObject) async throws -> (Set<NSManagedObjectID>, CKShare, CKContainer) {
+    try await persistentContainer.share([managedObject], to: nil)
+  }
+
+  func fetchParticipants(matching lookupInfos: [CKUserIdentity.LookupInfo]) async throws -> [CKShare.Participant] {
+    try await persistentContainer.fetchParticipants(matching: lookupInfos, into: privatePersistentStore)
+  }
+
+  @discardableResult
+  func persistUpdatedShare(share: CKShare) async throws -> CKShare {
+    try await persistentContainer.persistUpdatedShare(share, in: privatePersistentStore)
+  }
+
+  @discardableResult
+  func purgeObjectsAndRecords(share: CKShare) async throws -> CKRecordZone.ID {
+    let persistentStore = try persistentStore(with: share.recordID)
+    return try await persistentContainer.purgeObjectsAndRecordsInZone(with: share.recordID.zoneID, in: persistentStore)
+  }
+
+  private func persistentStore(with shareRecordID: CKRecord.ID) throws -> NSPersistentStore? {
+    if let shares = try? persistentContainer.fetchShares(in: privatePersistentStore) {
+      let zoneIDs = shares.map { $0.recordID.zoneID }
+      if zoneIDs.contains(shareRecordID.zoneID) {
+        return try privatePersistentStore
       }
     }
-    return results
-  }
 
-  func share(managedObject: NSManagedObject, dependeciesObjects: [NSManagedObject]) async throws -> Share {
-    let startTime = Date()
-    var ckShare: CKShare
-    var ckContainer: CKContainer
-    if let share = try persistentContainer.fetchShares(matching: [managedObject.objectID])[managedObject.objectID] {
-      ckShare = share
-      ckContainer = CKContainer(identifier: NSPersistentStoreDescription.containerIdentifier)
-    } else {
-      let (_, share, container) = try await persistentContainer.share([managedObject], to: nil)
-      ckShare = share
-      ckContainer = container
+    if let shares = try? persistentContainer.fetchShares(in: sharedPersistentStore) {
+      let zoneIDs = shares.map { $0.recordID.zoneID }
+      if zoneIDs.contains(shareRecordID.zoneID) {
+        return try sharedPersistentStore
+      }
     }
 
-    let executionTime1 = Date().timeIntervalSince(startTime)
-    print("executionTime1: \(executionTime1) seconds")
-
-    if !dependeciesObjects.isEmpty {
-      let (_, share, container) = try await persistentContainer.share(dependeciesObjects, to: ckShare)
-      ckShare = share
-      ckContainer = container
-    }
-
-    let executionTime2 = Date().timeIntervalSince(startTime)
-    print("executionTime2: \(executionTime2) seconds")
-
-    let share = try await persistentContainer.persistUpdatedShare(ckShare, in: privatePersistentStore)
-
-    let executionTime3 = Date().timeIntervalSince(startTime)
-    print("executionTime3: \(executionTime3) seconds")
-
-    return Share(
-      ckShare: share,
-      container: ckContainer
-    )
+    throw CoreDataStackError.canNotFindPersistentStore(id: shareRecordID)
   }
 
   func accept(invitation: Invitation) async throws {
@@ -207,44 +188,10 @@ public final class CoreDataStack {
     let executionTime = endTime.timeIntervalSince(startTime)
     print("executionTime: \(executionTime) seconds")
     print(meta)
-//    guard invitation.cloudKitShareMetadata.containerIdentifier == NSPersistentStoreDescription.containerIdentifier else {
-//      print("Shared container identifier \(invitation.cloudKitShareMetadata.containerIdentifier) did not match known identifier.")
-//      return
-//    }
-//
-//    let container = CKContainer(identifier: NSPersistentStoreDescription.containerIdentifier)
-//    let operation = CKAcceptSharesOperation(shareMetadatas: [invitation.cloudKitShareMetadata])
-//
-//    debugPrint("Accepting CloudKit Share with metadata: \(invitation.cloudKitShareMetadata)")
-//
-//    operation.perShareResultBlock = { metadata, result in
-//      let rootRecordID = metadata.rootRecord?.recordID
-//
-//      switch result {
-//      case .failure(let error):
-//        debugPrint("Error accepting share with root record ID: \(rootRecordID), \(error)")
-//
-//      case .success:
-//        debugPrint("Accepted CloudKit share for root record ID: \(rootRecordID)")
-//      }
-//    }
-//
-//    operation.acceptSharesResultBlock = { result in
-//      if case .failure(let error) = result {
-//        debugPrint("Error accepting CloudKit Share: \(error)")
-//      }
-//    }
-//
-//    operation.qualityOfService = .utility
-//    container.add(operation)
-//
-//    guard let sharedPersistentStore else {
-//      print("sharedPersistentStore not loaded.")
-//      return
-//    }
+  }
 
-//    let meta = try await persistentContainer.acceptShareInvitations(from: [invitation.cloudKitShareMetadata], into: sharedPersistentStore)
-//    print(meta)
+  func recordID(for object: NSManagedObject) -> CKRecord.ID? {
+      persistentContainer.recordID(for: object.objectID)
   }
 }
 
@@ -258,11 +205,11 @@ extension DependencyValues {
 }
 
 extension CoreDataStack: DependencyKey {
-  public static var liveValue: CoreDataStack {
+  static var liveValue: CoreDataStack {
     CoreDataStack(name: "SnapDay")
   }
 
-  public static var previewValue: CoreDataStack {
+  static var previewValue: CoreDataStack {
     CoreDataStack(name: "SnapDay", inMemoryStore: true)
   }
 }

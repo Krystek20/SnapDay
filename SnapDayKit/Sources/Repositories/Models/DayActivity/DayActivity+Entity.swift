@@ -10,9 +10,9 @@ extension DayActivity: Entity {
 
   public var title: String { name }
   public var iconIdentifier: UUID? { iconId }
-  public init?(object: DayActivityEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
+  public init?(object: DayActivityEntity?, context: NSManagedObjectContext) throws {
     guard let object else { return nil }
-    try self.init(object, context: context, isShared: isShared)
+    try self.init(object, context: context)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> DayActivityEntity {

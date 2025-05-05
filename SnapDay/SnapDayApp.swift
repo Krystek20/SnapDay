@@ -21,8 +21,5 @@ struct SnapDayApp: App {
           store.send(.handleUrl(url))
         }
     }
-    .backgroundTask(.appRefresh(BackgroundUpdaterIdentifier.createDay.rawValue)) { @MainActor in
-      store.send(.createDayBackgroundTaskCalled)
-    }
   }
 }

@@ -1,11 +1,13 @@
 import SwiftUI
 import Resources
 import Utilities
+import Dependencies
 
 public enum ActivityImageType: Equatable {
   case iconId(UUID?)
   case data(Data)
   case placeholder
+  case empty
 }
 
 public struct ActivityImageView: View {
@@ -67,6 +69,8 @@ public struct ActivityImageView: View {
       }
     case .placeholder:
       AnyView(placeholder)
+    case .empty:
+      AnyView(EmptyView())
     }
   }
 
@@ -80,14 +84,10 @@ private struct LoadableImage: View {
 
   private let iconId: UUID
   @State private var image: Image?
-  private let iconProvider: IconProviderType
+  @Dependency(\.iconProvider) private var iconProvider
 
-  init(
-    iconId: UUID,
-    iconProvider: IconProviderType = IconProvider()
-  ) {
+  init(iconId: UUID) {
     self.iconId = iconId
-    self.iconProvider = iconProvider
   }
 
   var body: some View {

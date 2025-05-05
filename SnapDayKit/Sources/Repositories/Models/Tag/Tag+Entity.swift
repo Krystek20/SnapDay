@@ -8,9 +8,9 @@ extension Tag: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public init?(object: TagEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
+  public init?(object: TagEntity?, context: NSManagedObjectContext) throws {
     guard let object else { return nil }
-    try self.init(object, context: context, isShared: isShared)
+    try self.init(object, context: context)
   }
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> TagEntity {

@@ -3,7 +3,7 @@ import CoreData.NSManagedObjectContext
 import Models
 
 extension Activity {
-  init(_ entity: ActivityEntity, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
+  init(_ entity: ActivityEntity, context: NSManagedObjectContext) throws {
     guard let identifier = entity.identifier,
           let name = entity.name,
           let tasks = entity.activityTasks?.allObjects as? [ActivityTaskEntity] else {
@@ -14,8 +14,8 @@ extension Activity {
       frequency = try JSONDecoder().decode(ActivityFrequency.self, from: frequencyJson)
     }
 
-    let tags: [Tag] = try entity.mapArray(for: "tagsIdentifiers", context: context, isShared: isShared)
-    let labels: [ActivityLabel] = try entity.mapArray(for: "labelsIdentifiers", context: context, isShared: isShared)
+    let tags: [Tag] = try entity.mapIdentifierArray(for: "tagsIdentifiers", context: context)
+    let labels: [ActivityLabel] = try entity.mapIdentifierArray(for: "labelsIdentifiers", context: context)
 
     self.init(
       id: identifier,

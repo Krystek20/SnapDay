@@ -10,11 +10,9 @@ import TipKit
 @Reducer
 public struct ApplicationFeature: TodayProvidable {
 
-  @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
-  @Dependency(\.backgroundUpdater) private var backgroundUpdater
   @Dependency(\.deeplinkService) private var deeplinkService
-  private let dayProvider = DayProvider()
-  private let iconProvider: IconProviderType = IconProvider()
+  @Dependency(\.cloudService) private var cloudService
+  @Dependency(\.iconProvider) private var iconProvider
   private static let isOnboardingShownKey = "isOnboardingShown"
 
   // MARK: - State & Action
@@ -47,8 +45,8 @@ public struct ApplicationFeature: TodayProvidable {
 
   public enum Action: BindableAction, Equatable {
     case appeared
-    case createDayBackgroundTaskCalled
     case cleanIcons
+    case setupCloud
     case deviceShaked
     case handleUrl(URL)
     case setTab(Tab)
@@ -86,9 +84,7 @@ public struct ApplicationFeature: TodayProvidable {
 
   // MARK: - Initialization
 
-  public init() {
-    userNotificationCenterProvider.registerCategories()
-  }
+  public init() { }
 
   // MARK: - Body
 
@@ -116,10 +112,6 @@ public struct ApplicationFeature: TodayProvidable {
               try? Tips.configure()
             }
           },
-          .run { _ in
-            DeveloperToolsLogger.shared.append(.refresh(.setup))
-            try await backgroundUpdater.scheduleCreatingDayBackgroundTask()
-          },
           .run { send in
             for await deeplink in deeplinkService.deeplinkPublisher.values {
               switch deeplink {
@@ -132,22 +124,22 @@ public struct ApplicationFeature: TodayProvidable {
           },
           .run { send in
             for await _ in NotificationCenter.default.publisher(for: .snapDayCloudKitChanged).values {
+              await send(.setupCloud)
               await send(.cleanIcons)
             }
           }
         )
-      case .createDayBackgroundTaskCalled:
-        DeveloperToolsLogger.shared.append(.refresh(.runInBackground))
-        return .run { _ in
-          try await backgroundUpdater.scheduleCreatingDayBackgroundTask()
-          DeveloperToolsLogger.shared.append(.refresh(.setupInBackground))
-          _ = try await dayProvider.day(tomorrow)
-          try await userNotificationCenterProvider.reloadReminders()
-          try await userNotificationCenterProvider.sendDeveloperMessage("Next day set and reminders scheduled")
-        }
       case .cleanIcons:
         return .run { _ in
           await iconProvider.cleanIcons()
+        }
+      case .setupCloud:
+        return .run { _ in
+          do {
+            try await cloudService.initializeIfNeeded()
+          } catch {
+            print("Cannot setupCloud: \(error)")
+          }
         }
       case .deviceShaked:
         state.developerTools = DeveloperToolsFeature.State()

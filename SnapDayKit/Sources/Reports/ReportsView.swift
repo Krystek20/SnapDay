@@ -162,7 +162,6 @@ public struct ReportsView: View {
   private var tagsGridView: some View {
     SectionView(
       name: String(localized: "Tags", bundle: .module),
-      rightContent: { EmptyView() },
       content: {
         WithPerceptionTracking {
           ActivitySummaryGrid(
@@ -179,7 +178,6 @@ public struct ReportsView: View {
   private var activitiesGridView: some View {
     SectionView(
       name: String(localized: "Activities", bundle: .module),
-      rightContent: { EmptyView() },
       content: {
         WithPerceptionTracking {
           ActivitySummaryGrid(

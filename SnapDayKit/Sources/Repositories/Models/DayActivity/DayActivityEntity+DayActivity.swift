@@ -14,8 +14,10 @@ extension DayActivityEntity {
     templateIdentifier = dayActivity.activity?.id
     name = dayActivity.name
     iconIdentifier = dayActivity.iconId
-    tagsIdentifiers = try JSONEncoder().encode(dayActivity.tags.map(\.id)) as NSObject
-    labelsIdentifiers = try JSONEncoder().encode(dayActivity.labels.map(\.id)) as NSObject
+    let tagsIdentifiersData = try JSONEncoder().encode(dayActivity.tags.map(\.id))
+    tagsIdentifiers = String(data: tagsIdentifiersData, encoding: .utf8)
+    let labelsIdentifiersData = try JSONEncoder().encode(dayActivity.labels.map(\.id))
+    labelsIdentifiers = String(data: labelsIdentifiersData, encoding: .utf8)
     dayActivityTasks = Set(
       try dayActivity.dayActivityTasks.map { task in
         try task.managedObject(context)

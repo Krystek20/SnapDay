@@ -8,6 +8,8 @@ final class RemoteChangeObserver {
 
   private let notificationCenter: NotificationCenter
   private let userDefaults: UserDefaults
+  private let lock = Lock()
+  private let deduplicationIdentifier = "Deduplication"
 
   // MARK: - Initialization
 
@@ -186,6 +188,13 @@ final class RemoteChangeObserver {
       updateHistoryToken(storyUUID: storeUUID, newToken: newToken)
     }
 
+    let userInfo: [UserInfoKey: Any] = [
+      UserInfoKey.storeUUID: store.identifier as Any,
+      UserInfoKey.transactions: translationsInfo
+    ]
+
+    notificationCenter.post(name: .snapDayStoreDidChange, object: userInfo)
+
     try await deduplicate(
       translationsInfo.insertedObjectIDs,
       context: context,
@@ -210,95 +219,21 @@ final class RemoteChangeObserver {
   private func deduplicate(
     _ inserted: [String?: Set<NSManagedObjectID>],
     context: NSManagedObjectContext,
-    persistentContainer: PersistentContainer,
-    deduplicationAttempts: Int = 3
+    persistentContainer: PersistentContainer
   ) async throws {
-    let lockTimeInterval = 30.0
     print("[TEST_DEDUPLICATION] - START: \(inserted.count)")
 
-    let deduplicationIdentifier = "Deduplication"
-    guard try await !isLocked(for: deduplicationIdentifier, lockTimeInterval: lockTimeInterval) else {
-      print("[TEST_DEDUPLICATION] - isLocked - deduplicationAttempts: \(deduplicationAttempts)")
-      try await Task.sleep(for: .seconds(lockTimeInterval))
-      if deduplicationAttempts > 1 {
-        try await deduplicate(
-          inserted,
-          context: context,
-          persistentContainer: persistentContainer,
-          deduplicationAttempts: deduplicationAttempts - 1
-        )
-      }
-      return
-    }
-
-    try await createLock(for: deduplicationIdentifier)
-    print("[TEST_DEDUPLICATION] - Locked")
-
-    try await context.perform { [weak self] in
-      for managedObjectIds in inserted.values {
-        print("[TEST_DEDUPLICATION] - managedObjectIdsCount \(managedObjectIds.count)")
-        for managedObjectId in managedObjectIds {
-          self?.deduplicate(managedObjectId, context: context, persistentContainer: persistentContainer)
+    try await lock.perform(for: deduplicationIdentifier) {
+      try await context.perform { [weak self] in
+        for managedObjectIds in inserted.values {
+          print("[TEST_DEDUPLICATION] - managedObjectIdsCount \(managedObjectIds.count)")
+          for managedObjectId in managedObjectIds {
+            self?.deduplicate(managedObjectId, context: context, persistentContainer: persistentContainer)
+          }
         }
+        try context.save()
       }
-      try context.save()
-    }
-    print("[TEST_DEDUPLICATION] - Deduplicated")
-
-    try await removeLock(for: deduplicationIdentifier)
-    print("[TEST_DEDUPLICATION] - Remove Lock")
-  }
-
-  private func isLocked(for identifier: String, lockTimeInterval: TimeInterval) async throws -> Bool {
-    let database = CKContainer.default().privateCloudDatabase
-    let predicate = NSPredicate(format: "identifier == %@", identifier)
-    let query = CKQuery(recordType: "Lock", predicate: predicate)
-
-    do {
-      let result = try await database.fetch(withQuery: query)
-      guard let lock = result.matchResults.first else { return false }
-      switch lock.1 {
-      case .success(let record):
-        guard let timestamp = record["timestamp"] as? Date else { return false }
-        return Date().timeIntervalSince(timestamp) < lockTimeInterval
-      case .failure(let error):
-        print(error)
-        return false
-      }
-    } catch {
-      print(error)
-      return false
-    }
-  }
-
-  private func createLock(for identifier: String) async throws {
-    let database = CKContainer.default().privateCloudDatabase
-    let record = CKRecord(recordType: "Lock")
-
-    record["identifier"] = identifier
-    record["lockedByDevice"] = TransactionAuthor.app()
-    record["timestamp"] = Date() as CKRecordValue
-
-    try await database.save(record)
-    print("lock created")
-  }
-
-  private func removeLock(for identifier: String) async throws {
-    let database = CKContainer.default().privateCloudDatabase
-    let predicate = NSPredicate(format: "identifier == %@", identifier)
-    let query = CKQuery(recordType: "Lock", predicate: predicate)
-
-    do {
-      let result = try await database.fetch(withQuery: query)
-      for record in result.matchResults {
-        do {
-          try await database.deleteRecord(withID: record.0)
-        } catch {
-          print("Cannot delete lock record: \(identifier) \(error)")
-        }
-      }
-    } catch {
-      print("Cannot fetch locks: \(identifier) \(error)")
+      print("[TEST_DEDUPLICATION] - Deduplicated")
     }
   }
 
@@ -349,20 +284,5 @@ final class RemoteChangeObserver {
     duplicated.remove(at: indexToReserve)
     duplicated.deduplicate(to: objectToReserve)
     duplicated.markAsDeduplicated()
-  }
-}
-
-extension CKDatabase {
-  func fetch(withQuery query: CKQuery) async throws -> (matchResults: [(CKRecord.ID, Result<CKRecord, any Error>)], queryCursor: CKQueryOperation.Cursor?) {
-    try await withCheckedThrowingContinuation { continuation in
-      fetch(withQuery: query) { result in
-        switch result {
-        case .success(let success):
-          continuation.resume(returning: success)
-        case .failure(let failure):
-          continuation.resume(throwing: failure)
-        }
-      }
-    }
   }
 }

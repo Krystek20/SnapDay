@@ -9,9 +9,11 @@ enum DayActivityMenuItem {
   case move
   case copy
   case remove
-  case markImportant
-  case unmarkImortant
-  case share
+  case importantMark
+  case imortantUnmark
+  case collaborateUnmarked
+  case collaborateMarked
+  case stopCollaboration
 
   var title: String {
     switch self {
@@ -31,12 +33,14 @@ enum DayActivityMenuItem {
       String(localized: "Copy", bundle: .module)
     case .remove:
       String(localized: "Remove", bundle: .module)
-    case .markImportant:
+    case .importantMark:
       String(localized: "Set as important", bundle: .module)
-    case .unmarkImortant:
+    case .imortantUnmark:
       String(localized: "Set as regular", bundle: .module)
-    case .share:
-      String(localized: "Share", bundle: .module)
+    case .collaborateUnmarked, .collaborateMarked:
+      String(localized: "Collaborate", bundle: .module)
+    case .stopCollaboration:
+      String(localized: "Stop Collaboration", bundle: .module)
     }
   }
 
@@ -58,37 +62,16 @@ enum DayActivityMenuItem {
       "doc.on.doc"
     case .remove:
       "trash"
-    case .markImportant:
+    case .importantMark:
       "exclamationmark.circle"
-    case .unmarkImortant:
+    case .imortantUnmark:
       "exclamationmark.circle.fill"
-    case .share:
-      "square.and.arrow.up"
-    }
-  }
-
-  var dayActivityAction: DayActivityActionType.DayActivityAction {
-    switch self {
-    case .deselect, .select:
-        .tapped
-    case .edit:
-        .edit
-    case .addTask:
-        .addActivityTask
-    case .save:
-        .save
-    case .move:
-        .move
-    case .copy:
-        .copy
-    case .remove:
-        .remove
-    case .markImportant:
-        .markImportant
-    case .unmarkImortant:
-        .unmarkImportant
-    case .share:
-        .share
+    case .collaborateMarked:
+      "person.2.circle.fill"
+    case .collaborateUnmarked:
+      "person.2.circle"
+    case .stopCollaboration:
+      "person.2.slash.fill"
     }
   }
 }

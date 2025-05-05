@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24A348" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24E263" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="ActivityEntity" representedClassName="ActivityEntity" syncable="YES" codeGenerationType="class">
         <attribute name="deduplicatedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="defaultDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -11,10 +11,10 @@
         <attribute name="important" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isDefaultDuration" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isFrequentEnabled" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
-        <attribute name="labelsIdentifiers" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
+        <attribute name="labelsIdentifiers" optional="YES" attributeType="String" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
         <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="tagsIdentifiers" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
+        <attribute name="tagsIdentifiers" optional="YES" attributeType="String" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="activityTasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ActivityTaskEntity" inverseName="activity" inverseEntity="ActivityTaskEntity"/>
     </entity>
@@ -47,12 +47,12 @@
         <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="important" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isGeneratedAutomatically" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
-        <attribute name="labelsIdentifiers" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
+        <attribute name="labelsIdentifiers" optional="YES" attributeType="String" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="overview" optional="YES" attributeType="String"/>
         <attribute name="position" optional="YES" attributeType="Integer 32" defaultValueString="-1" usesScalarValueType="YES"/>
         <attribute name="reminderDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="tagsIdentifiers" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
+        <attribute name="tagsIdentifiers" optional="YES" attributeType="String" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
         <attribute name="templateIdentifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="dayActivityTasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="DayActivityTaskEntity" inverseName="dayActivity" inverseEntity="DayActivityTaskEntity"/>
@@ -89,6 +89,56 @@
         <attribute name="identifier" optional="YES" attributeType="String"/>
         <attribute name="red" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="SharedByEntity" representedClassName="SharedByEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="deduplicatedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="String"/>
+        <attribute name="objectIdentifier" optional="YES" attributeType="String"/>
+        <attribute name="userIdentifier" optional="YES" attributeType="String"/>
+        <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="sharedDayActivity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SharedDayActivityEntity" inverseName="sharedBy" inverseEntity="SharedDayActivityEntity"/>
+        <relationship name="sharedDayActivityTask" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SharedDayActivityTaskEntity" inverseName="sharedBy" inverseEntity="SharedDayActivityTaskEntity"/>
+    </entity>
+    <entity name="SharedDayActivityEntity" representedClassName="SharedDayActivityEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="deduplicatedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="doneByUserIdentifier" optional="YES" attributeType="String"/>
+        <attribute name="doneDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="doneDateLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dueDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dueDateLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="iconIdentifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="iconIdentifierLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="important" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="importantLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="lockTimestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="nameLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="shared" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShareEntity" inverseName="dayActivities" inverseEntity="ShareEntity"/>
+        <relationship name="sharedBy" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SharedByEntity" inverseName="sharedDayActivity" inverseEntity="SharedByEntity"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SharedDayActivityTaskEntity" inverseName="dayActivity" inverseEntity="SharedDayActivityTaskEntity"/>
+    </entity>
+    <entity name="SharedDayActivityTaskEntity" representedClassName="SharedDayActivityTaskEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="assignedUserIdentifier" optional="YES" attributeType="String"/>
+        <attribute name="deduplicatedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="doneByUserIdentifier" optional="YES" attributeType="String"/>
+        <attribute name="doneDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="doneDateLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="nameLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="dayActivity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SharedDayActivityEntity" inverseName="tasks" inverseEntity="SharedDayActivityEntity"/>
+        <relationship name="sharedBy" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SharedByEntity" inverseName="sharedDayActivityTask" inverseEntity="SharedByEntity"/>
+    </entity>
+    <entity name="ShareEntity" representedClassName="ShareEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="deduplicatedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="identifier" optional="YES" attributeType="String"/>
+        <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="dayActivities" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SharedDayActivityEntity" inverseName="shared" inverseEntity="SharedDayActivityEntity"/>
     </entity>
     <entity name="TagEntity" representedClassName="TagEntity" syncable="YES" codeGenerationType="class">
         <attribute name="colorIdentifier" optional="YES" attributeType="String"/>

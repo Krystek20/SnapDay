@@ -12,7 +12,7 @@ public struct ActivityListFeature: TodayProvidable {
   // MARK: - Dependencies
 
   @Dependency(\.activityRepository) var activityRepository
-  @Dependency(\.dayEditor) private var dayEditor
+  @Dependency(\.dayUpdater) private var dayUpdater
   @Dependency(\.dismiss) private var dismiss
   @Dependency(\.calendar) private var calendar
   @Dependency(\.uuid) private var uuid
@@ -96,14 +96,14 @@ public struct ActivityListFeature: TodayProvidable {
           createdByUser: true
         )
         return .run { send in
-          try await dayEditor.saveDayActivity(dayActivity)
+          try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
           await send(.delegate(.daysUpdated))
         }
       case .view(.enableButtonTapped(var activity)):
         activity.isFrequentEnabled.toggle()
         return .run { [activity] send in
           try await activityRepository.saveActivity(activity)
-          try await dayEditor.updateDayActivities(activity, today)
+          try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
           await send(.internal(.loadActivities))
           await send(.delegate(.daysUpdated))
         }
@@ -131,7 +131,7 @@ public struct ActivityListFeature: TodayProvidable {
         }
       case .internal(.removeDayActivities(let activity)):
         return .run { [day = state.day] send in
-          try await dayEditor.removeDayActivities(activity, day.date)
+          try await dayUpdater.updateDaysByRemovedActivity(activity, from: day.date)
           try await activityRepository.deleteActivity(activity)
           await send(.delegate(.daysUpdated))
           await send(.internal(.loadActivities))
@@ -173,7 +173,7 @@ public struct ActivityListFeature: TodayProvidable {
           try await activityRepository.deleteActivityTask(task)
         }
         try await activityRepository.saveActivity(toUpdate)
-        try await dayEditor.updateDayActivities(toUpdate, day.date)
+        try await dayUpdater.updateDaysByUpdatedActivity(toUpdate, from: day.date)
         await send(.internal(.loadActivities))
         await send(.delegate(.daysUpdated))
       }
@@ -210,7 +210,7 @@ public struct ActivityListFeature: TodayProvidable {
 
       return .run { [day = state.day, activity] send in
         try await activityRepository.saveActivity(activity)
-        try await dayEditor.updateDayActivities(activity, day.date)
+        try await dayUpdater.updateDaysByUpdatedActivity(activity, from: day.date)
         await send(.delegate(.daysUpdated))
         await send(.internal(.loadActivities))
       }

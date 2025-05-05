@@ -62,7 +62,6 @@ extension DayActivityForm {
     case .activityTask(let showCompleted):
       [
         showCompleted ? .completed : nil,
-        .icon,
         .name,
         .duration,
         .reminder,
@@ -82,7 +81,6 @@ extension DayActivityForm {
       ]
     case .templateTask:
       [
-        .icon,
         .name,
         .duration,
         .reminder
@@ -283,7 +281,6 @@ extension DayActivityTask {
       dayActivityId: parentId,
       activityTask: nil,
       name: form.name,
-      iconId: form.iconId,
       doneDate: form.completed ? date() : nil,
       duration: form.duration,
       overview: form.overview,
@@ -294,7 +291,6 @@ extension DayActivityTask {
   public mutating func update(by form: DayActivityForm) {
     @Dependency(\.date) var date
     name = form.name
-    iconId = form.iconId
     if doneDate == nil && form.completed {
       doneDate = date.now
     } else if !form.completed {
@@ -377,7 +373,6 @@ extension DayActivityForm {
       .parentId: activityTask.activityId
     ]
     self.completed = false
-    self.iconId = activityTask.iconId
     self.name = activityTask.name
     self.tags = []
     self.duration = activityTask.defaultDuration ?? .zero
@@ -400,7 +395,6 @@ extension ActivityTask {
       id: form.id,
       activityId: parentId,
       name: form.name,
-      iconId: form.iconId,
       defaultDuration: form.duration,
       defaultReminderDate: form.reminderDate,
       defaultPosition: form.position
@@ -409,7 +403,6 @@ extension ActivityTask {
 
   public mutating func update(by form: DayActivityForm) {
     self.name = form.name
-    self.iconId = form.iconId
     self.defaultDuration = form.duration
     self.defaultReminderDate = form.reminderDate
   }

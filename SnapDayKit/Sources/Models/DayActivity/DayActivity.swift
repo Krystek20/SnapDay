@@ -20,7 +20,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
   public var reminderDate: Date?
   public var important: Bool
   public var position: Int
-  public var isShared: Bool
+  public var share: DayActivityShare?
 
   // MARK: - Initialization
 
@@ -41,7 +41,7 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     reminderDate: Date? = nil,
     important: Bool = false,
     position: Int = -1,
-    isShared: Bool = false
+    share: DayActivityShare? = nil
   ) {
     self.id = id
     self.date = date
@@ -59,13 +59,21 @@ public struct DayActivity: Identifiable, Equatable, Hashable {
     self.reminderDate = reminderDate
     self.important = important
     self.position = position
-    self.isShared = isShared
+    self.share = share
   }
 }
 
 extension DayActivity: DurationProtocol { }
 
 extension DayActivity {
+  public var isSavable: Bool {
+    !isInvitation
+  }
+
+  public var isInvitation: Bool {
+    share?.invitationId != nil
+  }
+
   public var isDone: Bool {
     doneDate != nil
   }

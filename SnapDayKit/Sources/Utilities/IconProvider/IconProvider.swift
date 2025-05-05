@@ -9,13 +9,26 @@ public protocol IconProviderType {
   func cleanIcons() async
 }
 
+extension DependencyValues {
+  public var iconProvider: IconProvider {
+    get { self[IconProvider.self] }
+    set { self[IconProvider.self] = newValue }
+  }
+}
+
+extension IconProvider: DependencyKey {
+  public static var liveValue: IconProvider {
+    IconProvider()
+  }
+}
+
 public actor IconProvider: IconProviderType {
 
   // MARK: - Dependecies
 
   @Dependency(\.iconRepository) private var iconRepository
   @Dependency(\.activityRepository) private var activityRepository
-  @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.dayUpdater) private var dayUpdater
 
   // MARK: - Properties
 
@@ -62,21 +75,18 @@ public actor IconProvider: IconProviderType {
 
       let allIcons = try await iconRepository.fetchAll()
       let allActivities = try await activityRepository.loadActivities()
-      let configuration = ActivitiesFetchConfiguration()
-      let allDayActivities = try await dayActivityRepository.activities(configuration)
+      let allDayActivities = try await dayUpdater.dayActivities()
 
       let allActivitiesIconIds = allActivities.reduce(into: [UUID](), { result, next in
         if let iconId = next.iconId {
           result += [iconId]
         }
-        result += next.tasks.compactMap(\.iconId)
       })
 
       let allDayActivitiesIconIds = allDayActivities.reduce(into: [UUID](), { result, next in
         if let iconId = next.iconId {
           result += [iconId]
         }
-        result += next.dayActivityTasks.compactMap(\.iconId)
       })
 
       let allUsedIcons = Set(allActivitiesIconIds) + allDayActivitiesIconIds

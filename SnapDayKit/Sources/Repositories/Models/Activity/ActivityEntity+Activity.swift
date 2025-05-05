@@ -13,8 +13,10 @@ extension ActivityEntity {
     defaultDuration = Int32(activity.defaultDuration ?? .zero)
     dueDaysCount = Int32(activity.dueDaysCount ?? .zero)
     startDate = activity.startDate
-    tagsIdentifiers = try JSONEncoder().encode(activity.tags.map(\.id)) as NSObject
-    labelsIdentifiers = try JSONEncoder().encode(activity.labels.map(\.id)) as NSObject
+    let tagsIdentifiersData = try JSONEncoder().encode(activity.tags.map(\.id))
+    tagsIdentifiers = String(data: tagsIdentifiersData, encoding: .utf8)
+    let labelsIdentifiersData = try JSONEncoder().encode(activity.labels.map(\.id))
+    labelsIdentifiers = String(data: labelsIdentifiersData, encoding: .utf8)
     activityTasks = Set(
       try activity.tasks.map { task in
         try task.managedObject(context)

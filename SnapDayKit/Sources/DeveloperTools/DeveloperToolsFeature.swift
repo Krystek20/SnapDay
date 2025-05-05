@@ -32,6 +32,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
         UserDefaults.standard.setValue(newValue, forKey: key)
       }
     }
+    var allShared: [String] = []
     public init() { }
   }
 
@@ -44,6 +45,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
       case sendEveningSummaryReminderNotificationButtonTapped
     }
     public enum InternalAction: Equatable {
+      case loadAllShared
+      case setAllShared([String])
       case loadPendingRequests
       case loadBackgroundPendingRequests
       case setPendingIdentifiers([String])
@@ -88,7 +91,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
     case .appeared:
       return .merge(
         .send(.internal(.loadPendingRequests)),
-        .send(.internal(.loadBackgroundPendingRequests))
+        .send(.internal(.loadBackgroundPendingRequests)),
+        .send(.internal(.loadAllShared))
       )
     case .cleanKeyValueStore:
       let allKeys = NSUbiquitousKeyValueStore.default.dictionaryRepresentation.keys
@@ -99,7 +103,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
     case .sendDayActivityReminderNotificationButtonTapped:
       return .run { send in
         let configuration = ActivitiesFetchConfiguration()
-        let dayActivities = try await dayActivityRepository.activities(configuration)
+        let dayActivities = try await dayActivityRepository.dayActivities(configuration: configuration)
         let dayActivity = dayActivities.randomElement() ?? DayActivity(
           id: uuid(),
           date: today,
@@ -119,7 +123,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
     case .sendDayActivityTaskReminderNotificationButtonTapped:
       return .run { send in
         let configuration = ActivitiesFetchConfiguration()
-        let dayActivities = try await dayActivityRepository.activities(configuration)
+        let dayActivities = try await dayActivityRepository.dayActivities(configuration: configuration)
         guard
           let dayActivity = dayActivities.first(where: { !$0.dayActivityTasks.isEmpty }),
           let dayActivityTask = dayActivity.dayActivityTasks.randomElement()
@@ -175,6 +179,24 @@ public struct DeveloperToolsFeature: TodayProvidable {
       return .none
     case .setBackgroundPendingIdentifiers(let identifiers):
       state.pendingBackgroundTask = identifiers
+      return .none
+    case .loadAllShared:
+      return .run { send in
+        let allShared = try await dayActivityRepository.sharedDayActivities(configuration: ActivitiesFetchConfiguration())
+        let text = allShared.map { sharedDay in
+          """
+          👉\(sharedDay.name)\n\(sharedDay.id.uuidString)\n
+          \(
+          sharedDay.tasks.map { sharedDayTask in
+            "\t👉\(sharedDayTask.name)\n\t\(sharedDayTask.id.uuidString)"
+          }.joined(separator: "\n")
+          )
+          """
+        }
+        await send(.internal(.setAllShared(text)))
+      }
+    case .setAllShared(let text):
+      state.allShared = text
       return .none
     }
   }

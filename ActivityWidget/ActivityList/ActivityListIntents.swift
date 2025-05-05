@@ -44,15 +44,15 @@ struct ToggleItemIntent: AppIntent {
 
   func perform() async throws -> some IntentResult {
     guard let identifier else { return .result() }
-    let dayActivityRepository = DayActivityRepository.liveValue
+    let dayUpdater = DayUpdater.liveValue
     let userNotificationCenterProvider = UserNotificationCenterProvider.liveValue
     do {
-      if var dayActivity = try await dayActivityRepository.activity(identifier) {
+      if var dayActivity = try await dayUpdater.dayActivity(identifier: identifier) {
         dayActivity.doneDate = dayActivity.doneDate == nil ? Date() : nil
-        try await dayActivityRepository.saveDayActivity(dayActivity)
-      } else if var dayActivityTask = try await dayActivityRepository.activityTask(identifier) {
+        try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
+      } else if var dayActivityTask = try await dayUpdater.dayActivityTask(identifier: identifier) {
         dayActivityTask.doneDate = dayActivityTask.doneDate == nil ? Date() : nil
-        try await dayActivityRepository.saveDayActivityTask(dayActivityTask)
+        try await dayUpdater.saveDayActivityTask(dayActivityTask, syncSharable: true)
       }
       try await userNotificationCenterProvider.reloadReminders()
       WidgetCenter.shared.reloadAllTimelines()

@@ -1,0 +1,42 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "Add" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Email or phone number" : {
+
+    },
+    "Friends" : {
+
+    },
+    "From Others" : {
+
+    },
+    "From You" : {
+
+    },
+    "If another user invites you, you’ll see it right here." : {
+
+    },
+    "Looks like it’s quiet around here. Send your first invitation to get started!" : {
+
+    },
+    "Preparing invitation" : {
+
+    },
+    "Reinvite" : {
+
+    },
+    "Remove" : {
+
+    }
+  },
+  "version" : "1.0"
+}

@@ -8,7 +8,7 @@ extension RGBColor: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public init?(object: RGBColorEntity?, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws {
+  public init?(object: RGBColorEntity?, context: NSManagedObjectContext) throws {
     guard let object else { return nil }
     self.init(object)
   }

@@ -25,15 +25,113 @@ public struct ActivitiesFetchConfiguration {
 }
 
 public struct DayActivityRepository {
-  public var activity: @Sendable (String) async throws -> DayActivity?
-  public var activityTask: @Sendable (String) async throws -> DayActivityTask?
-  public var activities: @Sendable (ActivitiesFetchConfiguration) async throws -> [DayActivity]
-  public var saveDayActivity: @Sendable (DayActivity) async throws -> Void
-  public var saveDayActivityTask: @Sendable (DayActivityTask) async throws -> Void
-  public var removeDayActivity: @Sendable (DayActivity) async throws -> Void
-  public var removeDayActivityTask: @Sendable (DayActivityTask) async throws -> Void
-  public var share: @Sendable (DayActivity) async throws -> Share
-  public var accept: @Sendable (Invitation) async throws -> Void
+
+  private let entityHandler = EntityHandler()
+
+  public func activity(identifier: String) async throws -> DayActivity? {
+    try await entityHandler.fetch(DayActivity.self, identifier: identifier)
+  }
+
+  public func activityTask(identifier: String) async throws -> DayActivityTask? {
+    try await entityHandler.fetch(DayActivityTask.self, identifier: identifier)
+  }
+
+  public func sharedDayActivity(identifier: String) async throws -> SharedDayActivity? {
+    try await entityHandler.fetch(SharedDayActivity.self, identifier: identifier)
+  }
+
+  public func sharedDayActivityTask(identifier: String) async throws -> SharedDayActivityTask? {
+    try await entityHandler.fetch(SharedDayActivityTask.self, identifier: identifier)
+  }
+
+  public func dayActivities(configuration: ActivitiesFetchConfiguration) async throws -> [DayActivity] {
+    try await activities(configuration: configuration)
+  }
+
+  public func sharedDayActivities(configuration: ActivitiesFetchConfiguration) async throws -> [SharedDayActivity] {
+    try await activities(configuration: configuration)
+  }
+
+  private func activities<T: Entity>(configuration: ActivitiesFetchConfiguration) async throws -> [T] {
+    var predicates: [NSPredicate] = []
+    if let range = configuration.range {
+      predicates.append(
+        NSPredicate(format: "date >= %@ AND date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)
+      )
+    }
+    if let done = configuration.done {
+      let predicate = done
+      ? NSPredicate(format: "doneDate != nil")
+      : NSPredicate(format: "doneDate == nil")
+      predicates.append(predicate)
+    }
+    predicates.append(contentsOf: configuration.predicates)
+
+    let sorts = configuration.sorts.isEmpty
+    ? [NSSortDescriptor(key: "name", ascending: true)]
+    : configuration.sorts
+
+    return try await entityHandler.fetch(
+      T.self,
+      predicates: { predicates },
+      sorts: { sorts },
+      fetchLimit: configuration.fetchLimit
+    )
+  }
+
+  public func saveDayActivity(_ dayActivity: DayActivity) async throws {
+    try await entityHandler.save(dayActivity)
+  }
+
+  public func saveDayActivityTask(_ dayActivityTask: DayActivityTask) async throws {
+    try await entityHandler.save(dayActivityTask)
+  }
+
+  public func removeDayActivity(_ dayActivity: DayActivity) async throws {
+    try await entityHandler.delete(dayActivity)
+    for dayActivityTask in dayActivity.dayActivityTasks {
+      try await removeDayActivityTask(dayActivityTask)
+    }
+  }
+
+  public func removeDayActivityTask(_ dayActivityTask: DayActivityTask) async throws {
+    try await entityHandler.delete(dayActivityTask)
+  }
+
+  public func sharedDayActivity(objectId: String) async throws -> SharedDayActivity? {
+    try await activities(
+      configuration: ActivitiesFetchConfiguration(
+        predicates: [
+          NSPredicate(format: "ANY sharedBy.objectIdentifier == %@", objectId)
+        ]
+      )
+    ).first
+  }
+
+  public func sharedDayActivityTask(objectId: String) async throws -> SharedDayActivityTask? {
+    try await activities(
+      configuration: ActivitiesFetchConfiguration(
+        predicates: [
+          NSPredicate(format: "ANY sharedBy.objectIdentifier == %@", objectId)
+        ]
+      )
+    ).first
+  }
+
+  public func saveSharedDayActivity(_ sharedDayActivity: SharedDayActivity) async throws {
+    try await entityHandler.save(sharedDayActivity)
+  }
+
+  public func saveSharedDayActivityTask(_ sharedDayActivityTask: SharedDayActivityTask) async throws {
+    guard !sharedDayActivityTask.removed else {
+      return try await entityHandler.delete(sharedDayActivityTask)
+    }
+    try await entityHandler.save(sharedDayActivityTask)
+  }
+
+  public func removeShareDayActivity(_ sharedDayActivity: SharedDayActivity) async throws {
+    try await entityHandler.delete(sharedDayActivity)
+  }
 }
 
 extension DependencyValues {
@@ -44,86 +142,5 @@ extension DependencyValues {
 }
 
 extension DayActivityRepository: DependencyKey {
-  public static var liveValue: DayActivityRepository {
-    DayActivityRepository(
-      activity: { dayActivityId in
-        try await EntityHandler().fetch(DayActivity.self, identifier: dayActivityId)
-      },
-      activityTask: { dayActivityTaskId in
-        try await EntityHandler().fetch(DayActivityTask.self, identifier: dayActivityTaskId)
-      },
-      activities: { configuration in
-        var predicates: [NSPredicate] = []
-        if let range = configuration.range {
-          predicates.append(
-            NSPredicate(format: "date >= %@ AND date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)
-          )
-        }
-        if let done = configuration.done {
-          let predicate = done
-          ? NSPredicate(format: "doneDate != nil")
-          : NSPredicate(format: "doneDate == nil")
-          predicates.append(predicate)
-        }
-        predicates.append(contentsOf: configuration.predicates)
-
-        let sorts = configuration.sorts.isEmpty
-        ? [NSSortDescriptor(key: "name", ascending: true)]
-        : configuration.sorts
-
-        return try await EntityHandler().fetch(
-          DayActivity.self,
-          predicates: { predicates },
-          sorts: { sorts },
-          fetchLimit: configuration.fetchLimit
-        )
-      },
-      saveDayActivity: { dayActivity in
-        try await EntityHandler().save(dayActivity)
-      },
-      saveDayActivityTask: { dayActivityTask in
-        try await EntityHandler().save(dayActivityTask)
-      },
-      removeDayActivity: { dayActivity in
-        try await EntityHandler().delete(dayActivity)
-        for dayActivityTask in dayActivity.dayActivityTasks {
-          try await EntityHandler().delete(dayActivityTask)
-        }
-      },
-      removeDayActivityTask: { dayActivityTask in
-        try await EntityHandler().delete(dayActivityTask)
-      },
-      share: { dayActivity in
-        var thumbnailImageData: Data?
-        var dependecies: [any Entity] = []
-        if let iconId = dayActivity.iconId,
-           let icon = try await EntityHandler().fetch(Icon.self, identifier: iconId as CVarArg) {
-          thumbnailImageData = icon.data
-          dependecies.append(icon)
-        }
-        let taskIconsIds = dayActivity.dayActivityTasks.compactMap(\.iconId)
-        for taskIconId in taskIconsIds {
-          guard let icon = try await EntityHandler().fetch(Icon.self, identifier: taskIconId as CVarArg) else { continue }
-          dependecies.append(icon)
-        }
-        dependecies.append(contentsOf: dayActivity.tags)
-        dependecies.append(contentsOf: dayActivity.tags.map(\.rgbColor))
-        dependecies.append(contentsOf: dayActivity.labels)
-        dependecies.append(contentsOf: dayActivity.labels.map(\.rgbColor))
-        let share = try await EntityHandler().share(
-          dayActivity,
-          dependecies: dependecies,
-          title: dayActivity.name,
-          thumbnailImageData: thumbnailImageData
-        )
-        Task { @MainActor in
-          ShareViewWrapper.shared.presentCloudSharingController(share: share)
-        }
-        return share
-      },
-      accept: { invitation in
-        try await EntityHandler().accept(invitation: invitation)
-      }
-    )
-  }
+  public static var liveValue = DayActivityRepository()
 }

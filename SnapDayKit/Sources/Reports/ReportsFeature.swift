@@ -15,7 +15,7 @@ public struct ReportsFeature: TodayProvidable {
 
   @Dependency(\.tagRepository) private var tagRepository
   @Dependency(\.activityRepository) private var activityRepository
-  private let dayProvider = DayProvider()
+  @Dependency(\.dayUpdater) private var dayUpdater
 
   // MARK: - State & Action
 
@@ -134,7 +134,7 @@ public struct ReportsFeature: TodayProvidable {
     case .loadDays:
       guard let periodRange = state.periodRange else { return .none }
       return .run { [periodRange] send in
-        let days = try await dayProvider.days(periodRange)
+        let days = try await dayUpdater.days(for: periodRange)
         await send(.internal(.setDays(days)))
         await send(.internal(.loadSummary))
       }

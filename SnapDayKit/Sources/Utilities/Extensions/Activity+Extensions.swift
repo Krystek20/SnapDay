@@ -38,7 +38,6 @@ public extension ActivityTask {
       id: uuid(),
       activityId: activityId,
       name: dayActivity.name,
-      iconId: dayActivity.iconId,
       defaultDuration: dayActivity.duration,
       defaultReminderDate: dayActivity.reminderDate,
       defaultPosition: dayActivity.position

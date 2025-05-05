@@ -523,7 +523,6 @@ public struct DayActivityFormView: View {
   private var tasksView: some View {
     SectionView(
       name: String(localized: "Tasks", bundle: .module),
-      rightContent: { },
       content: {
         taskContentView
           .formBackgroundModifier()
@@ -563,11 +562,6 @@ public struct DayActivityFormView: View {
   private var newActivityTaskForm: some View {
     WithPerceptionTracking {
       HStack(spacing: 5.0) {
-        ActivityImageView(
-          type:. placeholder,
-          size: 30.0,
-          cornerRadius: 15.0
-        )
         TextField("", text: $store.newActivityTask.name)
           .font(.system(size: 14.0, weight: .medium))
           .foregroundStyle(Color.sectionText)

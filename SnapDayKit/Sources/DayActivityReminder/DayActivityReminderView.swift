@@ -38,7 +38,7 @@ public struct DayActivityReminderView: View {
               Divider()
                 .padding(.leading, 20.0)
               DayActivityRow(
-                activityItem: DayActivityItem(activityType: dayActivityTask),
+                activityItem: DayActivityItem(activityType: dayActivityTask, iconRules: .none),
                 trailingIcon: .none
               )
               .padding(.leading, 10.0)

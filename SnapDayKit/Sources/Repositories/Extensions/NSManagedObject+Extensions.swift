@@ -24,11 +24,12 @@ extension NSManagedObject {
     return object
   }
 
-  func mapArray<T: Entity>(for key: String, context: NSManagedObjectContext, isShared: (NSManagedObject?) -> Bool) throws -> [T] {
-    guard let data = value(forKey: key) as? Data else { return [] }
+  func mapIdentifierArray<T: Entity>(for key: String, context: NSManagedObjectContext) throws -> [T] {
+    guard let string = value(forKey: key) as? String,
+          let data = string.data(using: .utf8) else { return [] }
     return try JSONDecoder().decode([String].self, from: data)
       .compactMap {
-        try T(identifier: $0, context: context, isShared: isShared)
+        try T(identifier: $0, context: context)
       }
   }
 }

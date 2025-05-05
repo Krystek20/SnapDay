@@ -9,7 +9,7 @@ public struct DayActivityReminderFeature: TodayProvidable {
 
   // MARK: - Dependencies
 
-  @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.dayUpdater) private var dayUpdater
 
   // MARK: - State & Action
 
@@ -85,11 +85,11 @@ public struct DayActivityReminderFeature: TodayProvidable {
       return .run { [type = state.type] send in
         switch type {
         case .activity(let identifier):
-          guard let dayActivity = try await dayActivityRepository.activity(identifier) else { return }
+          guard let dayActivity = try await dayUpdater.dayActivity(identifier: identifier) else { return }
           await send(.internal(.setActivity(dayActivity)))
         case .activityTask(let identifier):
-          guard let dayActivityTask = try await dayActivityRepository.activityTask(identifier),
-                let dayActivity = try await dayActivityRepository.activity(dayActivityTask.dayActivityId.uuidString) else { return }
+          guard let dayActivityTask = try await dayUpdater.dayActivityTask(identifier: identifier),
+                let dayActivity = try await dayUpdater.dayActivity(identifier: dayActivityTask.dayActivityId.uuidString) else { return }
           await send(.internal(.setActivityTask(dayActivity, dayActivityTask)))
         }
       }

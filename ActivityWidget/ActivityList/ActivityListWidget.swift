@@ -8,8 +8,8 @@ import Utilities
 @available(iOSApplicationExtension 17.0, *)
 struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
 
-  private let dayProvider = DayProvider()
-  private let iconProvider = IconProvider()
+  @Dependency(\.iconProvider) private var iconProvider
+  @Dependency(\.dayUpdater) private var dayUpdater
 
   func placeholder(in context: Context) -> DayEntry {
     DayEntry(
@@ -33,7 +33,7 @@ struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
     var entries = [DayEntry]()
     let reloadPolicy: TimelineReloadPolicy
     do {
-      let day = try await dayProvider.day(today)
+      let day = try await dayUpdater.day(today)
       let icons = await iconProvider.getIcons(ids: day.iconIds)
       entries.append(
         DayEntry(
@@ -46,7 +46,6 @@ struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
       reloadPolicy = .after(try tomorrow)
     } catch {
       reloadPolicy = .never
-      print(error.localizedDescription)
     }
     return Timeline(entries: entries, policy: reloadPolicy)
   }

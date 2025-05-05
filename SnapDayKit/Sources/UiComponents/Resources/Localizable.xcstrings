@@ -342,6 +342,9 @@
         }
       }
     },
+    "Collaborate" : {
+
+    },
     "Completed activities" : {
       "localizations" : {
         "de" : {
@@ -1126,9 +1129,6 @@
         }
       }
     },
-    "Share" : {
-
-    },
     "Show completed" : {
       "localizations" : {
         "de" : {
@@ -1184,6 +1184,9 @@
           }
         }
       }
+    },
+    "Stop Collaboration" : {
+
     },
     "Third" : {
       "localizations" : {

@@ -7,6 +7,7 @@ import ActivityList
 import DayActivityForm
 import CalendarPicker
 import Models
+import Friends
 
 public struct DashboardView: View {
 
@@ -81,13 +82,12 @@ public struct DashboardView: View {
         }
         .presentationDetents([.medium])
       }
-      .sheet(isPresented: $store.isShareViewPresented, content: {
-        WithPerceptionTracking {
-          if let share = store.share {
-            CloudSharingView(share: share)
-          }
+      .sheet(item: $store.scope(state: \.friends, action: \.friends)) { store in
+        NavigationStack {
+          FriendsView(store: store)
         }
-      })
+        .presentationDetents([.large])
+      }
       .task {
         store.send(.view(.appeared))
       }
@@ -118,6 +118,16 @@ public struct DashboardView: View {
         }
         ToolbarItem(placement: .topBarTrailing) {
           HStack {
+            Button(
+              action: {
+                store.send(.view(.showFriendsTapped))
+              },
+              label: {
+                Image(systemName: "person.2.circle.fill")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+
             Button(
               action: {
                 store.send(.view(.activityListButtonTapped))

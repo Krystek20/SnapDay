@@ -11,7 +11,7 @@ public struct ActivityDetailsFeature: TodayProvidable {
 
   // MARK: - Dependencies
 
-  private let dayProvider = DayProvider()
+  @Dependency(\.dayUpdater) private var dayUpdater
 
   // MARK: - State & Action
 
@@ -192,7 +192,7 @@ public struct ActivityDetailsFeature: TodayProvidable {
     case .loadDays:
       guard let periodRange = state.periodRange else { return .none }
       return .run { [periodRange] send in
-        let days = try await dayProvider.days(periodRange)
+        let days = try await dayUpdater.days(for: periodRange)
         await send(.internal(.setDays(days)))
       }
     case .setDays(let days):

@@ -13,7 +13,11 @@ public enum DayActivityActionType: Equatable {
     case reorder(ReorderAction)
     case markImportant
     case unmarkImportant
-    case share
+    case addParticipant(DayActivityParticipant)
+    case removeParticipant(DayActivityParticipant)
+    case stopCollaboration
+    case acceptInvitation
+    case discardInvitation
   }
 
   public enum DayActivityTaskAction: Equatable {
