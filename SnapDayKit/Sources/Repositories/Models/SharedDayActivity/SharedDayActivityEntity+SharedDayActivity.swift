@@ -12,7 +12,6 @@ extension SharedDayActivityEntity {
     dueDate = sharedDayActivity.dueDate
     dueDateLastUpdated = sharedDayActivity.dueDateLastUpdated
     iconIdentifier = sharedDayActivity.iconId
-    iconIdentifierLastUpdated = sharedDayActivity.iconIdLastUpdated
     important = sharedDayActivity.important
     importantLastUpdated = sharedDayActivity.importantLastUpdated
     lockTimestamp = sharedDayActivity.lockTimestamp

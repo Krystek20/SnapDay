@@ -213,7 +213,12 @@ public actor CloudService {
     return try await addParticipant(lookupInfo: lookupInfo)
   }
 
-  public func share(where userRecord: String) async throws -> Share? {
+  public enum ShareWhere {
+    case userRecord(String)
+    case shareDayActivity(UUID)
+  }
+
+  public func share(where: ShareWhere) async throws -> Share? {
     let context = coreDataStack.backgroundContext
     let allShares = try await shareRepository.fetchAll()
 
@@ -222,11 +227,16 @@ public actor CloudService {
         let shareEntity = try share.managedObject(context)
         guard let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else { return false }
 
-        let participants = ckShare.participants.filter {
-          $0.userIdentity.userRecordID?.recordName == userRecord || $0 == ckShare.currentUserParticipant
+        switch `where` {
+        case .userRecord(let userRecord):
+          let participants = ckShare.participants.filter {
+            $0.userIdentity.userRecordID?.recordName == userRecord || $0 == ckShare.currentUserParticipant
+          }
+          guard participants.count == 2 else { return false }
+          return participants.contains(ckShare.owner)
+        case .shareDayActivity(let identifier):
+          return share.sharedDayActivities.contains(where: { $0.id == identifier })
         }
-        guard participants.count == 2 else { return false }
-        return participants.contains(ckShare.owner)
       })
   }
 

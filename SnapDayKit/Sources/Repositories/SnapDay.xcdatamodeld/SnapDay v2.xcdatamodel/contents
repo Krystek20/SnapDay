@@ -79,6 +79,7 @@
         <attribute name="data" optional="YES" attributeType="Binary"/>
         <attribute name="deduplicatedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="RGBColorEntity" representedClassName="RGBColorEntity" syncable="YES" codeGenerationType="class">
@@ -109,7 +110,6 @@
         <attribute name="dueDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dueDateLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="iconIdentifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="iconIdentifierLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="identifier" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="important" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="importantLastUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>

@@ -52,7 +52,10 @@ public struct ActivityImageView: View {
     case .iconId(let iconId):
       if let iconId {
         AnyView(
-          LoadableImage(iconId: iconId)
+          LoadableImage(
+            iconId: iconId,
+            placeholder: Image(systemName: "photo.circle")
+          )
             .id(iconId)
         )
       } else {
@@ -84,16 +87,27 @@ private struct LoadableImage: View {
 
   private let iconId: UUID
   @State private var image: Image?
+  private let placeholder: Image
   @Dependency(\.iconProvider) private var iconProvider
 
-  init(iconId: UUID) {
+  init(
+    iconId: UUID,
+    placeholder: Image
+  ) {
     self.iconId = iconId
+    self.placeholder = placeholder
   }
 
   var body: some View {
     content
       .task {
         await loadImage()
+      }
+      .onReceive(iconProvider.iconChangedPublisher) { iconId in
+        guard iconId == self.iconId else { return }
+        Task { @MainActor in
+          await loadImage()
+        }
       }
   }
 
@@ -113,7 +127,10 @@ private struct LoadableImage: View {
     image = nil
     guard let icon = await iconProvider.getIcon(id: iconId),
           let iconData = icon.data,
-          let uiImage = UIImage(data: iconData) else { return }
+          let uiImage = UIImage(data: iconData) else {
+      image = placeholder
+      return
+    }
     image = Image(uiImage: uiImage)
   }
 }

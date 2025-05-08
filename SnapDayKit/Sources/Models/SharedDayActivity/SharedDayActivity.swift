@@ -9,8 +9,7 @@ public struct SharedDayActivity: Identifiable, Equatable, Hashable {
   public var dateLastUpdated: Date?
   public var name: String
   public var nameLastUpdated: Date?
-  public var iconId: UUID?
-  public var iconIdLastUpdated: Date?
+  public var iconId: UUID
   public var dueDate: Date?
   public var dueDateLastUpdated: Date?
   public var tasks: [SharedDayActivityTask]
@@ -30,8 +29,7 @@ public struct SharedDayActivity: Identifiable, Equatable, Hashable {
     dateLastUpdated: Date?,
     name: String,
     nameLastUpdated: Date?,
-    iconId: UUID? = nil,
-    iconIdLastUpdated: Date?,
+    iconId: UUID,
     dueDate: Date? = nil,
     dueDateLastUpdated: Date?,
     tasks: [SharedDayActivityTask],
@@ -49,7 +47,6 @@ public struct SharedDayActivity: Identifiable, Equatable, Hashable {
     self.name = name
     self.nameLastUpdated = nameLastUpdated
     self.iconId = iconId
-    self.iconIdLastUpdated = iconIdLastUpdated
     self.dueDate = dueDate
     self.dueDateLastUpdated = dueDateLastUpdated
     self.tasks = tasks

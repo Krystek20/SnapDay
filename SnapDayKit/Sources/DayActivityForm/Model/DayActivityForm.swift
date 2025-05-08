@@ -256,7 +256,6 @@ extension DayActivityForm {
       ids[.templateId] = templateId
     }
     self.completed = dayActivityTask.doneDate != nil
-    self.iconId = dayActivityTask.iconId
     self.name = dayActivityTask.name
     self.tags = []
     self.duration = dayActivityTask.duration

@@ -5,6 +5,7 @@ import Foundation
 public extension SharedDayActivity {
   init(
     dayActivity: DayActivity,
+    shareableIcon: Icon,
     uuid: UUIDGenerator,
     userRecordName: String,
     date: Date
@@ -16,8 +17,7 @@ public extension SharedDayActivity {
       dateLastUpdated: date,
       name: dayActivity.name,
       nameLastUpdated: date,
-      iconId: dayActivity.iconId,
-      iconIdLastUpdated: date,
+      iconId: shareableIcon.id,
       dueDate: dayActivity.dueDate,
       dueDateLastUpdated: date,
       tasks: dayActivity.dayActivityTasks.map {
@@ -59,10 +59,6 @@ public extension SharedDayActivity {
     if name != dayActivity.name {
       name = dayActivity.name
       nameLastUpdated = updateDate
-    }
-    if iconId != dayActivity.iconId {
-      iconId = dayActivity.iconId
-      iconIdLastUpdated = updateDate
     }
     if dueDate != dayActivity.dueDate {
       dueDate = dayActivity.dueDate

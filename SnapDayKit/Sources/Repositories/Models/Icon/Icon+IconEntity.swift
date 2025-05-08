@@ -8,7 +8,8 @@ extension Icon {
     }
     self.init(
       id: identifier,
-      data: entity.data
+      data: entity.data,
+      lastUpdated: entity.lastUpdated
     )
   }
 }

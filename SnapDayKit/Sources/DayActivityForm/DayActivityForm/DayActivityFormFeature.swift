@@ -395,7 +395,8 @@ public struct DayActivityFormFeature {
       if let imageData {
         let icon = Icon(
           id: uuid(),
-          data: imageData
+          data: imageData,
+          lastUpdated: date.now
         )
         return .run { [icon] send in
           try await iconRepository.saveIcon(icon)

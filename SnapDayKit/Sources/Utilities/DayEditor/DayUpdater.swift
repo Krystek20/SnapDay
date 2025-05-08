@@ -29,6 +29,7 @@ public actor DayUpdater: TodayProvidable {
   @Dependency(\.cloudService) private var cloudService
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
   @Dependency(\.date.now) private var now
+  @Dependency(\.iconProvider) private var iconProvider
 
   // MARK: - Properties
 
@@ -169,6 +170,12 @@ public actor DayUpdater: TodayProvidable {
 
   private func updateDayActivity(update: SharedDayActivityUpdater.Update, userRecordName: String) async throws {
     guard var dayActivity = try await dayActivityRepository.activity(identifier: update.sharedBy.objectId) else { return }
+    if let iconId = dayActivity.iconId {
+      await iconProvider.updateIcon(with: iconId, byIconId: update.sharedDayActivity.iconId)
+    } else {
+      let newIcon = await iconProvider.createIcon(from: update.sharedDayActivity.iconId)
+      dayActivity.iconId = newIcon.id
+    }
     let tasksToRemove = try await dayActivity.update(by: update.sharedDayActivity, userRecordName: userRecordName, uuid: uuid)
     for task in tasksToRemove {
       try await dayActivityRepository.removeDayActivityTask(task)
@@ -178,6 +185,11 @@ public actor DayUpdater: TodayProvidable {
 
   public func acceptInvitation(for dayActivity: DayActivity) async throws {
     try await sharedDayActivityUpdater.acceptInvitation(for: dayActivity)
+    var dayActivity = dayActivity
+    if let iconId = dayActivity.iconId {
+      let newIcon = await iconProvider.createIcon(from: iconId)
+      dayActivity.iconId = newIcon.id
+    }
     try await dayActivityRepository.saveDayActivity(dayActivity)
   }
 

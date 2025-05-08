@@ -6,11 +6,13 @@ extension SharedDayActivity {
   init(_ entity: SharedDayActivityEntity, context: NSManagedObjectContext) throws {
     guard let identifier = entity.identifier,
           let name = entity.name,
+          let iconIdentifier = entity.iconIdentifier,
           let tasks = entity.tasks?.allObjects as? [SharedDayActivityTaskEntity] else {
       let message = """
         let objectID = \(String(describing: entity.objectID)),
         let name = \(String(describing: entity.name)),
         let identifier = \(String(describing: entity.identifier))
+        let iconIdentifier = \(String(describing: entity.iconIdentifier))
       """
       throw EntityError.attributeNil(message: message)
     }
@@ -24,8 +26,7 @@ extension SharedDayActivity {
       dateLastUpdated: entity.dateLastUpdated,
       name: name,
       nameLastUpdated: entity.nameLastUpdated,
-      iconId: entity.iconIdentifier,
-      iconIdLastUpdated: entity.iconIdentifierLastUpdated,
+      iconId: iconIdentifier,
       dueDate: entity.dueDate,
       dueDateLastUpdated: entity.dueDateLastUpdated,
       tasks: try tasks.map {

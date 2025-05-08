@@ -2,6 +2,7 @@ import Foundation
 import Models
 import Dependencies
 import Repositories
+import Combine
 
 public protocol IconProviderType {
   func getIcon(id: UUID) async -> Icon?
@@ -29,8 +30,15 @@ public actor IconProvider: IconProviderType {
   @Dependency(\.iconRepository) private var iconRepository
   @Dependency(\.activityRepository) private var activityRepository
   @Dependency(\.dayUpdater) private var dayUpdater
+  @Dependency(\.uuid) private var uuid
+  @Dependency(\.date.now) private var now
 
   // MARK: - Properties
+
+  nonisolated public var iconChangedPublisher: AnyPublisher<UUID, Never> {
+    iconChangedSubject.eraseToAnyPublisher()
+  }
+  nonisolated private let iconChangedSubject = PassthroughSubject<UUID, Never>()
 
   private let userDefaults: UserDefaults
   private let iconWasCleanedKey = "iconWasCleanedKey"
@@ -49,6 +57,42 @@ public actor IconProvider: IconProviderType {
   }
 
   // MARK: - Public
+
+  public func createIcon(
+    from iconId: UUID?
+  ) async -> Icon {
+    var existingIcon: Icon?
+    if let iconId {
+      existingIcon = await getIcon(id: iconId)
+    }
+
+    let icon = Icon(
+      id: uuid(),
+      data: existingIcon?.data,
+      lastUpdated: existingIcon?.lastUpdated
+    )
+    await saveIcon(icon)
+    return icon
+  }
+
+  public func updateIcon(with iconId: UUID, byIconId: UUID?) async {
+    guard var updatedIcon = await getIcon(id: iconId) else {
+      print("UpdatedIcom does not exist")
+      return
+    }
+    if let byIconId, let byIcon = await getIcon(id: byIconId) {
+      guard byIcon.lastUpdated.orPast > updatedIcon.lastUpdated.orPast else { return }
+      updatedIcon.data = byIcon.data
+      updatedIcon.lastUpdated = byIcon.lastUpdated
+    } else {
+      updatedIcon.data = nil
+      updatedIcon.lastUpdated = now
+    }
+    await saveIcon(updatedIcon)
+    Task { @MainActor in
+      iconChangedSubject.send(iconId)
+    }
+  }
 
   public func getIcon(id: UUID) async -> Icon? {
     do {
@@ -98,6 +142,16 @@ public actor IconProvider: IconProviderType {
       try await iconRepository.deleteIcons(iconsToRemove)
     } catch {
       print("Cannot clean icons: \(error)")
+    }
+  }
+
+  // MARK: - Private
+
+  private func saveIcon(_ icon: Icon) async {
+    do {
+      try await iconRepository.saveIcon(icon)
+    } catch {
+      print("Cannot save icon: \(error)")
     }
   }
 }

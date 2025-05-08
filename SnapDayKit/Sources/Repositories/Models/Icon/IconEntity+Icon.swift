@@ -6,5 +6,6 @@ extension IconEntity {
   func setup(by icon: Icon) throws {
     identifier = icon.id
     data = icon.data
+    lastUpdated = icon.lastUpdated
   }
 }

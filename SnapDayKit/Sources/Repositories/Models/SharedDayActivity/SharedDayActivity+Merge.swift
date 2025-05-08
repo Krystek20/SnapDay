@@ -7,8 +7,6 @@ extension SharedDayActivity {
     dateLastUpdated = dateLastUpdated.orPast > sharedDayActivity.dateLastUpdated.orPast ? dateLastUpdated : sharedDayActivity.dateLastUpdated
     name = nameLastUpdated.orPast > sharedDayActivity.nameLastUpdated.orPast ? name : sharedDayActivity.name
     nameLastUpdated = nameLastUpdated.orPast > sharedDayActivity.nameLastUpdated.orPast ? nameLastUpdated : sharedDayActivity.nameLastUpdated
-    iconId = iconIdLastUpdated.orPast > sharedDayActivity.iconIdLastUpdated.orPast ? iconId : sharedDayActivity.iconId
-    iconIdLastUpdated = iconIdLastUpdated.orPast > sharedDayActivity.iconIdLastUpdated.orPast ? iconIdLastUpdated : sharedDayActivity.iconIdLastUpdated
     dueDate = dueDateLastUpdated.orPast > sharedDayActivity.dueDateLastUpdated.orPast ? dueDate : sharedDayActivity.dueDate
     dueDateLastUpdated = dueDateLastUpdated.orPast > sharedDayActivity.dueDateLastUpdated.orPast ? dueDateLastUpdated : sharedDayActivity.dueDateLastUpdated
     important = importantLastUpdated.orPast > sharedDayActivity.importantLastUpdated.orPast ? important : sharedDayActivity.important

@@ -43,7 +43,6 @@ public extension DayActivity {
   ) async throws -> [DayActivityTask] {
     date = sharedDayActivity.date
     name = sharedDayActivity.name
-    iconId = sharedDayActivity.iconId
     dueDate = sharedDayActivity.dueDate
     important = sharedDayActivity.important
     doneDate = sharedDayActivity.doneDate

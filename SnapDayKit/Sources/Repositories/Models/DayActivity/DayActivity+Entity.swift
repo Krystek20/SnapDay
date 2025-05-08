@@ -8,8 +8,6 @@ extension DayActivity: Entity {
     ManagedObject.fetchRequest()
   }
 
-  public var title: String { name }
-  public var iconIdentifier: UUID? { iconId }
   public init?(object: DayActivityEntity?, context: NSManagedObjectContext) throws {
     guard let object else { return nil }
     try self.init(object, context: context)

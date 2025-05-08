@@ -13,6 +13,7 @@ public struct DayActivityTask: Identifiable, Equatable, Hashable {
   public var overview: String?
   public var reminderDate: Date?
   public var position: Int
+  /// Represented by shared day activity task id
   public var invitationId: String?
 
   // MARK: - Initialization

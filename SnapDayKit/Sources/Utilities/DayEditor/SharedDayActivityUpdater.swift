@@ -137,12 +137,19 @@ actor SharedDayActivityUpdater {
     try await asyncWaiter.executeOrWait(for: dayActivity.id) {
       guard let userRecordName = await cloudService.userRecordName,
             var sharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString) else { return }
+
+      await iconProvider.updateIcon(
+        with: sharedDayActivity.iconId,
+        byIconId: dayActivity.iconId
+      )
+
       await sharedDayActivity.update(
         by: dayActivity,
         userRecordName: userRecordName,
         uuid: uuid,
         updateDate: now
       )
+
       try await save(
         identifier: sharedDayActivity.id,
         option: .dayActivity(sharedDayActivity),
@@ -287,22 +294,30 @@ actor SharedDayActivityUpdater {
     }
 
     let existingSharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString)
-    var sharedDayActivity: SharedDayActivity
 
     guard var share = if existingSharedDayActivity != nil {
       try await cloudService.firstShare(where: dayActivity.id.uuidString)
     } else {
-      try await cloudService.share(where: participant.userRecordName)
+      try await cloudService.share(where: .userRecord(participant.userRecordName))
     } else {
       throw SharedDayActivitySaverError.shareNotExist
     }
 
-    sharedDayActivity = existingSharedDayActivity ?? SharedDayActivity(
-      dayActivity: dayActivity,
-      uuid: uuid,
-      userRecordName: userRecordName,
-      date: now
-    )
+    var sharedDayActivity: SharedDayActivity
+    if let existingSharedDayActivity {
+      sharedDayActivity = existingSharedDayActivity
+    } else {
+      let icon = await iconProvider.createIcon(from: dayActivity.iconId)
+      try await cloudService.saveEntity(icon, to: share)
+
+      sharedDayActivity = SharedDayActivity(
+        dayActivity: dayActivity,
+        shareableIcon: icon,
+        uuid: uuid,
+        userRecordName: userRecordName,
+        date: now
+      )
+    }
 
     guard !sharedDayActivity.sharedBy.contains(where: { $0.userId == participant.userRecordName }) else { return }
     sharedDayActivity.sharedBy.append(
@@ -317,11 +332,6 @@ actor SharedDayActivityUpdater {
       share.sharedDayActivities[index] = sharedDayActivity
     } else {
       share.sharedDayActivities.append(sharedDayActivity)
-    }
-
-    if let iconId = sharedDayActivity.iconId,
-       let icon = await iconProvider.getIcon(id: iconId) {
-      try await cloudService.saveEntity(icon, to: share)
     }
 
     try await save(
