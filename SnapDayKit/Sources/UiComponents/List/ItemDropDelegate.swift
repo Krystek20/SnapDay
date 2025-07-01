@@ -4,26 +4,22 @@ import SwiftUI
 
 struct ItemDropDelegate: DropDelegate {
 
-  let destinationItem: DayActivity
-  @Binding var draggedItem: DayActivity?
+  let destinationItem: ListItem
+  @Binding var draggedItem: ListItem?
 
-  var moveAction: (_ draggedItem: DayActivity) -> Void
+  var moveAction: (_ draggedItem: ListItem) -> Void
   var performDrop: () -> Void
-
-  // MARK: - Dependecies
-
-  @Dependency(\.utcCalendar) private var calendar
 
   func dropUpdated(info: DropInfo) -> DropProposal? {
     guard let draggedItem else { return DropProposal(operation: .cancel) }
-    return canMove(item: draggedItem)
+    return draggedItem.priority == destinationItem.priority
     ? DropProposal(operation: .move)
     : DropProposal(operation: .cancel)
   }
 
   func performDrop(info: DropInfo) -> Bool {
     guard let draggedItem else { return false }
-    let moved = canMove(item: draggedItem)
+    let moved = draggedItem.priority == destinationItem.priority
     if moved {
       performDrop()
       self.draggedItem = nil
@@ -32,11 +28,7 @@ struct ItemDropDelegate: DropDelegate {
   }
 
   func dropEntered(info: DropInfo) {
-    guard let draggedItem, canMove(item: draggedItem) else { return }
+    guard let draggedItem, draggedItem.priority == destinationItem.priority else { return }
     moveAction(draggedItem)
-  }
-
-  private func canMove(item: DayActivity) -> Bool {
-    item.priority(calendar: calendar) == destinationItem.priority(calendar: calendar)
   }
 }

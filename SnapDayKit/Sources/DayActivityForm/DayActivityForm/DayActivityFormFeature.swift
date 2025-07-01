@@ -7,6 +7,9 @@ import EmojiPicker
 import Utilities
 import UIKit.UIApplication
 
+import struct UiComponents.ListItem
+import enum UiComponents.ListItemAction
+
 @Reducer
 public struct DayActivityFormFeature {
 
@@ -41,6 +44,8 @@ public struct DayActivityFormFeature {
     var form: DayActivityForm
     var focus: Field?
 
+    var newField: DayNewField?
+    var items: [ListItem] = []
     var existingTags: [Tag] = []
     var existingLabels: [ActivityLabel] = []
 
@@ -79,8 +84,6 @@ public struct DayActivityFormFeature {
     var showMonthWeekdays: Bool { form.areMonthWeekdaysRequried }
     var isSaveButtonDisabled: Bool { !form.validated }
 
-    var newActivityTask = DayNewActivityTask.empty
-
     @Presents var emojiPicker: EmojiPickerFeature.State?
     @Presents var addMarker: MarkerFormFeature.State?
     @Presents var dayActivityTaskForm: DayActivityFormFeature.State?
@@ -116,10 +119,7 @@ public struct DayActivityFormFeature {
 
       public enum TaskAction: Equatable {
         case addButtonTapped
-        case selectButtonTapped(DayActivityForm)
-        case editButtonTapped(DayActivityForm)
-        case removeButtonTapped(DayActivityForm)
-        case newActivityActionPerformed(DayNewActivityAction)
+        case listItemActionPerfomed(ListItemAction)
       }
 
       case appeared
@@ -145,6 +145,7 @@ public struct DayActivityFormFeature {
       case setIconId(_ identifier: UUID?)
       case determineNotificationStatus
       case handleNotificationStatus(UserNotificationCenterProvider.Status)
+      case setItems
     }
     public enum DelegateAction: Equatable {
       case activityDeleted(DayActivityForm)
@@ -219,6 +220,7 @@ public struct DayActivityFormFeature {
         .run { send in
           await send(.internal(.loadTags))
           await send(.internal(.loadLabels))
+          await send(.internal(.setItems))
         }
       )
     case .saveButtonTapped:
@@ -332,43 +334,62 @@ public struct DayActivityFormFeature {
   private func handleViewTaskAction(_ action: Action.ViewAction.TaskAction, state: inout State) -> Effect<Action> {
     switch action {
     case .addButtonTapped:
-      state.newActivityTask.activityId = state.form.id
-      state.newActivityTask.isFormVisible = true
+      state.newField = .taskName(identifier: state.form.id.uuidString)
       state.focus = .newTask
-      return .none
-    case .selectButtonTapped(let dayActivityTaskForm):
-      state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }).map { index in
-        state.form.tasks[index].completed.toggle()
-      }
-      return .none
-    case .editButtonTapped(let dayActivityTaskForm):
-      state.dayActivityTaskForm = DayActivityFormFeature.State(
-        form: dayActivityTaskForm,
-        type: .edit,
-        editDate: state.editDate
-      )
-      return .none
-    case .removeButtonTapped(let dayActivityTaskForm):
-      guard let index = state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }) else { return .none }
-      state.form.tasks.remove(at: index)
-      return .none
-    case .newActivityActionPerformed(.dayActivityTask(let action)):
+      return .send(.internal(.setItems))
+    case .listItemActionPerfomed(let action):
       switch action {
-      case .cancelled:
-        state.newActivityTask = .empty
-        state.focus = nil
+      case .reorder, .rowAction:
         return .none
-      case .submitted:
-        let name = state.newActivityTask.name
-        state.newActivityTask = .empty
+      case .itemTapped(let itemId, _):
+        guard let form = state.form.tasks.first(where: { $0.id.uuidString == itemId }) else { return .none }
+        state.dayActivityTaskForm = DayActivityFormFeature.State(
+          form: form,
+          type: .edit,
+          editDate: state.editDate
+        )
+        return .none
+      case .newItemForm(.cancelled):
+        state.newField = nil
         state.focus = nil
-        guard !name.isEmpty, var taskForm = state.form.newTaskForm(newId: uuid()) else { return .none }
-        taskForm.name = name
+        return .send(.internal(.setItems))
+      case .newItemForm(.submitted):
+        guard let item = state.items.first(where: { $0.isForm }),
+              item.title != .empty,
+              var taskForm = state.form.newTaskForm(newId: uuid()) else {
+          return handleViewTaskAction(.listItemActionPerfomed(.newItemForm(.cancelled)), state: &state)
+        }
+        state.newField = nil
+        state.focus = nil
+        taskForm.name = item.title
         state.form.tasks.append(taskForm)
-        return .none
+        return .send(.internal(.setItems))
+      case .menuAction(let menuParameters, _):
+        guard let form = state.form.tasks.first(where: { $0.id.uuidString == menuParameters.itemId }),
+              let action = DayActivityFormAction(rawValue: menuParameters.actionId) else { return .none }
+        switch action {
+        case .select:
+          state.form.tasks.firstIndex(where: { $0.id == form.id }).map { index in
+            state.form.tasks[index].completed = true
+          }
+          return .send(.internal(.setItems))
+        case .deselect:
+          state.form.tasks.firstIndex(where: { $0.id == form.id }).map { index in
+            state.form.tasks[index].completed = false
+          }
+          return .send(.internal(.setItems))
+        case .edit:
+          state.dayActivityTaskForm = DayActivityFormFeature.State(
+            form: form,
+            type: .edit,
+            editDate: state.editDate
+          )
+          return .none
+        case .remove:
+          state.form.tasks.removeAll(where: { $0.id == form.id })
+          return .send(.internal(.setItems))
+        }
       }
-    case .newActivityActionPerformed(.dayActivity):
-      return .none
     }
   }
 
@@ -422,6 +443,9 @@ public struct DayActivityFormFeature {
         false
       }
       return .none
+    case .setItems:
+      state.items = ListItemsBuilder(tasks: state.form.tasks, newField: state.newField).build()
+      return .none
     }
   }
 
@@ -453,12 +477,12 @@ public struct DayActivityFormFeature {
     switch action {
     case .presented(.delegate(.activityDeleted(let dayActivityTaskForm))):
       state.form.tasks.removeAll(where: { $0.id == dayActivityTaskForm.id })
-      return .none
+      return .send(.internal(.setItems))
     case .presented(.delegate(.activityUpdated(let dayActivityTaskForm))):
       state.form.tasks.firstIndex(where: { $0.id == dayActivityTaskForm.id }).map { index in
         state.form.tasks[index] = dayActivityTaskForm
       }
-      return .none
+      return .send(.internal(.setItems))
     default:
       return .none
     }

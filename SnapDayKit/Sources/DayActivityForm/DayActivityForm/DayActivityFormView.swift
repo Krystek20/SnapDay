@@ -179,7 +179,7 @@ public struct DayActivityFormView: View {
         )
       } label: {
         HStack(spacing: 10.0) {
-          ActivityImageView(
+          ImageView(
             type: .iconId(store.form.iconId),
             size: 30.0,
             cornerRadius: 5.0,
@@ -525,7 +525,7 @@ public struct DayActivityFormView: View {
       name: String(localized: "Tasks", bundle: .module),
       content: {
         taskContentView
-          .formBackgroundModifier()
+          .formBackgroundModifier(padding: EdgeInsets(.zero))
       }
     )
   }
@@ -533,51 +533,22 @@ public struct DayActivityFormView: View {
   @ViewBuilder
   private var taskContentView: some View {
     WithPerceptionTracking {
-      VStack(spacing: 10.0) {
-        if store.newActivityTask.isFormVisible {
-          newActivityTaskForm
-          Divider()
-        }
-        ForEach(store.form.tasks) { task in
-          DayActivityTaskRowView(
-            dayActivityTask: task,
-            selectTapped: { task in
-              store.send(.view(.task(.selectButtonTapped(task))))
-            },
-            editTapped: { task in
-              store.send(.view(.task(.editButtonTapped(task))))
-            },
-            removeTapped: { task in
-              store.send(.view(.task(.removeButtonTapped(task))))
+      VStack(spacing: .zero) {
+        ForEach($store.items) { item in
+          ListItemView(
+            item: item,
+            action: { action in
+              store.send(.view(.task(.listItemActionPerfomed(action))))
             }
           )
-          Divider()
+          .contentShape(Rectangle())
+          .onTapGesture {
+            store.send(.view(.task(.listItemActionPerfomed(.itemTapped(itemId: item.id, parentId: nil)))))
+          }
         }
         addTaskButton
-      }
-    }
-  }
-
-  @ViewBuilder
-  private var newActivityTaskForm: some View {
-    WithPerceptionTracking {
-      HStack(spacing: 5.0) {
-        TextField("", text: $store.newActivityTask.name)
-          .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.sectionText)
-          .submitLabel(.done)
-          .focused($focus, equals: .newTask)
-        Spacer()
-        if !store.newActivityTask.name.isEmpty {
-          Button(String(localized: "Cancel", bundle: .module), action: {
-            store.send(.view(.task(.newActivityActionPerformed(.dayActivityTask(.cancelled)))))
-          })
-          .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.actionBlue)
-        }
-      }
-      .onSubmit {
-        store.send(.view(.task(.newActivityActionPerformed(.dayActivityTask(.submitted)))))
+          .padding(.vertical, 15.0)
+          .padding(.horizontal, 10.0)
       }
     }
   }

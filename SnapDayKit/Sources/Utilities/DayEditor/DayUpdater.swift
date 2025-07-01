@@ -115,7 +115,7 @@ public actor DayUpdater: TodayProvidable {
   }
 
   public func saveDayActivities(_ dayActivities: [DayActivity]) async throws {
-    for dayActivity in dayActivities where dayActivity.isSavable {
+    for dayActivity in dayActivities where dayActivity.isTemporary {
       try await saveDayActivity(dayActivity, syncSharable: false)
     }
   }
@@ -149,12 +149,14 @@ public actor DayUpdater: TodayProvidable {
     }
   }
 
-  public func addParticipant(_ participant: DayActivityParticipant, to dayActivity: DayActivity) async throws {
-    try await sharedDayActivityUpdater.addParticipant(participant, to: dayActivity)
+  public func addParticipant(_ participantId: String, to dayActivity: DayActivity) async throws {
+    guard let recordName = try await cloudService.invited().first(where: { $0.id == participantId })?.recordName else { return }
+    try await sharedDayActivityUpdater.addParticipant(recordName, to: dayActivity)
   }
 
-  public func removeParticipant(_ participant: DayActivityParticipant, to dayActivity: DayActivity) async throws {
-    try await sharedDayActivityUpdater.removeParticipant(participant, to: dayActivity)
+  public func removeParticipant(_ participantId: String, to dayActivity: DayActivity) async throws {
+    guard let recordName = try await cloudService.invited().first(where: { $0.id == participantId })?.recordName else { return }
+    try await sharedDayActivityUpdater.removeParticipant(recordName, to: dayActivity)
   }
 
   public func stopCollaboration(in dayActivity: DayActivity) async throws {

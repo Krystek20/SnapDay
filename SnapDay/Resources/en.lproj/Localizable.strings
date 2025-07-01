@@ -1,0 +1,11 @@
+// Titles
+"notification.invitation.title" = "Invitation to Collaborate";
+"notification.accepted.title" = "Invitation Accepted";
+"notification.edited.title" = "Activity Updated";
+"notification.done.title" = "Activity Completed";
+
+// Bodies
+"notification.invitation.body" = "%@ invited you to join the activity \"%@\".";
+"notification.accepted.body" = "%@ accepted your invitation to \"%@\".";
+"notification.edited.body" = "\"%@\" was edited by %@.";
+"notification.done.body" = "%@ marked \"%@\" as done.";

@@ -8,10 +8,12 @@ import Models
 import Common
 import CalendarPicker
 import Combine
-import enum UiComponents.DayViewShowButtonState
-import protocol UiComponents.InformationViewConfigurable
 import WidgetKit
 import Friends
+
+import protocol UiComponents.InformationViewConfigurable
+import struct UiComponents.ListItem
+import enum UiComponents.ListItemAction
 
 @Reducer
 public struct DashboardFeature: TodayProvidable {
@@ -25,6 +27,7 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.utcCalendar) private var calendar
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.deeplinkService) private var deeplinkService
+  private let userDefaults: UserDefaults
 
   // MARK: - State & Action
 
@@ -42,29 +45,11 @@ public struct DashboardFeature: TodayProvidable {
       return DaySummary(day: selectedDay)
     }
 
-    var activities: [DayActivity] {
-      @Dependency(\.utcCalendar) var calendar
-      return switch activityListOption {
-      case .collapsed:
-        selectedDay?.activities.filter { !$0.isDone } ?? []
-      case .extended:
-        selectedDay?.activities ?? []
-      }
-    }
-
-    var dayViewShowButtonState: DayViewShowButtonState {
-      guard let selectedDay,
-            !selectedDay.activities.filter(\.isDone).isEmpty else { return .none }
-      switch activityListOption {
-      case .collapsed:
-        return .show
-      case .extended:
-        return .hide
-      }
-    }
+    var newField: DayNewField?
+    var items: [ListItem] = []
 
     var dayInformation: InformationViewConfiguration? {
-      guard let selectedDay, !newActivity.isFormVisible, !loading else { return nil }
+      guard let selectedDay, newField == nil, !loading else { return nil }
       if selectedDay.activities.allSatisfy(\.isDone) && !selectedDay.activities.isEmpty {
         return .todaySuccess
       } else if selectedDay.activities.isEmpty {
@@ -79,11 +64,9 @@ public struct DashboardFeature: TodayProvidable {
     var date: Date
     var selectedDay: Day?
     var streamSetup = false
-    var newActivity = DayNewActivity.empty
-    var newActivityTask = DayNewActivityTask.empty
-    var activityListOption: ActivityListOption = .collapsed
-    var focus: DayNewField?
     var alert: DashboardAlert?
+    var hideCompleted: Bool
+    var hideTasks: Bool
 
     @Presents var activityList: ActivityListFeature.State?
     @Presents var editDayActivity: DayActivityFormFeature.State?
@@ -91,8 +74,13 @@ public struct DashboardFeature: TodayProvidable {
     @Presents var calendarPicker: CalendarPickerFeature.State?
     @Presents var friends: FriendsFeature.State?
 
-    public init(date: Date) {
+    public init(
+      date: Date,
+      userDefaults: UserDefaults = .standard
+    ) {
       self.date = date
+      self.hideCompleted = userDefaults.bool(forKey: "hideCompleted")
+      self.hideTasks = userDefaults.bool(forKey: "hideTasks")
     }
   }
 
@@ -100,12 +88,11 @@ public struct DashboardFeature: TodayProvidable {
     public enum ViewAction: Equatable {
       case appeared
       case newButtonTapped
-      case newActivityActionPerformed(DayNewActivityAction)
       case calendarButtonTapped
       case activityListButtonTapped
-      case dayActivityActionPerfomed(DayActivityActionType)
-      case showCompletedActivitiesTapped
-      case hideCompletedActivitiesTapped
+      case listItemActionPerfomed(ListItemAction)
+      case toggleShowCompletedActivities
+      case toggleShowTasks
       case todayButtonTapped
       case increaseButtonTapped
       case decreaseButtonTapped
@@ -113,16 +100,19 @@ public struct DashboardFeature: TodayProvidable {
       case cancelAlertButtonTapped
       case showFriendsTapped
     }
+
     public enum InternalAction: Equatable {
       case changesApplied(AppliedChanges)
       case loadDay
       case setDate(_ date: Date)
       case setDay(_ day: Day)
+      case setItems
       case calendarDayChanged
       case handleDeepLink(DeeplinkService.DashboardAction?)
       case dayActivityAction(DayActivityAction)
       case dayActivityTaskAction(DayActivityTaskAction)
       case saveOrder
+      case newItemForm(NewItemFormAction)
 
       public enum DayActivityAction: Equatable {
         case showNewForm
@@ -140,8 +130,8 @@ public struct DashboardFeature: TodayProvidable {
         case save(DayActivity)
         case reorder(DayActivity, DayActivity)
         case setImportant(Bool, DayActivity)
-        case addParticipant(DayActivityParticipant, DayActivity)
-        case removeParticipant(DayActivityParticipant, DayActivity)
+        case addParticipant(String, DayActivity)
+        case removeParticipant(String, DayActivity)
         case stopCollaboration(DayActivity)
         case acceptInvitation(DayActivity)
         case discardInvitation(DayActivity)
@@ -215,7 +205,9 @@ public struct DashboardFeature: TodayProvidable {
 
   // MARK: - Initialization
 
-  public init() { }
+  public init(userDefaults: UserDefaults = .standard) {
+    self.userDefaults = userDefaults
+  }
 
   // MARK: - Private
 
@@ -258,8 +250,6 @@ public struct DashboardFeature: TodayProvidable {
       )
     case .newButtonTapped:
       return .send(.internal(.dayActivityAction(.showNewForm)))
-    case .newActivityActionPerformed(let action):
-      return handleDayNewActivityAction(action, state: &state)
     case .calendarButtonTapped:
       showDatePicker(state: &state)
       return .none
@@ -267,14 +257,16 @@ public struct DashboardFeature: TodayProvidable {
       guard let selectedDay = state.selectedDay else { return .none }
       state.activityList = ActivityListFeature.State(day: selectedDay)
       return .none
-    case .dayActivityActionPerfomed(let actionType):
-      return performDayActivityAction(actionType)
-    case .showCompletedActivitiesTapped:
-      state.activityListOption = .extended
-      return .none
-    case .hideCompletedActivitiesTapped:
-      state.activityListOption = .collapsed
-      return .none
+    case .listItemActionPerfomed(let actionType):
+      return performListItemAction(actionType, state: &state)
+    case .toggleShowCompletedActivities:
+      state.hideCompleted.toggle()
+      userDefaults.set(state.hideCompleted, forKey: "hideCompleted")
+      return .send(.internal(.setItems))
+    case .toggleShowTasks:
+      state.hideTasks.toggle()
+      userDefaults.set(state.hideTasks, forKey: "hideTasks")
+      return .send(.internal(.setItems))
     case .increaseButtonTapped:
       state.date = calendar.date(byAdding: .day, value: 1, to: state.date) ?? state.date
       return .send(.internal(.loadDay))
@@ -339,9 +331,18 @@ public struct DashboardFeature: TodayProvidable {
     case .setDay(let day):
       state.selectedDay = day
       state.loading = false
-      return .run { _ in
+      return .run { send in
+        await send(.internal(.setItems))
         try await userNotificationCenterProvider.reloadReminders()
       }
+    case .setItems:
+      state.items = ListItemsBuilder(
+        activities: state.selectedDay?.activities ?? [],
+        newField: state.newField,
+        hideCompleted: state.hideCompleted,
+        hideTasks: state.hideTasks
+      ).build()
+      return .none
     case .dayActivityAction(let action):
       return handleDayActivityAction(action, state: &state)
     case .dayActivityTaskAction(let action):
@@ -367,68 +368,110 @@ public struct DashboardFeature: TodayProvidable {
         }
         await send(.internal(.loadDay))
       }
+    case .newItemForm(let action):
+      return handleNewItemFormAction(action, state: &state)
     }
   }
 
-  private func performDayActivityAction(_ actionType: DayActivityActionType) -> Effect<Action> {
+  private func performListItemAction(_ actionType: ListItemAction, state: inout State) -> Effect<Action> {
     switch actionType {
-    case .dayActivity(let dayActivityAction, let dayActivity):
-      switch dayActivityAction {
-      case .tapped:
-        .send(.internal(.dayActivityAction(.select(dayActivity))))
-      case .edit:
-        .send(.internal(.dayActivityAction(.showEditForm(dayActivity))))
-      case .copy:
-        .send(.internal(.dayActivityAction(.showMultiDatePicker(dayActivity))))
-      case .move:
-        .send(.internal(.dayActivityAction(.showDatePicker(dayActivity))))
-      case .remove:
-        .send(.internal(.dayActivityAction(.remove(dayActivity))))
-      case .addActivityTask:
-        .send(.internal(.dayActivityTaskAction(.showNewForm(dayActivity))))
-      case .save:
-        .send(.internal(.dayActivityAction(.save(dayActivity))))
-      case .reorder(let action):
-        switch action {
-        case .perform(let destination):
-          .send(.internal(.dayActivityAction(.reorder(dayActivity, destination))))
-        case .drop:
-          .send(.internal(.saveOrder))
+    case .itemTapped(let itemId, let parentId):
+      return .run { send in
+        if let parentId,
+           let dayActivity = try await dayUpdater.dayActivity(identifier: parentId),
+           let task = dayActivity.dayActivityTasks.first(where: { $0.id.uuidString == itemId }) {
+          await send(.internal(.dayActivityTaskAction(.showEditForm(task))))
+        } else if let dayActivity = try await dayUpdater.dayActivity(identifier: itemId) {
+          await send(.internal(.dayActivityAction(.showEditForm(dayActivity))))
         }
-      case .markImportant:
-        .send(.internal(.dayActivityAction(.setImportant(true, dayActivity))))
-      case .unmarkImportant:
-        .send(.internal(.dayActivityAction(.setImportant(false, dayActivity))))
-      case .addParticipant(let participant):
-        .send(.internal(.dayActivityAction(.addParticipant(participant, dayActivity))))
-      case .removeParticipant(let participant):
-        .send(.internal(.dayActivityAction(.removeParticipant(participant, dayActivity))))
-      case .stopCollaboration:
-        .send(.internal(.dayActivityAction(.stopCollaboration(dayActivity))))
-      case .acceptInvitation:
-        .send(.internal(.dayActivityAction(.acceptInvitation(dayActivity))))
-      case .discardInvitation:
-        .send(.internal(.dayActivityAction(.discardInvitation(dayActivity))))
       }
-    case .dayActivityTask(let dayActivityTaskAction, let dayActivityTask):
-      switch dayActivityTaskAction {
-      case .tapped:
-        .send(.internal(.dayActivityTaskAction(.select(dayActivityTask))))
-      case .edit:
-        .send(.internal(.dayActivityTaskAction(.showEditForm(dayActivityTask))))
-      case .remove:
-        .send(.internal(.dayActivityTaskAction(.remove(dayActivityTask))))
+    case .rowAction(let parameters):
+      guard let action = DayActivityInvitationAction(rawValue: parameters.actionId),
+            let dayActivity = state.selectedDay?.activities.first(where: { $0.id.uuidString == parameters.itemId }) else {
+        return .none
       }
+      return .run { send in
+        switch action {
+        case .accept:
+          await send(.internal(.dayActivityAction(.acceptInvitation(dayActivity))))
+        case .discard:
+          await send(.internal(.dayActivityAction(.discardInvitation(dayActivity))))
+        }
+      }
+    case .menuAction(let menuParameters, let submenuParameters):
+      return .run { send in
+        if let parentId = menuParameters.parentId,
+           let dayActivity = try await dayUpdater.dayActivity(identifier: parentId),
+           let task = dayActivity.dayActivityTasks.first(where: { $0.id.uuidString == menuParameters.itemId }),
+           let action = DayActivityTaskAction(rawValue: menuParameters.actionId)
+        {
+          switch action {
+          case .deselect:
+            await send(.internal(.dayActivityTaskAction(.select(task))))
+          case .select:
+            await send(.internal(.dayActivityTaskAction(.select(task))))
+          case .edit:
+            await send(.internal(.dayActivityTaskAction(.showEditForm(task))))
+          case .remove:
+            await send(.internal(.dayActivityTaskAction(.remove(task))))
+          }
+        } else if let dayActivity = try await dayUpdater.dayActivity(identifier: menuParameters.itemId),
+                  let action = DayActivityAction(rawValue: menuParameters.actionId) {
+          switch action {
+          case .deselect:
+            await send(.internal(.dayActivityAction(.select(dayActivity))))
+          case .select:
+            await send(.internal(.dayActivityAction(.select(dayActivity))))
+          case .edit:
+            await send(.internal(.dayActivityAction(.showEditForm(dayActivity))))
+          case .addTask:
+            await send(.internal(.dayActivityTaskAction(.showNewForm(dayActivity))))
+          case .save:
+            await send(.internal(.dayActivityAction(.save(dayActivity))))
+          case .move:
+            await send(.internal(.dayActivityAction(.showDatePicker(dayActivity))))
+          case .copy:
+            await send(.internal(.dayActivityAction(.showMultiDatePicker(dayActivity))))
+          case .remove:
+            await send(.internal(.dayActivityAction(.remove(dayActivity))))
+          case .selectImportant:
+            await send(.internal(.dayActivityAction(.setImportant(true, dayActivity))))
+          case .deselectImportant:
+            await send(.internal(.dayActivityAction(.setImportant(false, dayActivity))))
+          case .deselectCollaborator, .selectCollaborator:
+            guard let submenuParameters, let submenuAction = DayActivityCollaborationAction(rawValue: submenuParameters.actionId) else { return }
+            switch submenuAction {
+            case .add:
+              await send(.internal(.dayActivityAction(.addParticipant(submenuParameters.itemId, dayActivity))))
+            case .remove:
+              await send(.internal(.dayActivityAction(.removeParticipant(submenuParameters.itemId, dayActivity))))
+            }
+          case .stopCollaboration:
+            await send(.internal(.dayActivityAction(.stopCollaboration(dayActivity))))
+          }
+        }
+      }
+    case .reorder(let action, let itemId):
+      return .run { [activities = state.selectedDay?.activities] send in
+        switch action {
+        case .perform(let destinationId):
+          guard let dayActivity = activities?.first(where: { $0.id.uuidString == itemId }),
+                let destination = activities?.first(where: { $0.id.uuidString == destinationId }) else { return }
+          await send(.internal(.dayActivityAction(.reorder(dayActivity, destination))))
+        case .drop:
+          await send(.internal(.saveOrder))
+        }
+      }
+    case .newItemForm(let action):
+      return .send(.internal(.newItemForm(action)))
     }
   }
 
   private func handleDayActivityAction(_ action: Action.InternalAction.DayActivityAction, state: inout State) -> Effect<Action> {
     switch action {
     case .showNewForm:
-      state.newActivityTask = .empty
-      state.newActivity.isFormVisible = true
-      state.focus = .activityName
-      return .none
+      state.newField = .activityName
+      return .send(.internal(.setItems))
     case .showEditForm(let dayActivity):
       guard let selectedDay = state.selectedDay else { return .none }
       state.editDayActivity = DayActivityFormFeature.State(
@@ -531,12 +574,11 @@ public struct DashboardFeature: TodayProvidable {
             let fromIndex = state.selectedDay?.activities.firstIndex(of: dayActivity),
             let toIndex = state.selectedDay?.activities.firstIndex(of: destinationDayActivity),
             fromIndex != toIndex else { return .none }
-
       state.selectedDay?.activities.move(
         fromOffsets: IndexSet(integer: fromIndex),
         toOffset: (toIndex > fromIndex ? (toIndex + 1) : toIndex)
       )
-      return .none
+      return .send(.internal(.setItems))
     case .setImportant(let isImportant, let dayActivity):
       guard var dayActivity = findActivity(id: dayActivity.id, state: state) else { return .none }
       dayActivity.important = isImportant
@@ -544,10 +586,10 @@ public struct DashboardFeature: TodayProvidable {
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
         await send(.internal(.loadDay))
       }
-    case .addParticipant(let participant, let dayActivity):
+    case .addParticipant(let participantId, let dayActivity):
       return .run { send in
         do {
-          try await dayUpdater.addParticipant(participant, to: dayActivity)
+          try await dayUpdater.addParticipant(participantId, to: dayActivity)
           await send(.internal(.loadDay))
         } catch {
           print(error)
@@ -558,9 +600,9 @@ public struct DashboardFeature: TodayProvidable {
         try await dayUpdater.stopCollaboration(in: dayActivity)
         await send(.internal(.loadDay))
       }
-    case .removeParticipant(let participant, let dayActivity):
+    case .removeParticipant(let participantId, let dayActivity):
       return .run { send in
-        try await dayUpdater.removeParticipant(participant, to: dayActivity)
+        try await dayUpdater.removeParticipant(participantId, to: dayActivity)
         await send(.internal(.loadDay))
       }
     case .acceptInvitation(let dayActivity):
@@ -579,11 +621,8 @@ public struct DashboardFeature: TodayProvidable {
   private func handleDayActivityTaskAction(_ action: Action.InternalAction.DayActivityTaskAction, state: inout State) -> Effect<Action> {
     switch action {
     case .showNewForm(let dayActivity):
-      state.newActivity = .empty
-      state.newActivityTask.activityId = dayActivity.id
-      state.newActivityTask.isFormVisible = true
-      state.focus = .taskName(identifier: dayActivity.id.uuidString)
-      return .none
+      state.newField = .taskName(identifier: dayActivity.id.uuidString)
+      return .send(.internal(.setItems))
     case .showEditForm(let dayActivityTask):
       guard let day = state.selectedDay else { return .none }
       state.dayActivityTaskForm = DayActivityFormFeature.State(
@@ -694,42 +733,38 @@ public struct DashboardFeature: TodayProvidable {
     }
   }
 
-  private func handleDayNewActivityAction(_ action: DayNewActivityAction, state: inout State) -> Effect<Action> {
+  private func handleNewItemFormAction(_ action: NewItemFormAction, state: inout State) -> Effect<Action> {
     switch action {
-    case .dayActivity(.cancelled):
-      state.newActivity = .empty
-      state.focus = nil
-      return .none
-    case .dayActivity(.submitted):
-      guard !state.newActivity.name.isEmpty, let day = state.selectedDay else {
-        return .send(.view(.newActivityActionPerformed(.dayActivity(.cancelled))))
+    case .cancelled:
+      state.newField = nil
+      return .send(.internal(.setItems))
+    case .submitted:
+      guard let newField = state.newField,
+            let item = state.items.first(where: { $0.isForm }),
+            item.title != .empty,
+            let day = state.selectedDay else {
+        return .send(.internal(.newItemForm(.cancelled)))
       }
-      let dayActivity = DayActivity(
-        id: uuid(),
-        date: day.date,
-        name: state.newActivity.name,
-        isGeneratedAutomatically: false
-      )
-      return .concatenate(
-        .send(.internal(.dayActivityAction(.create(dayActivity)))),
-        .send(.view(.newActivityActionPerformed(.dayActivity(.cancelled))))
-      )
-    case .dayActivityTask(.cancelled):
-      state.newActivityTask = .empty
-      state.focus = nil
-      return .none
-    case .dayActivityTask(.submitted):
-      let name = state.newActivityTask.name
-      let activityId = state.newActivityTask.activityId
-      state.newActivityTask = .empty
-      state.focus = nil
-      guard let activityId, !name.isEmpty else { return .none }
-      let dayActivityTask = DayActivityTask(
-        id: uuid(),
-        dayActivityId: activityId,
-        name: name
-      )
-      return .send(.internal(.dayActivityTaskAction(.create(dayActivityTask))))
+      switch newField {
+      case .activityName:
+        let dayActivity = DayActivity(
+          id: uuid(),
+          date: day.date,
+          name: item.title,
+          isGeneratedAutomatically: false
+        )
+        state.newField = nil
+        return .send(.internal(.dayActivityAction(.create(dayActivity))))
+      case .taskName(let activityId):
+        guard let dayActivityId = UUID(uuidString: activityId) else { return .none }
+        let dayActivityTask = DayActivityTask(
+          id: uuid(),
+          dayActivityId: dayActivityId,
+          name: item.title
+        )
+        state.newField = nil
+        return .send(.internal(.dayActivityTaskAction(.create(dayActivityTask))))
+      }
     }
   }
 

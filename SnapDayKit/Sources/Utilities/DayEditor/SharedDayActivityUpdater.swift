@@ -21,6 +21,7 @@ actor SharedDayActivityUpdater {
   @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.iconProvider) private var iconProvider
   @Dependency(\.cloudService) private var cloudService
+  @Dependency(\.remoteNotificationRepository) private var remoteNotificationRepository
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date.now) private var now
 
@@ -65,22 +66,22 @@ actor SharedDayActivityUpdater {
 
   // MARK: - Public
 
-  public func addParticipant(_ participant: DayActivityParticipant, to dayActivity: DayActivity) async throws {
+  public func addParticipant(_ userRecordName: String, to dayActivity: DayActivity) async throws {
     try await asyncWaiter.executeOrWait(for: dayActivity.id) {
-      try await addParticipant(to: dayActivity, participant: participant)
+      try await addParticipant(to: dayActivity, participantRecordName: userRecordName)
     }
   }
 
-  public func removeParticipant(_ participant: DayActivityParticipant, to dayActivity: DayActivity) async throws {
+  public func removeParticipant(_ userRecordName: String, to dayActivity: DayActivity) async throws {
     try await asyncWaiter.executeOrWait(for: dayActivity.id) {
-      try await removeParticipant(from: dayActivity, userRecordNameToRemove: participant.userRecordName)
+      try await removeParticipant(from: dayActivity, participantRecordName: userRecordName)
     }
   }
 
   public func stopCollaboration(in dayActivity: DayActivity) async throws {
     try await asyncWaiter.executeOrWait(for: dayActivity.id) {
       guard let userRecordName = await cloudService.userRecordName else { return }
-      try await removeParticipant(from: dayActivity, userRecordNameToRemove: userRecordName)
+      try await removeParticipant(from: dayActivity, participantRecordName: userRecordName)
     }
   }
 
@@ -115,6 +116,28 @@ actor SharedDayActivityUpdater {
         option: .dayActivity(sharedDayActivity),
         fetchOption: .sharedId
       )
+
+      guard let userName = try await cloudService.userName else {
+        print("No user name")
+        return
+      }
+
+      do {
+        try await remoteNotificationRepository.notifyParticipants(
+          request: NotifyParticipantsRequest(
+            userRecord: userRecordName,
+            participants: sharedDayActivity.sharedBy.map(\.userId),
+            action: .accept,
+            userData: [
+              .activityName: sharedDayActivity.name,
+              .userName: userName,
+              .activityLogId: "logActivityShare"
+            ]
+          )
+        )
+      } catch {
+        print("Cannot notify participants \(error)")
+      }
     }
   }
 
@@ -288,17 +311,16 @@ actor SharedDayActivityUpdater {
 
   // MARK: - Participants
 
-  private func addParticipant(to dayActivity: DayActivity, participant: DayActivityParticipant) async throws {
+  private func addParticipant(to dayActivity: DayActivity, participantRecordName: String) async throws {
     guard let userRecordName = await cloudService.userRecordName else {
       throw SharedDayActivitySaverError.userRecordNotExist
     }
-
     let existingSharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString)
 
     guard var share = if existingSharedDayActivity != nil {
       try await cloudService.firstShare(where: dayActivity.id.uuidString)
     } else {
-      try await cloudService.share(where: .userRecord(participant.userRecordName))
+      try await cloudService.myShare
     } else {
       throw SharedDayActivitySaverError.shareNotExist
     }
@@ -319,14 +341,15 @@ actor SharedDayActivityUpdater {
       )
     }
 
-    guard !sharedDayActivity.sharedBy.contains(where: { $0.userId == participant.userRecordName }) else { return }
-    sharedDayActivity.sharedBy.append(
-      SharedBy(
-        identifier: sharedDayActivity.id.uuidString + participant.userRecordName,
-        userId: participant.userRecordName,
-        action: .update
+    if !sharedDayActivity.sharedBy.contains(where: { $0.userId == participantRecordName }) {
+      sharedDayActivity.sharedBy.append(
+        SharedBy(
+          identifier: sharedDayActivity.id.uuidString + participantRecordName,
+          userId: participantRecordName,
+          action: .update
+        )
       )
-    )
+    }
 
     if let index = share.sharedDayActivities.firstIndex(where: { $0.id == sharedDayActivity.id }) {
       share.sharedDayActivities[index] = sharedDayActivity
@@ -341,20 +364,20 @@ actor SharedDayActivityUpdater {
     )
 
     try await cloudService.save(share)
-    try await cloudService.notify(participantRecordName: participant.userRecordName, activityId: sharedDayActivity.id.uuidString)
+    try await cloudService.notify(participantRecordName: userRecordName, activityId: sharedDayActivity.id.uuidString)
   }
 
-  private func removeParticipant(from dayActivity: DayActivity, userRecordNameToRemove: String) async throws {
+  private func removeParticipant(from dayActivity: DayActivity, participantRecordName: String) async throws {
     guard var existingSharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString) else { return }
 
     for (index, sharedBy) in existingSharedDayActivity.sharedBy.enumerated() {
-      guard sharedBy.userId == userRecordNameToRemove else { continue }
+      guard sharedBy.userId == participantRecordName else { continue }
       existingSharedDayActivity.sharedBy[index].action = .remove
     }
 
     for (taskIndex, task) in existingSharedDayActivity.tasks.enumerated() {
       for (index, sharedBy) in task.sharedBy.enumerated() {
-        guard sharedBy.userId == userRecordNameToRemove else { continue }
+        guard sharedBy.userId == participantRecordName else { continue }
         existingSharedDayActivity.tasks[taskIndex].sharedBy[index].action = .remove
       }
     }

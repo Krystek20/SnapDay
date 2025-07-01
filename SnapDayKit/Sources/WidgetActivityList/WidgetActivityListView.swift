@@ -14,7 +14,7 @@ public struct WidgetActivityListView: View {
   @Perception.Bindable private var store: StoreOf<WidgetActivityListFeature>
   private let listUpIntent: () -> any AppIntent
   private let listDownIntent: () -> any AppIntent
-  private let switchItemIntent: (UUID) -> any AppIntent
+  private let switchItemIntent: (String) -> any AppIntent
 
   // MARK: - Initialization
 
@@ -22,7 +22,7 @@ public struct WidgetActivityListView: View {
     store: StoreOf<WidgetActivityListFeature>,
     listUpIntent: @escaping () -> any AppIntent,
     listDownIntent: @escaping () -> any AppIntent,
-    switchItemIntent: @escaping (UUID) -> any AppIntent
+    switchItemIntent: @escaping (String) -> any AppIntent
   ) {
     self.store = store
     self.listUpIntent = listUpIntent
@@ -107,8 +107,8 @@ public struct WidgetActivityListView: View {
   private var contentView: some View {
     WithPerceptionTracking {
       switch store.contentType {
-      case .list(let dayActivityItems):
-        listView(dayActivityItems: dayActivityItems)
+      case .list(let items):
+        listView(items: items)
       case .success:
         successView
       case .empty:
@@ -163,19 +163,16 @@ public struct WidgetActivityListView: View {
     .padding(.all, 20.0)
   }
 
-  private func listView(dayActivityItems: [DayActivityItem]) -> some View {
+  private func listView(items: [ListItem]) -> some View {
     VStack(spacing: .zero) {
-      ForEach(dayActivityItems) { item in
-        DayActivityRow(
-          activityItem: item,
+      ForEach(items) { item in
+        ListItemView(
+          item: item,
           size: .small,
-          trailingIcon: .customView(customView(item: item))
+          customTrailingView: {
+            customView(item: item)
+          }
         )
-        .padding(.leading, item.isSubtask ? 10.0 : .zero)
-        if item != dayActivityItems.last {
-          Divider()
-            .padding(.leading, item.isSubtask ? 10.0 : .zero)
-        }
       }
       Spacer(minLength: .zero)
     }
@@ -194,7 +191,7 @@ public struct WidgetActivityListView: View {
   }
 
   @ViewBuilder
-  private func customView(item: DayActivityItem) -> some View {
+  private func customView(item: ListItem) -> some View {
     if #available(iOS 17.0, *) {
       Toggle(
         isOn: item.isStrikethrough,

@@ -33,6 +33,7 @@
       }
     },
     "Cancel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

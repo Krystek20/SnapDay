@@ -80,8 +80,10 @@ public struct FriendsView: View {
     WithPerceptionTracking {
       VStack(alignment: .center, spacing: 10.0) {
         Picker("", selection: $store.listType) {
-          ForEach(FriendsFeature.ListType.allCases) { listType in
-            Text(listType.title).tag(listType)
+          WithPerceptionTracking {
+            ForEach(FriendsFeature.ListType.allCases) { listType in
+              Text(listType.title).tag(listType)
+            }
           }
         }
         .pickerStyle(.segmented)

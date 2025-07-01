@@ -2,13 +2,14 @@ import Foundation
 import ComposableArchitecture
 import Utilities
 import Models
-import struct UiComponents.DayActivityItem
+
+import struct UiComponents.ListItem
 
 @Reducer
 public struct WidgetActivityListFeature: TodayProvidable {
 
   public enum ContentType: Equatable {
-    case list([DayActivityItem])
+    case list([ListItem])
     case success
     case empty
   }
@@ -37,21 +38,21 @@ public struct WidgetActivityListFeature: TodayProvidable {
     }
 
     var isDownButtonDisabled: Bool {
-      allDayActivityItems.count <= maxPerPage * (ListConfiguration.currentPage + 1)
+      allItems.count <= maxPerPage * (ListConfiguration.currentPage + 1)
     }
 
     var contentType: ContentType {
       guard let selectedDay, !selectedDay.activities.isEmpty else { return .empty }
       return selectedDay.activities.allSatisfy(\.isDone)
       ? .success
-      : .list(dayActivityItems)
+      : .list(items)
     }
 
-    private var dayActivityItems: [DayActivityItem] {
-      let dayActivityItems = allDayActivityItems
+    private var items: [ListItem] {
+      let items = allItems
       let lowerBounds = maxPerPage * ListConfiguration.currentPage
-      let upperBounds = min(dayActivityItems.count, maxPerPage * (ListConfiguration.currentPage + 1))
-      return Array(dayActivityItems[lowerBounds..<upperBounds])
+      let upperBounds = min(items.count, maxPerPage * (ListConfiguration.currentPage + 1))
+      return Array(items[lowerBounds..<upperBounds])
     }
 
     var completedActivities: CompletedActivities? {
@@ -63,42 +64,18 @@ public struct WidgetActivityListFeature: TodayProvidable {
       }
     }
 
-    private var allDayActivityItems: [DayActivityItem] {
+    private var allItems: [ListItem] {
       @Dependency(\.utcCalendar) var calendar
       guard let selectedDay else { return [] }
-      return selectedDay
+      let activities = selectedDay
         .activities
         .sorted(calendar: calendar)
-        .reduce(into: [DayActivityItem](), { result, dayActivity in
-          let ignoreActivity = hideCompleted && dayActivity.isDone
-          if !ignoreActivity {
-            var iconData: Data?
-            if let iconId = dayActivity.iconId,
-               let icon = icons.first(where: { $0.id == iconId }) {
-              iconData = icon.data
-            }
-            result.append(
-              DayActivityItem(
-                activityType: dayActivity,
-                iconRules: .data(iconData)
-              )
-            )
-          }
 
-          result.append(
-            contentsOf: dayActivity.dayActivityTasks.sorted(calendar: calendar).compactMap { dayActivityTask in
-              let ignoreTask = hideCompleted && dayActivityTask.isDone
-              guard !ignoreActivity && !ignoreTask else {
-                return nil
-              }
-              return DayActivityItem(
-                activityType: dayActivityTask,
-                iconRules: .none,
-                parentId: dayActivity.id
-              )
-            }
-          )
-        })
+      return ListItemsBuilder(
+        activities: activities,
+        hideCompleted: hideCompleted,
+        icons: icons
+      ).build()
     }
 
     private var maxPerPage = 6

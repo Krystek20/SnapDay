@@ -27,7 +27,6 @@ extension Day {
       if let iconId = next.iconId {
         result.append(iconId)
       }
-      result += next.dayActivityTasks.compactMap(\.iconId)
     })
   }
 

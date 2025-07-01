@@ -22,28 +22,8 @@ public struct DayActivityReminderView: View {
   public var body: some View {
     WithPerceptionTracking {
       VStack(alignment: .leading, spacing: .zero) {
-        if let type = store.viewType {
-          switch type {
-          case .activity(let dayActivity):
-            DayActivityRow(
-              activityItem: DayActivityItem(activityType: dayActivity),
-              trailingIcon: .none
-            )
-          case .activityTask(let dayActivity, let dayActivityTask):
-            VStack(spacing: .zero) {
-              DayActivityRow(
-                activityItem: DayActivityItem(activityType: dayActivity),
-                trailingIcon: .none
-              )
-              Divider()
-                .padding(.leading, 20.0)
-              DayActivityRow(
-                activityItem: DayActivityItem(activityType: dayActivityTask, iconRules: .none),
-                trailingIcon: .none
-              )
-              .padding(.leading, 10.0)
-            }
-          }
+        ForEach(store.items) { item in
+          ListItemView(item: item)
         }
       }
       .background(
@@ -59,7 +39,6 @@ public struct DayActivityReminderView: View {
 
   private func contentViewChanged(size: CGSize) -> some View {
     sizeChanged?(size)
-    return Color.background
-      .ignoresSafeArea()
+    return Color.background.ignoresSafeArea()
   }
 }

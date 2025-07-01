@@ -113,6 +113,9 @@
         }
       }
     },
+    "Add task" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "de" : {
@@ -140,6 +143,9 @@
           }
         }
       }
+    },
+    "Collaborate" : {
+
     },
     "Complete Activity?" : {
       "localizations" : {
@@ -253,6 +259,12 @@
         }
       }
     },
+    "Deselect" : {
+
+    },
+    "Edit" : {
+
+    },
     "Great job! Your activity has been successfully saved to your activity list. You can find it under the 'Activity List' button. From there, you can make your saved activities frequently and manage them easily. Keep up the good work!" : {
       "localizations" : {
         "de" : {
@@ -364,6 +376,30 @@
           }
         }
       }
+    },
+    "Remove" : {
+
+    },
+    "Save" : {
+
+    },
+    "Select" : {
+
+    },
+    "Set as important" : {
+
+    },
+    "Set as regular" : {
+
+    },
+    "Show completed" : {
+
+    },
+    "Show tasks" : {
+
+    },
+    "Stop Collaboration" : {
+
     },
     "Success!" : {
       "localizations" : {

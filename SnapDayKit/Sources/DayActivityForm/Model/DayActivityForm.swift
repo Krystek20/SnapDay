@@ -309,10 +309,10 @@ extension DayActivityForm {
     self.iconId = activity.iconId
     self.name = activity.name
     self.tags = activity.tags
-    self.duration = activity.duration
-    self.reminderDate = activity.reminderDate
+    self.duration = activity.defaultDuration ?? .zero
+    self.reminderDate = activity.defaultReminderDate
     self.dueDaysCount = activity.dueDaysCount
-    self.overview = activity.overview ?? ""
+    self.overview = ""
     self.tasks = activity
       .tasks
       .map(DayActivityForm.init)

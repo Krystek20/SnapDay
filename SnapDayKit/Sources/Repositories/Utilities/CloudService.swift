@@ -3,6 +3,7 @@ import CloudKit
 import Combine
 import Dependencies
 import Models
+import Common
 
 extension DependencyValues {
   public var cloudService: CloudService {
@@ -50,36 +51,68 @@ public actor CloudService {
   public var userRecordName: String? {
     get async {
       do {
-        return try await CKContainer.default().userRecordID().recordName
+        return try await container.userRecordID().recordName
       } catch {
         return nil
       }
     }
   }
 
+  public var userName: String? {
+    get async throws {
+      let userRecordId = try await container.userRecordID()
+      let participant: CKShare.Participant? = try await withCheckedThrowingContinuation { continuation in
+        container.fetchShareParticipant(withUserRecordID: userRecordId) { participant, error in
+          if let error {
+            continuation.resume(throwing: error)
+          } else {
+            continuation.resume(returning: participant)
+          }
+        }
+      }
+
+      return participant?.userIdentity.nameComponents?.givenName
+    }
+  }
+
   private var cloudState: CloudState {
     get async throws {
-      let container = CKContainer.default()
-      let accountStatus = try await container.accountStatus()
-      return switch accountStatus {
+      switch try await container.accountStatus() {
       case .available:
-        .active
+          .active
       case .couldNotDetermine:
-        .deactive
+          .deactive
       case .noAccount:
-        .actionNeeded(.login)
+          .actionNeeded(.login)
       case .restricted:
-        .actionNeeded(.permissions)
+          .actionNeeded(.permissions)
       case .temporarilyUnavailable:
-        .deactive
+          .deactive
       @unknown default:
-        .deactive
+          .deactive
       }
+    }
+  }
+
+  public var myShare: Share? {
+    get async throws {
+      let context = coreDataStack.backgroundContext
+      let allShares = try await shareRepository.fetchAll()
+      return try allShares
+        .first(where: { share in
+          let shareEntity = try share.managedObject(context)
+          guard let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else { return false }
+          return ckShare.currentUserParticipant?.role == .owner
+        })
     }
   }
 
   lazy var shareStatePublisher = shareStateSubject.eraseToAnyPublisher()
   private let shareStateSubject = CurrentValueSubject<ShareState, Never>(.idle)
+  private let container = CKContainer(identifier: "iCloud.com.mobilove.snapday")
+  private var publicCloudDatabase: CKDatabase {
+    container.publicCloudDatabase
+  }
 
   // MARK: - Public
 
@@ -99,7 +132,7 @@ public actor CloudService {
     subscription.notificationInfo = notificationInfo
 
     do {
-      try await CKContainer.default().publicCloudDatabase.save(subscription)
+      try await publicCloudDatabase.save(subscription)
       print("subscription saved")
     } catch {
       print("Save subscription with error: \(error)")
@@ -213,33 +246,6 @@ public actor CloudService {
     return try await addParticipant(lookupInfo: lookupInfo)
   }
 
-  public enum ShareWhere {
-    case userRecord(String)
-    case shareDayActivity(UUID)
-  }
-
-  public func share(where: ShareWhere) async throws -> Share? {
-    let context = coreDataStack.backgroundContext
-    let allShares = try await shareRepository.fetchAll()
-
-    return try allShares
-      .first(where: { share in
-        let shareEntity = try share.managedObject(context)
-        guard let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else { return false }
-
-        switch `where` {
-        case .userRecord(let userRecord):
-          let participants = ckShare.participants.filter {
-            $0.userIdentity.userRecordID?.recordName == userRecord || $0 == ckShare.currentUserParticipant
-          }
-          guard participants.count == 2 else { return false }
-          return participants.contains(ckShare.owner)
-        case .shareDayActivity(let identifier):
-          return share.sharedDayActivities.contains(where: { $0.id == identifier })
-        }
-      })
-  }
-
   public func firstShare(where objectId: String) async throws -> Share? {
     try await shareRepository.fetchAll()
       .first(where: { share in
@@ -250,23 +256,19 @@ public actor CloudService {
   }
 
   public func notify(participantRecordName: String, activityId: String) async throws {
-    let database = CKContainer.default().publicCloudDatabase
     let notificationRecord = CKRecord(recordType: "UserNotification")
-
     notificationRecord["participantRecordName"] = participantRecordName
     notificationRecord["activityId"] = activityId
     notificationRecord["timestamp"] = Date()
-
-    try await database.save(notificationRecord)
+    try await publicCloudDatabase.save(notificationRecord)
   }
 
   public func handleNotification(_ cloudNotification: CloudNotification) async throws {
     switch cloudNotification {
     case .collaborationStarted(let recordName):
-      let database = CKContainer.default().publicCloudDatabase
       let recordId = CKRecord.ID(recordName: recordName)
       do {
-        let result = try await database.record(for: recordId)
+        let result = try await publicCloudDatabase.record(for: recordId)
         print(result)
       } catch {
         print(error)

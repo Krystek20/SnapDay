@@ -140,7 +140,8 @@ final class CoreDataStack {
 
   func fetchShare(matching managedObject: NSManagedObject) throws -> (share: CKShare?, container: CKContainer) {
     let share = try persistentContainer.fetchShares(matching: [managedObject.objectID])[managedObject.objectID]
-    return (share, CKContainer(identifier: NSPersistentStoreDescription.containerIdentifier))
+    let container = CKContainer(identifier: NSPersistentStoreDescription.containerIdentifier)
+    return (share, container)
   }
 
   @discardableResult
@@ -182,12 +183,7 @@ final class CoreDataStack {
   }
 
   func accept(invitation: Invitation) async throws {
-    let startTime = Date()
-    let meta = try await persistentContainer.acceptShareInvitations(from: [invitation.cloudKitShareMetadata], into: sharedPersistentStore)
-    let endTime = Date()
-    let executionTime = endTime.timeIntervalSince(startTime)
-    print("executionTime: \(executionTime) seconds")
-    print(meta)
+    _ = try await persistentContainer.acceptShareInvitations(from: [invitation.cloudKitShareMetadata], into: sharedPersistentStore)
   }
 
   func recordID(for object: NSManagedObject) -> CKRecord.ID? {

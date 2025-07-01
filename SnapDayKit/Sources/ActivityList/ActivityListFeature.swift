@@ -6,6 +6,9 @@ import Utilities
 import Models
 import Common
 
+import enum UiComponents.ListItemAction
+import struct UiComponents.ListItem
+
 @Reducer
 public struct ActivityListFeature: TodayProvidable {
 
@@ -23,26 +26,14 @@ public struct ActivityListFeature: TodayProvidable {
   public struct State: Equatable {
 
     var searchText = ""
-
     var activities: [Activity] = []
-    var displayedActivities: [Activity] {
-      guard !searchText.isEmpty else { return activities }
-      return activities.filter { $0.name.contains(searchText) }
-    }
-
-    var information: InformationViewConfiguration? {
-      let showInformation = activities.isEmpty &&
-      !newActivity.isFormVisible &&
-      !loading
-      return showInformation ? .addActivity : nil
-    }
+    var items: [ListItem] = []
+    var information: InformationViewConfiguration?
 
     @Presents var templateForm: DayActivityFormFeature.State?
     @Presents var dayActivityForm: DayActivityFormFeature.State?
 
-    var newActivity = DayNewActivity.empty
-    var focus: DayNewField?
-    var loading = false
+    var newField: DayNewField?
 
     let day: Day
 
@@ -55,16 +46,16 @@ public struct ActivityListFeature: TodayProvidable {
     public enum ViewAction: Equatable {
       case appeared
       case newButtonTapped
-      case addToDayButtonTapped(Activity)
-      case enableButtonTapped(Activity)
-      case removeButtonTapped(Activity)
-      case activityEditTapped(Activity)
-      case newActivityActionPerformed(DayNewActivityAction)
+      case listItemActionPerfomed(ListItemAction)
     }
     public enum InternalAction: Equatable {
       case loadActivities
       case removeDayActivities(Activity)
       case activitiesLoaded(_ activities: [Activity])
+      case addToDay(_ activity: Activity)
+      case setIsFrequent(_ isFrequentEnabled: Bool, _ activity: Activity)
+      case edit(_ activity: Activity)
+      case setItems
     }
     public enum DelegateAction: Equatable {
       case daysUpdated
@@ -87,43 +78,11 @@ public struct ActivityListFeature: TodayProvidable {
       switch action {
       case .view(.appeared):
         return .send(.internal(.loadActivities))
-      case .view(.addToDayButtonTapped(let activity)):
-        let dayActivity = DayActivity.create(
-          from: activity,
-          uuid: { uuid() },
-          calendar: { calendar },
-          date: state.day.date,
-          createdByUser: true
-        )
-        return .run { send in
-          try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
-          await send(.delegate(.daysUpdated))
-        }
-      case .view(.enableButtonTapped(var activity)):
-        activity.isFrequentEnabled.toggle()
-        return .run { [activity] send in
-          try await activityRepository.saveActivity(activity)
-          try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
-          await send(.internal(.loadActivities))
-          await send(.delegate(.daysUpdated))
-        }
-      case .view(.removeButtonTapped(let activity)):
-        return .send(.internal(.removeDayActivities(activity)))
+      case .view(.listItemActionPerfomed(let action)):
+        return performListItemAction(action, state: &state)
       case .view(.newButtonTapped):
-        state.newActivity.isFormVisible = true
-        state.focus = .activityName
-        return .none
-      case .view(.newActivityActionPerformed(let action)):
-        return handleNewActivityAction(action, state: &state)
-      case .view(.activityEditTapped(let activity)):
-        state.templateForm = DayActivityFormFeature.State(
-          form: DayActivityForm(
-            activity: activity
-          ),
-          type: .edit,
-          editDate: state.day.date
-        )
-        return .none
+        state.newField = .activityName
+        return .send(.internal(.setItems))
       case .internal(.loadActivities):
         return .run { send in
           let activities = try await activityRepository.loadActivities()
@@ -138,23 +97,88 @@ public struct ActivityListFeature: TodayProvidable {
         }
       case .internal(.activitiesLoaded(let activities)):
         state.activities = activities
-        state.loading = false
+        return .send(.internal(.setItems))
+      case .internal(.addToDay(let activity)):
+        let dayActivity = DayActivity.create(
+          from: activity,
+          uuid: { uuid() },
+          calendar: { calendar },
+          date: state.day.date,
+          createdByUser: true
+        )
+        return .run { send in
+          try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
+          await send(.delegate(.daysUpdated))
+        }
+      case .internal(.setIsFrequent(let isFrequentEnabled, var activity)):
+        activity.isFrequentEnabled = isFrequentEnabled
+        return .run { [activity] send in
+          try await activityRepository.saveActivity(activity)
+          try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
+          await send(.internal(.loadActivities))
+          await send(.delegate(.daysUpdated))
+        }
+      case .internal(.edit(let activity)):
+        state.templateForm = DayActivityFormFeature.State(
+          form: DayActivityForm(
+            activity: activity
+          ),
+          type: .edit,
+          editDate: state.day.date
+        )
+        return .none
+      case .internal(.setItems):
+        state.items = ListItemsBuilder(
+          activities: state.activities,
+          newField: state.newField,
+          searchText: state.searchText
+        ).build()
+        state.information = state.items.isEmpty && state.searchText.isEmpty ? .addActivity : nil
         return .none
       case .templateForm(let action):
         return handleTemplateForm(action, state: &state)
       case .delegate:
         return .none
-      case .binding(\.focus):
-        if state.focus == nil {
-          state.newActivity = .empty
-        }
-        return .none
+      case .binding(\.searchText):
+        return .send(.internal(.setItems))
       case .binding:
         return .none
       }
     }
     .ifLet(\.$templateForm, action: \.templateForm) {
       DayActivityFormFeature()
+    }
+  }
+
+  private func performListItemAction(_ actionType: ListItemAction, state: inout State) -> Effect<Action> {
+    switch actionType {
+    case .rowAction, .reorder:
+        .none
+    case .itemTapped(let itemId, _):
+        .run { send in
+          guard let activity = try await activityRepository.activity(.id(itemId)) else { return }
+          await send(.internal(.edit(activity)))
+        }
+    case .menuAction(let menuParameters, _):
+        .run { send in
+          if let activity = try await activityRepository.activity(.id(menuParameters.itemId)),
+             let action = ActivityAction(rawValue: menuParameters.actionId) {
+            switch action {
+            case .addToDay:
+              await send(.internal(.addToDay(activity)))
+            case .edit:
+              await send(.internal(.edit(activity)))
+            case .enable:
+              await send(.internal(.setIsFrequent(true, activity)))
+            case .disable:
+              await send(.internal(.setIsFrequent(false, activity)))
+            case .remove:
+              await send(.internal(.removeDayActivities(activity)))
+            }
+          }
+        }
+    case .newItemForm(let action):
+        handleNewActivityAction(action, state: &state)
     }
   }
 
@@ -185,26 +209,21 @@ public struct ActivityListFeature: TodayProvidable {
     }
   }
 
-  private func handleNewActivityAction(_ action: DayNewActivityAction, state: inout State) -> Effect<Action> {
+  private func handleNewActivityAction(_ action: NewItemFormAction, state: inout State) -> Effect<Action> {
     switch action {
-    case .dayActivity(.cancelled):
-      state.newActivity = .empty
-      state.focus = nil
-      return .none
-    case .dayActivity(.submitted):
-      state.loading = true
-      let name = state.newActivity.name
-      state.newActivity = .empty
-      state.focus = nil
-
-      guard !name.isEmpty else {
-        state.loading = false
-        return .none
+    case .cancelled:
+      state.newField = nil
+      return .send(.internal(.setItems))
+    case .submitted:
+      guard let item = state.items.first(where: { $0.isForm }),
+            item.title != .empty else {
+        return handleNewActivityAction(.cancelled, state: &state)
       }
+      state.newField = nil
 
       let activity = Activity(
         id: uuid(),
-        name: name,
+        name: item.title,
         startDate: today
       )
 
@@ -214,8 +233,6 @@ public struct ActivityListFeature: TodayProvidable {
         await send(.delegate(.daysUpdated))
         await send(.internal(.loadActivities))
       }
-    case .dayActivityTask:
-      return .none
     }
   }
 

@@ -67,10 +67,14 @@ extension DayActivity: DurationProtocol { }
 
 extension DayActivity {
   public var isSavable: Bool {
+    activity == nil
+  }
+
+  public var isTemporary: Bool {
     !isInvitation
   }
 
-  public var isInvitation: Bool {
+  private var isInvitation: Bool {
     share?.invitationId != nil
   }
 
@@ -82,14 +86,6 @@ extension DayActivity {
     duration + dayActivityTasks.reduce(into: Int.zero, { result, dayActivityTask in
       result += dayActivityTask.duration
     })
-  }
-
-  public func ordered(hideCompleted: Bool) -> [DayActivityTask] {
-    dayActivityTasks
-      .sorted(by: { $0.position < $1.position })
-      .filter {
-        hideCompleted ? !$0.isDone : true
-      }
   }
 }
 

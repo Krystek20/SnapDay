@@ -18,7 +18,7 @@ public struct ActivityView: View {
 
   public var body: some View {
     HStack(spacing: 2.0) {
-      ActivityImageView(
+      ImageView(
         type: .iconId(activity.iconId),
         size: 20.0,
         cornerRadius: 5.0,

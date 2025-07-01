@@ -12,6 +12,7 @@
 		D423ACD42CB5A3A400591A0D /* StreakAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */; };
 		D423ACD62CB6559E00591A0D /* WidgetStreak in Frameworks */ = {isa = PBXBuildFile; productRef = D423ACD52CB6559E00591A0D /* WidgetStreak */; };
 		D432465C2AD0820100D3E8F9 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = D432465B2AD0820100D3E8F9 /* Application */; };
+		D45461272E0FB84300F8D4A2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D45461252E0FB84300F8D4A2 /* Localizable.strings */; };
 		D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418332C50D34A005920E1 /* WidgetKit.framework */; };
 		D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418352C50D34A005920E1 /* SwiftUI.framework */; };
 		D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */; };
@@ -84,6 +85,7 @@
 		D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakAppIntent.swift; sourceTree = "<group>"; };
 		D443ECEE2AD0771C002225CF /* SnapDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D443ED082AD0771D002225CF /* SnapDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SnapDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D45461262E0FB84300F8D4A2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ActivityWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D46418332C50D34A005920E1 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D46418352C50D34A005920E1 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -211,6 +213,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		D45461242E0FB82D00F8D4A2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D45461252E0FB84300F8D4A2 /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		D46418372C50D34A005920E1 /* ActivityWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -236,6 +246,7 @@
 		D4779AC12B6043280067E3AC /* SnapDay */ = {
 			isa = PBXGroup;
 			children = (
+				D45461242E0FB82D00F8D4A2 /* Resources */,
 				D4D8809D2D33B30A00280B02 /* AppDelegate.swift */,
 				D4CCE63E2BCAD13800C198C5 /* SnapDay.entitlements */,
 				D4779AC22B6043280067E3AC /* Assets.xcassets */,
@@ -405,6 +416,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D45461272E0FB84300F8D4A2 /* Localizable.strings in Resources */,
 				D423ACCC2CAD274700591A0D /* LaunchScreen.xib in Resources */,
 				D4779ACB2B6043280067E3AC /* Preview Assets.xcassets in Resources */,
 				D4779ACA2B6043280067E3AC /* Assets.xcassets in Resources */,
@@ -498,6 +510,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		D45461252E0FB84300F8D4A2 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D45461262E0FB84300F8D4A2 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		D4CCE62B2BC7B4BB00C198C5 /* MainInterface.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -637,7 +657,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -655,7 +675,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -679,7 +699,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -697,7 +717,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -756,7 +776,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -769,7 +789,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -789,7 +809,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -802,7 +822,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -820,7 +840,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -833,7 +853,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -851,7 +871,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -864,7 +884,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

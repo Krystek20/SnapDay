@@ -4,6 +4,7 @@ import Repositories
 import Dependencies
 import Models
 import Utilities
+import Common
 
 @MainActor
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +18,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
   ) -> Bool {
     registerNotifications()
+    application.registerForRemoteNotifications()
     registerBackgroundTask()
     return true
   }
@@ -43,6 +45,17 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
       }
     }
     return .noData
+  }
+
+  func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    Task {
+      let tokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
+      try await userNotificationCenterProvider.registerRemoteNotifications(deviceToken: tokenString)
+    }
+  }
+
+  func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: any Error) {
+    print(error)
   }
 }
 

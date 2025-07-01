@@ -83,12 +83,12 @@ public struct ReportDaysView: View {
     case .activity(let state, let iconId):
       switch state {
       case .done:
-        ActivityImageView(type: .iconId(iconId), size: 30.0, cornerRadius: 15.0)
+        ImageView(type: .iconId(iconId), size: 30.0, cornerRadius: 15.0)
       case .notDone:
         Image(systemName: "xmark.circle")
           .foregroundStyle(Color.sunburstOrange)
       case .planned:
-        ActivityImageView(type: .iconId(iconId), size: 30.0, cornerRadius: 15.0)
+        ImageView(type: .iconId(iconId), size: 30.0, cornerRadius: 15.0)
           .opacity(0.4)
       case .notPlanned:
         Image(systemName: "slash.circle")

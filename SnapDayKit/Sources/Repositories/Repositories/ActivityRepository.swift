@@ -3,7 +3,7 @@ import Dependencies
 import Models
 
 public enum ActivityBy {
-  case id(UUID)
+  case id(String)
   case name(String)
 }
 

@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Utilities
 import Models
 import Repositories
+import struct UiComponents.ListItem
 
 @Reducer
 public struct DayActivityReminderFeature: TodayProvidable {
@@ -10,6 +11,7 @@ public struct DayActivityReminderFeature: TodayProvidable {
   // MARK: - Dependencies
 
   @Dependency(\.dayUpdater) private var dayUpdater
+  @Dependency(\.utcCalendar) private var calendar
 
   // MARK: - State & Action
 
@@ -21,13 +23,8 @@ public struct DayActivityReminderFeature: TodayProvidable {
       case activityTask(String)
     }
 
-    public enum DayActivityViewType: Equatable {
-      case activity(DayActivity)
-      case activityTask(DayActivity, DayActivityTask)
-    }
-
     let type: DayActivityReminderType
-    var viewType: DayActivityViewType?
+    var items: [ListItem] = []
 
     public init(type: DayActivityReminderType) {
       self.type = type
@@ -94,10 +91,15 @@ public struct DayActivityReminderFeature: TodayProvidable {
         }
       }
     case .setActivity(let dayActivity):
-      state.viewType = .activity(dayActivity)
+      state.items = [
+        dayActivity.listItem()
+      ]
       return .none
     case .setActivityTask(let dayActivity, let dayActivityTask):
-      state.viewType = .activityTask(dayActivity, dayActivityTask)
+      state.items = [
+        dayActivity.listItem(divider: .indented),
+        dayActivityTask.listItem(parentId: dayActivity.id)
+      ]
       return .none
     }
   }

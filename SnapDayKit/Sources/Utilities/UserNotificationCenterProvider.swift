@@ -62,6 +62,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   @Dependency(\.utcCalendar) private var utcCalendar
   @Dependency(\.date) private var date
   @Dependency(\.cloudService) private var cloudService
+  @Dependency(\.tokenRepository) private var tokenRepository
 
   // MARK: - Initialization
 
@@ -75,6 +76,15 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
 
   public func requestAuthorization() async throws -> Bool {
     try await userNotificationCenter.requestAuthorization(options: [.alert, .badge, .sound])
+  }
+
+  public func registerRemoteNotifications(deviceToken: String) async throws {
+    guard let userRecordName = await cloudService.userRecordName else {
+      print("No user record for regestering: \(deviceToken)")
+      return
+    }
+    try await tokenRepository.registerToken(deviceToken, for: userRecordName)
+    print("APNs Device Token: \(deviceToken) for \(userRecordName)")
   }
 
   public func registerCategories() {

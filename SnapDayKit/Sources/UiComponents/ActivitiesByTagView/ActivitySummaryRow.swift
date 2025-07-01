@@ -61,7 +61,7 @@ public struct ActivitySummaryRow: View {
 
   public var body: some View {
     HStack(spacing: 5.0) {
-      ActivityImageView(
+      ImageView(
         type: .iconId(iconIdentifier),
         size: 30.0,
         cornerRadius: 15.0

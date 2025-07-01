@@ -8,37 +8,25 @@ public struct DaysSelectorView: View {
   // MARK: - Properties
 
   @Binding private var selectedDay: Day?
-  private var newForms: DayView.NewForms?
-  private let dayActivities: [DayActivity]
+  @Binding private var items: [ListItem]
   private let daySummary: DaySummary?
-  private let dayViewShowButtonState: DayViewShowButtonState
   private let informationConfiguration: InformationViewConfigurable?
-  private let dayActivityAction: (DayActivityActionType) -> Void
-  private let showCompletedTapped: () -> Void
-  private let hideCompletedTapped: () -> Void
+  private let dayActivityAction: (ListItemAction) -> Void
 
   // MARK: - Initialization
 
   public init(
     selectedDay: Binding<Day?>,
-    newForms: DayView.NewForms? = nil,
-    dayActivities: [DayActivity],
+    items: Binding<[ListItem]>,
     daySummary: DaySummary?,
-    dayViewShowButtonState: DayViewShowButtonState,
     informationConfiguration: InformationViewConfigurable?,
-    dayActivityAction: @escaping (DayActivityActionType) -> Void,
-    showCompletedTapped: @escaping () -> Void,
-    hideCompletedTapped: @escaping () -> Void
+    dayActivityAction: @escaping (ListItemAction) -> Void
   ) {
     self._selectedDay = selectedDay
-    self.newForms = newForms
-    self.dayActivities = dayActivities
+    self._items = items
     self.daySummary = daySummary
-    self.dayViewShowButtonState = dayViewShowButtonState
     self.informationConfiguration = informationConfiguration
     self.dayActivityAction = dayActivityAction
-    self.showCompletedTapped = showCompletedTapped
-    self.hideCompletedTapped = hideCompletedTapped
   }
 
   // MARK: - Views
@@ -54,7 +42,7 @@ public struct DaysSelectorView: View {
   @ViewBuilder
   private var dayActivityList: some View {
     if let selectedDay {
-      listDayView(selectedDay)
+      listView(selectedDay)
     }
   }
 
@@ -65,15 +53,11 @@ public struct DaysSelectorView: View {
     }
   }
 
-  private func listDayView(_ day: Day) -> some View {
-    DayView(
-      newForms: newForms,
-      activities: dayActivities,
+  private func listView(_ day: Day) -> some View {
+    ListView(
+      items: $items,
       completedActivities: day.completedActivities,
-      dayViewShowButtonState: dayViewShowButtonState,
-      dayActivityAction: dayActivityAction,
-      showCompletedTapped: showCompletedTapped,
-      hideCompletedTapped: hideCompletedTapped
+      action: dayActivityAction
     )
   }
 

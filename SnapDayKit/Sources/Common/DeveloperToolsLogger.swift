@@ -48,6 +48,6 @@ public final class DeveloperToolsLogger {
     } else {
       allEvents.append("1" + separation + date + separation + event.stringValue)
     }
-    userDefaults.setValue(Array(allEvents.suffix(5)), forKey: key)
+    userDefaults.setValue(Array(allEvents.suffix(10)), forKey: key)
   }
 }

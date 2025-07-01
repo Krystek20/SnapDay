@@ -75,7 +75,7 @@ struct ActivityListWidgetEntryView : View {
       ),
       listUpIntent: { ListUp() },
       listDownIntent: { ListDown() },
-      switchItemIntent: { identifier in ToggleItemIntent(identifier: identifier.uuidString) }
+      switchItemIntent: { identifier in ToggleItemIntent(identifier: identifier) }
     )
   }
 }

@@ -3,18 +3,18 @@ import Resources
 import Utilities
 import Dependencies
 
-public enum ActivityImageType: Equatable {
+public enum ImageType: Equatable {
   case iconId(UUID?)
   case data(Data)
   case placeholder
   case empty
 }
 
-public struct ActivityImageView: View {
+public struct ImageView: View {
 
   // MARK: - Properties
 
-  private let type: ActivityImageType
+  private let type: ImageType
   private let size: Double
   private let cornerRadius: Double
   private let tintColor: Color
@@ -22,7 +22,7 @@ public struct ActivityImageView: View {
   // MARK: - Initialization
 
   public init(
-    type: ActivityImageType,
+    type: ImageType,
     size: Double = 70.0,
     cornerRadius: Double = 15.0,
     tintColor: Color = .sectionText
@@ -36,11 +36,6 @@ public struct ActivityImageView: View {
   // MARK: - Views
 
   public var body: some View {
-    imageView
-  }
-
-  @ViewBuilder
-  private var imageView: some View {
     iconView
       .frame(width: size, height: size)
       .foregroundStyle(tintColor)
@@ -56,7 +51,7 @@ public struct ActivityImageView: View {
             iconId: iconId,
             placeholder: Image(systemName: "photo.circle")
           )
-            .id(iconId)
+          .id(iconId)
         )
       } else {
         AnyView(placeholder)

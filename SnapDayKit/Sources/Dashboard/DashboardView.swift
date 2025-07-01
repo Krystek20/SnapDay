@@ -14,7 +14,6 @@ public struct DashboardView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<DashboardFeature>
-  @FocusState private var focus: DayNewField?
   @State private var alertSize = CGSize.zero
 
   private var additionalButtomPadding: Double {
@@ -57,7 +56,6 @@ public struct DashboardView: View {
         alertViewIfVisible
       }
       .activityBackground
-      .bind($store.focus, to: $focus)
       .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
         NavigationStack {
           ActivityListView(store: store)
@@ -111,6 +109,35 @@ public struct DashboardView: View {
               },
               label: {
                 Image(systemName: "calendar.circle.fill")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+            Menu(
+              content: {
+                Button(
+                  action: {
+                    store.send(.view(.toggleShowCompletedActivities))
+                  },
+                  label: {
+                    Text("Show completed", bundle: .module)
+                    if !store.hideCompleted {
+                      Image(systemName: "checkmark.circle.fill")
+                    }
+                  }
+                )
+                Button(
+                  action: {
+                    store.send(.view(.toggleShowTasks))
+                  },
+                  label: {
+                    Text("Show tasks", bundle: .module)
+                    if !store.hideTasks {
+                      Image(systemName: "checkmark.circle.fill")
+                    }
+                  }
+                )
+              }, label: {
+                Image(systemName: "gearshape.circle.fill")
                   .foregroundStyle(Color.actionBlue)
               }
             )
@@ -179,26 +206,11 @@ public struct DashboardView: View {
     WithPerceptionTracking {
       DaysSelectorView(
         selectedDay: $store.selectedDay,
-        newForms: DayView.NewForms(
-          newActivity: $store.newActivity,
-          newActivityTask: $store.newActivityTask,
-          focus: $focus,
-          newActivityAction: { action in
-            store.send(.view(.newActivityActionPerformed(action)))
-          }
-        ),
-        dayActivities: store.activities,
+        items: $store.items,
         daySummary: store.daySummary,
-        dayViewShowButtonState: store.dayViewShowButtonState,
         informationConfiguration: store.dayInformation,
         dayActivityAction: { action in
-          store.send(.view(.dayActivityActionPerfomed(action)))
-        },
-        showCompletedTapped: {
-          store.send(.view(.showCompletedActivitiesTapped))
-        },
-        hideCompletedTapped: {
-          store.send(.view(.hideCompletedActivitiesTapped))
+          store.send(.view(.listItemActionPerfomed(action)))
         }
       )
       .formBackgroundModifier(padding: EdgeInsets(.zero))

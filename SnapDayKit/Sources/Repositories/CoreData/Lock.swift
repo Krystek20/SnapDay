@@ -8,7 +8,7 @@ public actor Lock {
   private let timeInterval: TimeInterval
   private let retryDelay: TimeInterval
   private let attempts: Int
-  private let database = CKContainer.default().privateCloudDatabase
+  private let database = CKContainer(identifier: "iCloud.com.mobilove.snapday").privateCloudDatabase
 
   // MARK: - Initialization
 

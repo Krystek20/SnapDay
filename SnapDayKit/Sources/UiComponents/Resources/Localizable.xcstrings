@@ -203,6 +203,7 @@
       }
     },
     "%lldh %lldmin" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -231,6 +232,7 @@
       }
     },
     "%lldmin" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -259,6 +261,7 @@
       }
     },
     "Add task" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -342,9 +345,6 @@
         }
       }
     },
-    "Collaborate" : {
-
-    },
     "Completed activities" : {
       "localizations" : {
         "de" : {
@@ -374,6 +374,7 @@
       }
     },
     "Copy" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -458,6 +459,7 @@
       }
     },
     "Deselect" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -486,6 +488,7 @@
       }
     },
     "Edit" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -598,6 +601,7 @@
       }
     },
     "Hide completed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -794,6 +798,7 @@
       }
     },
     "Move" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -906,6 +911,7 @@
       }
     },
     "Save" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1046,6 +1052,7 @@
       }
     },
     "Select" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1074,6 +1081,7 @@
       }
     },
     "Set as important" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1102,6 +1110,7 @@
       }
     },
     "Set as regular" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1130,6 +1139,7 @@
       }
     },
     "Show completed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1184,9 +1194,6 @@
           }
         }
       }
-    },
-    "Stop Collaboration" : {
-
     },
     "Third" : {
       "localizations" : {
