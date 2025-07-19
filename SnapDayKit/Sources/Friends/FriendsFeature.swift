@@ -6,7 +6,7 @@ import Models
 import Common
 import Combine
 import CloudKit
-import ContactList
+import Contacts
 
 public enum FriendsField: Hashable {
   case addNew
@@ -15,24 +15,8 @@ public enum FriendsField: Hashable {
 @Reducer
 public struct FriendsFeature: TodayProvidable {
 
-  public enum ListType: Int, CaseIterable, Identifiable {
-    case fromYou = 0
-    case fromOthers
-
-    public var id: Int { rawValue }
-
-    var title: String {
-      switch self {
-      case .fromOthers:
-        String(localized: "From Others", bundle: .module)
-      case .fromYou:
-        String(localized: "From You", bundle: .module)
-      }
-    }
-  }
-
   public enum ViewContent: Hashable, Equatable {
-    case empty(String)
+    case empty
     case form
     case list
     case loading
@@ -56,21 +40,10 @@ public struct FriendsFeature: TodayProvidable {
     var participants: [Participant] = []
     var isSharing: Bool = false
     var shareResult: ShareResult?
-    var listType: ListType = .fromYou
     var content: ViewContent = .loading
     var focus: FriendsField?
     var removing = [Participant]()
-
-    var emptyMessage: String {
-      switch listType {
-      case .fromYou:
-        String(localized: "Looks like it’s quiet around here. Send your first invitation to get started!", bundle: .module)
-      case .fromOthers:
-        String(localized: "If another user invites you, you’ll see it right here.", bundle: .module)
-      }
-    }
-
-    @Presents var contactList: ContactListFeature.State?
+    var showContactList = false
 
     public init() { }
   }
@@ -78,7 +51,8 @@ public struct FriendsFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
-      case showContacts
+      case showContactList
+      case contactsSelected([CNContact])
       case newButtonTapped
       case inviteButtonTapped
       case cancelButtonTapped
@@ -92,21 +66,17 @@ public struct FriendsFeature: TodayProvidable {
       case updateParticipantsWithContants(contacts: [Contact])
       case invite(String, String)
       case shareUrl(ShareResult)
-      case setListType(ListType)
       case cancelAdding
       case setViewContent(ViewContent)
       case setRemoving(Participant, Bool)
     }
-    public enum DelegateAction: Equatable {
-
-    }
+    public enum DelegateAction: Equatable { }
 
     case binding(BindingAction<State>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
-    case contactList(PresentationAction<ContactListFeature.Action>)
   }
 
   // MARK: - Body
@@ -119,24 +89,11 @@ public struct FriendsFeature: TodayProvidable {
         return handleViewAction(viewAction, state: &state)
       case .internal(let internalAction):
         return handleInternalAction(internalAction, state: &state)
-      case .contactList(let action):
-        return handleContactListAction(action, state: &state)
-      case .binding(\.listType):
-        return .run { [listType = state.listType] send in
-          if listType == .fromOthers {
-            await send(.internal(.cancelAdding))
-          }
-          await send(.internal(.setViewContent(.loading)))
-          await send(.internal(.loadParticipants))
-        }
       case .binding:
         return .none
       case .delegate:
         return .none
       }
-    }
-    .ifLet(\.$contactList, action: \.contactList) {
-      ContactListFeature()
     }
   }
 
@@ -153,21 +110,16 @@ public struct FriendsFeature: TodayProvidable {
           await send(.internal(.setViewContent(.loading)))
           await send(.internal(.loadParticipants))
       }
-    case .showContacts:
-      state.contactList = ContactListFeature.State()
+    case .showContactList:
+      state.showContactList = true
+      return .none
+    case .contactsSelected(let contants):
+      print(contants)
       return .none
     case .newButtonTapped:
       state.content = .form
       state.focus = .addNew
-      return switch state.listType {
-      case .fromYou:
-          .none
-      case .fromOthers:
-          .run { send in
-            await send(.internal(.setListType(.fromYou)))
-            await send(.internal(.loadParticipants))
-          }
-      }
+      return .none
     case .inviteButtonTapped:
       let value = state.contact
       let byEmail = value.isValidEmail
@@ -202,13 +154,8 @@ public struct FriendsFeature: TodayProvidable {
   private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
     switch action {
     case .loadParticipants:
-      return .run { [listType = state.listType] send in
-        let participants = switch listType {
-        case .fromYou:
-          try await cloudService.invited()
-        case .fromOthers:
-          try await cloudService.invitedBy()
-        }
+      return .run { send in
+        let participants = try await cloudService.participants()
         await send(.internal(.setParticipants(participants)))
         await send(.internal(.loadContactsIfAllowed))
       }
@@ -219,9 +166,7 @@ public struct FriendsFeature: TodayProvidable {
       if state.content == .form {
         return .none
       } else {
-        let content: ViewContent = state.participants.isEmpty
-        ? .empty(state.emptyMessage)
-        : .list
+        let content: ViewContent = state.participants.isEmpty ? .empty : .list
         return .send(.internal(.setViewContent(content)))
       }
     case .loadContactsIfAllowed:
@@ -274,7 +219,6 @@ public struct FriendsFeature: TodayProvidable {
           }
           await send(.internal(.shareUrl(url)))
         }
-        await send(.internal(.setListType(.fromYou)))
         await send(.internal(.loadParticipants))
       }
     case .shareUrl(let shareResult):
@@ -289,31 +233,26 @@ public struct FriendsFeature: TodayProvidable {
       ? state.removing.append(participant)
       : state.removing.removeAll(where: { $0 == participant })
       return .none
-    case .setListType(let listType):
-      state.listType = listType
-      return .none
     case .cancelAdding:
-      state.content = state.participants.isEmpty
-      ? .empty(state.emptyMessage)
-      : .list
+      state.content = state.participants.isEmpty ? .empty : .list
       state.focus = nil
       state.contact = ""
       return .none
     }
   }
 
-  private func handleContactListAction(_ action: PresentationAction<ContactListFeature.Action>, state: inout State) -> Effect<Action> {
-    switch action {
-    case .presented(.delegate(.contactSelected(let contact))):
-      let value = contact.preferredContact
-      let byEmail = contact.emails.contains(value)
-      let byPhone = contact.phoneNumbers.contains(value)
-      guard byEmail || byPhone else { return .none }
-      return .send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
-    case .presented(.delegate(.contactsLoaded(let contacts))):
-      return .send(.internal(.updateParticipantsWithContants(contacts: contacts)))
-    default:
-      return .none
-    }
-  }
+//  private func handleContactListAction(_ action: PresentationAction<ContactListFeature.Action>, state: inout State) -> Effect<Action> {
+//    switch action {
+//    case .presented(.delegate(.contactSelected(let contact))):
+//      let value = contact.preferredContact
+//      let byEmail = contact.emails.contains(value)
+//      let byPhone = contact.phoneNumbers.contains(value)
+//      guard byEmail || byPhone else { return .none }
+//      return .send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
+//    case .presented(.delegate(.contactsLoaded(let contacts))):
+//      return .send(.internal(.updateParticipantsWithContants(contacts: contacts)))
+//    default:
+//      return .none
+//    }
+//  }
 }

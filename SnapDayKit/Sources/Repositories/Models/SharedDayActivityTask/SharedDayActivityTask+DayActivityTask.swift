@@ -34,15 +34,27 @@ extension SharedDayActivityTask {
     by dayActivityTask: DayActivityTask,
     userRecordName: String,
     updateDate: Date
-  ) {
+  ) -> [UpdateProperty] {
+    var updatedProperties = [UpdateProperty]()
+
     if name != dayActivityTask.name {
+      updatedProperties.append(
+        .taskNameChanged(old: name, new: dayActivityTask.name)
+      )
       name = dayActivityTask.name
       nameLastUpdated = updateDate
     }
     if doneDate != dayActivityTask.doneDate {
+      updatedProperties.append(
+        dayActivityTask.doneDate == nil
+        ? .undone(dayActivityTask.name)
+        : .done(dayActivityTask.name)
+      )
       doneDate = dayActivityTask.doneDate
       doneByUserId = userRecordName
       doneDateLastUpdated = updateDate
     }
+
+    return updatedProperties
   }
 }

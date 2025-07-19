@@ -4,7 +4,6 @@ import UiComponents
 import Resources
 import Models
 import Utilities
-import ContactList
 
 @MainActor
 public struct FriendsView: View {
@@ -40,12 +39,14 @@ public struct FriendsView: View {
             )
           }
         }
-        .sheet(item: $store.scope(state: \.contactList, action: \.contactList)) { store in
-          NavigationStack {
-            ContactListView(store: store)
-          }
-          .presentationDetents([.large])
-        }
+        .sheet(isPresented: $store.showContactList, content: {
+          ContactViewWrapper(
+            isPresented: $store.showContactList,
+            onSelect: { contacts in
+              store.send(.view(.contactsSelected(contacts)))
+            }
+          )
+        })
         .navigationTitle(String(localized: "Friends", bundle: .module))
         .navigationBarTitleDisplayMode(.inline)
         .bind($store.focus, to: $focus)
@@ -54,7 +55,7 @@ public struct FriendsView: View {
             HStack {
               Button(
                 action: {
-                  store.send(.view(.showContacts))
+                  store.send(.view(.showContactList))
                 },
                 label: {
                   Image(systemName: "list.bullet.circle.fill")
@@ -78,17 +79,7 @@ public struct FriendsView: View {
 
   private var content: some View {
     WithPerceptionTracking {
-      VStack(alignment: .center, spacing: 10.0) {
-        Picker("", selection: $store.listType) {
-          WithPerceptionTracking {
-            ForEach(FriendsFeature.ListType.allCases) { listType in
-              Text(listType.title).tag(listType)
-            }
-          }
-        }
-        .pickerStyle(.segmented)
-        .padding(.horizontal, 15.0)
-
+      VStack(spacing: 10.0) {
         switch store.content {
         case .list, .form:
           ScrollView {
@@ -98,18 +89,13 @@ public struct FriendsView: View {
           }
           .scrollDismissesKeyboard(.immediately)
           .scrollIndicators(.hidden)
-        case .empty(let emptyListText):
-          Spacer()
-          VStack(spacing: 10.0) {
-            Image(systemName: "envelope")
-              .font(.system(size: 40.0, weight: .ultraLight))
-            Text(emptyListText)
-              .font(.system(size: 14.0, weight: .regular))
-              .multilineTextAlignment(.center)
-              .foregroundStyle(Color.standardText)
-              .padding(.horizontal, 30.0)
+        case .empty:
+          VStack {
+            InformationView(configuration: InformationViewConfiguration.addFriends)
+              .formBackgroundModifier(padding: EdgeInsets(.zero))
+              .padding(.horizontal, 15.0)
+            Spacer()
           }
-          Spacer()
         case .appending:
           Spacer()
           VStack(spacing: 10.0) {

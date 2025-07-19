@@ -5,6 +5,7 @@ import Common
 import Resources
 import Models
 import Utilities
+import UniformTypeIdentifiers
 
 public struct DeveloperToolsView: View {
 
@@ -26,6 +27,33 @@ public struct DeveloperToolsView: View {
         VStack(alignment: .leading, spacing: 10.0) {
           Text("Helpers")
             .font(.title2)
+          VStack(alignment: .leading, spacing: 2.0) {
+            ForEach(store.allShared) { shared in
+              if shared.showButton {
+                Button("Clean") {
+                  store.send(.view(.cleanShared(shared.sharedId)))
+                }
+              }
+              Text(shared.sharedId)
+                .font(.caption2)
+              if let text = shared.text {
+                Text(text)
+                  .font(.caption)
+              }
+            }
+          }
+          Button("Clean Unused CKShares") {
+            store.send(.view(.cleanZones))
+          }
+          Button("Clean Images") {
+            store.send(.view(.cleanImages))
+          }
+          Button("Invite krystek20") {
+            store.send(.view(.invite1))
+          }
+          Button("Invite zadumana") {
+            store.send(.view(.invite2))
+          }
           Button("Clean NSUbiquitousKeyValueStore") {
             store.send(.view(.cleanKeyValueStore))
           }
@@ -45,6 +73,9 @@ public struct DeveloperToolsView: View {
           ForEach(DeveloperToolsLogger.shared.events, id: \.self) { event in
             Text(event)
               .font(.caption)
+              .onTapGesture {
+                UIPasteboard.general.setValue(event, forPasteboardType: UTType.plainText.identifier)
+              }
           }
           Text("Scheduled events")
             .font(.title2)
@@ -60,12 +91,6 @@ public struct DeveloperToolsView: View {
           }
           Toggle("Background updated notification", isOn: $store.backgroundUpdatedNotificationEnabled)
             .font(.title2)
-          Text("Shares:")
-            .font(.title2)
-          ForEach(store.allShared, id: \.self) { share in
-            Text(share)
-              .font(.caption)
-          }
         }
         .maxFrame()
       }

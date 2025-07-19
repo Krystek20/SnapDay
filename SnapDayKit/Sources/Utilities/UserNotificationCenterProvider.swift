@@ -149,11 +149,6 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
     guard isNotificationScheduled else { return }
     userNotificationCenter.removePendingNotificationRequests(withIdentifiers: [userNotification.identifier])
   }
-
-  public func handleRemoteNotification(_ cloudNotification: CloudNotification) async throws {
-    try await cloudService.handleNotification(cloudNotification)
-    userActionSubject.send()
-  }
 }
 
 extension UserNotificationCenterProvider {

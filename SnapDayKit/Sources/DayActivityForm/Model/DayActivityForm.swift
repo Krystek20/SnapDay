@@ -239,7 +239,13 @@ extension DayActivity {
     self.overview = form.overview
     self.tags = form.tags
     self.labels = form.labels
-    self.dayActivityTasks = form.tasks.compactMap(DayActivityTask.init)
+    self.dayActivityTasks = form.tasks.compactMap { taskForm in
+      guard var originalTask = dayActivityTasks.first(where: { $0.id == taskForm.id }) else {
+        return DayActivityTask(form: taskForm)
+      }
+      originalTask.update(by: taskForm)
+      return originalTask
+    }
     self.reminderDate = form.reminderDate
     self.dueDate = form.dueDate
     self.important = form.important

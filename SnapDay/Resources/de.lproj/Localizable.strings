@@ -1,0 +1,33 @@
+// Titles
+"notification.observation.accepted.title" = "%@ ist bereit, mit dir zusammenzuarbeiten";
+"notification.invitation.title" = "Einladung zur Zusammenarbeit";
+"notification.accepted.title" = "Einladung angenommen";
+"notification.activity.updated.date.title" = "%@ hat das Aktivitätsdatum aktualisiert";
+"notification.activity.updated.name.title" = "%@ benannte „%@“ in „%@“ um";
+"notification.activity.updated.dueDate.title" = "%@ hat das Fälligkeitsdatum aktualisiert";
+"notification.activity.updated.important.title" = "%@ hat „%@“ als wichtig markiert";
+"notification.activity.updated.unimportant.title" = "%@ hat die Markierung von „%@“ als wichtig entfernt";
+"notification.activity.updated.done.title" = "%@ hat „%@“ als erledigt markiert";
+"notification.activity.updated.undone.title" = "%@ hat „%@“ wieder geöffnet";
+"notification.activity.updated.taskAdded.title" = "%@ hat die Aufgabe „%@“ zu „%@“ hinzugefügt";
+"notification.activity.updated.taskRemoved.title" = "%@ hat die Aufgabe „%@“ aus „%@“ entfernt";
+"notification.activity.updated.taskDone.title" = "%@ hat die Aufgabe „%@“ als erledigt markiert";
+"notification.activity.updated.taskUndone.title" = "%@ hat die Aufgabe „%@“ wieder geöffnet";
+"notification.activity.updated.taskNameChanged.title" = "%@ benannte die Aufgabe „%@“ in „%@“ um";
+
+// Bodies
+"notification.observation.accepted.body" = "%@ hat deine Einladung angenommen. Um Aktivitäten zu teilen, füge ihn als Mitwirkenden hinzu.";
+"notification.invitation.body" = "%@ hat dich zur Aktivität „%@“ eingeladen.";
+"notification.accepted.body" = "%@ hat deine Einladung zu „%@“ angenommen.";
+"notification.activity.updated.date.body" = "Das geplante Datum von „%@“ ist jetzt %@.";
+"notification.activity.updated.name.body" = "Die Aktivität wurde von „%@“ in „%@“ umbenannt.";
+"notification.activity.updated.dueDate.body" = "„%@“ ist jetzt fällig am %@.";
+"notification.activity.updated.important.body" = "Diese Aktivität wurde als wichtig markiert.";
+"notification.activity.updated.unimportant.body" = "Diese Aktivität ist nicht mehr als wichtig markiert.";
+"notification.activity.updated.done.body" = "Die Aktivität ist jetzt abgeschlossen.";
+"notification.activity.updated.undone.body" = "Die Aktivität ist nicht mehr als erledigt markiert.";
+"notification.activity.updated.taskAdded.body" = "Die Aufgabe „%@“ wurde zu „%@“ hinzugefügt.";
+"notification.activity.updated.taskRemoved.body" = "Die Aufgabe „%@“ wurde aus „%@“ entfernt.";
+"notification.activity.updated.taskDone.body" = "Die Aufgabe „%@“ wurde als erledigt markiert.";
+"notification.activity.updated.taskUndone.body" = "Die Aufgabe „%@“ wurde als nicht erledigt markiert.";
+"notification.activity.updated.taskNameChanged.body" = "Die Aufgabe „%@“ wurde in „%@“ umbenannt.";

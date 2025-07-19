@@ -2,11 +2,13 @@ import Foundation
 import Dependencies
 
 public enum ShareAction: String, Encodable {
+  case invite
   case accept
+  case acceptObserving
+  case activityUpdated
 }
 
 public enum ShareUserDataKey: String, Encodable {
-  case activityLogId
   case activityName
   case userName
 }
@@ -16,17 +18,20 @@ public struct NotifyParticipantsRequest: Encodable {
   let participants: [String]
   let action: ShareAction
   let userData: [ShareUserDataKey: String]
+  let activityChanges: [UpdateProperty]
 
   public init(
     userRecord: String,
     participants: [String],
     action: ShareAction,
-    userData: [ShareUserDataKey: String] = [:]
+    userData: [ShareUserDataKey: String] = [:],
+    activityChanges: [UpdateProperty] = []
   ) {
     self.userRecord = userRecord
     self.participants = participants
     self.action = action
     self.userData = userData
+    self.activityChanges = activityChanges
   }
 }
 

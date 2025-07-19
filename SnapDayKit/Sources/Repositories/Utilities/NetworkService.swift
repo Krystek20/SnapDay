@@ -56,7 +56,9 @@ struct NetworkService {
 
     switch body {
     case .json(let encodable):
-      request.httpBody = try JSONEncoder().encode(encodable)
+      let encoder = JSONEncoder()
+      encoder.dateEncodingStrategy = .iso8601
+      request.httpBody = try encoder.encode(encodable)
       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     case nil:
       break

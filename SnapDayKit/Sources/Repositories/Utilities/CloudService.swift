@@ -45,8 +45,13 @@ public actor CloudService {
 
   // MARK: - Dependecies
 
+  @Dependency(\.remoteNotificationRepository) private var remoteNotificationRepository
   @Dependency(\.shareRepository) private var shareRepository
   @Dependency(\.coreDataStack) private var coreDataStack
+
+  // MARK: - Properties
+
+  private let asyncWaiter = AsyncWaiter()
 
   public var userRecordName: String? {
     get async {
@@ -55,23 +60,6 @@ public actor CloudService {
       } catch {
         return nil
       }
-    }
-  }
-
-  public var userName: String? {
-    get async throws {
-      let userRecordId = try await container.userRecordID()
-      let participant: CKShare.Participant? = try await withCheckedThrowingContinuation { continuation in
-        container.fetchShareParticipant(withUserRecordID: userRecordId) { participant, error in
-          if let error {
-            continuation.resume(throwing: error)
-          } else {
-            continuation.resume(returning: participant)
-          }
-        }
-      }
-
-      return participant?.userIdentity.nameComponents?.givenName
     }
   }
 
@@ -97,8 +85,7 @@ public actor CloudService {
   public var myShare: Share? {
     get async throws {
       let context = coreDataStack.backgroundContext
-      let allShares = try await shareRepository.fetchAll()
-      return try allShares
+      return try await allShares()
         .first(where: { share in
           let shareEntity = try share.managedObject(context)
           guard let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else { return false }
@@ -110,33 +97,12 @@ public actor CloudService {
   lazy var shareStatePublisher = shareStateSubject.eraseToAnyPublisher()
   private let shareStateSubject = CurrentValueSubject<ShareState, Never>(.idle)
   private let container = CKContainer(identifier: "iCloud.com.mobilove.snapday")
-  private var publicCloudDatabase: CKDatabase {
-    container.publicCloudDatabase
-  }
 
   // MARK: - Public
 
   public func initializeIfNeeded() async throws {
     guard try await cloudState == .active, shareStateSubject.value == .idle else { return }
     shareStateSubject.send(.loading)
-
-    let subscription = CKQuerySubscription(
-      recordType: "UserNotification",
-      predicate: NSPredicate(value: true),
-      subscriptionID: "collaborationStarted",
-      options: .firesOnRecordCreation
-    )
-
-    let notificationInfo = CKSubscription.NotificationInfo()
-    notificationInfo.shouldSendContentAvailable = true
-    subscription.notificationInfo = notificationInfo
-
-    do {
-      try await publicCloudDatabase.save(subscription)
-      print("subscription saved")
-    } catch {
-      print("Save subscription with error: \(error)")
-    }
 
     do {
       guard let shareEntity = try await fetchShareEntity() else {
@@ -204,19 +170,31 @@ public actor CloudService {
     try await coreDataStack.persistUpdatedShare(share: ckShare)
   }
 
-  public func invitedBy() async throws -> [Participant] {
+  public func participants() async throws -> [Participant] {
     let context = coreDataStack.backgroundContext
     let shares = try await shareRepository.fetchAll()
 
-    let ckShares = try shares.compactMap {
-      let shareEntity = try $0.managedObject(context)
-      return try coreDataStack.fetchShare(matching: shareEntity).share
-    }
+    let participants = try shares.reduce(into: [Participant](), { result, share in
+      let shareEntity = try share.managedObject(context)
+      guard let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else { return }
 
-    return ckShares.compactMap { ckShare in
-      guard ckShare.owner != ckShare.currentUserParticipant else { return nil }
-      return Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant, type: .invitee)
-    }
+      if ckShare.owner == ckShare.currentUserParticipant {
+        for ckParticipant in ckShare.participants where ckParticipant != ckShare.currentUserParticipant {
+          let participant = Participant(ckParticipant, currentUser: ckShare.currentUserParticipant, type: .invited)
+          result.append(participant)
+        }
+      } else {
+        let participant = Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant, type: .invitee)
+        result.append(participant)
+      }
+    })
+
+    return participants
+
+//    return ckShares.compactMap { ckShare in
+//      guard ckShare.owner != ckShare.currentUserParticipant else { return nil }
+//      return Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant, type: .invitee)
+//    }
   }
 
   public func stopParticipating(_ participant: Participant) async throws {
@@ -247,37 +225,25 @@ public actor CloudService {
   }
 
   public func firstShare(where objectId: String) async throws -> Share? {
-    try await shareRepository.fetchAll()
-      .first(where: { share in
-        share.sharedDayActivities.contains {
-          $0.sharedBy.contains { $0.objectId == objectId }
-        }
-      })
-  }
-
-  public func notify(participantRecordName: String, activityId: String) async throws {
-    let notificationRecord = CKRecord(recordType: "UserNotification")
-    notificationRecord["participantRecordName"] = participantRecordName
-    notificationRecord["activityId"] = activityId
-    notificationRecord["timestamp"] = Date()
-    try await publicCloudDatabase.save(notificationRecord)
-  }
-
-  public func handleNotification(_ cloudNotification: CloudNotification) async throws {
-    switch cloudNotification {
-    case .collaborationStarted(let recordName):
-      let recordId = CKRecord.ID(recordName: recordName)
-      do {
-        let result = try await publicCloudDatabase.record(for: recordId)
-        print(result)
-      } catch {
-        print(error)
+    try await allShares().first(where: { share in
+      share.sharedDayActivities.contains {
+        $0.sharedBy.contains { $0.objectId == objectId }
       }
-    }
+    })
   }
 
   public func accept(invitation: Invitation) async throws {
     try await coreDataStack.accept(invitation: invitation)
+
+    let ckShare = invitation.cloudKitShareMetadata.share
+    let owner = Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant)
+
+    guard let ownerRecordName = owner.recordName else {
+      print("Accept - Owner record name not found")
+      return
+    }
+
+    try await notifyAboutAccepting(ownerRecordName: ownerRecordName)
   }
 
   // MARK: - Private
@@ -335,6 +301,90 @@ public actor CloudService {
     share.isCurrentUserOwner = ckShare.currentUserParticipant?.role == .owner
     share.participants = ckShare.participants.map { participant in
       Participant(participant, currentUser: ckShare.currentUserParticipant)
+    }
+  }
+
+  private func currentUserParticipant(inShareOwnedBy: String) async throws -> Participant? {
+    let allShares = try await allShares()
+    guard let share = allShares.first(where: { $0.owner == inShareOwnedBy }) else {
+      return nil
+    }
+    return share.participants.first(where: \.isCurrentUser)
+  }
+
+  private func notifyAboutAccepting(ownerRecordName: String) async throws {
+    try await asyncWaiter.waitUntil {
+      try await currentUserParticipant(inShareOwnedBy: ownerRecordName)?.acceptanceStatus == .accepted
+    }
+    let participant = try await currentUserParticipant(inShareOwnedBy: ownerRecordName)
+
+    guard let userRecordName = participant?.recordName,
+          let userName = participant?.name else {
+      print("Accept - User record name or user name not found")
+      return
+    }
+
+    do {
+      try await remoteNotificationRepository.notifyParticipants(
+        request: NotifyParticipantsRequest(
+          userRecord: userRecordName,
+          participants: [ownerRecordName],
+          action: .acceptObserving,
+          userData: [.userName: userName]
+        )
+      )
+    } catch {
+      print("AcceptObserving - Notification not sent: \(error)")
+    }
+  }
+}
+
+import CoreData
+
+// DEBUG
+extension CloudService {
+  public func coreDataEntity(entity: any Entity) throws -> NSManagedObject? {
+    let context = coreDataStack.backgroundContext
+    return try entity.managedObject(context)
+  }
+
+  public func ckShare(from shareEntity: ShareEntity) throws -> CKShare? {
+    try coreDataStack.fetchShare(matching: shareEntity).share
+  }
+
+  public func zones() async throws -> [String] {
+    let privateDB = container.privateCloudDatabase
+    let sharedDB = container.sharedCloudDatabase
+
+    var zoneNames: [String] = []
+
+    let privateZones = try await privateDB.allRecordZones()
+    for zone in privateZones {
+      zoneNames.append("[P]: " + zone.zoneID.zoneName)
+    }
+
+    let sharedZones = try await sharedDB.allRecordZones()
+    for zone in sharedZones {
+      zoneNames.append("[S]: " + zone.zoneID.zoneName)
+    }
+
+    return zoneNames
+  }
+
+  public func cleanPrivateZones() async throws {
+    let privateDB = container.privateCloudDatabase
+
+    let privateZones = try await privateDB.allRecordZones()
+    let defaults = ["com.apple.coredata.cloudkit.zone", "_defaultZone", CKRecordZone.default().zoneID.zoneName]
+    NSLog("[CLOUD_SERVICE] - \(defaults)")
+
+    for zone in privateZones where !defaults.contains(zone.zoneID.zoneName) {
+      do {
+        try await privateDB.deleteRecordZone(withID: zone.zoneID)
+        NSLog("[CLOUD_SERVICE] - Zone deleted \(zone.zoneID.zoneName)")
+      } catch {
+        NSLog("[CLOUD_SERVICE] 🚩 - Zone deleted \(zone.zoneID.zoneName) error \(error)")
+      }
     }
   }
 }

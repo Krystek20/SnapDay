@@ -4,6 +4,8 @@ public actor AsyncWaiter {
 
   private var proccessingIdentifiers: [UUID] = []
 
+  public init() { }
+
   public func executeOrWait<T>(
     for identifier: UUID,
     _ action: @Sendable () async throws -> T,
@@ -26,5 +28,20 @@ public actor AsyncWaiter {
       print("done for: \(function) id: \(identifier)")
     }
     return try await action()
+  }
+
+  public func waitUntil(
+    deadline: TimeInterval = 30.0,
+    interval: TimeInterval = 1.0,
+    action: () async throws -> Bool
+  ) async throws {
+    var deadline = deadline
+    repeat {
+      let isFound = try await action()
+      print("Try again... lopping count: \(deadline) isFound: \(isFound)")
+      guard !isFound else { break }
+      try await Task.sleep(for: .seconds(interval))
+      deadline -= interval
+    } while deadline > .zero
   }
 }

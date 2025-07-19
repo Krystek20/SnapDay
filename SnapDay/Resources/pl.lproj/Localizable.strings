@@ -1,0 +1,33 @@
+// Titles
+"notification.observation.accepted.title" = "%@ jest gotowy do współpracy z Tobą";
+"notification.invitation.title" = "Zaproszenie do współpracy";
+"notification.accepted.title" = "Zaproszenie zaakceptowane";
+"notification.activity.updated.date.title" = "%@ zaktualizował datę aktywności";
+"notification.activity.updated.name.title" = "%@ zmienił nazwę „%@” na „%@”";
+"notification.activity.updated.dueDate.title" = "%@ zaktualizował termin ukończenia";
+"notification.activity.updated.important.title" = "%@ oznaczył „%@” jako ważne";
+"notification.activity.updated.unimportant.title" = "%@ usunął oznaczenie „%@” jako ważne";
+"notification.activity.updated.done.title" = "%@ oznaczył „%@” jako wykonane";
+"notification.activity.updated.undone.title" = "%@ przywrócił „%@” do stanu niewykonanego";
+"notification.activity.updated.taskAdded.title" = "%@ dodał zadanie „%@” do „%@”";
+"notification.activity.updated.taskRemoved.title" = "%@ usunął zadanie „%@” z „%@”";
+"notification.activity.updated.taskDone.title" = "%@ oznaczył zadanie „%@” jako wykonane";
+"notification.activity.updated.taskUndone.title" = "%@ przywrócił zadanie „%@” do stanu niewykonanego";
+"notification.activity.updated.taskNameChanged.title" = "%@ zmienił nazwę zadania „%@” na „%@”";
+
+// Bodies
+"notification.observation.accepted.body" = "%@ zaakceptował Twoje zaproszenie. Aby udostępniać aktywności, dodaj go jako współpracownika do wybranych.";
+"notification.invitation.body" = "%@ zaprosił Cię do aktywności „%@”.";
+"notification.accepted.body" = "%@ zaakceptował Twoje zaproszenie do „%@”.";
+"notification.activity.updated.date.body" = "Zaplanowana data dla „%@” to teraz %@.";
+"notification.activity.updated.name.body" = "Aktywność została przemianowana z „%@” na „%@”.";
+"notification.activity.updated.dueDate.body" = "„%@” ma teraz termin ukończenia %@.";
+"notification.activity.updated.important.body" = "Ta aktywność została oznaczona jako ważna.";
+"notification.activity.updated.unimportant.body" = "Ta aktywność nie jest już oznaczona jako ważna.";
+"notification.activity.updated.done.body" = "Aktywność została oznaczona jako wykonana.";
+"notification.activity.updated.undone.body" = "Aktywność nie jest już oznaczona jako wykonana.";
+"notification.activity.updated.taskAdded.body" = "Zadanie „%@” zostało dodane do „%@”.";
+"notification.activity.updated.taskRemoved.body" = "Zadanie „%@” zostało usunięte z „%@”.";
+"notification.activity.updated.taskDone.body" = "Zadanie „%@” zostało oznaczone jako wykonane.";
+"notification.activity.updated.taskUndone.body" = "Zadanie „%@” zostało przywrócone jako niewykonane.";
+"notification.activity.updated.taskNameChanged.body" = "Zadanie „%@” zostało przemianowane na „%@”.";

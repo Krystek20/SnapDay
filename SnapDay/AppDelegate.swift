@@ -33,23 +33,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     return config
   }
 
-  func application(
-    _ application: UIApplication,
-    didReceiveRemoteNotification userInfo: [AnyHashable: Any]
-  ) async -> UIBackgroundFetchResult {
-    if let notification = CloudNotification(userInfo: userInfo) {
-      do {
-        try await userNotificationCenterProvider.handleRemoteNotification(notification)
-      } catch {
-        print("didReceiveRemoteNotification: \(error)")
-      }
-    }
-    return .noData
-  }
-
   func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
     Task {
       let tokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
+      DeveloperToolsLogger.shared.append(.token(tokenString))
       try await userNotificationCenterProvider.registerRemoteNotifications(deviceToken: tokenString)
     }
   }

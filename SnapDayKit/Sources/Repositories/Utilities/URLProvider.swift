@@ -3,6 +3,7 @@ import Foundation
 enum URLs {
 //  static let host = "127.0.0.1"
   static let host = "369c-89-71-124-130.ngrok-free.app"
+//  static let host = "snapday-server.onrender.com"
 }
 
 struct URLProvider {

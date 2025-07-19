@@ -132,6 +132,11 @@ public actor DayUpdater: TodayProvidable {
 
   public func removeDayActivityTask(_ dayActivityTask: DayActivityTask) async throws {
     try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
+
+    guard let dayActivity = try await dayActivity(identifier: dayActivityTask.dayActivityId.uuidString) else {
+      return
+    }
+    try await sharedDayActivityUpdater.updateSharedDayActivity(dayActivity: dayActivity)
   }
 
   public func moveDayActivity(_ dayActivity: DayActivity, toDate: Date) async throws {

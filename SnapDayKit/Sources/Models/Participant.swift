@@ -56,4 +56,3 @@ public enum ParticipantAcceptanceStatus: Int, Equatable {
   case accepted = 2
   case removed = 3
 }
-
