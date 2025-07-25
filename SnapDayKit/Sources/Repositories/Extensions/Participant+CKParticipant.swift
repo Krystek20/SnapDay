@@ -4,8 +4,7 @@ import Models
 extension Participant {
   init(
     _ participant: CKShare.Participant,
-    currentUser: CKShare.Participant?,
-    type: ParticipantType? = nil
+    currentUser: CKShare.Participant?
   ) {
     self.init(
       id: participant.participantID,
@@ -15,8 +14,7 @@ extension Participant {
       name: participant.name,
       email: participant.userIdentity.lookupInfo?.emailAddress ?? "",
       phoneNumber: participant.userIdentity.lookupInfo?.phoneNumber ?? "",
-      acceptanceStatus: ParticipantAcceptanceStatus(rawValue: participant.acceptanceStatus.rawValue) ?? .unknown,
-      type: type
+      acceptanceStatus: AcceptanceStatus(rawValue: participant.acceptanceStatus.rawValue) ?? .unknown
     )
   }
 }
@@ -37,3 +35,20 @@ extension CKShare.Participant {
     }
   }
 }
+
+//extension Participant.InvitationState {
+//  init(acceptanceStatus: CKShare.ParticipantAcceptanceStatus) {
+//    switch acceptanceStatus {
+//    case .unknown:
+//      self = .none
+//    case .pending:
+//      self = .pending
+//    case .accepted:
+//      self = .accepted
+//    case .removed:
+//      self = .none
+//    @unknown default:
+//      self = .none
+//    }
+//  }
+//}

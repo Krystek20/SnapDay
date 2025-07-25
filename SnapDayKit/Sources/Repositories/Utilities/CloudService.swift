@@ -155,52 +155,27 @@ public actor CloudService {
 
     return ckShare.participants.compactMap { ckParticipant in
       guard ckParticipant.role != .owner else { return nil }
-      return Participant(ckParticipant, currentUser: ckShare.currentUserParticipant, type: .invited)
+      return Participant(ckParticipant, currentUser: ckShare.currentUserParticipant)
     }
   }
 
-  public func removeParticipantFromInvited(_ participant: Participant) async throws {
+  public func removeParticipantFromInvited(_ participantIds: [String]) async throws {
     guard let shareEntity = try await fetchShareEntity(),
-          let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share,
-          let ckParticipant = ckShare.participants.first(where: { $0.participantID == participant.id }) else {
-      print("shareEntity or participant does not exist")
+          let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else {
+      print("shareEntity does not exist")
       return
     }
-    ckShare.removeParticipant(ckParticipant)
-    try await coreDataStack.persistUpdatedShare(share: ckShare)
+
+    for ckParticipant in ckShare.participants where participantIds.contains(ckParticipant.participantID) {
+      ckShare.removeParticipant(ckParticipant)
+      try await coreDataStack.persistUpdatedShare(share: ckShare)
+    }
   }
 
-  public func participants() async throws -> [Participant] {
+  public func stopParticipating(_ recordName: String) async throws {
     let context = coreDataStack.backgroundContext
-    let shares = try await shareRepository.fetchAll()
-
-    let participants = try shares.reduce(into: [Participant](), { result, share in
-      let shareEntity = try share.managedObject(context)
-      guard let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else { return }
-
-      if ckShare.owner == ckShare.currentUserParticipant {
-        for ckParticipant in ckShare.participants where ckParticipant != ckShare.currentUserParticipant {
-          let participant = Participant(ckParticipant, currentUser: ckShare.currentUserParticipant, type: .invited)
-          result.append(participant)
-        }
-      } else {
-        let participant = Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant, type: .invitee)
-        result.append(participant)
-      }
-    })
-
-    return participants
-
-//    return ckShares.compactMap { ckShare in
-//      guard ckShare.owner != ckShare.currentUserParticipant else { return nil }
-//      return Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant, type: .invitee)
-//    }
-  }
-
-  public func stopParticipating(_ participant: Participant) async throws {
-    let context = coreDataStack.backgroundContext
-    let ckShare = try await shareRepository.fetchAll()
-      .first(where: { $0.owner == participant.recordName })
+    let ckShare = try await allShares()
+      .first(where: { $0.owner == recordName })
       .flatMap {
         let shareEntity = try $0.managedObject(context)
         return try coreDataStack.fetchShare(matching: shareEntity).share
@@ -299,8 +274,8 @@ public actor CloudService {
     let shareEntity = try share.managedObject(context)
     guard let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else { return }
     share.isCurrentUserOwner = ckShare.currentUserParticipant?.role == .owner
-    share.participants = ckShare.participants.map { participant in
-      Participant(participant, currentUser: ckShare.currentUserParticipant)
+    share.participants = ckShare.participants.map { ckParticipant in
+      Participant(ckParticipant, currentUser: ckShare.currentUserParticipant)
     }
   }
 

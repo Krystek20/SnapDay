@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "%@ shared with you" : {
+
+    },
     "Add" : {
 
     },
@@ -14,6 +17,9 @@
 
     },
     "Friends" : {
+
+    },
+    "Invitation sent to %@" : {
 
     },
     "Invite friends to collaborate on your boards and share activities." : {
@@ -29,6 +35,24 @@
 
     },
     "Remove" : {
+
+    },
+    "They accepted your board, but haven’t shared theirs yet." : {
+
+    },
+    "They shared with you, but you haven’t accepted yet." : {
+
+    },
+    "Waiting for them to accept your invitation." : {
+
+    },
+    "You and %@ are connected" : {
+
+    },
+    "You shared with %@" : {
+
+    },
+    "You’re both sharing boards with each other." : {
 
     }
   },
