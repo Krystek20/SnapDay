@@ -35,20 +35,3 @@ extension CKShare.Participant {
     }
   }
 }
-
-//extension Participant.InvitationState {
-//  init(acceptanceStatus: CKShare.ParticipantAcceptanceStatus) {
-//    switch acceptanceStatus {
-//    case .unknown:
-//      self = .none
-//    case .pending:
-//      self = .pending
-//    case .accepted:
-//      self = .accepted
-//    case .removed:
-//      self = .none
-//    @unknown default:
-//      self = .none
-//    }
-//  }
-//}

@@ -4,12 +4,11 @@ struct URLProvider {
   static func url(for path: String) throws -> URL {
     var urlComponents = URLComponents()
     #if DEBUG
-    urlComponents.host = "127.0.0.1"
-    urlComponents.port = 8080
+    urlComponents.host = "relieved-manatee-wildly.ngrok-free.app"
     #else
-    urlComponents.scheme = "https"
     urlComponents.host = "snapday-server.onrender.com"
     #endif
+    urlComponents.scheme = "https"
     urlComponents.path = path
 
     guard let url = urlComponents.url else {

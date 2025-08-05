@@ -1,3 +1,4 @@
+#if DEBUG
 import Foundation
 import ComposableArchitecture
 import Repositories
@@ -217,10 +218,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
       }
     case .loadPendingRequests:
       return .run { send in
-//        #if DEBUG
         let identifiers = await userNotificationCenterProvider.pendingRequests
         await send(.internal(.setPendingIdentifiers(identifiers)))
-//        #endif
       }
     case .loadBackgroundPendingRequests:
       return .run { send in
@@ -291,3 +290,4 @@ fileprivate extension BGTaskRequest {
     return identifier + " - " + date
   }
 }
+#endif

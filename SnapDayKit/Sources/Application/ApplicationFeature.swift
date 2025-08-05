@@ -4,8 +4,10 @@ import Onboarding
 import ActivityDetails
 import ComposableArchitecture
 import Utilities
-import DeveloperTools
 import TipKit
+#if DEBUG
+import DeveloperTools
+#endif
 
 @Reducer
 public struct ApplicationFeature: TodayProvidable {
@@ -33,8 +35,10 @@ public struct ApplicationFeature: TodayProvidable {
     var reports = ReportsFeature.State()
     var onboarding = OnboardingFeature.State()
 
+    #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
-    
+    #endif
+
     private let userDefaults: UserDefaults
 
     public init(userDefaults: UserDefaults = .standard) {
@@ -54,7 +58,9 @@ public struct ApplicationFeature: TodayProvidable {
     case path(StackAction<Path.State, Path.Action>)
     case reports(ReportsFeature.Action)
     case onboarding(OnboardingFeature.Action)
+    #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
+    #endif
     case binding(BindingAction<State>)
   }
 
@@ -142,7 +148,9 @@ public struct ApplicationFeature: TodayProvidable {
           }
         }
       case .deviceShaked:
+        #if DEBUG
         state.developerTools = DeveloperToolsFeature.State()
+        #endif
         return .none
       case .handleUrl(let url):
         deeplinkService.handleUrl(url)
@@ -162,17 +170,21 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       case .onboarding:
         return .none
+      #if DEBUG
       case .developerTools:
         return .none
+      #endif
       case .path:
         return .none
       case .binding:
         return .none
       }
     }
+    #if DEBUG
     .ifLet(\.$developerTools, action: \.developerTools) {
       DeveloperToolsFeature()
     }
+    #endif
     .forEach(\.path, action: \.path) {
       Path()
     }

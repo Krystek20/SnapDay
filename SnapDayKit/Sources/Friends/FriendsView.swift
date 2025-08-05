@@ -11,7 +11,6 @@ public struct FriendsView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<FriendsFeature>
-  @State private var isLoading = false
   @FocusState private var focus: FriendsField?
 
   // MARK: - Initialization

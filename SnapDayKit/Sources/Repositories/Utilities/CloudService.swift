@@ -317,17 +317,13 @@ public actor CloudService {
   }
 }
 
+#if DEBUG
 import CoreData
 
-// DEBUG
 extension CloudService {
   public func coreDataEntity(entity: any Entity) throws -> NSManagedObject? {
     let context = coreDataStack.backgroundContext
     return try entity.managedObject(context)
-  }
-
-  public func ckShare(from shareEntity: ShareEntity) throws -> CKShare? {
-    try coreDataStack.fetchShare(matching: shareEntity).share
   }
 
   public func zones() async throws -> [String] {
@@ -366,3 +362,4 @@ extension CloudService {
     }
   }
 }
+#endif

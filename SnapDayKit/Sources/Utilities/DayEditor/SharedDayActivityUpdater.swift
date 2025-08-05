@@ -114,7 +114,7 @@ actor SharedDayActivityUpdater {
 
       try await save(
         identifier: sharedDayActivity.id,
-        option: .dayActivity(sharedDayActivity),
+        option: .update(sharedDayActivity),
         fetchOption: .sharedId
       )
 
@@ -143,7 +143,7 @@ actor SharedDayActivityUpdater {
       sharedDayActivity.sharedBy[index].action = .remove
       try await save(
         identifier: sharedDayActivity.id,
-        option: .dayActivity(sharedDayActivity),
+        option: .update(sharedDayActivity),
         fetchOption: .sharedId
       )
     }
@@ -168,7 +168,7 @@ actor SharedDayActivityUpdater {
 
       try await save(
         identifier: sharedDayActivity.id,
-        option: .dayActivity(sharedDayActivity),
+        option: .update(sharedDayActivity),
         fetchOption: .objectId(dayActivity.id)
       )
 
@@ -199,7 +199,7 @@ actor SharedDayActivityUpdater {
       )
       try await save(
         identifier: sharedDayActivityTask.sharedDayActivityId,
-        option: .dayActivityTask(sharedDayActivityTask),
+        option: .updateTask(sharedDayActivityTask),
         fetchOption: .objectId(dayActivityTask.id)
       )
 
@@ -216,6 +216,17 @@ actor SharedDayActivityUpdater {
         participants: sharedDayActivity.sharedBy.map(\.userId),
         activityName: sharedDayActivity.name,
         activityChanges: updatedProperties
+      )
+    }
+  }
+
+  public func removeSharedDayActivity(for dayActivity: DayActivity) async throws {
+    try await asyncWaiter.executeOrWait(for: dayActivity.id) {
+      guard let sharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString) else { return }
+      try await save(
+        identifier: sharedDayActivity.id,
+        option: .remove(sharedDayActivity),
+        fetchOption: .objectId(dayActivity.id)
       )
     }
   }
@@ -259,8 +270,9 @@ actor SharedDayActivityUpdater {
   }
 
   private enum SaveOption {
-    case dayActivity(SharedDayActivity)
-    case dayActivityTask(SharedDayActivityTask)
+    case update(SharedDayActivity)
+    case remove(SharedDayActivity)
+    case updateTask(SharedDayActivityTask)
   }
 
   private func save(
@@ -278,9 +290,11 @@ actor SharedDayActivityUpdater {
         await create(for: identifier)
 
         switch option {
-        case .dayActivity(let sharedDayActivity):
+        case .update(let sharedDayActivity):
           try await saveSharedDayActivity(sharedDayActivity, fetchOption: fetchOption)
-        case .dayActivityTask(let sharedDayActivityTask):
+        case .remove(let sharedDayActivity):
+          try await removeSharedDayActivity(sharedDayActivity)
+        case .updateTask(let sharedDayActivityTask):
           try await saveSharedDayActivityTask(sharedDayActivityTask, fetchOption: fetchOption)
         }
 
@@ -304,6 +318,10 @@ actor SharedDayActivityUpdater {
     } else {
       try await dayActivityRepository.saveSharedDayActivity(sharedDayActivity)
     }
+  }
+
+  private func removeSharedDayActivity(_ sharedDayActivity: SharedDayActivity) async throws {
+    try await dayActivityRepository.removeShareDayActivity(sharedDayActivity)
   }
 
   private func saveSharedDayActivityTask(_ sharedDayActivityTask: SharedDayActivityTask, fetchOption: FetchOption) async throws {
@@ -441,7 +459,7 @@ actor SharedDayActivityUpdater {
 
     try await save(
       identifier: existingSharedDayActivity.id,
-      option: .dayActivity(existingSharedDayActivity),
+      option: .update(existingSharedDayActivity),
       fetchOption: .objectId(dayActivity.id)
     )
   }

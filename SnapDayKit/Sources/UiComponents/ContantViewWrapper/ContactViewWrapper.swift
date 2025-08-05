@@ -4,7 +4,7 @@ import ContactsUI
 public struct ContactViewWrapper: UIViewControllerRepresentable {
 
   @Binding var isPresented: Bool
-  var onSelect: ([CNContact]) -> Void = { _ in }
+  private(set) var onSelect: ([CNContact]) -> Void = { _ in }
 
   public init(
     isPresented: Binding<Bool>,

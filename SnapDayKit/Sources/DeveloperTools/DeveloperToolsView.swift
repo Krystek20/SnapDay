@@ -1,3 +1,4 @@
+#if DEBUG
 import SwiftUI
 import ComposableArchitecture
 import UiComponents
@@ -101,3 +102,4 @@ public struct DeveloperToolsView: View {
     }
   }
 }
+#endif
