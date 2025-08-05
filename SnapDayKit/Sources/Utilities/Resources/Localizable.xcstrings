@@ -1,230 +1,518 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "%lldh" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldStd."
+  "sourceLanguage": "en",
+  "strings": {
+    "%lldh": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldStd."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldh"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldh"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldh"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldh"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldg"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldg"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldh"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldh"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld時間"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ساعة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 시간"
           }
         }
       }
     },
-    "%lldh %lldmin" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lldStd. %2$lldMin."
+    "%lldh %lldmin": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lldStd. %2$lldMin."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lldh %2$lldmin"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lldh %2$lldmin"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lldh %2$lldmin"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lldh %2$lldmin"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lldg %2$lldmin"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lldg %2$lldmin"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lldh %2$lldmin"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lldh %2$lldmin"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lldh %2$lldmin"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld時間 %2$lld分"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ساعة %2$lld دقيقة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld 시간 %2$lld 분"
           }
         }
       }
     },
-    "%lldmin" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldMin."
+    "%lldmin": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldMin."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldmin"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldmin"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldmin"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldmin"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldmin"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldmin"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldmin"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldmin"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldmin"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld分"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld دقيقة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 분"
           }
         }
       }
     },
-    "Hey there! Just a gentle nudge to tackle your planned activity today. You’ve got this!" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hey! Eine kleine Erinnerung, um deine geplante Aktivität heute anzugehen. Du schaffst das!"
+    "Hey there! Just a gentle nudge to tackle your planned activity today. You’ve got this!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hey! Eine kleine Erinnerung, um deine geplante Aktivität heute anzugehen. Du schaffst das!"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hey there! Just a gentle nudge to tackle your planned activity today. You’ve got this!"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hey there! Just a gentle nudge to tackle your planned activity today. You’ve got this!"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¡Hola! Un suave recordatorio para que completes tu actividad planificada de hoy. ¡Tú puedes!"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¡Hola! Un suave recordatorio para que completes tu actividad planificada de hoy. ¡Tú puedes!"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hej! Małe przypomnienie, aby zająć się zaplanowaną aktywnością na dziś. Dasz radę!"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hej! Małe przypomnienie, aby zająć się zaplanowaną aktywnością na dziś. Dasz radę!"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salut ! Juste un petit coup de pouce pour aborder votre activité planifiée aujourd'hui. Vous pouvez le faire !"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Olá! Apenas um lembrete gentil para lidar com sua atividade planejada hoje. Você consegue!"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ciao! Solo un piccolo incoraggiamento per affrontare la tua attività pianificata oggi. Ce la puoi fare!"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "こんにちは！今日は予定しているアクティビティに取り組むよう、優しくお知らせします。あなたはできます！"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مرحبًا! مجرد تذكير لطيف لبدء نشاطك المخطط له اليوم. أنت تستطيع القيام بذلك!"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "안녕하세요! 오늘 계획된 활동을 시작하도록 부드럽게 마무리하세요. 당신은 할 수 있습니다!"
           }
         }
       }
     },
-    "Mark as done" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als erledigt markieren"
+    "Mark as done": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als erledigt markieren"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mark as done"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as done"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marcar como hecho"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marcar como hecho"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oznacz jako wykonane"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oznacz jako wykonane"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marquer comme fait"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marcar como concluído"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segna come fatto"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了としてマーク"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تحديد كمكتمل"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료로 표시"
           }
         }
       }
     },
-    "Remind me in 15 minutes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erinnere mich in 15 Minuten"
+    "Remind me in 15 minutes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erinnere mich in 15 Minuten"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remind me in 15 minutes"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remind me in 15 minutes"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recuérdame en 15 minutos"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recuérdame en 15 minutos"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Przypomnij za 15 minut"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przypomnij za 15 minut"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rappelle-moi dans 15 minutes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lembre-me em 15 minutos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricordami fra 15 minuti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15分後にリマインド"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذكرني بعد 15 دقيقة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15분 후에 알림"
           }
         }
       }
     },
-    "Remind me in 30 minutes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erinnere mich in 30 Minuten"
+    "Remind me in 30 minutes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erinnere mich in 30 Minuten"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remind me in 30 minutes"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remind me in 30 minutes"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recuérdame en 30 minutos"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recuérdame en 30 minutos"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Przypomnij za 30 minut"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przypomnij za 30 minut"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rappelle-moi dans 30 minutes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lembre-me em 30 minutos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricordami fra 30 minuti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30分後にリマインド"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذكرني بعد 30 دقيقة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30분 후에 알림"
           }
         }
       }
     },
-    "Remind me in 60 minutes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erinnere mich in 60 Minuten"
+    "Remind me in 60 minutes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erinnere mich in 60 Minuten"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remind me in 60 minutes"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remind me in 60 minutes"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recuérdame en 60 minutos"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recuérdame en 60 minutos"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Przypomnij za 60 minut"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przypomnij za 60 minut"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rappelle-moi dans 60 minutes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lembre-me em 60 minutos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricordami fra 60 minuti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60分後にリマインド"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذكرني بعد 60 دقيقة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60분 후에 알림"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

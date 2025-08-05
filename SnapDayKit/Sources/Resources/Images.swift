@@ -6,6 +6,7 @@ public enum Images: String {
   case listDone = "list_done"
   case activityListEmpty = "activity_list_empty"
   case emptyCollaboration = "empty_collaboration"
+  case generatingUrl = "generating_url"
   case onboardingWelcome = "onboarding_welcome"
   case onboardingFeatureHabitTracking = "onboarding_feature_habit_tracking"
   case onboardingFeatureTakeControl = "onboarding_feature_take_control"

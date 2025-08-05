@@ -11,7 +11,6 @@ public struct FriendsView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<FriendsFeature>
-//  @State private var participantItemHeight: CGFloat = .zero
   @State private var isLoading = false
   @FocusState private var focus: FriendsField?
 
@@ -80,6 +79,12 @@ public struct FriendsView: View {
   private var content: some View {
     WithPerceptionTracking {
       VStack(spacing: 10.0) {
+        if store.isGeneratingInvitiation {
+          InformationView(configuration: InformationViewConfiguration.generatingUrl)
+            .formBackgroundModifier(padding: EdgeInsets(.zero))
+            .padding(.horizontal, 15.0)
+        }
+
         switch store.content {
         case .list, .form:
           ScrollView {
@@ -89,32 +94,19 @@ public struct FriendsView: View {
           }
           .scrollDismissesKeyboard(.immediately)
           .scrollIndicators(.hidden)
-        case .empty:
+        case .noCollaboration:
           VStack {
             InformationView(configuration: InformationViewConfiguration.addFriends)
               .formBackgroundModifier(padding: EdgeInsets(.zero))
               .padding(.horizontal, 15.0)
             Spacer()
           }
-        case .appending:
-          Spacer()
-          VStack(spacing: 10.0) {
-            Image(systemName: "paperplane.fill")
-              .font(.system(size: 40))
-              .offset(y: isLoading ? -20.0 : .zero)
-              .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: isLoading)
-              .onAppear { isLoading = true }
-              .onDisappear { isLoading = false }
-            Text("Preparing invitation", bundle: .module)
-              .font(.system(size: 14.0, weight: .regular))
-              .multilineTextAlignment(.center)
-              .foregroundStyle(Color.standardText)
-              .padding(.horizontal, 30.0)
-          }
+        case .empty:
           Spacer()
         case .loading:
           Spacer()
           ProgressView()
+            .maxWidth(alignment: .center)
           Spacer()
         }
       }

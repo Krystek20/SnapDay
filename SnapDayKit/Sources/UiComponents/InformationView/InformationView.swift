@@ -37,7 +37,6 @@ public struct InformationView: View {
           .multilineTextAlignment(.leading)
       }
     }
-
     .maxWidth(alignment: .center)
     .formBackgroundModifier()
   }

@@ -1,205 +1,457 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "" : {
-      "shouldTranslate" : false
+  "sourceLanguage": "en",
+  "strings": {
+    "": {
+      "shouldTranslate": false
     },
-    "Activities" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktivitäten"
+    "Activities": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktivitäten"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activities"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activities"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actividades"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actividades"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktywności"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktywności"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activités"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atividades"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attività"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクティビティ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنشطة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "활동"
           }
         }
       }
     },
-    "Reports" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Berichte"
+    "Reports": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berichte"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reports"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reports"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Informes"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Informes"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raporty"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raporty"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rapports"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relatórios"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レポート"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تقارير"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보고서"
           }
         }
       }
     },
-    "Scheduling only 80% of your day allows flexibility for unexpected tasks, reduces stress, and helps maintain sustainable productivity." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Planung von nur 80% Ihres Tages ermöglicht Flexibilität für unerwartete Aufgaben, reduziert Stress und hilft, eine nachhaltige Produktivität aufrechtzuerhalten."
+    "Scheduling only 80% of your day allows flexibility for unexpected tasks, reduces stress, and helps maintain sustainable productivity.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Planung von nur 80% Ihres Tages ermöglicht Flexibilität für unerwartete Aufgaben, reduziert Stress und hilft, eine nachhaltige Produktivität aufrechtzuerhalten."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scheduling only 80% of your day allows flexibility for unexpected tasks, reduces stress, and helps maintain sustainable productivity."
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scheduling only 80% of your day allows flexibility for unexpected tasks, reduces stress, and helps maintain sustainable productivity."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Programar solo el 80% de tu día permite flexibilidad para tareas inesperadas, reduce el estrés y ayuda a mantener una productividad sostenible."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programar solo el 80% de tu día permite flexibilidad para tareas inesperadas, reduce el estrés y ayuda a mantener una productividad sostenible."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Planowanie tylko 80% swojego dnia zapewnia elastyczność na nieprzewidziane zadania, zmniejsza stres i pomaga utrzymać zrównoważoną produktywność."
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planowanie tylko 80% swojego dnia zapewnia elastyczność na nieprzewidziane zadania, zmniejsza stres i pomaga utrzymać zrównoważoną produktywność."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planifier seulement 80% de votre journée permet une flexibilité pour les tâches imprévues, réduit le stress et aide à maintenir une productivité durable."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agendar apenas 80% do seu dia permite flexibilidade para tarefas inesperadas, reduz o estresse e ajuda a manter uma produtividade sustentável."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pianificare solo l'80% della tua giornata consente flessibilità per compiti imprevisti, riduce lo stress e aiuta a mantenere una produttività sostenibile."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1日の80%だけをスケジュールすることで、予想外のタスクに対する柔軟性が生まれ、ストレスが軽減され、持続可能な生産性が維持されます。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جدولة 80٪ فقط من يومك يسمح بالمرونة للمهام غير المتوقعة، ويقلل من التوتر، ويساعد في الحفاظ على إنتاجية مستدامة."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "하루의 80%만 일정을 잡으면 예기치 않은 작업에 대한 유연성을 허용하고 스트레스를 줄이며 지속 가능한 생산성을 유지하도록 도와줍니다."
           }
         }
       }
     },
-    "Tags" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tags"
+    "Tags": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tags"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tags"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tags"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Etiquetas"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiquetas"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tagi"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tagi"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Étiquettes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiquetas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タグ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "علامات"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "태그"
           }
         }
       }
     },
-    "Total Time Spent on Tracked Activities" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gesamtzeit für verfolgte Aktivitäten"
+    "Total Time Spent on Tracked Activities": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesamtzeit für verfolgte Aktivitäten"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Total Time Spent on Tracked Activities"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Total Time Spent on Tracked Activities"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tiempo total dedicado a las actividades rastreadas"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiempo total dedicado a las actividades rastreadas"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Łączny czas spędzony na śledzonych aktywnościach"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Łączny czas spędzony na śledzonych aktywnościach"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temps total passé sur les activités suivies"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempo total gasto em atividades rastreadas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempo totale trascorso su attività tracciate"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "追跡された活動に費やした総時間"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إجمالي الوقت المنقضي على الأنشطة المتعقبة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "추적된 활동에 소요된 총 시간"
           }
         }
       }
     },
-    "Tracking time spent on completed activities versus total planned time helps you assess productivity, identify time management gaps, and improve future planning accuracy." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Nachverfolgen der Zeit für erledigte Aktivitäten im Vergleich zur geplanten Gesamtzeit hilft, die Produktivität zu bewerten, Lücken im Zeitmanagement zu identifizieren und die Genauigkeit der zukünftigen Planung zu verbessern."
+    "Tracking time spent on completed activities versus total planned time helps you assess productivity, identify time management gaps, and improve future planning accuracy.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Nachverfolgen der Zeit für erledigte Aktivitäten im Vergleich zur geplanten Gesamtzeit hilft, die Produktivität zu bewerten, Lücken im Zeitmanagement zu identifizieren und die Genauigkeit der zukünftigen Planung zu verbessern."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tracking time spent on completed activities versus total planned time helps you assess productivity, identify time management gaps, and improve future planning accuracy."
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tracking time spent on completed activities versus total planned time helps you assess productivity, identify time management gaps, and improve future planning accuracy."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rastrear el tiempo invertido en actividades completadas versus el tiempo total planificado ayuda a evaluar la productividad, identificar brechas en la gestión del tiempo y mejorar la precisión en la planificación futura."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rastrear el tiempo invertido en actividades completadas versus el tiempo total planificado ayuda a evaluar la productividad, identificar brechas en la gestión del tiempo y mejorar la precisión en la planificación futura."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Śledzenie czasu spędzonego na wykonanych zadaniach w porównaniu z planowanym czasem pomaga ocenić produktywność, zidentyfikować luki w zarządzaniu czasem i poprawić dokładność przyszłego planowania."
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Śledzenie czasu spędzonego na wykonanych zadaniach w porównaniu z planowanym czasem pomaga ocenić produktywność, zidentyfikować luki w zarządzaniu czasem i poprawić dokładność przyszłego planowania."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suivre le temps consacré aux activités terminées par rapport au temps total prévu vous aide à évaluer la productivité, à identifier les lacunes en gestion du temps et à améliorer la précision de la planification future."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rastrear o tempo gasto em atividades concluídas versus o tempo total planejado ajuda você a avaliar a produtividade, identificar lacunas na gestão do tempo e melhorar a precisão do planejamento futuro."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monitorare il tempo impiegato nelle attività completate rispetto al tempo totale programmato ti aiuta a valutare la produttività, identificare le lacune nella gestione del tempo e migliorare l'accuratezza della pianificazione futura."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了した活動に費やした時間と総計画時間を追跡することで、生産性を評価し、時間管理のギャップを特定し、将来の計画精度を改善できます。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تساعدك تتبع الوقت المستغرق في الأنشطة المنجزة مقابل الوقت المخطط الإجمالي على تقييم الإنتاجية، وتحديد الفجوات في إدارة الوقت، وتحسين دقة التخطيط المستقبلي."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료된 활동에 소요된 시간과 총 계획 시간을 추적하면 생산성을 평가하고 시간 관리의 격차를 식별하며 향후 계획의 정확성을 개선하는 데 도움이 됩니다."
           }
         }
       }
     },
-    "Your Journey of Completed Activities" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ihr Weg abgeschlossener Aktivitäten"
+    "Your Journey of Completed Activities": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ihr Weg abgeschlossener Aktivitäten"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your Journey of Completed Activities"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Journey of Completed Activities"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu recorrido de actividades completadas"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu recorrido de actividades completadas"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twoja droga zakończonych aktywności"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twoja droga zakończonych aktywności"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre parcours d'activités terminées"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sua jornada de atividades concluídas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo percorso di attività completate"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了した活動の旅"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رحلتك الخاصة بالأنشطة المنجزة"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료된 활동의 여정"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

@@ -16,11 +16,11 @@ public enum FriendsField: Hashable {
 public struct FriendsFeature: TodayProvidable {
 
   public enum ViewContent: Hashable, Equatable {
-    case empty
+    case noCollaboration
     case form
     case list
     case loading
-    case appending
+    case empty
   }
 
   // MARK: - Dependencies
@@ -44,6 +44,7 @@ public struct FriendsFeature: TodayProvidable {
     var focus: FriendsField?
     var removing = [Collaboration]()
     var showContactList = false
+    var isGeneratingInvitiation = false
 
     public init() { }
   }
@@ -66,7 +67,7 @@ public struct FriendsFeature: TodayProvidable {
       case updateParticipantsWithContants(contacts: [Contact])
       case invite(String, String)
       case shareUrl(ShareResult)
-      case cancelAdding
+      case closeForm
       case setViewContent(ViewContent)
       case setRemoving(Collaboration, Bool)
     }
@@ -125,16 +126,9 @@ public struct FriendsFeature: TodayProvidable {
       state.focus = .addNew
       return .none
     case .inviteButtonTapped:
-      let value = state.contact
-      let byEmail = value.isValidEmail
-      let byPhone = value.isValidPhone
-      guard byEmail || byPhone else { return .none }
-      return .run { send in
-        await send(.internal(.cancelAdding))
-        await send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
-      }
+      return inviteButtonTapped(state: &state)
     case .cancelButtonTapped:
-      return .send(.internal(.cancelAdding))
+      return .send(.internal(.closeForm))
     case .reinviteButtonTapped(let participant):
       return .send(.internal(.invite(participant.email, participant.phoneNumber)))
     case .removeButtonTapped(let collaboration):
@@ -150,10 +144,11 @@ public struct FriendsFeature: TodayProvidable {
       state.collaborations = collaborations
         .filter { !state.removing.contains($0) }
 
+      state.isGeneratingInvitiation = false
       if state.content == .form {
         return .none
       } else {
-        let content: ViewContent = state.collaborations.isEmpty ? .empty : .list
+        let content: ViewContent = state.collaborations.isEmpty ? .noCollaboration : .list
         return .send(.internal(.setViewContent(content)))
       }
     case .loadContactsIfAllowed:
@@ -202,8 +197,12 @@ public struct FriendsFeature: TodayProvidable {
       ? state.removing.append(collaboration)
       : state.removing.removeAll(where: { $0 == collaboration })
       return .none
-    case .cancelAdding:
-      state.content = state.collaborations.isEmpty ? .empty : .list
+    case .closeForm:
+      let content: ViewContent = state.collaborations.isEmpty
+      ? state.isGeneratingInvitiation ? .empty : .noCollaboration
+      : .list
+
+      state.content = content
       state.focus = nil
       state.contact = ""
       return .none
@@ -267,8 +266,9 @@ public struct FriendsFeature: TodayProvidable {
   }
 
   private func invite(contacts: [(email: String, phoneNumber: String)], state: inout State) -> Effect<Action> {
-    .run { send in
-      await send(.internal(.setViewContent(.appending)))
+    state.isGeneratingInvitiation = true
+    return .run { send in
+      await send(.internal(.closeForm))
 
       var shareResult: ShareResult?
       for contact in contacts {
@@ -287,6 +287,14 @@ public struct FriendsFeature: TodayProvidable {
       await send(.internal(.shareUrl(shareResult)))
       await send(.internal(.loadParticipants))
     }
+  }
+
+  private func inviteButtonTapped(state: inout State) -> Effect<Action> {
+    let value = state.contact
+    let byEmail = value.isValidEmail
+    let byPhone = value.isValidPhone
+    guard byEmail || byPhone else { return .none }
+    return .send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
   }
 
   private func stopCollaborating(collaboration: Collaboration, state: inout State) -> Effect<Action> {

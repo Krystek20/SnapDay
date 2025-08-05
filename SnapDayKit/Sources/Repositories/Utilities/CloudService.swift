@@ -32,13 +32,6 @@ public actor CloudService {
     }
   }
 
-  public enum ShareState: Equatable {
-    case idle
-    case loading
-    case loaded
-    case failure(String)
-  }
-
   public enum CloudError: Error {
     case serviceNotAvailable
   }
@@ -48,6 +41,9 @@ public actor CloudService {
   @Dependency(\.remoteNotificationRepository) private var remoteNotificationRepository
   @Dependency(\.shareRepository) private var shareRepository
   @Dependency(\.coreDataStack) private var coreDataStack
+
+  private let iCloudStore =  NSUbiquitousKeyValueStore.default
+  private let isShareEntityGeneratedKey = "isShareEntityGeneratedKey"
 
   // MARK: - Properties
 
@@ -94,30 +90,48 @@ public actor CloudService {
     }
   }
 
-  lazy var shareStatePublisher = shareStateSubject.eraseToAnyPublisher()
-  private let shareStateSubject = CurrentValueSubject<ShareState, Never>(.idle)
+  private var shareEntity: ShareEntity? {
+    get async throws {
+      guard let userRecordName = await userRecordName,
+            let share = try await shareRepository.fetch(userRecordName: userRecordName) else {
+        return nil
+      }
+      return try share.managedObject(coreDataStack.backgroundContext)
+    }
+  }
+
   private let container = CKContainer(identifier: "iCloud.com.mobilove.snapday")
+  private var initializing = false
 
   // MARK: - Public
 
   public func initializeIfNeeded() async throws {
-    guard try await cloudState == .active, shareStateSubject.value == .idle else { return }
-    shareStateSubject.send(.loading)
+    guard !initializing,
+          try await cloudState == .active,
+          !iCloudStore.bool(forKey: isShareEntityGeneratedKey),
+          let userRecordName = await userRecordName else { return }
+    initializing = true
+    defer { initializing = false }
 
-    do {
-      guard let shareEntity = try await fetchShareEntity() else {
-        shareStateSubject.send(.failure("Cannot fetch share entity"))
-        return
+    try await asyncWaiter.waitUntil(
+      deadline: 5.0,
+      interval: 1.0,
+      action: { [weak self] in
+        try await self?.shareEntity != nil
       }
-      guard try coreDataStack.fetchShare(matching: shareEntity).share == nil else {
-        shareStateSubject.send(.loaded)
-        return
-      }
-      try await coreDataStack.share(managedObject: shareEntity)
-      shareStateSubject.send(.loaded)
-    } catch {
-      shareStateSubject.send(.failure(error.localizedDescription))
+    )
+
+    guard try await shareEntity == nil else {
+      iCloudStore.set(true, forKey: isShareEntityGeneratedKey)
+      iCloudStore.synchronize()
+      return
     }
+
+    let share = try await createShare(userRecordName: userRecordName)
+    let shareEntity = try share.managedObject(coreDataStack.backgroundContext)
+    try await coreDataStack.share(managedObject: shareEntity)
+    iCloudStore.set(true, forKey: isShareEntityGeneratedKey)
+    iCloudStore.synchronize()
   }
 
   public func allShares() async throws -> [Share] {
@@ -133,7 +147,7 @@ public actor CloudService {
     let context = coreDataStack.backgroundContext
     let object = try entity.managedObject(context)
 
-    guard let shareEntity = try await fetchShareEntity(),
+    guard let shareEntity = try await shareEntity,
           let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else {
       print("shareEntity does not exist")
       return
@@ -147,7 +161,7 @@ public actor CloudService {
   }
 
   public func invited() async throws -> [Participant] {
-    guard let shareEntity = try await fetchShareEntity(),
+    guard let shareEntity = try await shareEntity,
           let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else {
       print("shareEntity does not exist")
       return []
@@ -160,7 +174,7 @@ public actor CloudService {
   }
 
   public func removeParticipantFromInvited(_ participantIds: [String]) async throws {
-    guard let shareEntity = try await fetchShareEntity(),
+    guard let shareEntity = try await shareEntity,
           let ckShare = try coreDataStack.fetchShare(matching: shareEntity).share else {
       print("shareEntity does not exist")
       return
@@ -224,7 +238,7 @@ public actor CloudService {
   // MARK: - Private
 
   private func addParticipant(lookupInfo: CKUserIdentity.LookupInfo) async throws -> ShareResult? {
-    guard let shareEntity = try await fetchShareEntity() else {
+    guard let shareEntity = try await shareEntity else {
       print("There is no share entity")
       return nil
     }
@@ -245,17 +259,6 @@ public actor CloudService {
     share.addParticipant(participant)
     let updatedShare = try await coreDataStack.persistUpdatedShare(share: share)
     return ShareResult(ckShare: updatedShare, container: container)
-  }
-
-  private func fetchShareEntity() async throws -> ShareEntity? {
-    guard try await cloudState == .active, let userRecordName = await userRecordName else { return nil }
-    let share = if let share = try await shareRepository.fetch(userRecordName: userRecordName) {
-      share
-    } else {
-      try await createShare(userRecordName: userRecordName)
-    }
-    let context = coreDataStack.backgroundContext
-    return try share.managedObject(context)
   }
 
   private func createShare(userRecordName: String) async throws -> Share {

@@ -128,6 +128,7 @@ public struct ReportDaysProvider: TodayProvidable {
 
   private func dayNumber(_ date: Date) -> String {
     let dateFormatter = DateFormatter()
+    dateFormatter.locale = .preferred
     dateFormatter.dateFormat = "dd"
     return dateFormatter.string(from: date)
   }

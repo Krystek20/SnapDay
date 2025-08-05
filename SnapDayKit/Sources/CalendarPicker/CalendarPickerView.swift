@@ -64,6 +64,7 @@ public struct CalendarPickerView: View {
         displayedComponents: [.date]
       )
       .datePickerStyle(.graphical)
+      .environment(\.locale, Locale.preferred)
       .activityBackground
     }
   }

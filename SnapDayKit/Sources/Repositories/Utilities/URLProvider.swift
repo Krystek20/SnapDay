@@ -1,18 +1,16 @@
 import Foundation
 
-enum URLs {
-//  static let host = "127.0.0.1"
-  static let host = "369c-89-71-124-130.ngrok-free.app"
-//  static let host = "snapday-server.onrender.com"
-}
-
 struct URLProvider {
   static func url(for path: String) throws -> URL {
     var urlComponents = URLComponents()
+    #if DEBUG
+    urlComponents.host = "127.0.0.1"
+    urlComponents.port = 8080
+    #else
     urlComponents.scheme = "https"
-    urlComponents.host = URLs.host
+    urlComponents.host = "snapday-server.onrender.com"
+    #endif
     urlComponents.path = path
-//    urlComponents.port = 8080
 
     guard let url = urlComponents.url else {
       throw URLErrorCode.badURL

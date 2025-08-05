@@ -1,0 +1,33 @@
+// Titles
+"notification.observation.accepted.title" = "%@ さんが協力の準備ができました";
+"notification.invitation.title" = "コラボレーションの招待";
+"notification.accepted.title" = "招待が承認されました";
+"notification.activity.updated.date.title" = "%@ さんがアクティビティの日付を更新しました";
+"notification.activity.updated.name.title" = "%@ さんが「%@」を「%@」に名前変更しました";
+"notification.activity.updated.dueDate.title" = "%@ さんが期日を更新しました";
+"notification.activity.updated.important.title" = "%@ さんが「%@」を重要としてマークしました";
+"notification.activity.updated.unimportant.title" = "%@ さんが「%@」の重要マークを解除しました";
+"notification.activity.updated.done.title" = "%@ さんが「%@」を完了としてマークしました";
+"notification.activity.updated.undone.title" = "%@ さんが「%@」を再開しました";
+"notification.activity.updated.taskAdded.title" = "%@ さんがタスク「%@」を「%@」に追加しました";
+"notification.activity.updated.taskRemoved.title" = "%@ さんがタスク「%@」を「%@」から削除しました";
+"notification.activity.updated.taskDone.title" = "%@ さんがタスク「%@」を完了としてマークしました";
+"notification.activity.updated.taskUndone.title" = "%@ さんがタスク「%@」を未完了としてマークしました";
+"notification.activity.updated.taskNameChanged.title" = "%@ さんがタスク「%@」を「%@」に名前変更しました";
+
+// Bodies
+"notification.observation.accepted.body" = "%@ さんがあなたの招待を承認しました。アクティビティを共有するには、共有したいものに協力者として追加してください。";
+"notification.invitation.body" = "%@ さんがアクティビティ\"%@\"への参加を招待しました。";
+"notification.accepted.body" = "%@ さんが\"%@\"への招待を承認しました。";
+"notification.activity.updated.date.body" = "「%@」の予定日は%@になりました。";
+"notification.activity.updated.name.body" = "アクティビティ名が「%@」から「%@」に変更されました。";
+"notification.activity.updated.dueDate.body" = "「%@」の期限は%@です。";
+"notification.activity.updated.important.body" = "このアクティビティは重要としてマークされました。";
+"notification.activity.updated.unimportant.body" = "このアクティビティはもはや重要とはマークされていません。";
+"notification.activity.updated.done.body" = "アクティビティは完了しました。";
+"notification.activity.updated.undone.body" = "アクティビティは完了から未完了に戻されました。";
+"notification.activity.updated.taskAdded.body" = "タスク「%@」が「%@」に追加されました。";
+"notification.activity.updated.taskRemoved.body" = "タスク「%@」が「%@」から削除されました。";
+"notification.activity.updated.taskDone.body" = "タスク「%@」が完了としてマークされました。";
+"notification.activity.updated.taskUndone.body" = "タスク「%@」が未完了としてマークされました。";
+"notification.activity.updated.taskNameChanged.body" = "タスク「%@」が「%@」に名前変更されました。";

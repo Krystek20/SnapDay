@@ -37,6 +37,7 @@ public struct DashboardFeature: TodayProvidable {
     var title: String {
       let formatter = DateFormatter()
       formatter.dateFormat = "EEEE, d MMM yyyy"
+      formatter.locale = .preferred
       return formatter.string(from: date)
     }
 

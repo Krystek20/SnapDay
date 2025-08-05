@@ -72,11 +72,11 @@ extension Collaboration {
     case .pending:
       String(localized: "Waiting for them to accept your invitation.", bundle: .module)
     case .boardShared:
-      String(localized: "They accepted your board, but haven’t shared theirs yet.", bundle: .module)
+      String(localized: "They accepted your board, but haven't shared theirs yet.", bundle: .module)
     case .awaitingMutual:
-      String(localized: "They shared with you, but you haven’t accepted yet.", bundle: .module)
+      String(localized: "They shared with you, but you haven't accepted yet.", bundle: .module)
     case .mutual:
-      String(localized: "You’re both sharing boards with each other.", bundle: .module)
+      String(localized: "You're both sharing boards with each other.", bundle: .module)
     }
   }
 
@@ -113,6 +113,8 @@ extension Collaboration {
     case (.accepted, .unknown), (.accepted, .removed):
         .boardShared
     case (_, .pending):
+        .awaitingMutual
+    case (.unknown, .accepted), (.removed, .accepted):
         .awaitingMutual
     case (.accepted, .accepted):
         .mutual

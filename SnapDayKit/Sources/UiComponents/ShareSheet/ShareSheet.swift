@@ -1,4 +1,6 @@
 import SwiftUI
+import CloudKit
+import Resources
 import Repositories
 
 public struct ShareSheet: UIViewControllerRepresentable {
@@ -15,9 +17,16 @@ public struct ShareSheet: UIViewControllerRepresentable {
   }
 
   public func makeUIViewController(context: Context) -> UIActivityViewController {
+    let ckShare = shareResult.ckShare
+
+    ckShare[CKShare.SystemFieldKey.title] = String(localized: "SnapDay Invitation", bundle: .module)
+    if let image = UIImage(named: Images.onboardingWelcome.rawValue) {
+      ckShare[CKShare.SystemFieldKey.thumbnailImageData] = image.pngData()
+    }
+
     let itemProvider = NSItemProvider()
     itemProvider.registerCKShare(
-      shareResult.ckShare,
+      ckShare,
       container: shareResult.container,
       allowedSharingOptions: .standard
     )
