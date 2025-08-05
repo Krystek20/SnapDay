@@ -7,7 +7,7 @@ import Combine
 public protocol IconProviderType {
   func getIcon(id: UUID) async -> Icon?
   func getIcons(ids: [UUID]) async -> [Icon]
-  func cleanIcons() async
+  func cleanIcons(force: Bool) async
 }
 
 extension DependencyValues {
@@ -29,6 +29,7 @@ public actor IconProvider: IconProviderType {
 
   @Dependency(\.iconRepository) private var iconRepository
   @Dependency(\.activityRepository) private var activityRepository
+  @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.dayUpdater) private var dayUpdater
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date.now) private var now
@@ -77,7 +78,7 @@ public actor IconProvider: IconProviderType {
 
   public func updateIcon(with iconId: UUID, byIconId: UUID?) async {
     guard var updatedIcon = await getIcon(id: iconId) else {
-      print("UpdatedIcom does not exist")
+      print("UpdatedIcon does not exist")
       return
     }
     if let byIconId, let byIcon = await getIcon(id: byIconId) {
@@ -112,28 +113,21 @@ public actor IconProvider: IconProviderType {
     return icons
   }
 
-  public func cleanIcons() async {
+  public func cleanIcons(force: Bool = false) async {
     do {
-      guard shouldCleanIcons else { return }
+      guard shouldCleanIcons || force else { return }
       userDefaults.set(Date.now, forKey: iconWasCleanedKey)
 
       let allIcons = try await iconRepository.fetchAll()
       let allActivities = try await activityRepository.loadActivities()
       let allDayActivities = try await dayUpdater.dayActivities()
+      let allSharedDayActivities = try await dayActivityRepository.sharedDayActivities(configuration: ActivitiesFetchConfiguration())
 
-      let allActivitiesIconIds = allActivities.reduce(into: [UUID](), { result, next in
-        if let iconId = next.iconId {
-          result += [iconId]
-        }
-      })
+      let allActivitiesIconIds = allActivities.compactMap(\.iconId)
+      let allDayActivitiesIconIds = allDayActivities.compactMap(\.iconId)
+      let allSharedActivitiesIconIds = allSharedDayActivities.map(\.iconId)
 
-      let allDayActivitiesIconIds = allDayActivities.reduce(into: [UUID](), { result, next in
-        if let iconId = next.iconId {
-          result += [iconId]
-        }
-      })
-
-      let allUsedIcons = Set(allActivitiesIconIds) + allDayActivitiesIconIds
+      let allUsedIcons = Set(allActivitiesIconIds + allSharedActivitiesIconIds + allDayActivitiesIconIds)
       let allExisintIconIds = Set(allIcons.compactMap(\.id))
 
       let identifiersToRemove = allExisintIconIds.subtracting(allUsedIcons)

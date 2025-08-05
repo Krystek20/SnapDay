@@ -2,6 +2,7 @@ import Foundation
 import Dependencies
 import Models
 import Repositories
+import Common
 
 actor SharedDayActivityUpdater {
 
@@ -113,31 +114,23 @@ actor SharedDayActivityUpdater {
 
       try await save(
         identifier: sharedDayActivity.id,
-        option: .dayActivity(sharedDayActivity),
+        option: .update(sharedDayActivity),
         fetchOption: .sharedId
       )
 
-      guard let userName = try await cloudService.userName else {
-        print("No user name")
+      guard let share = try await cloudService.firstShare(where: dayActivity.id.uuidString) else {
+        print("No share")
         return
       }
 
-      do {
-        try await remoteNotificationRepository.notifyParticipants(
-          request: NotifyParticipantsRequest(
-            userRecord: userRecordName,
-            participants: sharedDayActivity.sharedBy.map(\.userId),
-            action: .accept,
-            userData: [
-              .activityName: sharedDayActivity.name,
-              .userName: userName,
-              .activityLogId: "logActivityShare"
-            ]
-          )
-        )
-      } catch {
-        print("Cannot notify participants \(error)")
-      }
+      await notifyParticipants(
+        action: .accept,
+        in: share,
+        userRecordName: userRecordName,
+        participants: sharedDayActivity.sharedBy.map(\.userId),
+        activityName: sharedDayActivity.name,
+        activityChanges: []
+      )
     }
   }
 
@@ -150,7 +143,7 @@ actor SharedDayActivityUpdater {
       sharedDayActivity.sharedBy[index].action = .remove
       try await save(
         identifier: sharedDayActivity.id,
-        option: .dayActivity(sharedDayActivity),
+        option: .update(sharedDayActivity),
         fetchOption: .sharedId
       )
     }
@@ -166,7 +159,7 @@ actor SharedDayActivityUpdater {
         byIconId: dayActivity.iconId
       )
 
-      await sharedDayActivity.update(
+      let updatedProperties = await sharedDayActivity.update(
         by: dayActivity,
         userRecordName: userRecordName,
         uuid: uuid,
@@ -175,8 +168,22 @@ actor SharedDayActivityUpdater {
 
       try await save(
         identifier: sharedDayActivity.id,
-        option: .dayActivity(sharedDayActivity),
+        option: .update(sharedDayActivity),
         fetchOption: .objectId(dayActivity.id)
+      )
+
+      guard let share = try await cloudService.firstShare(where: dayActivity.id.uuidString) else {
+        print("No share")
+        return
+      }
+
+      await notifyParticipants(
+        action: .activityUpdated,
+        in: share,
+        userRecordName: userRecordName,
+        participants: sharedDayActivity.sharedBy.map(\.userId),
+        activityName: sharedDayActivity.name,
+        activityChanges: updatedProperties
       )
     }
   }
@@ -185,16 +192,73 @@ actor SharedDayActivityUpdater {
     try await asyncWaiter.executeOrWait(for: dayActivityTask.dayActivityId) {
       guard let userRecordName = await cloudService.userRecordName,
             var sharedDayActivityTask = try await dayActivityRepository.sharedDayActivityTask(objectId: dayActivityTask.id.uuidString) else { return }
-      await sharedDayActivityTask.update(
+      let updatedProperties = await sharedDayActivityTask.update(
         by: dayActivityTask,
         userRecordName: userRecordName,
         updateDate: now
       )
       try await save(
         identifier: sharedDayActivityTask.sharedDayActivityId,
-        option: .dayActivityTask(sharedDayActivityTask),
+        option: .updateTask(sharedDayActivityTask),
         fetchOption: .objectId(dayActivityTask.id)
       )
+
+      guard let sharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivityTask.dayActivityId.uuidString),
+            let share = try await cloudService.firstShare(where: dayActivityTask.dayActivityId.uuidString) else {
+        print("No sharedDayActivity or share")
+        return
+      }
+
+      await notifyParticipants(
+        action: .activityUpdated,
+        in: share,
+        userRecordName: userRecordName,
+        participants: sharedDayActivity.sharedBy.map(\.userId),
+        activityName: sharedDayActivity.name,
+        activityChanges: updatedProperties
+      )
+    }
+  }
+
+  public func removeSharedDayActivity(for dayActivity: DayActivity) async throws {
+    try await asyncWaiter.executeOrWait(for: dayActivity.id) {
+      guard let sharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString) else { return }
+      try await save(
+        identifier: sharedDayActivity.id,
+        option: .remove(sharedDayActivity),
+        fetchOption: .objectId(dayActivity.id)
+      )
+    }
+  }
+
+  private func notifyParticipants(
+    action: ShareAction,
+    in share: Share,
+    userRecordName: String,
+    participants: [String],
+    activityName: String,
+    activityChanges: [UpdateProperty]
+  ) async {
+    guard let userName = share.participants.first(where: \.isCurrentUser)?.name else {
+      print("No user name")
+      return
+    }
+
+    do {
+      try await remoteNotificationRepository.notifyParticipants(
+        request: NotifyParticipantsRequest(
+          userRecord: userRecordName,
+          participants: participants,
+          action: action,
+          userData: [
+            .activityName: activityName,
+            .userName: userName
+          ],
+          activityChanges: activityChanges
+        )
+      )
+    } catch {
+      print("Update SharedDayActivity - cannot notify participants \(error)")
     }
   }
 
@@ -206,8 +270,9 @@ actor SharedDayActivityUpdater {
   }
 
   private enum SaveOption {
-    case dayActivity(SharedDayActivity)
-    case dayActivityTask(SharedDayActivityTask)
+    case update(SharedDayActivity)
+    case remove(SharedDayActivity)
+    case updateTask(SharedDayActivityTask)
   }
 
   private func save(
@@ -225,9 +290,11 @@ actor SharedDayActivityUpdater {
         await create(for: identifier)
 
         switch option {
-        case .dayActivity(let sharedDayActivity):
+        case .update(let sharedDayActivity):
           try await saveSharedDayActivity(sharedDayActivity, fetchOption: fetchOption)
-        case .dayActivityTask(let sharedDayActivityTask):
+        case .remove(let sharedDayActivity):
+          try await removeSharedDayActivity(sharedDayActivity)
+        case .updateTask(let sharedDayActivityTask):
           try await saveSharedDayActivityTask(sharedDayActivityTask, fetchOption: fetchOption)
         }
 
@@ -251,6 +318,10 @@ actor SharedDayActivityUpdater {
     } else {
       try await dayActivityRepository.saveSharedDayActivity(sharedDayActivity)
     }
+  }
+
+  private func removeSharedDayActivity(_ sharedDayActivity: SharedDayActivity) async throws {
+    try await dayActivityRepository.removeShareDayActivity(sharedDayActivity)
   }
 
   private func saveSharedDayActivityTask(_ sharedDayActivityTask: SharedDayActivityTask, fetchOption: FetchOption) async throws {
@@ -315,23 +386,14 @@ actor SharedDayActivityUpdater {
     guard let userRecordName = await cloudService.userRecordName else {
       throw SharedDayActivitySaverError.userRecordNotExist
     }
-    let existingSharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString)
-
-    guard var share = if existingSharedDayActivity != nil {
-      try await cloudService.firstShare(where: dayActivity.id.uuidString)
-    } else {
-      try await cloudService.myShare
-    } else {
-      throw SharedDayActivitySaverError.shareNotExist
-    }
+    var share = try await getShare(for: dayActivity)
 
     var sharedDayActivity: SharedDayActivity
-    if let existingSharedDayActivity {
+    if let existingSharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString) {
       sharedDayActivity = existingSharedDayActivity
     } else {
       let icon = await iconProvider.createIcon(from: dayActivity.iconId)
       try await cloudService.saveEntity(icon, to: share)
-
       sharedDayActivity = SharedDayActivity(
         dayActivity: dayActivity,
         shareableIcon: icon,
@@ -357,14 +419,27 @@ actor SharedDayActivityUpdater {
       share.sharedDayActivities.append(sharedDayActivity)
     }
 
-    try await save(
-      identifier: sharedDayActivity.id,
-      option: .dayActivity(sharedDayActivity),
-      fetchOption: .objectId(dayActivity.id)
-    )
-
     try await cloudService.save(share)
-    try await cloudService.notify(participantRecordName: userRecordName, activityId: sharedDayActivity.id.uuidString)
+
+    await notifyParticipants(
+      action: .invite,
+      in: share,
+      userRecordName: userRecordName,
+      participants: sharedDayActivity.sharedBy.map(\.userId),
+      activityName: sharedDayActivity.name,
+      activityChanges: []
+    )
+  }
+
+  private func getShare(for dayActivity: DayActivity) async throws -> Share {
+    let share = if let share = try await cloudService.firstShare(where: dayActivity.id.uuidString) {
+      share
+    } else if let share = try await cloudService.myShare {
+      share
+    } else {
+      throw SharedDayActivitySaverError.shareNotExist
+    }
+    return share
   }
 
   private func removeParticipant(from dayActivity: DayActivity, participantRecordName: String) async throws {
@@ -384,7 +459,7 @@ actor SharedDayActivityUpdater {
 
     try await save(
       identifier: existingSharedDayActivity.id,
-      option: .dayActivity(existingSharedDayActivity),
+      option: .update(existingSharedDayActivity),
       fetchOption: .objectId(dayActivity.id)
     )
   }

@@ -1,0 +1,33 @@
+// Titles
+"notification.observation.accepted.title" = "%@ è pronto a collaborare con te";
+"notification.invitation.title" = "Invito a collaborare";
+"notification.accepted.title" = "Invito accettato";
+"notification.activity.updated.date.title" = "%@ ha aggiornato la data dell’attività";
+"notification.activity.updated.name.title" = "%@ ha rinominato \"%@\" in \"%@\"";
+"notification.activity.updated.dueDate.title" = "%@ ha aggiornato la data di scadenza";
+"notification.activity.updated.important.title" = "%@ ha contrassegnato \"%@\" come importante";
+"notification.activity.updated.unimportant.title" = "%@ ha rimosso l’importanza da \"%@\"";
+"notification.activity.updated.done.title" = "%@ ha contrassegnato \"%@\" come completata";
+"notification.activity.updated.undone.title" = "%@ ha riaperto \"%@\"";
+"notification.activity.updated.taskAdded.title" = "%@ ha aggiunto il compito \"%@\" a \"%@\"";
+"notification.activity.updated.taskRemoved.title" = "%@ ha rimosso il compito \"%@\" da \"%@\"";
+"notification.activity.updated.taskDone.title" = "%@ ha contrassegnato il compito \"%@\" come completato";
+"notification.activity.updated.taskUndone.title" = "%@ ha riaperto il compito \"%@\"";
+"notification.activity.updated.taskNameChanged.title" = "%@ ha rinominato il compito \"%@\" in \"%@\"";
+
+// Bodies
+"notification.observation.accepted.body" = "%@ ha accettato il tuo invito. Per iniziare a condividere le attività, aggiungilo come collaboratore alle attività che vuoi condividere.";
+"notification.invitation.body" = "%@ ti ha invitato a partecipare all’attività \"%@\".";
+"notification.accepted.body" = "%@ ha accettato il tuo invito a \"%@\".";
+"notification.activity.updated.date.body" = "La data programmata di \"%@\" è ora %@.";
+"notification.activity.updated.name.body" = "L’attività è stata rinominata da \"%@\" in \"%@\".";
+"notification.activity.updated.dueDate.body" = "\"%@\" ora scade il %@.";
+"notification.activity.updated.important.body" = "Questa attività è stata contrassegnata come importante.";
+"notification.activity.updated.unimportant.body" = "Questa attività non è più contrassegnata come importante.";
+"notification.activity.updated.done.body" = "L’attività è ora completa.";
+"notification.activity.updated.undone.body" = "L’attività non è più contrassegnata come completata.";
+"notification.activity.updated.taskAdded.body" = "Il compito \"%@\" è stato aggiunto a \"%@\".";
+"notification.activity.updated.taskRemoved.body" = "Il compito \"%@\" è stato rimosso da \"%@\".";
+"notification.activity.updated.taskDone.body" = "Il compito \"%@\" è stato contrassegnato come completato.";
+"notification.activity.updated.taskUndone.body" = "Il compito \"%@\" è stato contrassegnato come non completato.";
+"notification.activity.updated.taskNameChanged.body" = "Il compito \"%@\" è stato rinominato in \"%@\".";

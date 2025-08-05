@@ -4,7 +4,6 @@ import UiComponents
 import Resources
 import Models
 import Utilities
-import ContactList
 
 @MainActor
 public struct FriendsView: View {
@@ -12,8 +11,6 @@ public struct FriendsView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<FriendsFeature>
-  @State private var participantItemHeight: CGFloat = .zero
-  @State private var isLoading = false
   @FocusState private var focus: FriendsField?
 
   // MARK: - Initialization
@@ -40,12 +37,14 @@ public struct FriendsView: View {
             )
           }
         }
-        .sheet(item: $store.scope(state: \.contactList, action: \.contactList)) { store in
-          NavigationStack {
-            ContactListView(store: store)
-          }
-          .presentationDetents([.large])
-        }
+        .sheet(isPresented: $store.showContactList, content: {
+          ContactViewWrapper(
+            isPresented: $store.showContactList,
+            onSelect: { contacts in
+              store.send(.view(.contactsSelected(contacts)))
+            }
+          )
+        })
         .navigationTitle(String(localized: "Friends", bundle: .module))
         .navigationBarTitleDisplayMode(.inline)
         .bind($store.focus, to: $focus)
@@ -54,7 +53,7 @@ public struct FriendsView: View {
             HStack {
               Button(
                 action: {
-                  store.send(.view(.showContacts))
+                  store.send(.view(.showContactList))
                 },
                 label: {
                   Image(systemName: "list.bullet.circle.fill")
@@ -78,16 +77,12 @@ public struct FriendsView: View {
 
   private var content: some View {
     WithPerceptionTracking {
-      VStack(alignment: .center, spacing: 10.0) {
-        Picker("", selection: $store.listType) {
-          WithPerceptionTracking {
-            ForEach(FriendsFeature.ListType.allCases) { listType in
-              Text(listType.title).tag(listType)
-            }
-          }
+      VStack(spacing: 10.0) {
+        if store.isGeneratingInvitiation {
+          InformationView(configuration: InformationViewConfiguration.generatingUrl)
+            .formBackgroundModifier(padding: EdgeInsets(.zero))
+            .padding(.horizontal, 15.0)
         }
-        .pickerStyle(.segmented)
-        .padding(.horizontal, 15.0)
 
         switch store.content {
         case .list, .form:
@@ -98,37 +93,19 @@ public struct FriendsView: View {
           }
           .scrollDismissesKeyboard(.immediately)
           .scrollIndicators(.hidden)
-        case .empty(let emptyListText):
-          Spacer()
-          VStack(spacing: 10.0) {
-            Image(systemName: "envelope")
-              .font(.system(size: 40.0, weight: .ultraLight))
-            Text(emptyListText)
-              .font(.system(size: 14.0, weight: .regular))
-              .multilineTextAlignment(.center)
-              .foregroundStyle(Color.standardText)
-              .padding(.horizontal, 30.0)
+        case .noCollaboration:
+          VStack {
+            InformationView(configuration: InformationViewConfiguration.addFriends)
+              .formBackgroundModifier(padding: EdgeInsets(.zero))
+              .padding(.horizontal, 15.0)
+            Spacer()
           }
-          Spacer()
-        case .appending:
-          Spacer()
-          VStack(spacing: 10.0) {
-            Image(systemName: "paperplane.fill")
-              .font(.system(size: 40))
-              .offset(y: isLoading ? -20.0 : .zero)
-              .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: isLoading)
-              .onAppear { isLoading = true }
-              .onDisappear { isLoading = false }
-            Text("Preparing invitation", bundle: .module)
-              .font(.system(size: 14.0, weight: .regular))
-              .multilineTextAlignment(.center)
-              .foregroundStyle(Color.standardText)
-              .padding(.horizontal, 30.0)
-          }
+        case .empty:
           Spacer()
         case .loading:
           Spacer()
           ProgressView()
+            .maxWidth(alignment: .center)
           Spacer()
         }
       }
@@ -140,7 +117,7 @@ public struct FriendsView: View {
       VStack {
         if store.content == .form {
           inviteFriendsView
-          if !store.participants.isEmpty {
+          if !store.collaborations.isEmpty {
             Divider()
           }
         }
@@ -156,31 +133,35 @@ public struct FriendsView: View {
   private var participantList: some View {
     WithPerceptionTracking {
       VStack(alignment: .leading, spacing: 10.0) {
-        ForEach(store.participants) { participant in
-          HStack(alignment: .center, spacing: 5.0) {
+        ForEach(store.collaborations) { collaboration in
+          HStack(alignment: .center, spacing: 10.0) {
+            Image(systemName: collaboration.iconName)
+              .iconable(color: collaboration.color)
             VStack(alignment: .leading, spacing: 2.0) {
-              if !participant.name.isEmpty {
-                Text(participant.name)
+              Text(collaboration.title)
+                .font(.system(size: 14.0, weight: .regular))
+              if let subtitle = collaboration.subtitle {
+                Text(subtitle)
+                  .font(.system(size: 12.0, weight: .regular))
               }
-              Text(participant.value)
+              Text(collaboration.description)
+                .font(.system(size: 12.0, weight: .regular))
             }
-            .font(.system(size: 14.0, weight: .regular))
-            .lineLimit(1)
             .foregroundStyle(Color.standardText)
+            .fixedSize(horizontal: false, vertical: true)
 
             Spacer()
 
             HStack(spacing: 10.0) {
-              participantIcon(status: participant.acceptanceStatus)
               TrailingIcon.moreIcon
                 .overlay {
-                  menuView(participant: participant)
+                  menuView(collaboration: collaboration)
                 }
             }
           }
-          .maxDynamic(height: $participantItemHeight, minHeight: 36.0)
+          .padding(.horizontal, 5.0)
 
-          if participant != store.participants.last {
+          if collaboration != store.collaborations.last {
             Divider()
           }
         }
@@ -188,37 +169,21 @@ public struct FriendsView: View {
     }
   }
 
-  private func participantIcon(status: ParticipantAcceptanceStatus) -> some View {
-    let (image, color) = switch status {
-    case .unknown:
-      (Image(systemName: "questionmark.circle"), Color.sectionText)
-    case .pending:
-      (Image(systemName: "clock.circle"), Color.sectionText)
-    case .accepted:
-      (Image(systemName: "checkmark.circle"), Color.greenSuccess)
-    case .removed:
-      (Image(systemName: "xmark.circle"), Color.alertText)
-    }
-    return image.iconable(color: color)
-  }
-
-  private func menuView(participant: Participant) -> some View {
+  private func menuView(collaboration: Collaboration) -> some View {
     Menu {
-      if participant.type == .invited {
-        reinviteButton(participant: participant)
-      }
-      removeButton(participant: participant)
+      reinviteButton(collaboration: collaboration)
+      removeButton(collaboration: collaboration)
     } label: {
       Color.clear
         .frame(width: 30.0, height: 30.0)
     }
   }
 
-  private func reinviteButton(participant: Participant) -> some View {
+  private func reinviteButton(collaboration: Collaboration) -> some View {
     WithPerceptionTracking {
       Button(
         action: {
-          store.send(.view(.reinviteButtonTapped(participant)))
+          store.send(.view(.reinviteButtonTapped(collaboration)))
         },
         label: {
           Text("Reinvite", bundle: .module)
@@ -228,11 +193,11 @@ public struct FriendsView: View {
     }
   }
 
-  private func removeButton(participant: Participant) -> some View {
+  private func removeButton(collaboration: Collaboration) -> some View {
     WithPerceptionTracking {
       Button(
         action: {
-          store.send(.view(.removeButtonTapped(participant)))
+          store.send(.view(.removeButtonTapped(collaboration)))
         },
         label: {
           Text("Remove", bundle: .module)
@@ -270,7 +235,6 @@ public struct FriendsView: View {
           .foregroundStyle(Color.actionBlue)
         }
       }
-      .maxDynamic(height: $participantItemHeight, minHeight: 36.0)
     }
   }
 }

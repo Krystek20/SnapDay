@@ -5,8 +5,10 @@ import Reports
 import Onboarding
 import ActivityDetails
 import Resources
-import DeveloperTools
 import UIKit.UIDevice
+#if DEBUG
+import DeveloperTools
+#endif
 
 @MainActor
 public struct ApplicationView: View {
@@ -48,16 +50,16 @@ public struct ApplicationView: View {
         .onAppear {
           store.send(.appeared)
         }
+        #if DEBUG
         .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
           NavigationStack {
             DeveloperToolsView(store: store)
           }
           .presentationDetents([.medium, .large])
         }
+        #endif
         .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification)) { _ in
-          //        #if DEBUG
           store.send(.deviceShaked)
-          //        #endif
         }
     }
   }

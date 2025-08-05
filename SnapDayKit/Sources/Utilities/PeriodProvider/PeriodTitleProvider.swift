@@ -16,6 +16,7 @@ public struct PeriodTitleProvider {
 
   public func title(for period: Period, range: ClosedRange<Date>) -> String? {
     let formatter = DateFormatter(period: period)
+    formatter.locale = .preferred
     switch period {
     case .day:
       return formatter.string(from: range.lowerBound)

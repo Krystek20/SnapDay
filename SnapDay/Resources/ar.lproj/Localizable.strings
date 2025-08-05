@@ -1,0 +1,33 @@
+// Titles
+"notification.observation.accepted.title" = "٪@ جاهز للتعاون معك";
+"notification.invitation.title" = "دعوة للتعاون";
+"notification.accepted.title" = "تم قبول الدعوة";
+"notification.activity.updated.date.title" = "٪@ قام بتحديث تاريخ النشاط";
+"notification.activity.updated.name.title" = "٪@ أعاد تسمية \"%@\" إلى \"%@\"";
+"notification.activity.updated.dueDate.title" = "٪@ قام بتحديث موعد الانتهاء";
+"notification.activity.updated.important.title" = "٪@ وضع علامة \"%@\" كمهمة هامة";
+"notification.activity.updated.unimportant.title" = "٪@ أزال العلامة عن \"%@\" كمهمة هامة";
+"notification.activity.updated.done.title" = "٪@ وضع علامة \"%@\" كمكتملة";
+"notification.activity.updated.undone.title" = "٪@ أعاد فتح \"%@\"";
+"notification.activity.updated.taskAdded.title" = "٪@ أضاف المهمة \"%@\" إلى \"%@\"";
+"notification.activity.updated.taskRemoved.title" = "٪@ أزال المهمة \"%@\" من \"%@\"";
+"notification.activity.updated.taskDone.title" = "٪@ وضع علامة على المهمة \"%@\" كمكتملة";
+"notification.activity.updated.taskUndone.title" = "٪@ أعاد فتح المهمة \"%@\"";
+"notification.activity.updated.taskNameChanged.title" = "٪@ أعاد تسمية المهمة \"%@\" إلى \"%@\"";
+
+// Bodies
+"notification.observation.accepted.body" = "٪@ قبل دعوتك. لبدء مشاركة الأنشطة، أضفه كمتعاون إلى الأنشطة التي ترغب بمشاركتها.";
+"notification.invitation.body" = "٪@ دعاك للانضمام إلى النشاط \"%@\".";
+"notification.accepted.body" = "٪@ قبل دعوتك إلى \"%@\".";
+"notification.activity.updated.date.body" = "تاريخ النشاط \"%@\" المجدول هو الآن %@.";
+"notification.activity.updated.name.body" = "تم تغيير اسم النشاط من \"%@\" إلى \"%@\".";
+"notification.activity.updated.dueDate.body" = "الموعد المحدد لتنفيذ \"%@\" أصبح %@.";
+"notification.activity.updated.important.body" = "تم وضع علامة على هذا النشاط كمهم.";
+"notification.activity.updated.unimportant.body" = "لم يعد هذا النشاط معلمًا كمهم.";
+"notification.activity.updated.done.body" = "أصبح النشاط مكتملًا الآن.";
+"notification.activity.updated.undone.body" = "لم يعد النشاط معلمًا كمكتمل.";
+"notification.activity.updated.taskAdded.body" = "تمت إضافة المهمة \"%@\" إلى \"%@\".";
+"notification.activity.updated.taskRemoved.body" = "تمت إزالة المهمة \"%@\" من \"%@\".";
+"notification.activity.updated.taskDone.body" = "تمت ملاحظة المهمة \"%@\" كمكتملة.";
+"notification.activity.updated.taskUndone.body" = "تمت ملاحظة المهمة \"%@\" كغير مكتملة.";
+"notification.activity.updated.taskNameChanged.body" = "تمت إعادة تسمية المهمة \"%@\" إلى \"%@\".";

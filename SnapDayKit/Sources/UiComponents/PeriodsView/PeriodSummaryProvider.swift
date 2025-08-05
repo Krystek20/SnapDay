@@ -99,6 +99,7 @@ public struct PeriodSummaryProvider {
     guard let firstDay = dictionary[component]?.first else { return nil }
 
     let formatter = DateFormatter()
+    formatter.locale = .preferred
 
     switch period {
     case .day:

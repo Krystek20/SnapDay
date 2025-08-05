@@ -1,3 +1,4 @@
+#if DEBUG
 import Foundation
 import ComposableArchitecture
 import Repositories
@@ -5,6 +6,14 @@ import Utilities
 import Models
 import Common
 import BackgroundTasks
+import CloudKit
+
+public struct Shared: Identifiable, Equatable {
+  public let id: Int
+  let sharedId: String
+  let text: String?
+  var showButton = false
+}
 
 @Reducer
 public struct DeveloperToolsFeature: TodayProvidable {
@@ -32,21 +41,26 @@ public struct DeveloperToolsFeature: TodayProvidable {
         UserDefaults.standard.setValue(newValue, forKey: key)
       }
     }
-    var allShared: [String] = []
+    var allShared: [Shared] = []
     public init() { }
   }
 
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
+      case cleanShared(String)
       case cleanKeyValueStore
+      case cleanZones
+      case invite1
+      case invite2
+      case cleanImages
       case sendDayActivityReminderNotificationButtonTapped
       case sendDayActivityTaskReminderNotificationButtonTapped
       case sendEveningSummaryReminderNotificationButtonTapped
     }
     public enum InternalAction: Equatable {
       case loadAllShared
-      case setAllShared([String])
+      case setAllShared([Shared])
       case loadPendingRequests
       case loadBackgroundPendingRequests
       case setPendingIdentifiers([String])
@@ -94,6 +108,46 @@ public struct DeveloperToolsFeature: TodayProvidable {
         .send(.internal(.loadBackgroundPendingRequests)),
         .send(.internal(.loadAllShared))
       )
+    case .invite1:
+      return .run { send in
+        NSLog("[DeveloperToolsFeature] - Invite1]")
+        @Dependency(\.cloudService) var cloudService
+        do {
+          let url = try await cloudService.addParticipant(toEmailAddress: "krystek20@me.com")
+          NSLog("[DeveloperToolsFeature] - Invitation done: \(url?.ckShare.url?.absoluteString ?? "")")
+        } catch {
+          NSLog("[DeveloperToolsFeature] - Invitation error: \(error)")
+        }
+      }
+    case .invite2:
+      return .run { send in
+        NSLog("[DeveloperToolsFeature] - Invite2]")
+        @Dependency(\.cloudService) var cloudService
+        do {
+          let url = try await cloudService.addParticipant(toEmailAddress: "zadumana3przez5@icloud.com")
+          NSLog("[DeveloperToolsFeature] - Invitation done: \(url?.ckShare.url?.absoluteString ?? "")")
+        } catch {
+          NSLog("[DeveloperToolsFeature] - Invitation error: \(error)")
+        }
+      }
+    case .cleanShared(let shareId):
+      return .run { send in
+        @Dependency(\.shareRepository) var shareRepository
+        let shares = try await shareRepository.fetchAll()
+        for share in shares where share.id == shareId {
+          try await shareRepository.delete(share: share)
+        }
+      }
+    case .cleanImages:
+      return .run { send in
+        @Dependency(\.iconProvider) var iconProvider
+        await iconProvider.cleanIcons(force: true)
+      }
+    case .cleanZones:
+      return .run { send in
+        @Dependency(\.cloudService) var cloudService
+        try await cloudService.cleanPrivateZones()
+      }
     case .cleanKeyValueStore:
       let allKeys = NSUbiquitousKeyValueStore.default.dictionaryRepresentation.keys
       for key in allKeys {
@@ -164,10 +218,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
       }
     case .loadPendingRequests:
       return .run { send in
-//        #if DEBUG
         let identifiers = await userNotificationCenterProvider.pendingRequests
         await send(.internal(.setPendingIdentifiers(identifiers)))
-//        #endif
       }
     case .loadBackgroundPendingRequests:
       return .run { send in
@@ -182,21 +234,48 @@ public struct DeveloperToolsFeature: TodayProvidable {
       return .none
     case .loadAllShared:
       return .run { send in
-        let allShared = try await dayActivityRepository.sharedDayActivities(configuration: ActivitiesFetchConfiguration())
-        let text = allShared.map { sharedDay in
-          """
-          👉\(sharedDay.name)\n\(sharedDay.id.uuidString)\n
-          \(
-          sharedDay.tasks.map { sharedDayTask in
-            "\t👉\(sharedDayTask.name)\n\t\(sharedDayTask.id.uuidString)"
-          }.joined(separator: "\n")
-          )
-          """
+        @Dependency(\.shareRepository) var shareRepository
+        @Dependency(\.dayActivityRepository) var dayActivityRepository
+        @Dependency(\.cloudService) var cloudService
+        var shared: [Shared] = []
+
+        let zones = try await cloudService.zones()
+        for (index, zone) in zones.enumerated() {
+          shared.append(Shared(id: index + 100, sharedId: zone, text: nil))
         }
-        await send(.internal(.setAllShared(text)))
+
+        var id = Int.zero
+
+        let allShareRepository = try await dayActivityRepository.sharedDayActivities(configuration: ActivitiesFetchConfiguration())
+        var text = ""
+        for activity in allShareRepository {
+
+          let managedObject = try await cloudService.coreDataEntity(entity: activity)
+
+          text += activity.name + "\n"
+          text += activity.tasks.reduce(into: "", { result, task in
+            result += "▸▸ " + task.name + " isSync: \(managedObject?.hasChanges == true)" + "\n"
+          })
+        }
+
+        shared.append(Shared(id: id, sharedId: "Shared Day Activities", text: text))
+        let userRecordName = await cloudService.userRecordName
+
+        shared += try await shareRepository.fetchAll().compactMap { share in
+          id += 1
+          var text = "Owner: \(share.owner == userRecordName)\n"
+          text += share.sharedDayActivities.reduce(into: "", { result, activity in
+            result += activity.name + "\n"
+            result += activity.tasks.reduce(into: "", { result, task in
+              result += "▸▸ " + task.name + "\n"
+            })
+          })
+          return Shared(id: id, sharedId: share.id, text: text, showButton: true)
+        }
+        await send(.internal(.setAllShared(shared)))
       }
-    case .setAllShared(let text):
-      state.allShared = text
+    case .setAllShared(let shared):
+      state.allShared = shared
       return .none
     }
   }
@@ -211,3 +290,4 @@ fileprivate extension BGTaskRequest {
     return identifier + " - " + date
   }
 }
+#endif

@@ -1,0 +1,33 @@
+// Titles
+"notification.observation.accepted.title" = "%@ está listo para colaborar contigo";
+"notification.invitation.title" = "Invitación para colaborar";
+"notification.accepted.title" = "Invitación aceptada";
+"notification.activity.updated.date.title" = "%@ actualizó la fecha de la actividad";
+"notification.activity.updated.name.title" = "%@ renombró “%@” a “%@”";
+"notification.activity.updated.dueDate.title" = "%@ actualizó la fecha de vencimiento";
+"notification.activity.updated.important.title" = "%@ marcó “%@” como importante";
+"notification.activity.updated.unimportant.title" = "%@ desmarcó “%@” como importante";
+"notification.activity.updated.done.title" = "%@ marcó “%@” como completado";
+"notification.activity.updated.undone.title" = "%@ reabrió “%@”";
+"notification.activity.updated.taskAdded.title" = "%@ agregó la tarea “%@” a “%@”";
+"notification.activity.updated.taskRemoved.title" = "%@ eliminó la tarea “%@” de “%@”";
+"notification.activity.updated.taskDone.title" = "%@ marcó la tarea “%@” como completada";
+"notification.activity.updated.taskUndone.title" = "%@ reabrió la tarea “%@”";
+"notification.activity.updated.taskNameChanged.title" = "%@ renombró la tarea “%@” a “%@”";
+
+// Bodies
+"notification.observation.accepted.body" = "%@ aceptó tu invitación. Para empezar a compartir actividades, agrégalo como colaborador a las que deseas compartir.";
+"notification.invitation.body" = "%@ te ha invitado a unirte a la actividad \"%@\".";
+"notification.accepted.body" = "%@ aceptó tu invitación a \"%@\".";
+"notification.activity.updated.date.body" = "La fecha programada de “%@” ahora es %@.";
+"notification.activity.updated.name.body" = "La actividad se renombró de “%@” a “%@”.";
+"notification.activity.updated.dueDate.body" = "“%@” vence ahora el %@.";
+"notification.activity.updated.important.body" = "Esta actividad ha sido marcada como importante.";
+"notification.activity.updated.unimportant.body" = "Esta actividad ya no está marcada como importante.";
+"notification.activity.updated.done.body" = "La actividad ahora está completada.";
+"notification.activity.updated.undone.body" = "La actividad ya no está marcada como completada.";
+"notification.activity.updated.taskAdded.body" = "La tarea “%@” fue agregada a “%@”.";
+"notification.activity.updated.taskRemoved.body" = "La tarea “%@” fue eliminada de “%@”.";
+"notification.activity.updated.taskDone.body" = "La tarea “%@” fue marcada como completada.";
+"notification.activity.updated.taskUndone.body" = "La tarea “%@” fue marcada como no completada.";
+"notification.activity.updated.taskNameChanged.body" = "La tarea “%@” fue renombrada a “%@”.";

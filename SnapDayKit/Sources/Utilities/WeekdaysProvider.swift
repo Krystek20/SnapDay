@@ -4,10 +4,6 @@ import Models
 
 public struct WeekdaysProvider {
 
-  // MARK: - Dependecies
-
-  @Dependency(\.utcCalendar) private var calendar
-
   // MARK: - Initialization
 
   public init() { }
@@ -15,6 +11,8 @@ public struct WeekdaysProvider {
   // MARK: - Public
 
   public var weekdays: [Weekday] {
+    var calendar = Calendar.autoupdatingCurrent.utcCalendar
+    calendar.locale = .preferred
     let weekdays = calendar.shortWeekdaySymbols.enumerated().map { index, name in
       Weekday(name: name, index: index + 1)
     }

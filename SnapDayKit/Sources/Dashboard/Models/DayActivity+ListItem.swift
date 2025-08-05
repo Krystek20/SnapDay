@@ -12,7 +12,7 @@ extension DayActivity {
   ) -> ListItem {
     let isDone = doneDate != nil
     var participants: [ListItem.Participant] = []
-    if let share, !share.availableParticipants.filter(\.isShared).isEmpty {
+    if let share, !share.participants.filter(\.isShared).isEmpty {
       participants = share.participants.map {
         ListItem.Participant(id: $0.id, name: $0.name)
       }

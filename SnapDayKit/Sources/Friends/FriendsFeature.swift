@@ -6,7 +6,7 @@ import Models
 import Common
 import Combine
 import CloudKit
-import ContactList
+import Contacts
 
 public enum FriendsField: Hashable {
   case addNew
@@ -15,28 +15,12 @@ public enum FriendsField: Hashable {
 @Reducer
 public struct FriendsFeature: TodayProvidable {
 
-  public enum ListType: Int, CaseIterable, Identifiable {
-    case fromYou = 0
-    case fromOthers
-
-    public var id: Int { rawValue }
-
-    var title: String {
-      switch self {
-      case .fromOthers:
-        String(localized: "From Others", bundle: .module)
-      case .fromYou:
-        String(localized: "From You", bundle: .module)
-      }
-    }
-  }
-
   public enum ViewContent: Hashable, Equatable {
-    case empty(String)
+    case noCollaboration
     case form
     case list
     case loading
-    case appending
+    case empty
   }
 
   // MARK: - Dependencies
@@ -53,24 +37,14 @@ public struct FriendsFeature: TodayProvidable {
     var isAddCollaboratorInviteEnabled: Bool {
       contact.isValidEmail || contact.isValidPhone
     }
-    var participants: [Participant] = []
+    var collaborations: [Collaboration] = []
     var isSharing: Bool = false
     var shareResult: ShareResult?
-    var listType: ListType = .fromYou
     var content: ViewContent = .loading
     var focus: FriendsField?
-    var removing = [Participant]()
-
-    var emptyMessage: String {
-      switch listType {
-      case .fromYou:
-        String(localized: "Looks like it’s quiet around here. Send your first invitation to get started!", bundle: .module)
-      case .fromOthers:
-        String(localized: "If another user invites you, you’ll see it right here.", bundle: .module)
-      }
-    }
-
-    @Presents var contactList: ContactListFeature.State?
+    var removing = [Collaboration]()
+    var showContactList = false
+    var isGeneratingInvitiation = false
 
     public init() { }
   }
@@ -78,35 +52,32 @@ public struct FriendsFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
-      case showContacts
+      case showContactList
+      case contactsSelected([CNContact])
       case newButtonTapped
       case inviteButtonTapped
       case cancelButtonTapped
-      case reinviteButtonTapped(Participant)
-      case removeButtonTapped(Participant)
+      case reinviteButtonTapped(Collaboration)
+      case removeButtonTapped(Collaboration)
     }
     public enum InternalAction: Equatable {
       case loadParticipants
-      case setParticipants([Participant])
+      case setCollaborations([Collaboration])
       case loadContactsIfAllowed
       case updateParticipantsWithContants(contacts: [Contact])
       case invite(String, String)
       case shareUrl(ShareResult)
-      case setListType(ListType)
-      case cancelAdding
+      case closeForm
       case setViewContent(ViewContent)
-      case setRemoving(Participant, Bool)
+      case setRemoving(Collaboration, Bool)
     }
-    public enum DelegateAction: Equatable {
-
-    }
+    public enum DelegateAction: Equatable { }
 
     case binding(BindingAction<State>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
-    case contactList(PresentationAction<ContactListFeature.Action>)
   }
 
   // MARK: - Body
@@ -119,24 +90,11 @@ public struct FriendsFeature: TodayProvidable {
         return handleViewAction(viewAction, state: &state)
       case .internal(let internalAction):
         return handleInternalAction(internalAction, state: &state)
-      case .contactList(let action):
-        return handleContactListAction(action, state: &state)
-      case .binding(\.listType):
-        return .run { [listType = state.listType] send in
-          if listType == .fromOthers {
-            await send(.internal(.cancelAdding))
-          }
-          await send(.internal(.setViewContent(.loading)))
-          await send(.internal(.loadParticipants))
-        }
       case .binding:
         return .none
       case .delegate:
         return .none
       }
-    }
-    .ifLet(\.$contactList, action: \.contactList) {
-      ContactListFeature()
     }
   }
 
@@ -153,75 +111,44 @@ public struct FriendsFeature: TodayProvidable {
           await send(.internal(.setViewContent(.loading)))
           await send(.internal(.loadParticipants))
       }
-    case .showContacts:
-      state.contactList = ContactListFeature.State()
+    case .showContactList:
+      state.showContactList = true
       return .none
+    case .contactsSelected(let contacts):
+      let contactsForms = contacts.map { contant in
+        let email = String(contant.emailAddresses.first?.value ?? "")
+        let phoneNumber = contant.phoneNumbers.first?.value.stringValue ?? ""
+        return (email, phoneNumber)
+      }
+      return invite(contacts: contactsForms, state: &state)
     case .newButtonTapped:
       state.content = .form
       state.focus = .addNew
-      return switch state.listType {
-      case .fromYou:
-          .none
-      case .fromOthers:
-          .run { send in
-            await send(.internal(.setListType(.fromYou)))
-            await send(.internal(.loadParticipants))
-          }
-      }
+      return .none
     case .inviteButtonTapped:
-      let value = state.contact
-      let byEmail = value.isValidEmail
-      let byPhone = value.isValidPhone
-      guard byEmail || byPhone else { return .none }
-      return .run { send in
-        await send(.internal(.cancelAdding))
-        await send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
-      }
+      return inviteButtonTapped(state: &state)
     case .cancelButtonTapped:
-      return .send(.internal(.cancelAdding))
+      return .send(.internal(.closeForm))
     case .reinviteButtonTapped(let participant):
       return .send(.internal(.invite(participant.email, participant.phoneNumber)))
-    case .removeButtonTapped(let participant):
-      return .run { send in
-        await send(.internal(.setRemoving(participant, true)))
-        await send(.internal(.loadParticipants))
-        switch participant.type {
-        case .invited:
-          try await cloudService.removeParticipantFromInvited(participant)
-        case .invitee:
-          try await cloudService.stopParticipating(participant)
-        case .none:
-          return
-        }
-        await send(.internal(.setRemoving(participant, false)))
-        await send(.internal(.loadParticipants))
-      }
+    case .removeButtonTapped(let collaboration):
+      return stopCollaborating(collaboration: collaboration, state: &state)
     }
   }
 
   private func handleInternalAction(_ action: Action.InternalAction, state: inout State) -> Effect<Action> {
     switch action {
     case .loadParticipants:
-      return .run { [listType = state.listType] send in
-        let participants = switch listType {
-        case .fromYou:
-          try await cloudService.invited()
-        case .fromOthers:
-          try await cloudService.invitedBy()
-        }
-        await send(.internal(.setParticipants(participants)))
-        await send(.internal(.loadContactsIfAllowed))
-      }
-    case .setParticipants(let participants):
-      state.participants = participants
+      return loadParticipants(state: &state)
+    case .setCollaborations(let collaborations):
+      state.collaborations = collaborations
         .filter { !state.removing.contains($0) }
 
+      state.isGeneratingInvitiation = false
       if state.content == .form {
         return .none
       } else {
-        let content: ViewContent = state.participants.isEmpty
-        ? .empty(state.emptyMessage)
-        : .list
+        let content: ViewContent = state.collaborations.isEmpty ? .noCollaboration : .list
         return .send(.internal(.setViewContent(content)))
       }
     case .loadContactsIfAllowed:
@@ -232,18 +159,18 @@ public struct FriendsFeature: TodayProvidable {
       }
     case .updateParticipantsWithContants(let contacts):
       guard !contacts.isEmpty else { return .none }
-      for (index, participant) in state.participants.enumerated() {
-        guard participant.name.isEmpty else { continue }
-        var participant = participant
+      for (index, collaboration) in state.collaborations.enumerated() {
+        guard collaboration.name.isEmpty else { continue }
+        var collaboration = collaboration
         let foundContact = contacts.first(where: { contact in
           let emailExist = contact.emails.contains(where: { email in
-            email.lowercased().contains(participant.email.lowercased())
+            email.lowercased().contains(collaboration.email.lowercased())
           })
           let phoneNumberExist = contact.phoneNumbers.contains(where: { phoneNumber in
             let phoneNumberTrimmed = phoneNumber
               .trimmingCharacters(in: .whitespacesAndNewlines)
               .replacingOccurrences(of: " ", with: "")
-            let participantPhoneNumberTrimmed = participant
+            let participantPhoneNumberTrimmed = collaboration
               .phoneNumber
               .trimmingCharacters(in: .whitespacesAndNewlines)
               .replacingOccurrences(of: " ", with: "")
@@ -252,31 +179,12 @@ public struct FriendsFeature: TodayProvidable {
           return emailExist || phoneNumberExist
         })
         guard let foundContact else { continue }
-        participant.updateName(foundContact.name)
-        state.participants[index] = participant
+        collaboration.name = foundContact.name
+        state.collaborations[index] = collaboration
       }
       return .none
     case .invite(let email, let phoneNumber):
-      return .run { send in
-        await send(.internal(.setViewContent(.appending)))
-        let byEmail = !email.isEmpty
-        let byPhone = !phoneNumber.isEmpty
-        if byEmail {
-          guard let url = try await cloudService.addParticipant(toEmailAddress: email) else {
-            await send(.internal(.loadParticipants))
-            return
-          }
-          await send(.internal(.shareUrl(url)))
-        } else if byPhone {
-          guard let url = try await cloudService.addParticipant(toPhoneNumber: phoneNumber) else {
-            await send(.internal(.loadParticipants))
-            return
-          }
-          await send(.internal(.shareUrl(url)))
-        }
-        await send(.internal(.setListType(.fromYou)))
-        await send(.internal(.loadParticipants))
-      }
+      return invite(contacts: [(email, phoneNumber)], state: &state)
     case .shareUrl(let shareResult):
       state.shareResult = shareResult
       state.isSharing = true
@@ -284,36 +192,121 @@ public struct FriendsFeature: TodayProvidable {
     case .setViewContent(let value):
       state.content = value
       return .none
-    case .setRemoving(let participant, let add):
+    case .setRemoving(let collaboration, let add):
       add
-      ? state.removing.append(participant)
-      : state.removing.removeAll(where: { $0 == participant })
+      ? state.removing.append(collaboration)
+      : state.removing.removeAll(where: { $0 == collaboration })
       return .none
-    case .setListType(let listType):
-      state.listType = listType
-      return .none
-    case .cancelAdding:
-      state.content = state.participants.isEmpty
-      ? .empty(state.emptyMessage)
+    case .closeForm:
+      let content: ViewContent = state.collaborations.isEmpty
+      ? state.isGeneratingInvitiation ? .empty : .noCollaboration
       : .list
+
+      state.content = content
       state.focus = nil
       state.contact = ""
       return .none
     }
   }
 
-  private func handleContactListAction(_ action: PresentationAction<ContactListFeature.Action>, state: inout State) -> Effect<Action> {
-    switch action {
-    case .presented(.delegate(.contactSelected(let contact))):
-      let value = contact.preferredContact
-      let byEmail = contact.emails.contains(value)
-      let byPhone = contact.phoneNumbers.contains(value)
-      guard byEmail || byPhone else { return .none }
-      return .send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
-    case .presented(.delegate(.contactsLoaded(let contacts))):
-      return .send(.internal(.updateParticipantsWithContants(contacts: contacts)))
-    default:
-      return .none
+  private func loadParticipants(state: inout State) -> Effect<Action> {
+    .run { send in
+      let shares = try await cloudService.allShares()
+      let collaborations = shares.reduce(into: [Collaboration](), { result, share in
+        if share.isCurrentUserOwner == true {
+          for participant in share.participants where !participant.isCurrentUser {
+            let existingIndex = result.firstIndex(where: {
+              ($0.recordName != nil && $0.recordName == participant.recordName)
+              || (!$0.email.isEmpty && $0.email == participant.email)
+              || (!$0.phoneNumber.isEmpty && $0.phoneNumber == participant.phoneNumber)
+            })
+            if let existingIndex {
+              result[existingIndex].updateInvitedByCurrentUser(participant)
+            } else {
+              let collaboration = Collaboration(
+                participantIds: [participant.id],
+                recordName: participant.recordName,
+                name: participant.name,
+                email: participant.email,
+                phoneNumber: participant.phoneNumber,
+                invitedByCurrentUser: participant.acceptanceStatus,
+                invitedCurrentUser: .unknown
+              )
+              result.append(collaboration)
+            }
+          }
+        } else {
+          for participant in share.participants where participant.isOwner {
+            let existingIndex = result.firstIndex(where: {
+              ($0.recordName != nil && $0.recordName == participant.recordName)
+              || (!$0.email.isEmpty && $0.email == participant.email)
+              || (!$0.phoneNumber.isEmpty && $0.phoneNumber == participant.phoneNumber)
+            })
+            if let existingIndex {
+              result[existingIndex].updateInvitedCurrentUser(participant)
+            } else {
+              let collaboration = Collaboration(
+                participantIds: [participant.id],
+                recordName: participant.recordName,
+                name: participant.name,
+                email: participant.email,
+                phoneNumber: participant.phoneNumber,
+                invitedByCurrentUser: .unknown,
+                invitedCurrentUser: participant.acceptanceStatus
+              )
+              result.append(collaboration)
+            }
+          }
+        }
+      })
+
+      await send(.internal(.setCollaborations(collaborations)))
+      await send(.internal(.loadContactsIfAllowed))
+    }
+  }
+
+  private func invite(contacts: [(email: String, phoneNumber: String)], state: inout State) -> Effect<Action> {
+    state.isGeneratingInvitiation = true
+    return .run { send in
+      await send(.internal(.closeForm))
+
+      var shareResult: ShareResult?
+      for contact in contacts {
+        let byEmail = !contact.email.isEmpty
+        let byPhone = !contact.phoneNumber.isEmpty
+        if byEmail {
+          shareResult = try await cloudService.addParticipant(toEmailAddress: contact.email)
+        } else if byPhone {
+          shareResult = try await cloudService.addParticipant(toPhoneNumber: contact.phoneNumber)
+        }
+      }
+
+      guard let shareResult else {
+        return await send(.internal(.loadParticipants))
+      }
+      await send(.internal(.shareUrl(shareResult)))
+      await send(.internal(.loadParticipants))
+    }
+  }
+
+  private func inviteButtonTapped(state: inout State) -> Effect<Action> {
+    let value = state.contact
+    let byEmail = value.isValidEmail
+    let byPhone = value.isValidPhone
+    guard byEmail || byPhone else { return .none }
+    return .send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
+  }
+
+  private func stopCollaborating(collaboration: Collaboration, state: inout State) -> Effect<Action> {
+    return .run { send in
+      await send(.internal(.setRemoving(collaboration, true)))
+      await send(.internal(.loadParticipants))
+      try await cloudService.removeParticipantFromInvited(collaboration.participantIds)
+      if let recordName = collaboration.recordName {
+        try await cloudService.stopParticipating(recordName)
+      }
+      await send(.internal(.setRemoving(collaboration, false)))
+      await send(.internal(.loadParticipants))
     }
   }
 }

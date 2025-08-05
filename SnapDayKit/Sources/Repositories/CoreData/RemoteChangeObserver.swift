@@ -80,7 +80,7 @@ final class RemoteChangeObserver {
         print("Can not remove deduplicated objects \(error)")
       }
 
-      if event.type == .import {
+      if event.type == .import, event.endDate != nil {
         notificationCenter.post(name: .snapDayCloudKitChanged, object: nil)
       }
     }

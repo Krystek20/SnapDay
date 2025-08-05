@@ -127,11 +127,24 @@ public actor DayUpdater: TodayProvidable {
   }
 
   public func removeDayActivity(_ dayActivity: DayActivity) async throws {
+    let invited = try await cloudService.invited()
+    if let share = try await prepareDayActivityShare(for: dayActivity, participants: invited) {
+      if share.isOwner {
+        try await sharedDayActivityUpdater.removeSharedDayActivity(for: dayActivity)
+      } else {
+        try await stopCollaboration(in: dayActivity)
+      }
+    }
     try await dayActivityRepository.removeDayActivity(dayActivity)
   }
 
   public func removeDayActivityTask(_ dayActivityTask: DayActivityTask) async throws {
     try await dayActivityRepository.removeDayActivityTask(dayActivityTask)
+
+    guard let dayActivity = try await dayActivity(identifier: dayActivityTask.dayActivityId.uuidString) else {
+      return
+    }
+    try await sharedDayActivityUpdater.updateSharedDayActivity(dayActivity: dayActivity)
   }
 
   public func moveDayActivity(_ dayActivity: DayActivity, toDate: Date) async throws {
@@ -371,19 +384,30 @@ public actor DayUpdater: TodayProvidable {
     participants: [Participant]
   ) async throws {
     for (index, dayActivity) in dayActivities.enumerated() {
-      guard let sharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString),
-            let share = try await cloudService.allShares().first(where: { $0.sharedDayActivities.contains { $0.id == sharedDayActivity.id } }) else {
+      guard let dayActivityShare = try await prepareDayActivityShare(for: dayActivity, participants: participants) else {
         dayActivities[index].share = .notSharedYet(availableParticipants: makeAvailableParticipants(participants: participants, for: nil))
         continue
       }
 
-      dayActivities[index].share = DayActivityShare(
-        invitationId: nil,
-        isOwner: share.isCurrentUserOwner == true,
-        participants: makeDayActivityParticipant(from: sharedDayActivity, share: share),
-        availableParticipants: makeAvailableParticipants(participants: participants, for: sharedDayActivity)
-      )
+      dayActivities[index].share = dayActivityShare
     }
+  }
+
+  private func prepareDayActivityShare(
+    for dayActivity: DayActivity,
+    participants: [Participant]
+  ) async throws -> DayActivityShare? {
+    guard let sharedDayActivity = try await dayActivityRepository.sharedDayActivity(objectId: dayActivity.id.uuidString),
+          let share = try await cloudService.allShares().first(where: { $0.sharedDayActivities.contains { $0.id == sharedDayActivity.id } }) else {
+      return nil
+    }
+
+    return DayActivityShare(
+      invitationId: nil,
+      isOwner: share.isCurrentUserOwner == true,
+      participants: makeDayActivityParticipant(from: sharedDayActivity, share: share),
+      availableParticipants: makeAvailableParticipants(participants: participants, for: sharedDayActivity)
+    )
   }
 
   private func updateDayActivitiesWithInvitations(

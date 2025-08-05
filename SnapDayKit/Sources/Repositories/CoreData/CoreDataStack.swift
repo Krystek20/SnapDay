@@ -91,46 +91,46 @@ final class CoreDataStack {
       }
     }
 
-      self.persistentContainer = persistentContainer
-      self.persistentContainer.viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
-      self.persistentContainer.viewContext.transactionAuthor = TransactionAuthor.app()
-      self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
+    self.persistentContainer = persistentContainer
+    self.persistentContainer.viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+    self.persistentContainer.viewContext.transactionAuthor = TransactionAuthor.app()
+    self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
 
-      do {
-          try persistentContainer.viewContext.setQueryGenerationFrom(.current)
-      } catch {
-          fatalError("Failed to pin viewContext to the current generation:\(error)")
-      }
+    do {
+      try persistentContainer.viewContext.setQueryGenerationFrom(.current)
+    } catch {
+      fatalError("Failed to pin viewContext to the current generation:\(error)")
+    }
 
-      guard Bundle.main.isMainApp else { return }
+    guard Bundle.main.isMainApp else { return }
 
-      do {
-        try coreDataBackupService.scheduleBackups(
-          persistentContainer: persistentContainer,
-          storeURL: storeUrl,
-          description: description
-        )
-      } catch {
-        print("Backup schedule failed: \(error)")
-      }
+    do {
+      try coreDataBackupService.scheduleBackups(
+        persistentContainer: persistentContainer,
+        storeURL: storeUrl,
+        description: description
+      )
+    } catch {
+      print("Backup schedule failed: \(error)")
+    }
 
-      Task {
-        await remoteChangeObserver.startObservingRemoteChanges(
-          persistentContainer: persistentContainer,
-          store: try privatePersistentStore,
-          sharedStore: try sharedPersistentStore,
-          backgroundContextProvider: { [weak self] in self?.backgroundContext }
-        )
-      }
+    Task {
+      await remoteChangeObserver.startObservingRemoteChanges(
+        persistentContainer: persistentContainer,
+        store: try privatePersistentStore,
+        sharedStore: try sharedPersistentStore,
+        backgroundContextProvider: { [weak self] in self?.backgroundContext }
+      )
+    }
 
-      Task {
-        await remoteChangeObserver.startObservingCloudKitChanges(
-          persistentContainer: persistentContainer,
-          store: try privatePersistentStore,
-          shareStore: try sharedPersistentStore,
-          backgroundContextProvider: { [weak self] in self?.backgroundContext }
-        )
-      }
+    Task {
+      await remoteChangeObserver.startObservingCloudKitChanges(
+        persistentContainer: persistentContainer,
+        store: try privatePersistentStore,
+        shareStore: try sharedPersistentStore,
+        backgroundContextProvider: { [weak self] in self?.backgroundContext }
+      )
+    }
   }
 
   @discardableResult
@@ -187,7 +187,7 @@ final class CoreDataStack {
   }
 
   func recordID(for object: NSManagedObject) -> CKRecord.ID? {
-      persistentContainer.recordID(for: object.objectID)
+    persistentContainer.recordID(for: object.objectID)
   }
 }
 

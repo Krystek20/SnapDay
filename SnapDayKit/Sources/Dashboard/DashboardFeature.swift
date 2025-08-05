@@ -37,6 +37,7 @@ public struct DashboardFeature: TodayProvidable {
     var title: String {
       let formatter = DateFormatter()
       formatter.dateFormat = "EEEE, d MMM yyyy"
+      formatter.locale = .preferred
       return formatter.string(from: date)
     }
 
@@ -49,7 +50,7 @@ public struct DashboardFeature: TodayProvidable {
     var items: [ListItem] = []
 
     var dayInformation: InformationViewConfiguration? {
-      guard let selectedDay, newField == nil, !loading else { return nil }
+      guard !hideDayInformation, let selectedDay, newField == nil else { return nil }
       if selectedDay.activities.allSatisfy(\.isDone) && !selectedDay.activities.isEmpty {
         return .todaySuccess
       } else if selectedDay.activities.isEmpty {
@@ -60,10 +61,11 @@ public struct DashboardFeature: TodayProvidable {
       return nil
     }
 
-    var loading = false
-    var date: Date
+    @ObservationStateIgnored var hideDayInformation = true
+    @ObservationStateIgnored var streamSetup = false
+    @ObservationStateIgnored var date: Date
+
     var selectedDay: Day?
-    var streamSetup = false
     var alert: DashboardAlert?
     var hideCompleted: Bool
     var hideTasks: Bool
@@ -275,7 +277,6 @@ public struct DashboardFeature: TodayProvidable {
       return .send(.internal(.loadDay))
     case .todayButtonTapped:
       state.date = today
-      state.selectedDay = nil
       return .send(.internal(.loadDay))
     case .confirmAlertButtonTapped:
       defer { state.alert = nil }
@@ -316,7 +317,6 @@ public struct DashboardFeature: TodayProvidable {
       state.date = date
       return .send(.internal(.loadDay))
     case .loadDay:
-      state.loading = true
       return .run { [date = state.date] send in
         do {
           let day = try await dayUpdater.day(date)
@@ -330,7 +330,7 @@ public struct DashboardFeature: TodayProvidable {
       }
     case .setDay(let day):
       state.selectedDay = day
-      state.loading = false
+      state.hideDayInformation = false
       return .run { send in
         await send(.internal(.setItems))
         try await userNotificationCenterProvider.reloadReminders()
@@ -490,7 +490,7 @@ public struct DashboardFeature: TodayProvidable {
         await send(.internal(.dayActivityAction(.showAlertSelectAll(dayActivity))))
       }
     case .create(let dayActivity):
-      state.loading = true
+      state.hideDayInformation = true
       return .run { [dayActivity] send in
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
         await send(.internal(.loadDay))

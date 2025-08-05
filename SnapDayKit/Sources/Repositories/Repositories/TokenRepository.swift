@@ -5,11 +5,21 @@ public struct TokenRepository {
 
   @Dependency(\.networkService) private var networkService
 
-  public func registerToken(_ token: String, for userRecord: String) async throws {
+  public func registerToken(
+    _ token: String,
+    for userRecord: String,
+    preferredLanguage: String = Locale.preferredLanguages.first ?? "en"
+  ) async throws {
     try await networkService.request(
       url: URLProvider.url(for: "/api/v1/register-token"),
       httpMethod: .post,
-      body: .json(["token": token, "userRecordID": userRecord])
+      body: .json(
+        [
+          "token": token,
+          "userRecordID": userRecord,
+          "preferredLanguage": preferredLanguage
+        ]
+      )
     )
   }
 }

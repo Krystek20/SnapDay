@@ -1,0 +1,33 @@
+// Titles
+"notification.observation.accepted.title" = "%@님이 협력할 준비가 되셨습니다";
+"notification.invitation.title" = "협업 초대";
+"notification.accepted.title" = "초대 수락됨";
+"notification.activity.updated.date.title" = "%@님이 활동 날짜를 업데이트하셨습니다";
+"notification.activity.updated.name.title" = "%@님이 \"%@\"의 이름을 \"%@\"으로 변경하셨습니다";
+"notification.activity.updated.dueDate.title" = "%@님이 기한을 업데이트하셨습니다";
+"notification.activity.updated.important.title" = "%@님이 \"%@\"를 중요 표시하셨습니다";
+"notification.activity.updated.unimportant.title" = "%@님이 \"%@\"의 중요 표시를 제거하셨습니다";
+"notification.activity.updated.done.title" = "%@님이 \"%@\"를 완료로 표시하셨습니다";
+"notification.activity.updated.undone.title" = "%@님이 \"%@\"를 다시 진행 중 상태로 표시하셨습니다";
+"notification.activity.updated.taskAdded.title" = "%@님이 작업 \"%@\"을 \"%@\"에 추가하셨습니다";
+"notification.activity.updated.taskRemoved.title" = "%@님이 작업 \"%@\"을 \"%@\"에서 제거하셨습니다";
+"notification.activity.updated.taskDone.title" = "%@님이 작업 \"%@\"를 완료로 표시하셨습니다";
+"notification.activity.updated.taskUndone.title" = "%@님이 작업 \"%@\"를 미완료로 표시하셨습니다";
+"notification.activity.updated.taskNameChanged.title" = "%@님이 작업 이름을 \"%@\"에서 \"%@\"로 변경하셨습니다";
+
+// Bodies
+"notification.observation.accepted.body" = "%@님이 초대를 수락하셨습니다. 활동을 공유하려면 함께 작업할 활동에 해당 사용자를 협력자로 추가하세요.";
+"notification.invitation.body" = "%@님이 활동 \"%@\"에 초대하셨습니다.";
+"notification.accepted.body" = "%@님이 \"%@\"에 대한 초대를 수락하셨습니다.";
+"notification.activity.updated.date.body" = "“%@”의 예정 날짜는 이제 %@입니다.";
+"notification.activity.updated.name.body" = "활동 이름이 \"%@\"에서 \"%@\"로 변경되었습니다.";
+"notification.activity.updated.dueDate.body" = "“%@”의 마감일은 이제 %@입니다.";
+"notification.activity.updated.important.body" = "이 활동은 중요로 표시되었습니다.";
+"notification.activity.updated.unimportant.body" = "이 활동은 더 이상 중요로 표시되지 않습니다.";
+"notification.activity.updated.done.body" = "활동이 완료되었습니다.";
+"notification.activity.updated.undone.body" = "활동이 더 이상 완료 상태가 아닙니다.";
+"notification.activity.updated.taskAdded.body" = "작업 \"%@\"이 \"%@\"에 추가되었습니다.";
+"notification.activity.updated.taskRemoved.body" = "작업 \"%@\"이 \"%@\"에서 제거되었습니다.";
+"notification.activity.updated.taskDone.body" = "작업 \"%@\"이 완료로 표시되었습니다.";
+"notification.activity.updated.taskUndone.body" = "작업 \"%@\"이 미완료로 표시되었습니다.";
+"notification.activity.updated.taskNameChanged.body" = "작업 이름이 \"%@\"에서 \"%@\"로 변경되었습니다.";

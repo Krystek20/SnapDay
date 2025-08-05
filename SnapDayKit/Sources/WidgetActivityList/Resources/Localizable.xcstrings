@@ -1,118 +1,262 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🎉 Gute Arbeit! Jetzt ruhe dich aus und genieße den Rest deines Tages mit einem Lächeln! 🎉"
+  "sourceLanguage": "en",
+  "strings": {
+    "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Gute Arbeit! Jetzt ruhe dich aus und genieße den Rest deines Tages mit einem Lächeln! 🎉"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🎉 ¡Gran trabajo! Ahora, descansa y disfruta el resto de tu día con una sonrisa. 🎉"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 ¡Gran trabajo! Ahora, descansa y disfruta el resto de tu día con una sonrisa. 🎉"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "🎉 Świetna robota! Teraz odpocznij i ciesz się resztą dnia z uśmiechem! 🎉"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Świetna robota! Teraz odpocznij i ciesz się resztą dnia z uśmiechem! 🎉"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Beau travail ! Maintenant, repose-toi et profite du reste de ta journée avec le sourire ! 🎉"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Ótimo trabalho! Agora, descanse e aproveite o resto do seu dia com um sorriso! 🎉"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 Ottimo lavoro! Ora, riposati e goditi il resto della tua giornata con un sorriso! 🎉"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 素晴らしい仕事！さあ、休んで、残りの一日を笑顔で楽しんで！ 🎉"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 عمل رائع! الآن، خذ استراحة واستمتع ببقية يومك بابتسامة! 🎉"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🎉 훌륭합니다! 이제 휴식을 취하고 남은 하루를 미소로 즐기세요! 🎉"
           }
         }
       }
     },
-    "A blank canvas awaits your plans or spontaneous joys." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eine leere Leinwand erwartet deine Pläne oder spontanen Freuden."
+    "A blank canvas awaits your plans or spontaneous joys.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine leere Leinwand erwartet deine Pläne oder spontanen Freuden."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A blank canvas awaits your plans or spontaneous joys."
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A blank canvas awaits your plans or spontaneous joys."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un lienzo en blanco espera tus planes o alegrías espontáneas."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un lienzo en blanco espera tus planes o alegrías espontáneas."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pusta karta czeka na Twoje plany lub spontaniczne radości."
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pusta karta czeka na Twoje plany lub spontaniczne radości."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une toile blanche attend vos plans ou vos joies spontanées."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma tela em branco aguarda seus planos ou alegrias espontâneas."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una tela vuota attende i tuoi piani o gioie spontanee."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "真っ白なキャンバスがあなたの計画や突発的な喜びを待っています。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تنتظر لوحة فارغة خططك أو أفراحك العفوية."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "빈 캔버스가 당신의 계획이나 자발적인 기쁨을 기다립니다."
           }
         }
       }
     },
-    "Add Activity" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktivität hinzufügen"
+    "Add Activity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktivität hinzufügen"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Activity"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Activity"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agregar actividad"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar actividad"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodaj aktywność"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dodaj aktywność"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une activité"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar atividade"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi attività"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクテ��ビティを追加"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أضف نشاط"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "활동 추가"
           }
         }
       }
     },
-    "Your Day, Your Way" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dein Tag, dein Weg"
+    "Your Day, Your Way": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Tag, dein Weg"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your Day, Your Way"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Day, Your Way"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu día, tu camino"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu día, tu camino"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twój dzień, Twoja droga"
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twój dzień, Twoja droga"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre journée, votre façon"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seu dia, sua maneira"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo giorno, il tuo modo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたの一日、あなたのやり方"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يومك، طريقتك"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "당신의 하루, 당신의 방식"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

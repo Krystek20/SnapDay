@@ -21,6 +21,10 @@ public struct ShareRepository {
   public func save(share: Share) async throws {
     try await EntityHandler().save(share)
   }
+
+  public func delete(share: Share) async throws {
+    try await EntityHandler().delete(share)
+  }
 }
 
 extension DependencyValues {

@@ -40,9 +40,8 @@ private var targets: [Target] {
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
   TargetParamenters(module: .reports, dependencies: sceneDependecies)
-  TargetParamenters(module: .friends, dependencies: sceneDependecies + [.contactList])
+  TargetParamenters(module: .friends, dependencies: sceneDependecies)
   TargetParamenters(module: .activityDetails, dependencies: sceneDependecies + [.selectableList])
-  TargetParamenters(module: .contactList, dependencies: sceneDependecies)
   TargetParamenters(module: .selectableList, dependencies: sceneDependecies)
   TargetParamenters(module: .eveningSummary, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityReminder, dependencies: sceneDependecies)
@@ -84,7 +83,6 @@ private enum Module: String {
   case calendarPicker
   case reports
   case friends
-  case contactList
   case activityDetails
   case selectableList
   case eveningSummary

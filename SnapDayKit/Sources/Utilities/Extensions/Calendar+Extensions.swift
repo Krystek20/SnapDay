@@ -48,6 +48,7 @@ extension Calendar {
 
   public func monthName(_ fromDate: Date) throws -> String {
     let dateFormatter = DateFormatter()
+    dateFormatter.locale = .preferred
     guard let month = dateComponents([.month], from: fromDate).month,
           dateFormatter.standaloneMonthSymbols.indices.contains(month - 1) else {
       throw DateError.monthNotExist

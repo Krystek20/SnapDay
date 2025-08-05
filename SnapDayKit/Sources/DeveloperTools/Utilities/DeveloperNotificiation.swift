@@ -1,3 +1,4 @@
+#if DEBUG
 import Models
 import UserNotifications
 
@@ -18,3 +19,4 @@ public struct DeveloperNotificiation: UserNotification {
     self.canBySchedule = true
   }
 }
+#endif

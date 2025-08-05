@@ -10,11 +10,14 @@ public final class DeveloperToolsLogger {
       case error
     }
     case refresh(RefreshEvent)
+    case token(String)
 
     var stringValue: String {
       switch self {
       case .refresh(let refreshEvent):
         "refresh:" + refreshEvent.rawValue
+      case .token(let value):
+        value
       }
     }
   }

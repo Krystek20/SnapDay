@@ -1,11 +1,33 @@
 // Titles
+"notification.observation.accepted.title" = "%@ is ready to collaborate with you";
 "notification.invitation.title" = "Invitation to Collaborate";
 "notification.accepted.title" = "Invitation Accepted";
-"notification.edited.title" = "Activity Updated";
-"notification.done.title" = "Activity Completed";
+"notification.activity.updated.date.title" = "%@ updated the activity date";
+"notification.activity.updated.name.title" = "%@ renamed “%@” to “%@”";
+"notification.activity.updated.dueDate.title" = "%@ updated the due date";
+"notification.activity.updated.important.title" = "%@ marked “%@” as important";
+"notification.activity.updated.unimportant.title" = "%@ unmarked “%@” as important";
+"notification.activity.updated.done.title" = "%@ marked “%@” as done";
+"notification.activity.updated.undone.title" = "%@ reopened “%@”";
+"notification.activity.updated.taskAdded.title" = "%@ added task “%@” to “%@”";
+"notification.activity.updated.taskRemoved.title" = "%@ removed task “%@” from “%@”";
+"notification.activity.updated.taskDone.title" = "%@ marked task “%@” as done";
+"notification.activity.updated.taskUndone.title" = "%@ reopened task “%@”";
+"notification.activity.updated.taskNameChanged.title" = "%@ renamed task “%@” to “%@”";
 
 // Bodies
+"notification.observation.accepted.body" = "%@ accepted your invite. To start sharing activities, add them as a collaborator to the ones you'd like to share.";
 "notification.invitation.body" = "%@ invited you to join the activity \"%@\".";
 "notification.accepted.body" = "%@ accepted your invitation to \"%@\".";
-"notification.edited.body" = "\"%@\" was edited by %@.";
-"notification.done.body" = "%@ marked \"%@\" as done.";
+"notification.activity.updated.date.body" = "The scheduled date of “%@” is now %@.";
+"notification.activity.updated.name.body" = "The activity was renamed from “%@” to “%@”.";
+"notification.activity.updated.dueDate.body" = "“%@” is now due on %@.";
+"notification.activity.updated.important.body" = "This activity has been marked as important.";
+"notification.activity.updated.unimportant.body" = "This activity is no longer marked as important.";
+"notification.activity.updated.done.body" = "The activity is now complete.";
+"notification.activity.updated.undone.body" = "The activity is no longer marked as done.";
+"notification.activity.updated.taskAdded.body" = "Task “%@” was added to “%@”.";
+"notification.activity.updated.taskRemoved.body" = "Task “%@” was removed from “%@”.";
+"notification.activity.updated.taskDone.body" = "Task “%@” was marked as done.";
+"notification.activity.updated.taskUndone.body" = "Task “%@” was marked as not done.";
+"notification.activity.updated.taskNameChanged.body" = "Task “%@” was renamed to “%@”.";

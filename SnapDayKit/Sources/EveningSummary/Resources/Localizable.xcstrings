@@ -27,6 +27,42 @@
             "value" : "¡Buen trabajo manteniéndote en el camino y superando tus límites!"
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excellent travail pour rester sur la bonne voie et repousser vos limites !"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ótimo trabalho mantendo-se no caminho e superando seus limites!"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ottimo lavoro nel rimanere in pista e spingere i tuoi limiti!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "軌道に乗って限界に挑戦し続ける素晴らしい仕事です！"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عمل رائع في البقاء على المسار الصحيح وتجاوز حدودك!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "궤도에 머물며 한계를 밀어붙이는 훌륭한 일입니다!"
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -53,6 +89,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Parece que no completaste ninguna actividad hoy. ¡No te desanimes! Mañana es un nuevo día para establecer tus metas y alcanzarlas. ¡Recuerda, cada pequeño paso cuenta hacia tu progreso!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il semble que vous n'ayez terminé aucune activité aujourd'hui. Ne vous découragez pas ! Demain est un nouveau jour pour fixer vos objectifs et les atteindre. N'oubliez pas, chaque petit pas compte vers votre progression !"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parece que você não completou nenhuma atividade hoje. Não se desanime! Amanhã é um novo dia para definir seus objetivos e alcançá-los. Lembre-se, cada pequeno passo conta para o seu progresso!"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sembra che tu non abbia completato nessuna attività oggi. Non scoraggiarti! Domani è un nuovo giorno per fissare i tuoi obiettivi e raggiungerli. Ricorda, ogni piccolo passo conta per il tuo progresso!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日は何も活動を完了していないようですね。がっかりしないでください！明日は目標を設定して達成する新しい日です。小さな一歩一歩が進歩につながることを忘れないでください！"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يبدو أنك لم تكمل أي أنشطة اليوم. لا تثبط عزيمتك! غدًا يوم جديد لتعيين أهدافك وتحقيقها. تذكر، كل خطوة صغيرة تعد نحو تقدمك!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘 활동을 완료하지 못한 것 같습니다. 낙담하지 마세요! 내일은 목표를 설정하고 달성할 새로운 날입니다. 작은 한 걸음 한 걸음이 진전에 기여한다는 것을 기억하세요!"
           }
         },
         "pl" : {
@@ -83,6 +155,42 @@
             "value" : "Otros"
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outros"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altri"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أخرى"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기타"
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -109,6 +217,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "TRIUNFOS DE HOY"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRIOMPHES D'AUJOURD'HUI"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRIUNFOS DE HOJE"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRIONFI DI OGGI"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日の勝利"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "انتصارات اليوم"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘의 승리"
           }
         },
         "pl" : {
@@ -139,6 +283,42 @@
             "value" : "¿Quién es genial? ¡Tú lo eres! 🌟 Todas tus actividades de hoy están completadas. Es hora de relajarse y disfrutar de tu tarde. ¡Te lo has ganado!"
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui est génial ? C'est vous ! 🌟 Toutes vos activités d'aujourd'hui sont terminées. Il est temps de se détendre et de profiter de votre soirée. Vous l'avez mérité !"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quem é incrível? Você é! 🌟 Todas as suas atividades de hoje estão concluídas. Hora de relaxar e aproveitar sua noite. Você merece!"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chi è fantastico? Tu lo sei! 🌟 Tutte le tue attività di oggi sono completate. È ora di rilassarsi e goderti la serata. Te lo sei meritato!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "誰がすごい？あなたです！🌟 今日のすべての活動が完了しました。リラックスして夜を楽しむ時間です。あなたはそれに値します！"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "من رائع؟ أنت كذلك! 🌟 جميع أنشطتك اليوم مكتملة. حان الوقت للاسترخاء والاستمتاع بمسائك. لقد استحقت ذلك!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "누가 멋진가요? 당신입니다! 🌟 오늘의 모든 활동이 완료되었습니다. 긴장을 풀고 저녁을 즐길 시간입니다. 당신은 그럴 자격이 있습니다!"
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -167,6 +347,42 @@
             "value" : "Has completado exitosamente **%1$lld actividades**, sumando un total de **%2$@** de tiempo productivo."
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez terminé avec succès **%1$lld activités**, totalisant **%2$@** de temps productif."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você completou com sucesso **%1$lld atividades**, totalizando **%2$@** de tempo produtivo."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai completato con successo **%1$lld attività**, per un totale di **%2$@** di tempo produttivo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**%1$lld個の活動**を正常に完了し、合計**%2$@**の生産的な時間を費やしました。"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لقد أكملت بنجاح **%1$lld نشاطًا**، بإجمالي **%2$@** من الوقت الإنتاجي."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**%1$lld개의 활동**을 성공적으로 완료하여 총 **%2$@**의 생산적인 시간을 보냈습니다."
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -193,6 +409,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Has completado exitosamente **%lld actividades**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez terminé avec succès **%lld activités**."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você completou com sucesso **%lld atividades**."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai completato con successo **%lld attività**."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**%lld個の活動**を正常に完了しました。"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لقد أكملت بنجاح **%lld نشاطًا**."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**%lld개의 활동**을 성공적으로 완료했습니다."
           }
         },
         "pl" : {

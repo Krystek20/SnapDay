@@ -29,7 +29,7 @@ extension NSManagedObject {
           let data = string.data(using: .utf8) else { return [] }
     return try JSONDecoder().decode([String].self, from: data)
       .compactMap {
-        try T(identifier: $0, context: context)
+        try? T(identifier: $0, context: context)
       }
   }
 }
