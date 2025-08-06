@@ -63,12 +63,12 @@ public struct DashboardFeature: TodayProvidable {
 
     @ObservationStateIgnored var hideDayInformation = true
     @ObservationStateIgnored var streamSetup = false
-    @ObservationStateIgnored var date: Date
 
     var selectedDay: Day?
     var alert: DashboardAlert?
     var hideCompleted: Bool
     var hideTasks: Bool
+    var date: Date
 
     @Presents var activityList: ActivityListFeature.State?
     @Presents var editDayActivity: DayActivityFormFeature.State?
