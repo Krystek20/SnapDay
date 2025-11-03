@@ -11,6 +11,7 @@
 		080EA92E2EB936610095AF50 /* WeeklyProgressAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA92B2EB936610095AF50 /* WeeklyProgressAppIntent.swift */; };
 		080EA9312EB936B70095AF50 /* ActivityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA9302EB936B70095AF50 /* ActivityProvider.swift */; };
 		080EA9332EBA839D0095AF50 /* WidgetWeeklyProgress in Frameworks */ = {isa = PBXBuildFile; productRef = 080EA9322EBA839D0095AF50 /* WidgetWeeklyProgress */; };
+		087462262EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087462252EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift */; };
 		D423ACCC2CAD274700591A0D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D423ACCB2CAD274700591A0D /* LaunchScreen.xib */; };
 		D423ACD32CB5A39E00591A0D /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACCE2CB5A04200591A0D /* StreakWidget.swift */; };
 		D423ACD42CB5A3A400591A0D /* StreakAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */; };
@@ -102,6 +103,7 @@
 		084CACB62E20397F0060281E /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		084CACB72E203B880060281E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		084CACB82E203B950060281E /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainInterface.strings; sourceTree = "<group>"; };
+		087462252EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictateAccessoryCircularWidget.swift; sourceTree = "<group>"; };
 		08A7E3A92E203BAE00EF4AFB /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		08A7E3AA2E203BB000EF4AFB /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D423ACCB2CAD274700591A0D /* LaunchScreen.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
@@ -200,6 +202,14 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		087462242EB00A980002AA21 /* DictateWidget */ = {
+			isa = PBXGroup;
+			children = (
+				087462252EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift */,
+			);
+			path = DictateWidget;
+			sourceTree = "<group>";
+		};
 		D423ACCD2CB5A03C00591A0D /* StreakWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -267,6 +277,7 @@
 			isa = PBXGroup;
 			children = (
 				080EA92F2EB936B50095AF50 /* Helpers */,
+				087462242EB00A980002AA21 /* DictateWidget */,
 				D423ACD02CB5A14000591A0D /* ActivityList */,
 				D423ACCD2CB5A03C00591A0D /* StreakWidget */,
 				080EA92C2EB936610095AF50 /* WeeklyProgressWidget */,
@@ -534,6 +545,7 @@
 				D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */,
 				080EA92D2EB936610095AF50 /* WeeklyProgressWidget.swift in Sources */,
 				080EA9312EB936B70095AF50 /* ActivityProvider.swift in Sources */,
+				087462262EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -737,7 +749,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnapDay/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSContactsUsageDescription = "We need access to your contacts to help you invite others to collaborate. This allows you to easily select people from your address book and send them invitations to join your projects or teams. Your contacts will only be used for this purpose and will not be shared with anyone else.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.xib;
@@ -779,7 +793,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnapDay/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSContactsUsageDescription = "We need access to your contacts to help you invite others to collaborate. This allows you to easily select people from your address book and send them invitations to join your projects or teams. Your contacts will only be used for this purpose and will not be shared with anyone else.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.xib;

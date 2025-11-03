@@ -8,6 +8,7 @@ import DayActivityForm
 import CalendarPicker
 import Models
 import Friends
+import Dictation
 
 public struct DashboardView: View {
 
@@ -85,6 +86,12 @@ public struct DashboardView: View {
           FriendsView(store: store)
         }
         .presentationDetents([.large])
+      }
+      .sheet(item: $store.scope(state: \.dictation, action: \.dictation)) { store in
+        NavigationStack {
+          DictationView(store: store)
+        }
+        .presentationDetents([.medium])
       }
       .task {
         store.send(.view(.appeared))

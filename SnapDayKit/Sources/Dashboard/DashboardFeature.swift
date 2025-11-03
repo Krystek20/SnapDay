@@ -10,6 +10,7 @@ import CalendarPicker
 import Combine
 import WidgetKit
 import Friends
+import Dictation
 
 import protocol UiComponents.InformationViewConfigurable
 import struct UiComponents.ListItem
@@ -75,6 +76,7 @@ public struct DashboardFeature: TodayProvidable {
     @Presents var dayActivityTaskForm: DayActivityFormFeature.State?
     @Presents var calendarPicker: CalendarPickerFeature.State?
     @Presents var friends: FriendsFeature.State?
+    @Presents var dictation: DictationFeature.State?
 
     public init(
       date: Date,
@@ -114,6 +116,7 @@ public struct DashboardFeature: TodayProvidable {
       case dayActivityAction(DayActivityAction)
       case dayActivityTaskAction(DayActivityTaskAction)
       case saveOrder
+      case dictation
       case newItemForm(NewItemFormAction)
 
       public enum DayActivityAction: Equatable {
@@ -156,6 +159,7 @@ public struct DashboardFeature: TodayProvidable {
     case dayActivityTaskForm(PresentationAction<DayActivityFormFeature.Action>)
     case calendarPicker(PresentationAction<CalendarPickerFeature.Action>)
     case friends(PresentationAction<FriendsFeature.Action>)
+    case dictation(PresentationAction<DictationFeature.Action>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
@@ -182,6 +186,8 @@ public struct DashboardFeature: TodayProvidable {
         return handleCalendarPickerAction(action, state: &state)
       case .friends:
         return .none
+      case .dictation:
+        return .none
       case .delegate:
         return .none
       case .binding:
@@ -202,6 +208,9 @@ public struct DashboardFeature: TodayProvidable {
     }
     .ifLet(\.$friends, action: \.friends) {
       FriendsFeature()
+    }
+    .ifLet(\.$dictation, action: \.dictation) {
+      DictationFeature()
     }
   }
 
@@ -353,9 +362,11 @@ public struct DashboardFeature: TodayProvidable {
       state.dayActivityTaskForm = nil
       state.calendarPicker = nil
       state.alert = nil
-      switch deeplink {
+      return switch deeplink {
       case .addActivity:
-        return .send(.internal(.dayActivityAction(.showNewForm)))
+        .send(.internal(.dayActivityAction(.showNewForm)))
+      case .dictate:
+        .send(.internal(.dictation))
       }
     case .saveOrder:
       return .run { [selectedDay = state.selectedDay] send in
@@ -366,6 +377,9 @@ public struct DashboardFeature: TodayProvidable {
         }
         await send(.internal(.loadDay))
       }
+    case .dictation:
+      state.dictation = DictationFeature.State()
+      return .none
     case .newItemForm(let action):
       return handleNewItemFormAction(action, state: &state)
     }

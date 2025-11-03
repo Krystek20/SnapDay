@@ -9,5 +9,6 @@ struct ActivityWidgetBundle: WidgetBundle {
       StreakWidget()
       WeeklyProgressWidget()
     }
+    DictateAccessoryCircularWidget()
   }
 }

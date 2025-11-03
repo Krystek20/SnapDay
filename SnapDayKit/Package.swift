@@ -36,7 +36,7 @@ private var targets: [Target] {
   TargetParamenters(module: .application, dependencies: sceneDependecies + [
     .onboarding, .dashboard, .reports, .activityDetails, .developerTools
   ])
-  TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends])
+  TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends, .dictation])
   TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
@@ -50,6 +50,7 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
+  TargetParamenters(module: .dictation, dependencies: sceneDependecies)
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .calendarPicker, dependencies: [.common, .uiComponents, .resources])
@@ -93,6 +94,7 @@ private enum Module: String {
   case widgetWeeklyProgress
   case dayActivityReminder
   case onboarding
+  case dictation
   case developerTools
   case utilities
   case repositories
