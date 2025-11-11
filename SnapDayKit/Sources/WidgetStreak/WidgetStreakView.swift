@@ -12,6 +12,7 @@ public struct WidgetStreakView: View {
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<WidgetStreakFeature>
+  @Environment(\.widgetRenderingMode) var widgetRenderingMode
 
   // MARK: - Initialization
 
@@ -41,6 +42,7 @@ public struct WidgetStreakView: View {
       ZStack(alignment: .top) {
         Image(from: image)
           .resizable()
+          .makeDesaturated(widgetRenderingMode: widgetRenderingMode)
           .scaledToFit()
           .padding(.horizontal, 25.0)
       }

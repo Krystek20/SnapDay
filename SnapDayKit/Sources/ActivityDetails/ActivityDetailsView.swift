@@ -155,12 +155,12 @@ public struct ActivityDetailsView: View {
               .foregroundStyle(Color.standardText)
           }
         }
-        if store.summary.duration > .zero {
+        if let duration = DateComponentsFormatter.duration(for: .minutes(store.summary.duration)) {
           HStack(spacing: 5.0) {
             Text("Total Time", bundle: .module)
               .formTitleTextStyle
             Spacer()
-            Text(TimeProvider.duration(from: store.summary.duration, bundle: .module) ?? "")
+            Text(duration)
               .font(.system(size: 12.0, weight: .bold))
               .foregroundStyle(Color.standardText)
           }

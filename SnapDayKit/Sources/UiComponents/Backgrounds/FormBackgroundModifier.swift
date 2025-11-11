@@ -1,5 +1,6 @@
 import SwiftUI
 import Resources
+import WidgetKit
 
 public extension View {
   func formBackgroundModifier(
@@ -15,14 +16,29 @@ struct FormBackgroundModifier: ViewModifier {
   let color: Color
   let padding: EdgeInsets
 
+  @Environment(\.widgetRenderingMode) var widgetRenderingMode
+
   // MARK: - ViewModifier
 
   func body(content: Content) -> some View {
-    content
-      .padding(padding)
-      .background(
-        color
-          .clipShape(RoundedRectangle(cornerRadius: 10.0))
-      )
+    switch widgetRenderingMode {
+    case .fullColor, .vibrant:
+      content
+        .padding(padding)
+        .background(
+          color
+            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+        )
+    case .accented:
+      content
+        .padding(padding)
+    default:
+      content
+        .padding(padding)
+        .background(
+          color
+            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+        )
+    }
   }
 }

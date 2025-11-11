@@ -1,3 +1,5 @@
+import Foundation
+
 public struct SubtitleFormatter {
   public static func format(
     overview: String? = nil,
@@ -5,7 +7,8 @@ public struct SubtitleFormatter {
   ) -> String {
     var subtitle = ""
 
-    if let duration, let formatted = formattedDuration(duration: duration) {
+    if let duration,
+       let formatted = DateComponentsFormatter.duration(for: .minutes(duration)) {
       subtitle += formatted
     }
 
@@ -15,14 +18,5 @@ public struct SubtitleFormatter {
     }
 
     return subtitle
-  }
-
-  private static func formattedDuration(duration: Int) -> String? {
-    guard duration > .zero else { return nil }
-    let minutes = duration % 60
-    let hours = duration / 60
-    return hours > .zero
-    ? String(localized: "\(hours)h \(minutes)min", bundle: .module)
-    : String(localized: "\(minutes)min", bundle: .module)
   }
 }

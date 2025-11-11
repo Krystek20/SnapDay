@@ -70,8 +70,8 @@ public struct ActivitySummaryGrid: View {
               )
           }
 
-          if timePeriodActivity.duration > .zero {
-            Text(TimeProvider.duration(from: timePeriodActivity.duration, bundle: .module) ?? "")
+          if let duration = DateComponentsFormatter.duration(for: .minutes(timePeriodActivity.duration)) {
+            Text(duration)
               .font(.system(size: 12.0, weight: .regular))
               .foregroundStyle(Color.sectionText)
           }

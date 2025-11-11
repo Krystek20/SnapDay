@@ -22,6 +22,7 @@ private var products: [Product] {
   Module.dayActivityReminder
   Module.widgetActivityList
   Module.widgetStreak
+  Module.widgetWeeklyProgress
   Module.previews
 }
 
@@ -47,11 +48,12 @@ private var targets: [Target] {
   TargetParamenters(module: .dayActivityReminder, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetActivityList, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
+  TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .calendarPicker, dependencies: [.common, .uiComponents, .resources])
-  TargetParamenters(module: .utilities, dependencies: [.models, .repositories, .composableArchitecture])
+  TargetParamenters(module: .utilities, dependencies: [.common, .models, .repositories, .composableArchitecture])
   TargetParamenters(module: .repositories, dependencies: [.common, .models, .composableArchitecture])
   TargetParamenters(module: .common, dependencies: [.composableArchitecture])
   TargetParamenters(module: .models, dependencies: [.common])
@@ -88,6 +90,7 @@ private enum Module: String {
   case eveningSummary
   case widgetActivityList
   case widgetStreak
+  case widgetWeeklyProgress
   case dayActivityReminder
   case onboarding
   case developerTools

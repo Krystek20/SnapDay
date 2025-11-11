@@ -20,24 +20,24 @@ public struct TimeSummaryView: View {
   public var body: some View {
     LazyVStack(alignment: .leading, spacing: 10.0) {
       VStack(spacing: 10.0) {
-        if daySummary.remaingDuration > .zero {
+        if let remaingDuration = DateComponentsFormatter.duration(for: .minutes(daySummary.remaingDuration)) {
           HStack(spacing: 5.0) {
             Text("Remaining Time", bundle: .module)
               .font(.system(size: 12.0, weight: .regular))
               .foregroundStyle(Color.standardText)
             Spacer()
-            Text(TimeProvider.duration(from: daySummary.remaingDuration, bundle: .module) ?? "")
+            Text(remaingDuration)
               .font(.system(size: 12.0, weight: .semibold))
               .foregroundStyle(Color.standardText)
           }
         }
-        if daySummary.duration > .zero {
+        if let duration = DateComponentsFormatter.duration(for: .minutes(daySummary.duration)) {
           HStack(spacing: 5.0) {
             Text("Total Task Time", bundle: .module)
               .font(.system(size: 12.0, weight: .regular))
               .foregroundStyle(Color.standardText)
             Spacer()
-            Text(TimeProvider.duration(from: daySummary.duration, bundle: .module) ?? "")
+            Text(duration)
               .font(.system(size: 12.0, weight: .semibold))
               .foregroundStyle(Color.standardText)
           }
