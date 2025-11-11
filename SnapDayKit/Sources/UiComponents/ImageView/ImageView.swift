@@ -2,6 +2,7 @@ import SwiftUI
 import Resources
 import Utilities
 import Dependencies
+import WidgetKit
 
 public enum ImageType: Equatable {
   case iconId(UUID?)
@@ -18,6 +19,7 @@ public struct ImageView: View {
   private let size: Double
   private let cornerRadius: Double
   private let tintColor: Color
+  @Environment(\.widgetRenderingMode) var widgetRenderingMode
 
   // MARK: - Initialization
 
@@ -60,7 +62,7 @@ public struct ImageView: View {
       if let uiImage = UIImage(data: data) {
         AnyView(
           Image(uiImage: uiImage)
-            .applyIconProperties()
+            .applyIconProperties(widgetRenderingMode: widgetRenderingMode)
         )
       } else {
         AnyView(placeholder)
@@ -74,16 +76,17 @@ public struct ImageView: View {
 
   private var placeholder: some View {
     Image(systemName: "photo.circle")
-      .applyIconProperties()
+      .applyIconProperties(widgetRenderingMode: widgetRenderingMode)
   }
 }
 
 private struct LoadableImage: View {
 
   private let iconId: UUID
-  @State private var image: Image?
   private let placeholder: Image
+  @State private var image: Image?
   @Dependency(\.iconProvider) private var iconProvider
+  @Environment(\.widgetRenderingMode) var widgetRenderingMode
 
   init(
     iconId: UUID,
@@ -109,7 +112,7 @@ private struct LoadableImage: View {
   private var content: some View {
     if let image {
       AnyView(
-        image.applyIconProperties()
+        image.applyIconProperties(widgetRenderingMode: widgetRenderingMode)
       )
     } else {
       AnyView(
@@ -131,8 +134,9 @@ private struct LoadableImage: View {
 }
 
 private extension Image {
-  func applyIconProperties() -> some View {
+  func applyIconProperties(widgetRenderingMode: WidgetRenderingMode) -> some View {
     resizable()
+      .makeDesaturated(widgetRenderingMode: widgetRenderingMode)
       .scaledToFill()
       .fontWeight(.ultraLight)
   }

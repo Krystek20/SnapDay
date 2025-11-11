@@ -44,7 +44,10 @@ fileprivate extension ListItem {
       id: form.id.uuidString,
       parentId: nil,
       title: form.name,
-      subtitle: SubtitleFormatter.format(overview: form.overview, duration: form.duration),
+      subtitle: SubtitleFormatter.format(
+        overview: form.overview,
+        duration: form.duration
+      ),
       fieldType: .text,
       iconType: .empty,
       isStrikethrough: form.completed,

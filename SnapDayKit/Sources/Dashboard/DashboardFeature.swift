@@ -321,9 +321,7 @@ public struct DashboardFeature: TodayProvidable {
         do {
           let day = try await dayUpdater.day(date)
           await send(.internal(.setDay(day)))
-          if date == today {
-            WidgetCenter.shared.reloadAllTimelines()
-          }
+          WidgetCenter.shared.reloadAllTimelines()
         } catch {
           print("error: \(error)")
         }

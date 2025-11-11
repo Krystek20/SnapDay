@@ -6,22 +6,32 @@ public struct CompletedActivitiesView: View {
   // MARK: - Properties
 
   private let completedActivities: CompletedActivities
+  private let showBackground: Bool
+  private let showProgressView: Bool
 
   // MARK: - Initialization
 
-  public init(completedActivities: CompletedActivities) {
+  public init(
+    completedActivities: CompletedActivities,
+    showBackground: Bool = true,
+    showProgressView: Bool = true
+  ) {
     self.completedActivities = completedActivities
+    self.showBackground = showBackground
+    self.showProgressView = showProgressView
   }
 
   // MARK: - Views
 
   public var body: some View {
     HStack(spacing: 10.0) {
-      CircularProgressView(
-        progress: completedActivities.percent,
-        lineWidth: 4.0
-      )
-      .frame(width: 20.0, height: 20.0)
+      if showProgressView {
+        CircularProgressView(
+          progress: completedActivities.percent,
+          lineWidth: 4.0
+        )
+        .frame(width: 20.0, height: 20.0)
+      }
       Text("Completed activities", bundle: .module)
         .font(.system(size: 14.0, weight: .medium))
         .foregroundStyle(Color.standardText)
@@ -31,6 +41,15 @@ public struct CompletedActivitiesView: View {
         .foregroundStyle(Color.standardText)
     }
     .padding(.all, 14.0)
-    .background(Color.selection)
+    .background(backgroundColor)
+  }
+
+  @ViewBuilder
+  private var backgroundColor: some View {
+    if showBackground {
+      Color.selection
+    } else {
+      Color.clear.widgetAccentable()
+    }
   }
 }

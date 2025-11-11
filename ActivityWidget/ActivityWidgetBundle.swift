@@ -7,6 +7,7 @@ struct ActivityWidgetBundle: WidgetBundle {
     if #available(iOSApplicationExtension 17.0, *) {
       ActivityListWidget()
       StreakWidget()
+      WeeklyProgressWidget()
     }
   }
 }

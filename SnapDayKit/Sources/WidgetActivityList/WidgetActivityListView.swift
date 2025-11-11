@@ -7,11 +7,13 @@ import Models
 import AppIntents
 import Utilities
 
+@available(iOS 17.0, *)
 public struct WidgetActivityListView: View {
 
   // MARK: - Properties
 
   @Perception.Bindable private var store: StoreOf<WidgetActivityListFeature>
+  @Environment(\.widgetRenderingMode) var widgetRenderingMode
   private let listUpIntent: () -> any AppIntent
   private let listDownIntent: () -> any AppIntent
   private let switchItemIntent: (String) -> any AppIntent
@@ -35,6 +37,7 @@ public struct WidgetActivityListView: View {
   public var body: some View {
     VStack(spacing: .zero) {
       headerView
+      Divider()
       contentView
       bottomView
     }
@@ -51,6 +54,7 @@ public struct WidgetActivityListView: View {
         Text(store.title)
           .font(.system(size: 14.0, weight: .regular))
           .foregroundStyle(Color.standardText)
+          .widgetAccentable()
 
         Spacer()
 
@@ -60,11 +64,6 @@ public struct WidgetActivityListView: View {
       }
       .padding(.horizontal, 10.0)
       .frame(height: 50.0)
-      .background(
-        Color
-          .formBackground
-          .shadow(color: Color.standardText.opacity(0.15), radius: 5.0, x: .zero, y: .zero)
-      )
     }
   }
 
@@ -75,6 +74,7 @@ public struct WidgetActivityListView: View {
         Button(intent: listUpIntent()) {
           Image(systemName: "chevron.up.circle.fill")
             .resizable()
+            .makeAccented(widgetRenderingMode: widgetRenderingMode)
             .foregroundStyle(
               Color.actionBlue.opacity(store.isUpButtonDisabled ? 0.3 : 1.0)
             )
@@ -86,6 +86,7 @@ public struct WidgetActivityListView: View {
         Button(intent: listDownIntent()) {
           Image(systemName: "chevron.down.circle.fill")
             .resizable()
+            .makeAccented(widgetRenderingMode: widgetRenderingMode)
             .foregroundStyle(
               Color.actionBlue.opacity(store.isDownButtonDisabled ? 0.3 : 1.0)
             )
@@ -97,6 +98,7 @@ public struct WidgetActivityListView: View {
         Link(destination: DeeplinkService.addActivity, label: {
           Image(systemName: "plus.circle.fill")
             .resizable()
+            .makeAccented(widgetRenderingMode: widgetRenderingMode)
             .foregroundStyle(Color.actionBlue)
             .frame(width: 20.0, height: 20.0)
         })
@@ -128,6 +130,7 @@ public struct WidgetActivityListView: View {
       Spacer(minLength: .zero)
       Image(from: .listDone)
         .resizable()
+        .makeDesaturated(widgetRenderingMode: widgetRenderingMode)
         .scaledToFit()
       Spacer(minLength: .zero)
     }
@@ -145,6 +148,7 @@ public struct WidgetActivityListView: View {
       Spacer(minLength: .zero)
       Image(from: .listEmpty)
         .resizable()
+        .makeDesaturated(widgetRenderingMode: widgetRenderingMode)
         .scaledToFit()
       Spacer(minLength: .zero)
       Link(destination: DeeplinkService.addActivity, label: {
@@ -157,6 +161,7 @@ public struct WidgetActivityListView: View {
           .background(
             Color.actionBlue
               .clipShape(RoundedRectangle(cornerRadius: 10.0))
+              .widgetAccentable()
           )
       })
     }
@@ -183,8 +188,20 @@ public struct WidgetActivityListView: View {
   private var bottomView: some View {
     WithPerceptionTracking {
       if let completedActivities = store.completedActivities {
+        let showAllViews = switch widgetRenderingMode {
+        case .accented, .vibrant:
+          if #available(iOS 18.0, *) {
+            false
+          } else {
+            true
+          }
+        default:
+          true
+        }
         CompletedActivitiesView(
-          completedActivities: completedActivities
+          completedActivities: completedActivities,
+          showBackground: showAllViews,
+          showProgressView: showAllViews
         )
       }
     }
@@ -192,16 +209,12 @@ public struct WidgetActivityListView: View {
 
   @ViewBuilder
   private func customView(item: ListItem) -> some View {
-    if #available(iOS 17.0, *) {
-      Toggle(
-        isOn: item.isStrikethrough,
-        intent: switchItemIntent(item.id)
-      ) {
-        EmptyView()
-      }
-      .toggleStyle(CheckToggleStyle(showLabel: false))
-    } else {
+    Toggle(
+      isOn: item.isStrikethrough,
+      intent: switchItemIntent(item.id)
+    ) {
       EmptyView()
     }
+    .toggleStyle(CheckToggleStyle(showLabel: false))
   }
 }

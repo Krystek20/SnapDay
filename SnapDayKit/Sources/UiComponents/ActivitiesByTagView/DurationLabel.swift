@@ -20,7 +20,7 @@ public struct DurationLabel: View {
       Image(systemName: "clock")
         .foregroundStyle(Color.sectionText)
         .imageScale(.small)
-      Text(TimeProvider.duration(from: duration, bundle: .module) ?? "")
+      Text(DateComponentsFormatter.duration(for: .minutes(duration)) ?? "")
         .font(.system(size: 12.0, weight: .semibold))
         .foregroundStyle(Color.sectionText)
     }

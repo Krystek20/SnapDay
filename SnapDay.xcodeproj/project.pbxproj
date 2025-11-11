@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		080EA92D2EB936610095AF50 /* WeeklyProgressWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA92A2EB936610095AF50 /* WeeklyProgressWidget.swift */; };
+		080EA92E2EB936610095AF50 /* WeeklyProgressAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA92B2EB936610095AF50 /* WeeklyProgressAppIntent.swift */; };
+		080EA9312EB936B70095AF50 /* ActivityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA9302EB936B70095AF50 /* ActivityProvider.swift */; };
+		080EA9332EBA839D0095AF50 /* WidgetWeeklyProgress in Frameworks */ = {isa = PBXBuildFile; productRef = 080EA9322EBA839D0095AF50 /* WidgetWeeklyProgress */; };
 		D423ACCC2CAD274700591A0D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D423ACCB2CAD274700591A0D /* LaunchScreen.xib */; };
 		D423ACD32CB5A39E00591A0D /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACCE2CB5A04200591A0D /* StreakWidget.swift */; };
 		D423ACD42CB5A3A400591A0D /* StreakAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */; };
@@ -92,6 +96,9 @@
 		08097F032E40F05A0028D16E /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		08097F042E40F1550028D16E /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		08097F052E40F1550028D16E /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
+		080EA92A2EB936610095AF50 /* WeeklyProgressWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressWidget.swift; sourceTree = "<group>"; };
+		080EA92B2EB936610095AF50 /* WeeklyProgressAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressAppIntent.swift; sourceTree = "<group>"; };
+		080EA9302EB936B70095AF50 /* ActivityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityProvider.swift; sourceTree = "<group>"; };
 		084CACB62E20397F0060281E /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		084CACB72E203B880060281E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		084CACB82E203B950060281E /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainInterface.strings; sourceTree = "<group>"; };
@@ -156,6 +163,7 @@
 			files = (
 				D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */,
 				D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */,
+				080EA9332EBA839D0095AF50 /* WidgetWeeklyProgress in Frameworks */,
 				D423ACD62CB6559E00591A0D /* WidgetStreak in Frameworks */,
 				D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */,
 			);
@@ -175,6 +183,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		080EA92C2EB936610095AF50 /* WeeklyProgressWidget */ = {
+			isa = PBXGroup;
+			children = (
+				080EA92A2EB936610095AF50 /* WeeklyProgressWidget.swift */,
+				080EA92B2EB936610095AF50 /* WeeklyProgressAppIntent.swift */,
+			);
+			path = WeeklyProgressWidget;
+			sourceTree = "<group>";
+		};
+		080EA92F2EB936B50095AF50 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				080EA9302EB936B70095AF50 /* ActivityProvider.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		D423ACCD2CB5A03C00591A0D /* StreakWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -241,8 +266,10 @@
 		D46418372C50D34A005920E1 /* ActivityWidget */ = {
 			isa = PBXGroup;
 			children = (
+				080EA92F2EB936B50095AF50 /* Helpers */,
 				D423ACD02CB5A14000591A0D /* ActivityList */,
 				D423ACCD2CB5A03C00591A0D /* StreakWidget */,
+				080EA92C2EB936610095AF50 /* WeeklyProgressWidget */,
 				D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */,
 				D4EE7DB62C5562A7007A0B4F /* ActivityWidgetExtension.entitlements */,
 				D46418402C50D34B005920E1 /* Assets.xcassets */,
@@ -355,6 +382,7 @@
 			packageProductDependencies = (
 				D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */,
 				D423ACD52CB6559E00591A0D /* WidgetStreak */,
+				080EA9322EBA839D0095AF50 /* WidgetWeeklyProgress */,
 			);
 			productName = ActivityWidgetExtension;
 			productReference = D46418322C50D34A005920E1 /* ActivityWidgetExtension.appex */;
@@ -502,7 +530,10 @@
 				D464183F2C50D34A005920E1 /* ActivityListAppIntent.swift in Sources */,
 				D4D658782C56D122007E61EB /* ActivityListIntents.swift in Sources */,
 				D423ACD42CB5A3A400591A0D /* StreakAppIntent.swift in Sources */,
+				080EA92E2EB936610095AF50 /* WeeklyProgressAppIntent.swift in Sources */,
 				D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */,
+				080EA92D2EB936610095AF50 /* WeeklyProgressWidget.swift in Sources */,
+				080EA9312EB936B70095AF50 /* ActivityProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -699,7 +730,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -741,7 +772,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -818,7 +849,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -851,7 +882,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -882,7 +913,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -913,7 +944,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -989,6 +1020,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		080EA9322EBA839D0095AF50 /* WidgetWeeklyProgress */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WidgetWeeklyProgress;
+		};
 		D423ACD52CB6559E00591A0D /* WidgetStreak */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = WidgetStreak;

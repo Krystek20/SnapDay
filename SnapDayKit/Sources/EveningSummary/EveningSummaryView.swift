@@ -80,7 +80,7 @@ public struct EveningSummaryView: View {
   }
 
   private var totalTimeText: Text {
-    if let duration = TimeProvider.duration(from: store.doneActivitiesDuration, bundle: .module) {
+    if let duration = DateComponentsFormatter.duration(for: .minutes(store.doneActivitiesDuration)) {
       activitiesWithDuration(durationText: duration)
     } else {
       activitiesWithoutDuration
