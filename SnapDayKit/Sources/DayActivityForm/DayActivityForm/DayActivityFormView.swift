@@ -34,6 +34,8 @@ public struct DayActivityFormView: View {
     WithPerceptionTracking {
       content
         .navigationTitle(store.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
         .fullScreenCover(item: $store.scope(state: \.emojiPicker, action: \.emojiPicker)) { store in
           NavigationStack {
             EmojiPickerView(store: store)
@@ -67,7 +69,7 @@ public struct DayActivityFormView: View {
           .padding(.bottom, 15.0)
           .padding(.horizontal, 15.0)
       }
-      .activityBackground
+      .backgroundSoft
       .onAppear {
         store.send(.view(.appeared))
       }
@@ -624,7 +626,7 @@ public struct DayActivityFormView: View {
         }
       )
       .disabled(store.isSaveButtonDisabled)
-      .buttonStyle(PrimaryButtonStyle(disabled: store.isSaveButtonDisabled))
+      .buttonStyle(PrimaryButtonStyle())
     }
   }
 

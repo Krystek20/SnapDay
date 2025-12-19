@@ -8,7 +8,7 @@ import DayActivityForm
 import CalendarPicker
 import Models
 import Friends
-import Dictation
+import ManageActivity
 
 public struct DashboardView: View {
 
@@ -54,9 +54,32 @@ public struct DashboardView: View {
           }
         )
 
+        VStack {
+          Spacer()
+          HStack {
+            Spacer()
+            Button(
+              action: {
+                store.send(.view(.assistantButtonTapped))
+              },
+              label: {
+                Image(systemName: "sparkles")
+                  .foregroundStyle(Color.pureWhite)
+                  .font(.system(size: 20.0))
+                  .padding(.all, 8.0)
+                  .background(
+                    Circle()
+                      .fill(Color.actionBlue)
+                  )
+              }
+            )
+          }
+        }
+        .padding(20.0)
+
         alertViewIfVisible
       }
-      .activityBackground
+      .background
       .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
         NavigationStack {
           ActivityListView(store: store)
@@ -87,9 +110,9 @@ public struct DashboardView: View {
         }
         .presentationDetents([.large])
       }
-      .sheet(item: $store.scope(state: \.dictation, action: \.dictation)) { store in
+      .sheet(item: $store.scope(state: \.manageActivity, action: \.manageActivity)) { store in
         NavigationStack {
-          DictationView(store: store)
+          ManageActivityView(store: store)
         }
         .presentationDetents([.medium])
       }

@@ -37,7 +37,7 @@ public struct Switcher: View {
         Spacer()
         Text(title)
           .font(.system(size: 14.0, weight: .regular))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
         Spacer()
         Button(
           action: rightArrowAction,
@@ -51,7 +51,7 @@ public struct Switcher: View {
       .frame(height: 50.0)
       .background(
         Color.formBackground
-          .shadow(color: Color.standardText.opacity(0.15), radius: 5.0, x: .zero, y: .zero)
+          .shadow(color: Color.primaryText.opacity(0.15), radius: 5.0, x: .zero, y: .zero)
       )
     }
   }

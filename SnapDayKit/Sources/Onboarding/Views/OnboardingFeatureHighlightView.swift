@@ -16,10 +16,10 @@ struct OnboardingFeatureHighlightView: View {
           VStack(alignment: .leading, spacing: 5.0) {
             Text(highlight.title)
               .font(.system(size: 20.0, weight: .semibold))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
             Text(highlight.description)
               .font(.system(size: 14.0, weight: .regular))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
               .lineSpacing(5.0)
               .multilineTextAlignment(.leading)
               .padding(.bottom, 5.0)

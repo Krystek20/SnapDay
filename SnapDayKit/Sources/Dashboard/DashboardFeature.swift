@@ -10,7 +10,7 @@ import CalendarPicker
 import Combine
 import WidgetKit
 import Friends
-import Dictation
+import ManageActivity
 
 import protocol UiComponents.InformationViewConfigurable
 import struct UiComponents.ListItem
@@ -76,7 +76,7 @@ public struct DashboardFeature: TodayProvidable {
     @Presents var dayActivityTaskForm: DayActivityFormFeature.State?
     @Presents var calendarPicker: CalendarPickerFeature.State?
     @Presents var friends: FriendsFeature.State?
-    @Presents var dictation: DictationFeature.State?
+    @Presents var manageActivity: ManageActivityFeature.State?
 
     public init(
       date: Date,
@@ -103,6 +103,7 @@ public struct DashboardFeature: TodayProvidable {
       case confirmAlertButtonTapped
       case cancelAlertButtonTapped
       case showFriendsTapped
+      case assistantButtonTapped
     }
 
     public enum InternalAction: Equatable {
@@ -116,7 +117,7 @@ public struct DashboardFeature: TodayProvidable {
       case dayActivityAction(DayActivityAction)
       case dayActivityTaskAction(DayActivityTaskAction)
       case saveOrder
-      case dictation
+      case manageActivity
       case newItemForm(NewItemFormAction)
 
       public enum DayActivityAction: Equatable {
@@ -159,7 +160,7 @@ public struct DashboardFeature: TodayProvidable {
     case dayActivityTaskForm(PresentationAction<DayActivityFormFeature.Action>)
     case calendarPicker(PresentationAction<CalendarPickerFeature.Action>)
     case friends(PresentationAction<FriendsFeature.Action>)
-    case dictation(PresentationAction<DictationFeature.Action>)
+    case manageActivity(PresentationAction<ManageActivityFeature.Action>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
@@ -186,7 +187,7 @@ public struct DashboardFeature: TodayProvidable {
         return handleCalendarPickerAction(action, state: &state)
       case .friends:
         return .none
-      case .dictation:
+      case .manageActivity:
         return .none
       case .delegate:
         return .none
@@ -209,8 +210,8 @@ public struct DashboardFeature: TodayProvidable {
     .ifLet(\.$friends, action: \.friends) {
       FriendsFeature()
     }
-    .ifLet(\.$dictation, action: \.dictation) {
-      DictationFeature()
+    .ifLet(\.$manageActivity, action: \.manageActivity) {
+      ManageActivityFeature()
     }
   }
 
@@ -307,6 +308,9 @@ public struct DashboardFeature: TodayProvidable {
     case .showFriendsTapped:
       state.friends = FriendsFeature.State()
       return .none
+    case .assistantButtonTapped:
+      state.manageActivity = ManageActivityFeature.State()
+      return .none
     }
   }
 
@@ -366,7 +370,7 @@ public struct DashboardFeature: TodayProvidable {
       case .addActivity:
         .send(.internal(.dayActivityAction(.showNewForm)))
       case .dictate:
-        .send(.internal(.dictation))
+        .send(.internal(.manageActivity))
       }
     case .saveOrder:
       return .run { [selectedDay = state.selectedDay] send in
@@ -377,8 +381,8 @@ public struct DashboardFeature: TodayProvidable {
         }
         await send(.internal(.loadDay))
       }
-    case .dictation:
-      state.dictation = DictationFeature.State()
+    case .manageActivity:
+      state.manageActivity = ManageActivityFeature.State()
       return .none
     case .newItemForm(let action):
       return handleNewItemFormAction(action, state: &state)

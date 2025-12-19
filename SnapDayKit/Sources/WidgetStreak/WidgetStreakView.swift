@@ -56,11 +56,11 @@ public struct WidgetStreakView: View {
             Text(name)
               .lineLimit(1)
               .font(.system(size: 12.0, weight: .semibold))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
 
             Text("Start growing your streak today!", bundle: .module)
               .font(.system(size: 12.0, weight: .regular))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
           }
           .maxWidth()
         case .streak(let name, let current, let nextTitle, let next, let progress):
@@ -69,11 +69,11 @@ public struct WidgetStreakView: View {
               Text(name)
                 .lineLimit(1)
                 .font(.system(size: 12.0, weight: .semibold))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
 
               Text(nextTitle)
                 .font(.system(size: 12.0, weight: .regular))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
             }
 
             Spacer()
@@ -81,12 +81,12 @@ public struct WidgetStreakView: View {
             VStack(alignment: .trailing, spacing: .zero) {
               Text(current)
                 .font(.system(size: 34.0, weight: .bold))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
                 .offset(x: 2.5, y: 5.0)
 
               Text(next)
                 .font(.system(size: 12.0, weight: .bold))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
             }
           }
           .maxWidth()

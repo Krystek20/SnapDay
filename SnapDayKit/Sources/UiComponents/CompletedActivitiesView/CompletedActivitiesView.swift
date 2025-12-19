@@ -1,4 +1,5 @@
 import SwiftUI
+import Resources
 import Models
 
 public struct CompletedActivitiesView: View {
@@ -34,11 +35,11 @@ public struct CompletedActivitiesView: View {
       }
       Text("Completed activities", bundle: .module)
         .font(.system(size: 14.0, weight: .medium))
-        .foregroundStyle(Color.standardText)
+        .foregroundStyle(Color.primaryText)
       Spacer()
       Text("\(completedActivities.doneCount) / \(completedActivities.totalCount)", bundle: .module)
         .font(.system(size: 12.0, weight: .semibold))
-        .foregroundStyle(Color.standardText)
+        .foregroundStyle(Color.primaryText)
     }
     .padding(.all, 14.0)
     .background(backgroundColor)
@@ -47,7 +48,8 @@ public struct CompletedActivitiesView: View {
   @ViewBuilder
   private var backgroundColor: some View {
     if showBackground {
-      Color.selection
+      Color.emphasisBackground
+        .clipShape(RoundedCorner(radius: 12.0, corners: [.bottomLeft, .bottomRight]))
     } else {
       Color.clear.widgetAccentable()
     }

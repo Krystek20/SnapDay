@@ -59,7 +59,7 @@ public struct WeeklyProgressView: View {
 
             Text(item.label)
               .font(.system(size: 10.0, weight: .semibold))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
           }
         }
       }
@@ -82,10 +82,10 @@ public struct WeeklyProgressView: View {
             HStack(alignment: .bottom, spacing: 4.0) {
               Text("\(store.daysStats.doneActivitiesCount)")
                 .font(.system(size: 14.0, weight: .bold))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
               Text("activities")
                 .font(.system(size: 14.0, weight: .regular))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
             }
           }
           if store.showTotalSpentTime,
@@ -93,17 +93,17 @@ public struct WeeklyProgressView: View {
             HStack(alignment: .bottom, spacing: 4.0) {
               Text(totalCompletedDuration)
                 .font(.system(size: 14.0, weight: .bold))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
               Text("spent")
                 .font(.system(size: 14.0, weight: .regular))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
             }
           }
         }
         Spacer()
         Text("\(store.daysStats.doneDaysCount) / \(store.days.count)")
           .font(.system(size: 34.0, weight: .semibold))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
       }
       .frame(maxWidth: width ?? .infinity)
     }

@@ -83,7 +83,7 @@ public struct ActivitySummaryGrid: View {
               HStack(alignment: .bottom) {
                 Text("\(timePeriodActivity.percent)%", bundle: .module)
                   .font(.system(size: 12.0, weight: .regular))
-                  .foregroundStyle(Color.standardText)
+                  .foregroundStyle(Color.primaryText)
                 Spacer()
                 Text("\(timePeriodActivity.doneCount) / \(timePeriodActivity.totalCount)", bundle: .module)
                   .font(.system(size: 12.0, weight: .regular))

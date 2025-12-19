@@ -28,9 +28,9 @@ public struct ReportDaysView: View {
             HStack(spacing: 10.0) {
               Text(title)
                 .font(.system(size: 14.0, weight: .medium))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
               Rectangle()
-                .fill(Color.standardText.opacity(0.1))
+                .fill(Color.primaryText.opacity(0.1))
                 .frame(height: 1.0)
             }
           }
@@ -50,7 +50,7 @@ public struct ReportDaysView: View {
           if let title = item.title {
             Text(title)
               .font(.system(size: 10.0, weight: .medium))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
           }
         }
       }
@@ -78,7 +78,7 @@ public struct ReportDaysView: View {
           .opacity(0.4)
       case .notPlanned:
         Image(systemName: "slash.circle")
-          .foregroundStyle(Color.selection)
+          .foregroundStyle(Color.border)
       }
     case .activity(let state, let iconId):
       switch state {
@@ -92,7 +92,7 @@ public struct ReportDaysView: View {
           .opacity(0.4)
       case .notPlanned:
         Image(systemName: "slash.circle")
-          .foregroundStyle(Color.selection)
+          .foregroundStyle(Color.border)
       }
     case .empty:
       Color.clear

@@ -65,7 +65,7 @@ public struct OptionsView<Option: Optionable>: View {
 
   private func foregroundColor(for option: Option) -> Color {
     guard option.name == selected?.name else {
-      return .standardText
+      return .primaryText
     }
     return .pureWhite
   }

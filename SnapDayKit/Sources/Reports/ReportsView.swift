@@ -43,7 +43,7 @@ public struct ReportsView: View {
           }
         )
       }
-      .activityBackground
+      .background
       .task {
         store.send(.view(.appeared))
       }
@@ -106,7 +106,7 @@ public struct ReportsView: View {
           VStack(alignment: .leading, spacing: 10.0) {
             Text("Your Journey of Completed Activities", bundle: .module)
               .font(.system(size: 14.0, weight: .medium))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
             LinearChartView(
               points: linearChartValues.points,
               expectedPoints: linearChartValues.expectedPoints,
@@ -135,7 +135,7 @@ public struct ReportsView: View {
     HStack(spacing: 10.0) {
       Text("Total Time Spent on Tracked Activities", bundle: .module)
         .font(.system(size: 14.0, weight: .medium))
-        .foregroundStyle(Color.standardText)
+        .foregroundStyle(Color.primaryText)
       Spacer()
 
       Button(

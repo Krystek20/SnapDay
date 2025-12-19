@@ -23,7 +23,7 @@ public struct CalendarPickerView: View {
       picker
         .padding(.horizontal, 15.0)
         .maxFrame()
-        .activityBackground
+        .backgroundSoft
         .toolbar {
           if let buttonTitle = store.buttonTitle {
             ToolbarItem(placement: .topBarTrailing) {
@@ -42,6 +42,7 @@ public struct CalendarPickerView: View {
             }
           }
         }
+        .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
     }
   }
 
@@ -65,7 +66,7 @@ public struct CalendarPickerView: View {
       )
       .datePickerStyle(.graphical)
       .environment(\.locale, Locale.preferred)
-      .activityBackground
+      .backgroundSoft
     }
   }
 
@@ -75,7 +76,7 @@ public struct CalendarPickerView: View {
         "",
         selection: $store.dates
       )
-      .activityBackground
+      .backgroundSoft
     }
   }
 }

@@ -11,7 +11,7 @@ final class SpeechAnalyzer {
   private var silenceTimerTask: Task<Void, Never>?
 
   init() {
-    print(SFSpeechRecognizer.supportedLocales())
+//    print(SFSpeechRecognizer.supportedLocales())
   }
 
   func start() async throws -> String {
@@ -103,7 +103,7 @@ final class SpeechAnalyzer {
     lastSpeechTime = Date()
 
     silenceTimerTask = Task { [weak self] in
-      while Date().timeIntervalSince(self?.lastSpeechTime ?? Date()) <= 2, self?.silenceTimerTask?.isCancelled == false {
+      while Date().timeIntervalSince(self?.lastSpeechTime ?? Date()) <= 3, self?.silenceTimerTask?.isCancelled == false {
         print(["ELO_TEST_\(Date().timeIntervalSince(self?.lastSpeechTime ?? Date()))"])
         try? await Task.sleep(for: .seconds(2))
       }

@@ -23,7 +23,8 @@ public struct MarkerFormView: View {
     WithPerceptionTracking {
       content
         .navigationTitle(store.title)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
     }
   }
 
@@ -37,7 +38,7 @@ public struct MarkerFormView: View {
       }
       .padding(.horizontal, 15.0)
       .padding(.top, 25.0)
-      .activityBackground
+      .backgroundSoft
     }
   }
 
@@ -78,7 +79,7 @@ public struct MarkerFormView: View {
           store.send(.view(.saveButtonTapped))
         }
         .disabled(store.name.isEmpty)
-        .buttonStyle(PrimaryButtonStyle(disabled: store.name.isEmpty))
+        .buttonStyle(PrimaryButtonStyle())
       }
     }
   }

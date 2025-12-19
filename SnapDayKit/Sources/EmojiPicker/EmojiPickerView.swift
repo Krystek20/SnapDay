@@ -27,9 +27,10 @@ public struct EmojiPickerView: View {
         emojiTextField
       }
       .padding(.horizontal, 15.0)
-      .activityBackground
+      .backgroundSoft
       .bind($store.focus, to: $focus)
       .navigationTitle(String(localized: "Set Your Activity Emoji", bundle: .module))
+      .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
           Button(String(localized: "Save", bundle: .module)) {
@@ -46,6 +47,7 @@ public struct EmojiPickerView: View {
           .foregroundStyle(Color.actionBlue)
         }
       }
+      .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
     }
   }
 

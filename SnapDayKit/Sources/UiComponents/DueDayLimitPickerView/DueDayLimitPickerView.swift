@@ -30,7 +30,7 @@ public struct DueDayLimitPickerView: View {
       } label: {
         daysLabelText
           .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
       }
       .id(String(selectedDaysCount))
     }

@@ -42,6 +42,6 @@ struct SelectableTextItemStyle: ViewModifier {
   private var foregroundColor: some ShapeStyle {
     isSelected
     ? Color.pureWhite
-    : Color.standardText
+    : Color.primaryText
   }
 }

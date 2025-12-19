@@ -53,7 +53,7 @@ public struct WidgetActivityListView: View {
 
         Text(store.title)
           .font(.system(size: 14.0, weight: .regular))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
           .widgetAccentable()
 
         Spacer()
@@ -123,7 +123,7 @@ public struct WidgetActivityListView: View {
     VStack(spacing: .zero) {
       Text("🎉 Great job! Now, take a rest and enjoy the rest of your day with a smile! 🎉", bundle: .module)
         .font(.system(size: 14.0, weight: .regular))
-        .foregroundStyle(Color.standardText)
+        .foregroundStyle(Color.primaryText)
         .multilineTextAlignment(.center)
         .padding(.top, 20.0)
         .padding(.horizontal, 30.0)
@@ -140,10 +140,10 @@ public struct WidgetActivityListView: View {
     VStack(spacing: .zero) {
       Text("Your Day, Your Way", bundle: .module)
         .font(.system(size: 14.0, weight: .medium))
-        .foregroundStyle(Color.standardText)
+        .foregroundStyle(Color.primaryText)
       Text("A blank canvas awaits your plans or spontaneous joys.", bundle: .module)
         .font(.system(size: 12.0, weight: .regular))
-        .foregroundStyle(Color.standardText)
+        .foregroundStyle(Color.primaryText)
         .multilineTextAlignment(.center)
       Spacer(minLength: .zero)
       Image(from: .listEmpty)
@@ -160,7 +160,7 @@ public struct WidgetActivityListView: View {
           .tint(Color.actionBlue)
           .background(
             Color.actionBlue
-              .clipShape(RoundedRectangle(cornerRadius: 10.0))
+              .clipShape(RoundedRectangle(cornerRadius: 12.0))
               .widgetAccentable()
           )
       })

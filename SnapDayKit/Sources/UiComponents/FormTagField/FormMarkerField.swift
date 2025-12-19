@@ -79,7 +79,7 @@ public struct FormMarkerField<Marker: MarkerProtocol & Identifiable>: View {
   private var newMarkerField: some View {
     TextField(placeholder, text: newMarker)
       .font(.system(size: 16.0, weight: .regular))
-      .foregroundStyle(Color.standardText)
+      .foregroundStyle(Color.primaryText)
       .padding(.top, markers.isEmpty ? 2.0 : .zero)
       .onSubmit { onSubmit() }
   }

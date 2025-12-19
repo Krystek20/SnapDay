@@ -28,8 +28,9 @@ public struct ActivityListView: View {
     WithPerceptionTracking {
       content
         .maxWidth()
-        .activityBackground
+        .backgroundSoft
         .navigationTitle(String(localized: "Saved Activities", bundle: .module))
+        .navigationBarTitleDisplayMode(.inline)
         .searchable(
           text: $store.searchText,
           placement: .navigationBarDrawer(displayMode: .always),
@@ -51,6 +52,7 @@ public struct ActivityListView: View {
               )
             }
         }
+        .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
         .sheet(item: $store.scope(state: \.templateForm, action: \.templateForm)) { store in
           NavigationStack {
             DayActivityFormView(store: store)

@@ -31,8 +31,9 @@ public struct SelectableListView: View {
         .maxWidth()
       }
       .scrollIndicators(.hidden)
-      .activityBackground
+      .backgroundSoft
       .navigationTitle(store.title)
+      .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         WithPerceptionTracking {
           if store.isClearVisible {
@@ -46,6 +47,7 @@ public struct SelectableListView: View {
           }
         }
       }
+      .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
     }
   }
 
@@ -90,6 +92,6 @@ public struct SelectableListView: View {
   }
 
   private func titleColor(item: Item) -> Color {
-    store.selectedItem == item ? .standardText : .sectionText
+    store.selectedItem == item ? .primaryText : .sectionText
   }
 }

@@ -43,12 +43,13 @@ public struct ActivityDetailsView: View {
           }
         )
       }
-      .activityBackground
+      .backgroundSoft
       .task {
         store.send(.view(.appeared))
       }
       .navigationTitle(store.title)
       .navigationBarTitleDisplayMode(.inline)
+      .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
       .toolbar {
         toolbarTitle
         toolbarContent
@@ -142,7 +143,7 @@ public struct ActivityDetailsView: View {
             Spacer()
             Text("\(store.summary.doneCount)")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
           }
         }
         if store.summary.notDoneCount > .zero {
@@ -152,7 +153,7 @@ public struct ActivityDetailsView: View {
             Spacer()
             Text("\(store.summary.notDoneCount)")
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
           }
         }
         if let duration = DateComponentsFormatter.duration(for: .minutes(store.summary.duration)) {
@@ -162,7 +163,7 @@ public struct ActivityDetailsView: View {
             Spacer()
             Text(duration)
               .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.standardText)
+              .foregroundStyle(Color.primaryText)
           }
         }
       }

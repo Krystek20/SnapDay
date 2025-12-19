@@ -1,0 +1,39 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Accept" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Confirm" : {
+
+    },
+    "Discard" : {
+
+    },
+    "e.g. add gym on Monday evening, set reminder 10 minutes before..." : {
+
+    },
+    "Listening..." : {
+
+    },
+    "or" : {
+
+    },
+    "Tap to speak" : {
+
+    },
+    "This won’t take long" : {
+
+    },
+    "Type your request..." : {
+
+    },
+    "What Should I Do?" : {
+
+    }
+  },
+  "version" : "1.1"
+}

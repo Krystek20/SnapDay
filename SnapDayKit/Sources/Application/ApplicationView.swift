@@ -30,7 +30,7 @@ public struct ApplicationView: View {
 
     appearance.titleTextAttributes = [
       .font: UIFont.systemFont(ofSize: 16.0, weight: .medium),
-      .foregroundColor: UIColor.standardText
+      .foregroundColor: UIColor.primaryText
     ]
 
     let scrollEdgeAppearance = appearance.copy()

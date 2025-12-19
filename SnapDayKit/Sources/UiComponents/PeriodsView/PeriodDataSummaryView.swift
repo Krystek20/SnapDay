@@ -18,11 +18,11 @@ public struct PeriodDataSummaryView: View {
             .frame(width: 10.0, height: 10.0)
           Text("Total Available Time", bundle: .module)
             .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
           Spacer()
           Text(remaingDuration)
             .font(.system(size: 12.0, weight: .semibold))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
         }
       }
       if let totalPlannedTime = DateComponentsFormatter.duration(for: .minutes(periodSummaryData.totalPlannedTime)) {
@@ -32,14 +32,14 @@ public struct PeriodDataSummaryView: View {
             .frame(width: 10.0, height: 10.0)
           Text("Total Planned Time", bundle: .module)
             .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
           Spacer()
           Text(totalPlannedTime)
             .font(.system(size: 12.0, weight: .semibold))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
           Text("(\(Int(periodSummaryData.totalPlannedTimePercent * 100))%)")
             .font(.system(size: 10.0, weight: .bold))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
         }
       }
       if let totalCompletedTime = DateComponentsFormatter.duration(for: .minutes(periodSummaryData.totalCompletedTime)) {
@@ -49,14 +49,14 @@ public struct PeriodDataSummaryView: View {
             .frame(width: 10.0, height: 10.0)
           Text("Total Completed Time", bundle: .module)
             .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
           Spacer()
           Text(totalCompletedTime)
             .font(.system(size: 12.0, weight: .semibold))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
           Text("(\(Int(periodSummaryData.totalCompletedTimePercent * 100))%)")
             .font(.system(size: 10.0, weight: .bold))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
         }
       }
     }

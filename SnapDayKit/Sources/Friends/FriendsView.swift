@@ -25,7 +25,7 @@ public struct FriendsView: View {
     WithPerceptionTracking {
       content
         .maxWidth()
-        .activityBackground
+        .backgroundSoft
         .onAppear {
           store.send(.view(.appeared))
         }
@@ -72,6 +72,7 @@ public struct FriendsView: View {
             }
           }
         }
+        .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
     }
   }
 
@@ -147,7 +148,7 @@ public struct FriendsView: View {
               Text(collaboration.description)
                 .font(.system(size: 12.0, weight: .regular))
             }
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
             .fixedSize(horizontal: false, vertical: true)
 
             Spacer()
@@ -213,7 +214,7 @@ public struct FriendsView: View {
         TextField(String(localized: "Email or phone number", bundle: .module), text: $store.contact)
           .font(.system(size: 14.0, weight: .regular))
           .lineLimit(1)
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
           .submitLabel(.done)
           .focused($focus, equals: .addNew)
 

@@ -27,7 +27,7 @@ struct FormBackgroundModifier: ViewModifier {
         .padding(padding)
         .background(
           color
-            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+            .clipShape(RoundedRectangle(cornerRadius: 12.0))
         )
     case .accented:
       content
@@ -37,7 +37,7 @@ struct FormBackgroundModifier: ViewModifier {
         .padding(padding)
         .background(
           color
-            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+            .clipShape(RoundedRectangle(cornerRadius: 12.0))
         )
     }
   }
