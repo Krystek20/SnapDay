@@ -40,17 +40,24 @@ public struct ActivityListView: View {
           store.send(.view(.appeared))
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-              Button(
-                action: {
-                  store.send(.view(.newButtonTapped))
-                },
-                label: {
-                  Image(systemName: "plus.circle.fill")
-                    .foregroundStyle(Color.actionBlue)
-                }
-              )
+          ToolbarItem(placement: .topBarLeading) {
+            Button(String(localized: "Cancel", bundle: .module)) {
+              store.send(.view(.cancelButtonTapped))
             }
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          }
+          ToolbarItem(placement: .topBarTrailing) {
+            Button(
+              action: {
+                store.send(.view(.newButtonTapped))
+              },
+              label: {
+                Image(systemName: "plus.circle.fill")
+                  .foregroundStyle(Color.actionBlue)
+              }
+            )
+          }
         }
         .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
         .sheet(item: $store.scope(state: \.templateForm, action: \.templateForm)) { store in

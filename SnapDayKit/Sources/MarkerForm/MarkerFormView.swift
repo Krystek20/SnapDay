@@ -25,6 +25,15 @@ public struct MarkerFormView: View {
         .navigationTitle(store.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
+        .toolbar {
+          ToolbarItem(placement: .topBarLeading) {
+            Button(String(localized: "Cancel", bundle: .module)) {
+              store.send(.view(.cancelButtonTapped))
+            }
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          }
+        }
     }
   }
 

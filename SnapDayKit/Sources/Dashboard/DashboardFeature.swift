@@ -187,6 +187,8 @@ public struct DashboardFeature: TodayProvidable {
         return handleCalendarPickerAction(action, state: &state)
       case .friends:
         return .none
+      case .manageActivity(.dismiss):
+        return .send(.internal(.loadDay))
       case .manageActivity:
         return .none
       case .delegate:

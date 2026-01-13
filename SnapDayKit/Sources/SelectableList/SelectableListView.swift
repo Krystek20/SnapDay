@@ -36,6 +36,13 @@ public struct SelectableListView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         WithPerceptionTracking {
+          ToolbarItem(placement: .topBarLeading) {
+            Button(String(localized: "Cancel", bundle: .module)) {
+              store.send(.view(.cancelButtonTapped))
+            }
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          }
           if store.isClearVisible {
             ToolbarItem(placement: .topBarTrailing) {
               Button(String(localized: "Clear", bundle: .module)) {

@@ -44,6 +44,7 @@ public struct SelectableListViewFeature {
     public enum ViewAction: Equatable {
       case selected(Item)
       case clearTapped
+      case cancelButtonTapped
     }
     public enum InternalAction: Equatable { }
 
@@ -74,6 +75,10 @@ public struct SelectableListViewFeature {
       case .view(.clearTapped):
         return .run { [listId = state.listId] send in
           await send(.delegate(.selected(nil, listId)))
+          await dismiss()
+        }
+      case .view(.cancelButtonTapped):
+        return .run { _ in
           await dismiss()
         }
       case .delegate:

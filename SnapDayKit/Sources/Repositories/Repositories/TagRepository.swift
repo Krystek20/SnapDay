@@ -6,6 +6,7 @@ public struct TagRepository {
   public var saveTag: @Sendable (Tag) async throws -> Void
   public var deleteTag: @Sendable (Tag) async throws -> Void
   public var loadTags: @Sendable (_ excludedTags: [Tag]) async throws -> [Tag]
+  public var loadTag: @Sendable (_ name: String) async throws -> Tag?
 }
 
 extension DependencyValues {
@@ -38,6 +39,14 @@ extension TagRepository: DependencyKey {
             NSSortDescriptor(key: "name", ascending: true)
           }
         )
+      },
+      loadTag: { name in
+        try await EntityHandler().fetch(
+          Tag.self,
+          predicates: {
+            NSPredicate(format: "name == %@", name)
+          }
+        )
       }
     )
   }
@@ -46,7 +55,8 @@ extension TagRepository: DependencyKey {
     TagRepository(
       saveTag: { _ in },
       deleteTag: { _ in },
-      loadTags: { _ in [] }
+      loadTags: { _ in [] },
+      loadTag: { _ in nil }
     )
   }
 }

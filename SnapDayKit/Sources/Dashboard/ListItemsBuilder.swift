@@ -70,7 +70,7 @@ struct ListItemsBuilder {
         contentsOf: sortedTasks.map { task in
           task.listItem(
             parentId: dayActivity.id,
-            divider: task == dayActivity.dayActivityTasks.last
+            divider: task == sortedTasks.last
             ? isLast ? .none : .full
             : .indented
           )

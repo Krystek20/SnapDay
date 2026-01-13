@@ -36,6 +36,15 @@ public struct DayActivityFormView: View {
         .navigationTitle(store.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
+        .toolbar {
+          ToolbarItem(placement: .topBarLeading) {
+            Button(String(localized: "Cancel", bundle: .module)) {
+              store.send(.view(.cancelButtonTapped))
+            }
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          }
+        }
         .fullScreenCover(item: $store.scope(state: \.emojiPicker, action: \.emojiPicker)) { store in
           NavigationStack {
             EmojiPickerView(store: store)

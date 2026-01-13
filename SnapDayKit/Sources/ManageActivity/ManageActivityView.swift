@@ -3,10 +3,15 @@ import ComposableArchitecture
 import Resources
 import UiComponents
 
+enum UserDecisionCardType: Equatable {
+  case listItem(ListItem)
+  case marker(Marker)
+}
+
 struct UserDecisionCard: Equatable {
   let title: String
   let subtitle: String?
-  let item: ListItem
+  let cardType: UserDecisionCardType
 }
 
 @MainActor
@@ -53,8 +58,13 @@ public struct ManageActivityView: View {
                 }
               }
 
-              ListItemView(item: .constant(userDecisionCard.item))
-                .formBackgroundModifier(padding: EdgeInsets(.zero))
+              switch userDecisionCard.cardType {
+              case .listItem(let listItem):
+                ListItemView(item: .constant(listItem))
+                  .formBackgroundModifier(padding: EdgeInsets(.zero))
+              case .marker(let marker):
+                MarkerView(marker: marker)
+              }
             }
           } else if store.showProcessingState {
             AIProcessingStateView()
@@ -122,6 +132,15 @@ public struct ManageActivityView: View {
       .navigationTitle(String(localized: "What Should I Do?", bundle: .module))
       .navigationBarTitleDisplayMode(.inline)
       .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
+      .toolbar {
+        ToolbarItem(placement: .topBarLeading) {
+          Button(String(localized: "Cancel", bundle: .module)) {
+            store.send(.view(.cancelButtonTapped))
+          }
+          .font(.system(size: 12.0, weight: .bold))
+          .foregroundStyle(Color.actionBlue)
+        }
+      }
     }
   }
 

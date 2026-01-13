@@ -12,6 +12,7 @@ public struct ActivityRepository {
   public var loadActivities: @Sendable () async throws -> [Activity]
   public var saveActivity: @Sendable (Activity) async throws -> Void
   public var deleteActivity: @Sendable (Activity) async throws -> Void
+  public var activityTask: @Sendable (String) async throws -> ActivityTask?
   public var deleteActivityTask: @Sendable (ActivityTask) async throws -> Void
 }
 
@@ -54,9 +55,18 @@ extension ActivityRepository: DependencyKey {
           try await EntityHandler().delete(task)
         }
       },
+      activityTask: { identifier in
+        try await EntityHandler().fetch(ActivityTask.self, identifier: identifier)
+      },
       deleteActivityTask: { activityTask in
         try await EntityHandler().delete(activityTask)
       }
     )
+  }
+}
+
+public extension ActivityRepository {
+  func getActivity(identifier: String) async throws -> Activity? {
+    try await activity(.id(identifier))
   }
 }

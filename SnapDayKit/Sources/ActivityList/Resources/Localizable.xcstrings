@@ -68,6 +68,9 @@
         }
       }
     },
+    "Cancel" : {
+
+    },
     "Disable Repeat" : {
       "localizations" : {
         "ar" : {

@@ -3,6 +3,12 @@
   "strings" : {
     "" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21,12 +27,6 @@
             "value" : ""
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -34,12 +34,6 @@
           }
         },
         "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "ar" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
@@ -56,11 +50,23 @@
             "state" : "translated",
             "value" : ""
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
         }
       }
     },
     "Add Label" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة تسمية"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -85,12 +91,6 @@
             "value" : "Ajouter une étiquette"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicionar rótulo"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -101,12 +101,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ラベルを追加"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إضافة تسمية"
           }
         },
         "ko" : {
@@ -120,11 +114,23 @@
             "state" : "translated",
             "value" : "Dodaj etykietę"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar rótulo"
+          }
         }
       }
     },
     "Add tag" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة علامة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -149,12 +155,6 @@
             "value" : "Ajouter un tag"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicionar tag"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -165,12 +165,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タグを追加"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إضافة علامة"
           }
         },
         "ko" : {
@@ -184,11 +178,23 @@
             "state" : "translated",
             "value" : "Dodaj tag"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar tag"
+          }
         }
       }
     },
     "Add task" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة مهمة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -213,12 +219,6 @@
             "value" : "Ajouter une tâche"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicionar tarefa"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -229,12 +229,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タスクを追加"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إضافة مهمة"
           }
         },
         "ko" : {
@@ -248,11 +242,26 @@
             "state" : "translated",
             "value" : "Dodaj zadanie"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar tarefa"
+          }
         }
       }
     },
+    "Cancel" : {
+
+    },
     "Change icon" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير الأيقونة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -277,12 +286,6 @@
             "value" : "Changer l'icône"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alterar ícone"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -293,12 +296,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アイコンを変更"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تغيير الأيقونة"
           }
         },
         "ko" : {
@@ -312,11 +309,23 @@
             "state" : "translated",
             "value" : "Zmień ikonę"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alterar ícone"
+          }
         }
       }
     },
     "Completed" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مكتمل"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -341,12 +350,6 @@
             "value" : "Terminé"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Concluído"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -357,12 +360,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مكتمل"
           }
         },
         "ko" : {
@@ -376,11 +373,23 @@
             "state" : "translated",
             "value" : "Ukończono"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concluído"
+          }
         }
       }
     },
     "Delete" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -405,12 +414,6 @@
             "value" : "Supprimer"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Excluir"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -421,12 +424,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حذف"
           }
         },
         "ko" : {
@@ -440,11 +437,23 @@
             "state" : "translated",
             "value" : "Usuń"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excluir"
+          }
         }
       }
     },
     "Deselect" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء التحديد"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -469,12 +478,6 @@
             "value" : "Désélectionner"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desmarcar"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -485,12 +488,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択解除"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إلغاء التحديد"
           }
         },
         "ko" : {
@@ -504,11 +501,23 @@
             "state" : "translated",
             "value" : "Odznacz"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desmarcar"
+          }
         }
       }
     },
     "Due date" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تاريخ الاستحقاق"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -533,12 +542,6 @@
             "value" : "Date d'échéance"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data de vencimento"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -549,12 +552,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "期限日"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تاريخ الاستحقاق"
           }
         },
         "ko" : {
@@ -568,11 +565,23 @@
             "state" : "translated",
             "value" : "Termin"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data de vencimento"
+          }
         }
       }
     },
     "Edit" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -597,12 +606,6 @@
             "value" : "Modifier"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -613,12 +616,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحرير"
           }
         },
         "ko" : {
@@ -632,11 +629,23 @@
             "state" : "translated",
             "value" : "Edytuj"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar"
+          }
         }
       }
     },
     "Edit Activity" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير النشاط"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -661,12 +670,6 @@
             "value" : "Modifier l'activité"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar atividade"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -677,12 +680,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アクティビティを編集"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحرير النشاط"
           }
         },
         "ko" : {
@@ -696,11 +693,23 @@
             "state" : "translated",
             "value" : "Edytuj aktywność"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar atividade"
+          }
         }
       }
     },
     "Edit Activity Task" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير مهمة النشاط"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -725,12 +734,6 @@
             "value" : "Modifier la tâche d'activité"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar tarefa da atividade"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -741,12 +744,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アクティビティタスクを編集"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحرير مهمة النشاط"
           }
         },
         "ko" : {
@@ -760,11 +757,23 @@
             "state" : "translated",
             "value" : "Edytuj zadanie aktywności"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar tarefa da atividade"
+          }
         }
       }
     },
     "Edit Template" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير القالب"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -789,12 +798,6 @@
             "value" : "Modifier le modèle"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar modelo"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -805,12 +808,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "テンプレートを編集"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحرير القالب"
           }
         },
         "ko" : {
@@ -824,11 +821,23 @@
             "state" : "translated",
             "value" : "Edytuj szablon"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar modelo"
+          }
         }
       }
     },
     "Edit Template Task" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير مهمة القالب"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -853,12 +862,6 @@
             "value" : "Modifier la tâche du modèle"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar tarefa do modelo"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -869,12 +872,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "テンプレートタスクを編集"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحرير مهمة القالب"
           }
         },
         "ko" : {
@@ -888,11 +885,23 @@
             "state" : "translated",
             "value" : "Edytuj zadanie szablonu"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar tarefa do modelo"
+          }
         }
       }
     },
     "Enter label" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل التسمية"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -917,12 +926,6 @@
             "value" : "Saisir l'étiquette"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Digite o rótulo"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -933,12 +936,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ラベルを入力"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أدخل التسمية"
           }
         },
         "ko" : {
@@ -952,11 +949,23 @@
             "state" : "translated",
             "value" : "Wprowadź etykietę"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digite o rótulo"
+          }
         }
       }
     },
     "Enter name" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل الاسم"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -981,12 +990,6 @@
             "value" : "Saisir le nom"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Digite o nome"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -997,12 +1000,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名前を入力"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أدخل الاسم"
           }
         },
         "ko" : {
@@ -1016,11 +1013,23 @@
             "state" : "translated",
             "value" : "Wpisz nazwę"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digite o nome"
+          }
         }
       }
     },
     "Enter overview" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل النظرة العامة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1045,12 +1054,6 @@
             "value" : "Saisir l'aperçu"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Digite o resumo"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1061,12 +1064,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "概要を入力"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أدخل النظرة العامة"
           }
         },
         "ko" : {
@@ -1080,11 +1077,23 @@
             "state" : "translated",
             "value" : "Wprowadź przegląd"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digite o resumo"
+          }
         }
       }
     },
     "Enter tag" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل العلامة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1109,12 +1118,6 @@
             "value" : "Saisir le tag"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Digite a tag"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1125,12 +1128,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タグを入力"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أدخل العلامة"
           }
         },
         "ko" : {
@@ -1144,11 +1141,23 @@
             "state" : "translated",
             "value" : "Wprowadź tag"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digite a tag"
+          }
         }
       }
     },
     "Existing labels" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التسميات الموجودة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1173,12 +1182,6 @@
             "value" : "Étiquettes existantes"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rótulos existentes"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1189,12 +1192,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "既存のラベル"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "التسميات الموجودة"
           }
         },
         "ko" : {
@@ -1208,11 +1205,23 @@
             "state" : "translated",
             "value" : "Istniejące etykiety"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rótulos existentes"
+          }
         }
       }
     },
     "Existing tags" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العلامات الموجودة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1237,12 +1246,6 @@
             "value" : "Tags existants"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tags existentes"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1253,12 +1256,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "既存のタグ"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "العلامات الموجودة"
           }
         },
         "ko" : {
@@ -1272,11 +1269,23 @@
             "state" : "translated",
             "value" : "Istniejące tagi"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags existentes"
+          }
         }
       }
     },
     "Important" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مهم"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1301,12 +1310,6 @@
             "value" : "Important"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importante"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1317,12 +1320,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重要"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مهم"
           }
         },
         "ko" : {
@@ -1336,11 +1333,23 @@
             "state" : "translated",
             "value" : "Ważne"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importante"
+          }
         }
       }
     },
     "Labels" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التسميات"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1365,12 +1374,6 @@
             "value" : "Étiquettes"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rótulos"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1381,12 +1384,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ラベル"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "التسميات"
           }
         },
         "ko" : {
@@ -1400,11 +1397,23 @@
             "state" : "translated",
             "value" : "Etykiety"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rótulos"
+          }
         }
       }
     },
     "Name" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاسم"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1429,12 +1438,6 @@
             "value" : "Nom"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nome"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1445,12 +1448,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名前"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الاسم"
           }
         },
         "ko" : {
@@ -1464,11 +1461,23 @@
             "state" : "translated",
             "value" : "Nazwa"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
         }
       }
     },
     "Overview" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نظرة عامة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1493,12 +1502,6 @@
             "value" : "Aperçu"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resumo"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1509,12 +1512,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "概要"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نظرة عامة"
           }
         },
         "ko" : {
@@ -1528,11 +1525,23 @@
             "state" : "translated",
             "value" : "Przegląd"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumo"
+          }
         }
       }
     },
     "Pick Photo" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر صورة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1557,12 +1566,6 @@
             "value" : "Choisir une photo"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolher foto"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1573,12 +1576,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "写真を選択"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اختر صورة"
           }
         },
         "ko" : {
@@ -1592,11 +1589,23 @@
             "state" : "translated",
             "value" : "Wybierz zdjęcie"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher foto"
+          }
         }
       }
     },
     "Reminder" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تذكير"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1621,12 +1630,6 @@
             "value" : "Rappel"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lembrete"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1637,12 +1640,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リマインダー"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تذكير"
           }
         },
         "ko" : {
@@ -1656,11 +1653,23 @@
             "state" : "translated",
             "value" : "Przypomnienie"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lembrete"
+          }
         }
       }
     },
     "Remove" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إزالة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1685,12 +1694,6 @@
             "value" : "Supprimer"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remover"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1701,12 +1704,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إزالة"
           }
         },
         "ko" : {
@@ -1720,11 +1717,23 @@
             "state" : "translated",
             "value" : "Usuń"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover"
+          }
         }
       }
     },
     "Repeat" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تكرار"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1749,12 +1758,6 @@
             "value" : "Répéter"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Repetir"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1765,12 +1768,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "繰り返し"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تكرار"
           }
         },
         "ko" : {
@@ -1784,11 +1781,23 @@
             "state" : "translated",
             "value" : "Powtórz"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repetir"
+          }
         }
       }
     },
     "Save" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حفظ"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1813,12 +1822,6 @@
             "value" : "Enregistrer"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Salvar"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1829,12 +1832,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حفظ"
           }
         },
         "ko" : {
@@ -1848,11 +1845,23 @@
             "state" : "translated",
             "value" : "Zapisz"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvar"
+          }
         }
       }
     },
     "Select" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1877,12 +1886,6 @@
             "value" : "Sélectionner"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecionar"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1893,12 +1896,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحديد"
           }
         },
         "ko" : {
@@ -1912,11 +1909,23 @@
             "state" : "translated",
             "value" : "Wybierz"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionar"
+          }
         }
       }
     },
     "Select Emoji" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر الرمز التعبيري"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1941,12 +1950,6 @@
             "value" : "Sélectionner l'emoji"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecionar emoji"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1957,12 +1960,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "絵文字を選択"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اختر الرمز التعبيري"
           }
         },
         "ko" : {
@@ -1976,11 +1973,23 @@
             "state" : "translated",
             "value" : "Wybierz emotikonę"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionar emoji"
+          }
         }
       }
     },
     "Set date" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين التاريخ"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2005,12 +2014,6 @@
             "value" : "Définir la date"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Definir data"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2021,12 +2024,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日付を設定"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تعيين التاريخ"
           }
         },
         "ko" : {
@@ -2040,11 +2037,23 @@
             "state" : "translated",
             "value" : "Ustaw datę"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definir data"
+          }
         }
       }
     },
     "Set day limit" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين الحد اليومي"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2069,12 +2078,6 @@
             "value" : "Définir la limite quotidienne"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Definir limite diário"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2085,12 +2088,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日次制限を設定"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تعيين الحد اليومي"
           }
         },
         "ko" : {
@@ -2104,11 +2101,23 @@
             "state" : "translated",
             "value" : "Ustaw limit dzienny"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definir limite diário"
+          }
         }
       }
     },
     "Set duration" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين المدة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2133,12 +2142,6 @@
             "value" : "Définir la durée"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Definir duração"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2149,12 +2152,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "期間を設定"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تعيين المدة"
           }
         },
         "ko" : {
@@ -2168,11 +2165,23 @@
             "state" : "translated",
             "value" : "Ustaw czas trwania"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definir duração"
+          }
         }
       }
     },
     "Set time" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين الوقت"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2197,12 +2206,6 @@
             "value" : "Définir l'heure"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Definir hora"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2213,12 +2216,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "時刻を設定"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تعيين الوقت"
           }
         },
         "ko" : {
@@ -2232,11 +2229,23 @@
             "state" : "translated",
             "value" : "Ustaw czas"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definir hora"
+          }
         }
       }
     },
     "Tags" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العلامات"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2261,12 +2270,6 @@
             "value" : "Tags"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tags"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2277,12 +2280,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タグ"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "العلامات"
           }
         },
         "ko" : {
@@ -2296,11 +2293,23 @@
             "state" : "translated",
             "value" : "Tagi"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
         }
       }
     },
     "Tasks" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المهام"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2325,12 +2334,6 @@
             "value" : "Tâches"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarefas"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2341,12 +2344,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タスク"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المهام"
           }
         },
         "ko" : {
@@ -2360,11 +2357,23 @@
             "state" : "translated",
             "value" : "Zadania"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarefas"
+          }
         }
       }
     },
     "Turn on" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تشغيل"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2389,12 +2398,6 @@
             "value" : "Activer"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ativar"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2407,12 +2410,6 @@
             "value" : "オンにする"
           }
         },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تشغيل"
-          }
-        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2423,6 +2420,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Włącz"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ativar"
           }
         }
       }

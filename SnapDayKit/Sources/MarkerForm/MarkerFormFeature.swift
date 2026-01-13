@@ -47,6 +47,7 @@ public struct MarkerFormFeature {
 
     public enum ViewAction: Equatable {
       case saveButtonTapped
+      case cancelButtonTapped
     }
     public enum InternalAction: Equatable { }
     public enum DelegateAction: Equatable {
@@ -87,6 +88,10 @@ public struct MarkerFormFeature {
             try await activityRepository.saveActivity(activity)
             await send(.delegate(.labelCreated(label)))
           }
+          await dismiss()
+        }
+      case .view(.cancelButtonTapped):
+        return .run { _ in
           await dismiss()
         }
       case .delegate:

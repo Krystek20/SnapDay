@@ -99,6 +99,18 @@ public struct DeveloperToolsView: View {
       .onAppear {
         store.send(.view(.appeared))
       }
+      .navigationTitle("Developer Tools")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
+      .toolbar {
+        ToolbarItem(placement: .topBarLeading) {
+          Button("Cancel") {
+            store.send(.view(.cancelButtonTapped))
+          }
+          .font(.system(size: 12.0, weight: .bold))
+          .foregroundStyle(Color.actionBlue)
+        }
+      }
     }
   }
 }

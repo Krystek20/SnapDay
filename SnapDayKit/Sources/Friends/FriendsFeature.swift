@@ -27,6 +27,7 @@ public struct FriendsFeature: TodayProvidable {
 
   @Dependency(\.contactsProvider) private var contactsProvider
   @Dependency(\.cloudService) private var cloudService
+  @Dependency(\.dismiss) private var dismiss
 
   // MARK: - State & Action
 
@@ -128,7 +129,10 @@ public struct FriendsFeature: TodayProvidable {
     case .inviteButtonTapped:
       return inviteButtonTapped(state: &state)
     case .cancelButtonTapped:
-      return .send(.internal(.closeForm))
+      return .run { send in
+        await send(.internal(.closeForm))
+        await dismiss()
+      }
     case .reinviteButtonTapped(let participant):
       return .send(.internal(.invite(participant.email, participant.phoneNumber)))
     case .removeButtonTapped(let collaboration):

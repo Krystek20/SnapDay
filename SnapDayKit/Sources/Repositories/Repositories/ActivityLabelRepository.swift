@@ -6,6 +6,7 @@ public struct ActivityLabelRepository {
   public var saveLabel: @Sendable (ActivityLabel) async throws -> Void
   public var deleteLabel: @Sendable (ActivityLabel) async throws -> Void
   public var loadLabels: @Sendable (_ activityId: UUID, _ excludedLabels: [ActivityLabel]) async throws -> [ActivityLabel]
+  public var loadLabel: @Sendable (_ activityId: UUID, _ name: String) async throws -> ActivityLabel?
 }
 
 extension DependencyValues {
@@ -40,6 +41,14 @@ extension ActivityLabelRepository: DependencyKey {
         )
 
         return labels.filter(activity.labels.contains)
+      },
+      loadLabel: { activityId, name in
+        let activity = try await EntityHandler().fetch(Activity.self, identifier: activityId as CVarArg)
+        guard let activity else { return nil }
+
+        return try await EntityHandler().fetch(ActivityLabel.self) {
+          NSPredicate(format: "name == %@", name)
+        }
       }
     )
   }
@@ -48,7 +57,8 @@ extension ActivityLabelRepository: DependencyKey {
     ActivityLabelRepository(
       saveLabel: { _ in },
       deleteLabel: { _ in },
-      loadLabels: { _,_ in [] }
+      loadLabels: { _,_ in [] },
+      loadLabel: { _,_ in nil }
     )
   }
 }

@@ -2,6 +2,16 @@ import SwiftUI
 import Models
 import Resources
 
+public struct Marker: MarkerProtocol, Equatable {
+  public let name: String
+  public let rgbColor: RGBColor
+
+  public init(name: String, rgbColor: RGBColor) {
+    self.name = name
+    self.rgbColor = rgbColor
+  }
+}
+
 public struct MarkerView<Marker: MarkerProtocol>: View {
 
   // MARK: - Properties

@@ -7,18 +7,23 @@ import Models
 import AIModule
 
 import struct UiComponents.ListItem
-import struct UiComponents.ListTrailingMenuItem
+import struct UiComponents.Marker
 
 @Reducer
-public struct ManageActivityFeature {
+public struct ManageActivityFeature: TodayProvidable {
 
   // MARK: - Dependecies
 
   @Dependency(\.dismiss) private var dismiss
+  @Dependency(\.uuid) private var uuid
   @Dependency(\.webSocket) private var webSocket
 
-  @Dependency(\.activityRepository) var activityRepository
-  @Dependency(\.dayActivityRepository) var dayActivityRepository
+  @Dependency(\.activityRepository) private var activityRepository
+  @Dependency(\.tagRepository) private var tagRepository
+  @Dependency(\.activityLabelRepository) private var activityLabelRepository
+  @Dependency(\.iconRepository) private var iconRepository
+  @Dependency(\.dayUpdater) private var dayUpdater
+  @Dependency(\.utcCalendar) var calendar
 
   private let speechAnalyzer = SpeechAnalyzer()
 
@@ -34,7 +39,20 @@ public struct ManageActivityFeature {
     }
 
     public enum UserDecision: Equatable {
-      case create(DayActivity, UUID)
+      case createDayActivity(DayActivity, ManageActivityAction)
+      case updateDayActivity(DayActivity, ManageActivityAction)
+      case deleteDayActivity(DayActivity, ManageActivityAction)
+      case createDayActivityTask(DayActivity, DayActivityTask, ManageActivityAction)
+      case updateDayActivityTask(DayActivityTask, ManageActivityAction)
+      case deleteDayActivityTask(DayActivityTask, ManageActivityAction)
+      case createActivity(Activity, ManageActivityAction)
+      case updateActivity(Activity, ManageActivityAction)
+      case deleteActivity(Activity, ManageActivityAction)
+      case createActivityTask(Activity, ActivityTask, ManageActivityAction)
+      case updateActivityTask(Activity, ActivityTask, ManageActivityAction)
+      case deleteActivityTask(Activity, ActivityTask, ManageActivityAction)
+      case createTag(Tag, ManageActivityAction)
+      case createLabel(ActivityLabel, Activity, ManageActivityAction)
     }
     var userDecision: UserDecision?
 
@@ -43,7 +61,6 @@ public struct ManageActivityFeature {
     }
     var focus: Field? = .request
 
-//    var transcribedText = "Dodaj spacer z Harleyem na środę z przypomnieniem o 19 i oznacz jako ważne"
     var transcribedText = ""
 
     var bottomSection: BottomSection {
@@ -66,52 +83,92 @@ public struct ManageActivityFeature {
 
     var userDecisionCard: UserDecisionCard? {
       switch userDecision {
-      case .create(let dayActivity, _):
-
-        let isDone = dayActivity.doneDate != nil
-        var participants: [ListItem.Participant] = []
-        if let share = dayActivity.share, !share.participants.filter(\.isShared).isEmpty {
-          participants = share.participants.map {
-            ListItem.Participant(id: $0.id, name: $0.name)
-          }
-        }
-
-        var progress = ListItem.Progress.none
-        if !dayActivity.dayActivityTasks.isEmpty {
-          let doneTasks = dayActivity.dayActivityTasks.filter(\.isDone).count
-          let totalTasks = dayActivity.dayActivityTasks.count
-          progress = .line(value: Double(doneTasks), total: Double(totalTasks))
-        }
-
-        return UserDecisionCard(
+      case .createDayActivity(let dayActivity, _):
+        UserDecisionCard(
           title: "Create new activity?",
           subtitle: "SnapDay AI prepared this action for you",
-          item: ListItem(
-            id: dayActivity.id.uuidString,
-            parentId: nil,
-            title: dayActivity.name,
-            subtitle: SubtitleFormatter.format(
-              overview: dayActivity.overview,
-              duration: dayActivity.totalDuration
-            ),
-            fieldType: .text,
-            iconType: .iconId(dayActivity.iconId),
-            isStrikethrough: isDone,
-            displayedIcons: [
-              dayActivity.important ? .exclamationmark : nil,
-              dayActivity.dueDate != nil ? .hourglass : nil,
-              dayActivity.reminderDate != nil ? .bell : nil
-            ].compactMap { $0 },
-            participants: participants,
-            divider: .none,
-            isDraggable: false,
-            priority: .normal,
-            trailing: .none,
-            progress: progress
-          )
+          cardType: .listItem(ListItem(dayActivity: dayActivity))
+        )
+      case .updateDayActivity(let dayActivity, _):
+        UserDecisionCard(
+          title: "Update existing activity?",
+          subtitle: "SnapDay AI prepared this action for you",
+          cardType: .listItem(ListItem(dayActivity: dayActivity))
+        )
+      case .deleteDayActivity(let dayActivity, _):
+        UserDecisionCard(
+          title: "Delete existing activity?",
+          subtitle: "SnapDay AI prepared this action for you",
+          cardType: .listItem(ListItem(dayActivity: dayActivity))
+        )
+      case .createDayActivityTask(_, let dayActivityTask, _):
+        UserDecisionCard(
+          title: "Create new task?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(dayActivityTask: dayActivityTask))
+        )
+      case .updateDayActivityTask(let dayActivityTask, _):
+        UserDecisionCard(
+          title: "Update existing task?",
+          subtitle: "SnapDay AI updated this task for you",
+          cardType: .listItem(ListItem(dayActivityTask: dayActivityTask))
+        )
+      case .deleteDayActivityTask(let dayActivityTask, _):
+        UserDecisionCard(
+          title: "Delete existing task?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(dayActivityTask: dayActivityTask))
+        )
+      case .createActivity(let activity, _):
+        UserDecisionCard(
+          title: "Create new template?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(activity: activity))
+        )
+      case .updateActivity(let activity, _):
+        UserDecisionCard(
+          title: "Update existing template?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(activity: activity))
+        )
+      case .deleteActivity(let activity, _):
+        UserDecisionCard(
+          title: "Delete existing template?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(activity: activity))
+        )
+      case .createActivityTask(_, let activityTask, _):
+        UserDecisionCard(
+          title: "Create new template task?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(activityTask: activityTask))
+        )
+      case .updateActivityTask(_, let activityTask, _):
+        UserDecisionCard(
+          title: "Update existing template task?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(activityTask: activityTask))
+        )
+      case .deleteActivityTask(_, let activityTask, _):
+        UserDecisionCard(
+          title: "Delete existing template task?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .listItem(ListItem(activityTask: activityTask))
+        )
+      case .createTag(let tag, _):
+        UserDecisionCard(
+          title: "Create new tag?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .marker(Marker(name: tag.name, rgbColor: tag.rgbColor))
+        )
+      case .createLabel(let label, let activity, _):
+        UserDecisionCard(
+          title: "Create new label for \(activity.name)?",
+          subtitle: "SnapDay AI prepared this task for you",
+          cardType: .marker(Marker(name: label.name, rgbColor: label.rgbColor))
         )
       case nil:
-        return nil
+        nil
       }
     }
 
@@ -122,7 +179,7 @@ public struct ManageActivityFeature {
     var queue: [ManageActivityAction] = []
 
     @ObservationStateIgnored
-    var responses: [String] = []
+    var responses: [ManageActivityActionResultRequest] = []
 
     @ObservationStateIgnored
     var connection: WebSocketConnection?
@@ -166,7 +223,7 @@ public struct ManageActivityFeature {
       case start([ManageActivityAction])
       case processNext
       case handle(ManageActivityAction)
-      case finishAction(String)
+      case finishAction(ManageActivityActionResultRequest)
     }
 
     case binding(BindingAction<State>)
@@ -187,13 +244,13 @@ public struct ManageActivityFeature {
     Reduce { state, action in
       switch action {
       case .view(.micButtonTapped):
-        .send(.internal(.startSpeaking))
+          .send(.internal(.startSpeaking))
       case .view(.confirmButtonTapped):
         connectAndProceed(state: &state)
       case .view(.cancelButtonTapped):
-        .run { _ in
-          await dismiss()
-        }
+          .run { _ in
+            await dismiss()
+          }
       case .view(.acceptButtonTapped):
         acceptUserDecision(state: &state)
       case .view(.discardButtonPressed):
@@ -213,11 +270,11 @@ public struct ManageActivityFeature {
       case .internal(.setUserDecision(let userDecision)):
         setUserDecision(state: &state, userDecision: userDecision)
       case .delegate(.dataSelected):
-        .none
+          .none
       case .delegate:
-        .none
+          .none
       case .binding:
-        .none
+          .none
       }
     }
   }
@@ -339,11 +396,63 @@ public struct ManageActivityFeature {
   private func acceptUserDecision(state: inout State) -> Effect<Action> {
     defer { state.userDecision = nil }
     return switch state.userDecision {
-    case .create(let dayActivity, let actionId):
-        .run { send in
-          try await dayActivityRepository.saveDayActivity(dayActivity)
-          await send(.internal(.flow(.finishAction("createDayActivity_actionId:\(actionId)_created_id:\(dayActivity.id)"))))
-        }
+    case .createDayActivity(let dayActivity, let action),
+        .updateDayActivity(let dayActivity, let action):
+      accept(action, objectId: dayActivity.id.uuidString) {
+        try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
+      }
+    case .deleteDayActivity(let dayActivity, let action):
+      accept(action, objectId: dayActivity.id.uuidString) {
+        try await dayUpdater.removeDayActivity(dayActivity)
+      }
+    case .createDayActivityTask(let dayActivity, let dayActivityTask, let action):
+      accept(action, objectId: dayActivityTask.id.uuidString) {
+        try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
+      }
+    case .updateDayActivityTask(let dayActivityTask, let action):
+      accept(action, objectId: dayActivityTask.id.uuidString) {
+        try await dayUpdater.saveDayActivityTask(dayActivityTask, syncSharable: true)
+      }
+    case .deleteDayActivityTask(let dayActivityTask, let action):
+      accept(action, objectId: dayActivityTask.id.uuidString) {
+        try await dayUpdater.removeDayActivityTask(dayActivityTask)
+      }
+    case.createActivity(let activity, let action):
+      accept(action, objectId: activity.id.uuidString) {
+        try await activityRepository.saveActivity(activity)
+        try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
+      }
+    case.updateActivity(let activity, let action):
+      accept(action, objectId: activity.id.uuidString) {
+        try await activityRepository.saveActivity(activity)
+        try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
+      }
+    case.deleteActivity(let activity, let action):
+      accept(action, objectId: activity.id.uuidString) {
+        try await dayUpdater.updateDaysByRemovedActivity(activity, from: today)
+        try await activityRepository.deleteActivity(activity)
+      }
+    case.createActivityTask(let activity, let activityTask, let action),
+        .updateActivityTask(let activity, let activityTask, let action):
+      accept(action, objectId: activityTask.id.uuidString) {
+        try await activityRepository.saveActivity(activity)
+        try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
+      }
+    case.deleteActivityTask(let activity, let activityTask, let action):
+      accept(action, objectId: activityTask.id.uuidString) {
+        try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
+        try await activityRepository.deleteActivityTask(activityTask)
+        try await activityRepository.saveActivity(activity)
+      }
+    case .createTag(let tag, let action):
+      accept(action, objectId: tag.name) {
+        try await tagRepository.saveTag(tag)
+      }
+    case .createLabel(let label, let activity, let action):
+      accept(action, objectId: label.name) {
+        try await activityLabelRepository.saveLabel(label)
+        try await activityRepository.saveActivity(activity)
+      }
     case .none:
         .none
     }
@@ -352,9 +461,26 @@ public struct ManageActivityFeature {
   private func discardUserDecision(state: inout State) -> Effect<Action> {
     defer { state.userDecision = nil }
     return switch state.userDecision {
-    case .create(_, let actionId):
+    case .createDayActivity(_, let action),
+        .updateDayActivity(_, let action),
+        .deleteDayActivity(_, let action),
+        .createDayActivityTask(_, _, let action),
+        .updateDayActivityTask(_, let action),
+        .deleteDayActivityTask(_, let action),
+        .createActivity(_, let action),
+        .updateActivity(_, let action),
+        .deleteActivity(_, let action),
+        .createActivityTask(_, _, let action),
+        .updateActivityTask(_, _, let action),
+        .deleteActivityTask(_, _, let action),
+        .createTag(_, let action),
+        .createLabel(_, _, let action):
         .run { send in
-          await send(.internal(.flow(.finishAction("createDayActivity_actionId:\(actionId)_userCancelled"))))
+          let result = ManageActivityActionResultRequest(
+            action: action,
+            resultType: .userCancelled
+          )
+          await send(.internal(.flow(.finishAction(result))))
         }
     case .none:
         .none
@@ -365,7 +491,11 @@ public struct ManageActivityFeature {
     switch flow {
     case .start(let actions):
       state.queue = actions
-//      state.pending = nil
+      guard !actions.isEmpty else {
+        return .run { _ in
+          await dismiss()
+        }
+      }
       return .send(.internal(.flow(.processNext)))
     case .processNext:
       guard let next = state.queue.first else {
@@ -378,186 +508,392 @@ public struct ManageActivityFeature {
       state.queue.removeFirst()
       return .send(.internal(.flow(.handle(next))))
     case .handle(let action):
-      switch action.action {
-
-      case .getDayActivities:
-          return .run { send in
-            guard let date = ISO8601DateFormatter.utcDate(from: action.value) else {
-              print("NO DATE FOR \(action.value)")
-              return
-            }
-            let configuration = ActivitiesFetchConfiguration(range: date...date)
-            let dayActivities = try await dayActivityRepository.dayActivities(configuration: configuration)
-            let result = "getDayActivities_actionId:\(action.actionId)_[\(dayActivities.rawString)]"
-            await send(.internal(.flow(.finishAction(result))))
-          }
-
-      case .getDayActivity:
-        return .run { [action] send in
-          guard let dayActivityId = action.value,
-                let dayActivity = try await dayActivityRepository.activity(identifier: dayActivityId) else {
-            print("NO dayActivityId: \(action.value)")
-            return
-          }
-          let result = "getDayActivity_actionId:\(action.actionId)_[\(dayActivity.rawString)]"
-          await send(.internal(.flow(.finishAction(result))))
-        }
-
-      case .createDayActivity:
-        return .run { [action] send in
-          guard let fields = action.fields,
-                let data = fields.data(using: .utf8),
-                let dictionary = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            print("NO fields: \(action.fields)")
-            return
-          }
-
-          if let dayActivity = DayActivity(dictionary: dictionary, activity: nil) {
-            print("New day activity: \(dayActivity)")
-            await send(.internal(.setUserDecision(.create(dayActivity, action.actionId))))
-          } else {
-            await send(.internal(.flow(.finishAction("createDayActivity_actionId:\(action.actionId)_failed"))))
-          }
-        }
-
-      case .updateDayActivity:
-        return .none
-
-      case .getActivityTemplates:
-        return .run { send in
-            let activities = try await activityRepository.loadActivities()
-            let rawActivities = activities
-              .map { "{name:\($0.name);id:\($0.id)}" }
-              .joined(separator: ",")
-            let result = "getActivityTemplates:[\(rawActivities)]"
-            await send(.internal(.flow(.finishAction(result))))
-          }
-      case .deleteDayActivity:
-        return .none
-      case .createDayActivityTask:
-        return .run { [action] send in
-          guard let fields = action.fields,
-                let data = fields.data(using: .utf8),
-                let dictionary = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            print("NO fields: \(action.fields)")
-            return
-          }
-          if let dayActivityTask = DayActivityTask(dictionary: dictionary, dayActivityId: action.value) {
-            print("New day activity task: \(dayActivityTask)")
-            await send(.internal(.flow(.finishAction("createDayActivityTask_actionId:\(action.actionId)_created_id:\(dayActivityTask.id)"))))
-          } else {
-            await send(.internal(.flow(.finishAction("createDayActivityTask_actionId:\(action.actionId)_failed"))))
-          }
-          //          try await dayActivityRepository.saveDayActivity(newActivity)
-        }
-
-      case .updateDayActivityTask:
-        return .none
-      case .deleteDayActivityTask:
-        return .none
-      case .getActivityTemplate:
-        return .none
-      case .createActivityTemplate:
-        return .none
-      case .updateActivityTemplate:
-        return .none
-      case .deleteActivityTemplate:
-        return .none
-      case .createActivityTemplateTask:
-        return .none
-      case .updateActivityTemplateTask:
-        return .none
-      case .deleteActivityTemplateTask:
-        return .none
-      case .getTags:
-        return .none
-      case .createTag:
-        return .none
-      case .createLabel:
-        return .none
-      case .createRGBColor:
-        return .none
-      case .createIcon:
-        return .none
+      return switch action.action {
+      case .getDayActivities: getDayActivities(action: action)
+      case .getDayActivity: getDayActivity(action: action)
+      case .createDayActivity: createDayActivity(action: action)
+      case .updateDayActivity: updateDayActivity(action: action)
+      case .deleteDayActivity: deleteDayActivity(action: action)
+      case .getActivityTemplates: getActivityTemplates(action: action)
+      case .createDayActivityTask: createDayActivityTask(action: action)
+      case .updateDayActivityTask: updateDayActivityTask(action: action)
+      case .deleteDayActivityTask: deleteDayActivityTask(action: action)
+      case .getActivityTemplate: getActivityTemplate(action: action)
+      case .createActivityTemplate: createActivityTemplate(action: action)
+      case .updateActivityTemplate: updateActivityTemplate(action: action)
+      case .deleteActivityTemplate: deleteActivityTemplate(action: action)
+      case .createActivityTemplateTask: createActivityTaskTemplate(action: action)
+      case .updateActivityTemplateTask: updateActivityTaskTemplate(action: action)
+      case .deleteActivityTemplateTask: deleteActivityTaskTemplate(action: action)
+      case .getTags: getTags(action: action)
+      case .createTag: createTag(action: action)
+      case .createLabel: createLabel(action: action)
       }
     case .finishAction(let result):
       state.responses.append(result)
       return .send(.internal(.flow(.processNext)))
     }
   }
-}
 
-extension [DayActivity] {
-  var rawString: String {
-      map { "{name:\($0.name);id:\($0.id)}" }
-      .joined(separator: ",")
+  private func getDayActivities(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      guard let iso8601Date = ISO8601DateFormatter.date(from: action.fields?["date"]?.stringValue) else {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: "fieldsNotFound: date")
+        )
+        return await send(.internal(.flow(.finishAction(result))))
+      }
+      let date = calendar.dayFormat(iso8601Date)
+      let configuration = ActivitiesFetchConfiguration(range: date...date)
+      let dayActivities = try await dayUpdater.dayActivities(configuration: configuration)
+
+      let result = ManageActivityActionResultRequest(
+        action: action,
+        resultType: .fetched(dayActivities.map(DayActivityRequest.init))
+      )
+      await send(.internal(.flow(.finishAction(result))))
+    }
   }
-}
 
-extension DayActivity {
-
-  #warning("Tags and Labels and dayActivityTasks are not handled yet")
-  init?(dictionary: [String: Any], activity: Activity?) {
-    guard let name = dictionary["name"] as? String,
-          let date = ISO8601DateFormatter.utcDate(from: dictionary["date"] as? String) else { return nil }
-    self.init(
-      id: UUID(),
-      date: date,
-      activity: activity,
-      name: name,
-      iconId: dictionary["iconIdentifier"] as? UUID,
-      dueDate: ISO8601DateFormatter.utcDate(from: dictionary["dueDate"] as? String),
-      doneDate: ISO8601DateFormatter.utcDate(from: dictionary["doneDate"] as? String),
-      duration: dictionary["duration"] as? Int ?? .zero,
-      overview: dictionary["overview"] as? String,
-      isGeneratedAutomatically: false,
-      reminderDate: ISO8601DateFormatter.utcDate(from: dictionary["reminderDate"] as? String),
-      important: dictionary["important"] as? Bool ?? false,
-      position: dictionary["position"] as? Int ?? -1
+  private func getDayActivity(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: dayUpdater.dayActivity,
+      operate: { dayActivity in
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .fetched(DayActivityRequest(dayActivity: dayActivity))
+        )
+        return .internal(.flow(.finishAction(result)))
+      }
     )
   }
 
-  var rawString: String {
-    var rawDayActivity = "{"
-    rawDayActivity += "date:\(date, default: "Nil");"
-    rawDayActivity += "doneDate:\(doneDate, default: "Nil");"
-    rawDayActivity += "dueDate:\(dueDate, default: "Nil");"
-    rawDayActivity += "duration:\(duration);"
-    rawDayActivity += "iconIdentifier:\(iconId, default: "Nil");"
-    rawDayActivity += "identifier:\(id);"
-    rawDayActivity += "important:\(important);"
-    let rawLabels = labels.map { "id:\($0.id);name:\($0.name);" }.joined(separator: ",")
-    rawDayActivity += "labels:[\(rawLabels)];"
-    let rawTags = tags.map { "id:\($0.id);name:\($0.name);" }.joined(separator: ",")
-    rawDayActivity += "tags:[\(rawTags)];"
-    rawDayActivity += "name:\(name);"
-    rawDayActivity += "overview:\(overview, default: "Nil");"
-    rawDayActivity += "position:\(position);"
-    rawDayActivity += "reminderDate:\(reminderDate, default: "Nil");"
-    rawDayActivity += "templateIdentifier:\(activity?.id, default: "Nil");"
-    let rawDayActivityTasks = dayActivityTasks.map { "id:\($0.id);name:\($0.name);" }.joined(separator: ",")
-    rawDayActivity += "dayActivityTasks:[\(rawDayActivityTasks)];"
-    rawDayActivity += "}"
-    return rawDayActivity
+  private func createDayActivity(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      do {
+        let dayActivity = try await DayActivity(
+          uuid: uuid,
+          action: action,
+          activity: nil,
+          tagRepository: tagRepository,
+          activityLabelRepository: activityLabelRepository,
+          iconRepository: iconRepository,
+          calendar: calendar
+        )
+        await send(.internal(.setUserDecision(.createDayActivity(dayActivity, action))))
+      } catch {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: error.localizedDescription)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      }
+    }
   }
-}
 
-extension DayActivityTask {
-
-#warning("ActivityTask is not handled yet")
-  init?(dictionary: [String: Any], dayActivityId: String?) {
-    guard let name = dictionary["name"] as? String,
-          let dayActivityId = UUID(uuidString: dayActivityId ?? "") else { return nil }
-    self.init(
-      id: UUID(),
-      dayActivityId: dayActivityId,
-      activityTask: nil,
-      name: name,
-      doneDate: ISO8601DateFormatter.utcDate(from: dictionary["doneDate"] as? String),
-      duration: dictionary["duration"] as? Int ?? .zero,
-      overview: dictionary["overview"] as? String,
-      reminderDate: ISO8601DateFormatter.utcDate(from: dictionary["reminderDate"] as? String),
-      position: dictionary["position"] as? Int ?? -1
+  private func updateDayActivity(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: dayUpdater.dayActivity,
+      operate: { dayActivity in
+        try await dayActivity.update(
+          with: action,
+          uuid: uuid,
+          tagRepository: tagRepository,
+          activityLabelRepository: activityLabelRepository,
+          iconRepository: iconRepository
+        )
+        return .internal(.setUserDecision(.updateDayActivity(dayActivity, action)))
+      }
     )
+  }
+
+  private func deleteDayActivity(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: dayUpdater.dayActivity,
+      operate: { dayActivity in
+          .internal(.setUserDecision(.deleteDayActivity(dayActivity, action)))
+      }
+    )
+  }
+
+  private func getActivityTemplates(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      let activities = try await activityRepository.loadActivities()
+      let result = ManageActivityActionResultRequest(
+        action: action,
+        resultType: .fetched(activities.map(ActivityTemplateRequest.init))
+      )
+      await send(.internal(.flow(.finishAction(result))))
+    }
+  }
+
+  private func getActivityTemplate(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: activityRepository.getActivity,
+      operate: { activity in
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .fetched(ActivityTemplateRequest(activity: activity))
+        )
+        return .internal(.flow(.finishAction(result)))
+      }
+    )
+  }
+
+  private func createActivityTemplate(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      do {
+        let activity = try await Activity(
+          uuid: uuid,
+          action: action,
+          tagRepository: tagRepository,
+          activityLabelRepository: activityLabelRepository,
+          iconRepository: iconRepository
+        )
+        await send(.internal(.setUserDecision(.createActivity(activity, action))))
+      } catch {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: error.localizedDescription)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      }
+    }
+  }
+
+  private func updateActivityTemplate(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: activityRepository.getActivity,
+      operate: { activity in
+        try await activity.update(
+          with: action,
+          uuid: uuid,
+          tagRepository: tagRepository,
+          activityLabelRepository: activityLabelRepository,
+          iconRepository: iconRepository
+        )
+        return .internal(.setUserDecision(.updateActivity(activity, action)))
+      }
+    )
+  }
+
+  private func deleteActivityTemplate(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: activityRepository.getActivity,
+      operate: { activity in
+          .internal(.setUserDecision(.deleteActivity(activity, action)))
+      }
+    )
+  }
+
+  private func createActivityTaskTemplate(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      do {
+        let activityTask = try ActivityTask(uuid: uuid, action: action)
+        guard var activity = try await activityRepository.activity(.id(activityTask.activityId.uuidString)) else {
+          throw NSError(domain: "Activity not found: \(activityTask.activityId)", code: -1)
+        }
+        activity.tasks.append(activityTask)
+        await send(.internal(.setUserDecision(.createActivityTask(activity, activityTask, action))))
+      } catch {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: error.localizedDescription)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      }
+    }
+  }
+
+  private func updateActivityTaskTemplate(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: activityRepository.activityTask,
+      operate: { activityTask in
+        try activityTask.update(with: action)
+        guard var activity = try await activityRepository.activity(.id(activityTask.activityId.uuidString)) else {
+          throw NSError(domain: "Activity not found: \(activityTask.activityId)", code: -1)
+        }
+        activity.tasks.removeAll { $0.id == activityTask.id }
+        activity.tasks.append(activityTask)
+        return .internal(.setUserDecision(.updateActivityTask(activity, activityTask, action)))
+      }
+    )
+  }
+
+  private func deleteActivityTaskTemplate(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: activityRepository.activityTask,
+      operate: { activityTask in
+        guard var activity = try await activityRepository.activity(.id(activityTask.activityId.uuidString)) else {
+          throw NSError(domain: "Activity not found: \(activityTask.activityId)", code: -1)
+        }
+        activity.tasks.removeAll { $0.id == activityTask.id }
+        return .internal(.setUserDecision(.deleteActivityTask(activity, activityTask, action)))
+      }
+    )
+  }
+
+  private func getTags(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      let tags = try await tagRepository.loadTags([])
+      let result = ManageActivityActionResultRequest(
+        action: action,
+        resultType: .fetched(tags.map(MarkerRequest.init))
+      )
+      await send(.internal(.flow(.finishAction(result))))
+    }
+  }
+
+  private func createTag(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      let tag = try Tag(action: action)
+      if let existingTag = try await tagRepository.loadTag(tag.name) {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .success(existingTag.id)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      } else {
+        await send(.internal(.setUserDecision(.createTag(tag, action))))
+      }
+    }
+  }
+
+  private func createLabel(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      guard let activityId = action.fields?["activityTemplateIdentifier"]?.uuidValue else {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: "activityTemplateIdentifier not provided")
+        )
+        return await send(.internal(.flow(.finishAction(result))))
+      }
+
+      guard var activity = try await activityRepository.activity(.id(activityId.uuidString)) else {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: "activity does not exist with id: \(activityId)")
+        )
+        return await send(.internal(.flow(.finishAction(result))))
+      }
+
+      let label = try ActivityLabel(action: action)
+      if let existingLabel = activity.labels.first(where: { $0.name == label.name }) {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .success(existingLabel.id)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      } else {
+        activity.labels.append(label)
+        await send(.internal(.setUserDecision(.createLabel(label, activity, action))))
+      }
+    }
+  }
+
+  private func createDayActivityTask(action: ManageActivityAction) -> Effect<Action> {
+    .run { send in
+      do {
+        let dayActivityTask = try DayActivityTask(uuid: uuid, action: action)
+        guard var dayActivity = try await dayUpdater.dayActivity(identifier: dayActivityTask.dayActivityId.uuidString) else {
+          throw NSError(domain: "Day activity not found: \(dayActivityTask.dayActivityId)", code: -1)
+        }
+        dayActivity.dayActivityTasks.append(dayActivityTask)
+        await send(.internal(.setUserDecision(.createDayActivityTask(dayActivity, dayActivityTask, action))))
+      } catch {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: error.localizedDescription)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      }
+    }
+  }
+
+  private func updateDayActivityTask(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: dayUpdater.dayActivityTask,
+      operate: { dayActivityTask in
+        try dayActivityTask.update(with: action)
+        return .internal(.setUserDecision(.updateDayActivityTask(dayActivityTask, action)))
+      }
+    )
+  }
+
+  private func deleteDayActivityTask(action: ManageActivityAction) -> Effect<Action> {
+    operateOnObject(
+      for: action,
+      fetcher: dayUpdater.dayActivityTask,
+      operate: { dayActivityTask in
+          .internal(.setUserDecision(.deleteDayActivityTask(dayActivityTask, action)))
+      }
+    )
+  }
+
+  private func operateOnObject<T>(
+    for action: ManageActivityAction,
+    fetcher: @escaping (String) async throws -> T?,
+    operate: @escaping (inout T) async throws -> Action
+  ) -> Effect<Action> {
+    .run { send in
+      guard let objectId = action.fields?["identifier"]?.stringValue else {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: "[\(action.actionId)] fieldsNotFound: identifier")
+        )
+        return await send(.internal(.flow(.finishAction(result))))
+      }
+
+      guard var object = try await fetcher(objectId) else {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: "[\(action.actionId)] objectNotFound: \(objectId)")
+        )
+        return await send(.internal(.flow(.finishAction(result))))
+      }
+
+      do {
+        await send(try await operate(&object))
+      } catch {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: error.localizedDescription)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      }
+    }
+  }
+
+  private func accept(
+    _ action: ManageActivityAction,
+    objectId: String,
+    operate: @escaping () async throws -> Void
+  ) -> Effect<Action> {
+    .run { send in
+      do {
+        try await operate()
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .success(objectId)
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      } catch {
+        let result = ManageActivityActionResultRequest(
+          action: action,
+          resultType: .failed(errorMessage: "can not perform operation: \(error.localizedDescription)")
+        )
+        await send(.internal(.flow(.finishAction(result))))
+      }
+    }
   }
 }

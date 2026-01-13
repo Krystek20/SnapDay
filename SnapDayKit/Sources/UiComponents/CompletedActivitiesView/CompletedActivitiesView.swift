@@ -49,7 +49,6 @@ public struct CompletedActivitiesView: View {
   private var backgroundColor: some View {
     if showBackground {
       Color.emphasisBackground
-        .clipShape(RoundedCorner(radius: 12.0, corners: [.bottomLeft, .bottomRight]))
     } else {
       Color.clear.widgetAccentable()
     }

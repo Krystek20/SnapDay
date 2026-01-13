@@ -49,6 +49,13 @@ public struct FriendsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .bind($store.focus, to: $focus)
         .toolbar {
+          ToolbarItem(placement: .topBarLeading) {
+            Button(String(localized: "Cancel", bundle: .module)) {
+              store.send(.view(.cancelButtonTapped))
+            }
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          }
           ToolbarItem(placement: .topBarTrailing) {
             HStack {
               Button(

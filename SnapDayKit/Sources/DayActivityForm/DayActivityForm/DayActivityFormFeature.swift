@@ -128,6 +128,7 @@ public struct DayActivityFormFeature {
       case task(TaskAction)
       case saveButtonTapped
       case deleteButtonTapped
+      case cancelButtonTapped
       case iconTapped
       case pickPhotoTapped
       case removeImageTapped
@@ -234,6 +235,10 @@ public struct DayActivityFormFeature {
     case .deleteButtonTapped:
       return .run { [form = state.form] send in
         await send(.delegate(.activityDeleted(form)))
+        await dismiss()
+      }
+    case .cancelButtonTapped:
+      return .run { _ in
         await dismiss()
       }
     case .tag(let tagAction):
