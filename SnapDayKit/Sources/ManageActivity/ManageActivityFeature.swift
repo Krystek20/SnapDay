@@ -51,8 +51,6 @@ public struct ManageActivityFeature: TodayProvidable {
       case createActivityTask(Activity, ActivityTask, ManageActivityAction)
       case updateActivityTask(Activity, ActivityTask, ManageActivityAction)
       case deleteActivityTask(Activity, ActivityTask, ManageActivityAction)
-      case createTag(Tag, ManageActivityAction)
-      case createLabel(ActivityLabel, Activity, ManageActivityAction)
     }
     var userDecision: UserDecision?
 
@@ -87,85 +85,73 @@ public struct ManageActivityFeature: TodayProvidable {
         UserDecisionCard(
           title: "Create new activity?",
           subtitle: "SnapDay AI prepared this action for you",
-          cardType: .listItem(ListItem(dayActivity: dayActivity))
+          item: ListItem(dayActivity: dayActivity)
         )
       case .updateDayActivity(let dayActivity, _):
         UserDecisionCard(
           title: "Update existing activity?",
           subtitle: "SnapDay AI prepared this action for you",
-          cardType: .listItem(ListItem(dayActivity: dayActivity))
+          item: ListItem(dayActivity: dayActivity)
         )
       case .deleteDayActivity(let dayActivity, _):
         UserDecisionCard(
           title: "Delete existing activity?",
           subtitle: "SnapDay AI prepared this action for you",
-          cardType: .listItem(ListItem(dayActivity: dayActivity))
+          item: ListItem(dayActivity: dayActivity)
         )
       case .createDayActivityTask(_, let dayActivityTask, _):
         UserDecisionCard(
           title: "Create new task?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(dayActivityTask: dayActivityTask))
+          item: ListItem(dayActivityTask: dayActivityTask)
         )
       case .updateDayActivityTask(let dayActivityTask, _):
         UserDecisionCard(
           title: "Update existing task?",
           subtitle: "SnapDay AI updated this task for you",
-          cardType: .listItem(ListItem(dayActivityTask: dayActivityTask))
+          item: ListItem(dayActivityTask: dayActivityTask)
         )
       case .deleteDayActivityTask(let dayActivityTask, _):
         UserDecisionCard(
           title: "Delete existing task?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(dayActivityTask: dayActivityTask))
+          item: ListItem(dayActivityTask: dayActivityTask)
         )
       case .createActivity(let activity, _):
         UserDecisionCard(
           title: "Create new template?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(activity: activity))
+          item: ListItem(activity: activity)
         )
       case .updateActivity(let activity, _):
         UserDecisionCard(
           title: "Update existing template?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(activity: activity))
+          item: ListItem(activity: activity)
         )
       case .deleteActivity(let activity, _):
         UserDecisionCard(
           title: "Delete existing template?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(activity: activity))
+          item: ListItem(activity: activity)
         )
       case .createActivityTask(_, let activityTask, _):
         UserDecisionCard(
           title: "Create new template task?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(activityTask: activityTask))
+          item: ListItem(activityTask: activityTask)
         )
       case .updateActivityTask(_, let activityTask, _):
         UserDecisionCard(
           title: "Update existing template task?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(activityTask: activityTask))
+          item: ListItem(activityTask: activityTask)
         )
       case .deleteActivityTask(_, let activityTask, _):
         UserDecisionCard(
           title: "Delete existing template task?",
           subtitle: "SnapDay AI prepared this task for you",
-          cardType: .listItem(ListItem(activityTask: activityTask))
-        )
-      case .createTag(let tag, _):
-        UserDecisionCard(
-          title: "Create new tag?",
-          subtitle: "SnapDay AI prepared this task for you",
-          cardType: .marker(Marker(name: tag.name, rgbColor: tag.rgbColor))
-        )
-      case .createLabel(let label, let activity, _):
-        UserDecisionCard(
-          title: "Create new label for \(activity.name)?",
-          subtitle: "SnapDay AI prepared this task for you",
-          cardType: .marker(Marker(name: label.name, rgbColor: label.rgbColor))
+          item: ListItem(activityTask: activityTask)
         )
       case nil:
         nil
@@ -204,7 +190,6 @@ public struct ManageActivityFeature: TodayProvidable {
       case connection(ConnectionAction)
       case flow(Flow)
       case handleReceivedMessage(ManageActivitiesEvent)
-      case handleManageActivitiesResponse(ManageActivitiesResponse)
       case setUserDecision(State.UserDecision)
     }
     public enum DelegateAction: Equatable {
@@ -263,8 +248,6 @@ public struct ManageActivityFeature: TodayProvidable {
         handleConnectionAction(state: &state, action: action)
       case .internal(.handleReceivedMessage(let message)):
         handleReceivedMessage(state: &state, message: message)
-      case .internal(.handleManageActivitiesResponse(let response)):
-        handleManageActivitiesResponse(state: &state, response: response)
       case .internal(.flow(let flow)):
         handleFlow(state: &state, flow: flow)
       case .internal(.setUserDecision(let userDecision)):
@@ -380,12 +363,8 @@ public struct ManageActivityFeature: TodayProvidable {
       return .none
     case .response(let response):
       print("ReceivedMessage: .response(\(response)")
-      return .send(.internal(.handleManageActivitiesResponse(response)))
+      return .send(.internal(.flow(.start(response.actions))))
     }
-  }
-
-  private func handleManageActivitiesResponse(state: inout State, response: ManageActivitiesResponse) -> Effect<Action> {
-    .send(.internal(.flow(.start(response.actions))))
   }
 
   private func setUserDecision(state: inout State, userDecision: State.UserDecision) -> Effect<Action> {
@@ -397,8 +376,19 @@ public struct ManageActivityFeature: TodayProvidable {
     defer { state.userDecision = nil }
     return switch state.userDecision {
     case .createDayActivity(let dayActivity, let action),
-        .updateDayActivity(let dayActivity, let action):
+         .updateDayActivity(let dayActivity, let action):
       accept(action, objectId: dayActivity.id.uuidString) {
+        if var activity = dayActivity.activity {
+          let notAdded = dayActivity.labels.filter { dayActivityLabel in
+            !activity.labels.contains { $0.name == dayActivity.name }
+          }
+          if !notAdded.isEmpty {
+            activity.labels.append(contentsOf: notAdded)
+            try await activityLabelRepository.saveLabels(notAdded)
+            try await activityRepository.saveActivity(activity)
+          }
+        }
+        try await tagRepository.saveTags(dayActivity.tags)
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
       }
     case .deleteDayActivity(let dayActivity, let action):
@@ -417,13 +407,11 @@ public struct ManageActivityFeature: TodayProvidable {
       accept(action, objectId: dayActivityTask.id.uuidString) {
         try await dayUpdater.removeDayActivityTask(dayActivityTask)
       }
-    case.createActivity(let activity, let action):
+    case.createActivity(let activity, let action),
+        .updateActivity(let activity, let action):
       accept(action, objectId: activity.id.uuidString) {
-        try await activityRepository.saveActivity(activity)
-        try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
-      }
-    case.updateActivity(let activity, let action):
-      accept(action, objectId: activity.id.uuidString) {
+        try await tagRepository.saveTags(activity.tags)
+        try await activityLabelRepository.saveLabels(activity.labels)
         try await activityRepository.saveActivity(activity)
         try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
       }
@@ -442,15 +430,6 @@ public struct ManageActivityFeature: TodayProvidable {
       accept(action, objectId: activityTask.id.uuidString) {
         try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
         try await activityRepository.deleteActivityTask(activityTask)
-        try await activityRepository.saveActivity(activity)
-      }
-    case .createTag(let tag, let action):
-      accept(action, objectId: tag.name) {
-        try await tagRepository.saveTag(tag)
-      }
-    case .createLabel(let label, let activity, let action):
-      accept(action, objectId: label.name) {
-        try await activityLabelRepository.saveLabel(label)
         try await activityRepository.saveActivity(activity)
       }
     case .none:
@@ -472,9 +451,7 @@ public struct ManageActivityFeature: TodayProvidable {
         .deleteActivity(_, let action),
         .createActivityTask(_, _, let action),
         .updateActivityTask(_, _, let action),
-        .deleteActivityTask(_, _, let action),
-        .createTag(_, let action),
-        .createLabel(_, _, let action):
+        .deleteActivityTask(_, _, let action):
         .run { send in
           let result = ManageActivityActionResultRequest(
             action: action,
@@ -526,8 +503,6 @@ public struct ManageActivityFeature: TodayProvidable {
       case .updateActivityTemplateTask: updateActivityTaskTemplate(action: action)
       case .deleteActivityTemplateTask: deleteActivityTaskTemplate(action: action)
       case .getTags: getTags(action: action)
-      case .createTag: createTag(action: action)
-      case .createLabel: createLabel(action: action)
       }
     case .finishAction(let result):
       state.responses.append(result)
@@ -576,7 +551,7 @@ public struct ManageActivityFeature: TodayProvidable {
         let dayActivity = try await DayActivity(
           uuid: uuid,
           action: action,
-          activity: nil,
+          activityRepository: activityRepository,
           tagRepository: tagRepository,
           activityLabelRepository: activityLabelRepository,
           iconRepository: iconRepository,
@@ -750,53 +725,6 @@ public struct ManageActivityFeature: TodayProvidable {
         resultType: .fetched(tags.map(MarkerRequest.init))
       )
       await send(.internal(.flow(.finishAction(result))))
-    }
-  }
-
-  private func createTag(action: ManageActivityAction) -> Effect<Action> {
-    .run { send in
-      let tag = try Tag(action: action)
-      if let existingTag = try await tagRepository.loadTag(tag.name) {
-        let result = ManageActivityActionResultRequest(
-          action: action,
-          resultType: .success(existingTag.id)
-        )
-        await send(.internal(.flow(.finishAction(result))))
-      } else {
-        await send(.internal(.setUserDecision(.createTag(tag, action))))
-      }
-    }
-  }
-
-  private func createLabel(action: ManageActivityAction) -> Effect<Action> {
-    .run { send in
-      guard let activityId = action.fields?["activityTemplateIdentifier"]?.uuidValue else {
-        let result = ManageActivityActionResultRequest(
-          action: action,
-          resultType: .failed(errorMessage: "activityTemplateIdentifier not provided")
-        )
-        return await send(.internal(.flow(.finishAction(result))))
-      }
-
-      guard var activity = try await activityRepository.activity(.id(activityId.uuidString)) else {
-        let result = ManageActivityActionResultRequest(
-          action: action,
-          resultType: .failed(errorMessage: "activity does not exist with id: \(activityId)")
-        )
-        return await send(.internal(.flow(.finishAction(result))))
-      }
-
-      let label = try ActivityLabel(action: action)
-      if let existingLabel = activity.labels.first(where: { $0.name == label.name }) {
-        let result = ManageActivityActionResultRequest(
-          action: action,
-          resultType: .success(existingLabel.id)
-        )
-        await send(.internal(.flow(.finishAction(result))))
-      } else {
-        activity.labels.append(label)
-        await send(.internal(.setUserDecision(.createLabel(label, activity, action))))
-      }
     }
   }
 

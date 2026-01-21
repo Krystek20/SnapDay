@@ -3,15 +3,10 @@ import ComposableArchitecture
 import Resources
 import UiComponents
 
-enum UserDecisionCardType: Equatable {
-  case listItem(ListItem)
-  case marker(Marker)
-}
-
 struct UserDecisionCard: Equatable {
   let title: String
   let subtitle: String?
-  let cardType: UserDecisionCardType
+  let item: ListItem
 }
 
 @MainActor
@@ -58,13 +53,8 @@ public struct ManageActivityView: View {
                 }
               }
 
-              switch userDecisionCard.cardType {
-              case .listItem(let listItem):
-                ListItemView(item: .constant(listItem))
-                  .formBackgroundModifier(padding: EdgeInsets(.zero))
-              case .marker(let marker):
-                MarkerView(marker: marker)
-              }
+              ListItemView(item: .constant(userDecisionCard.item))
+                .formBackgroundModifier(padding: EdgeInsets(.zero))
             }
           } else if store.showProcessingState {
             AIProcessingStateView()

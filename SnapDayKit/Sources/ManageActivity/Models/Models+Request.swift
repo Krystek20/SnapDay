@@ -107,7 +107,9 @@ extension Activity: Updateable {
 
     let existingTags = try await tagRepository.loadTags([])
     let requestedNames = Set(fields["tagsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? [])
-    let tags = existingTags.filter { requestedNames.contains($0.name) }
+    let tags = requestedNames.map { name in
+      existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
+    }
 
     var labels = [ActivityLabel]()
     let labelsNames = fields["labelsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? []
@@ -164,7 +166,9 @@ extension Activity: Updateable {
     if let tagsChanges = changes["tagsIdentifiers"] {
       let existingTags = try await tagRepository.loadTags([])
       let requestedNames = Set(tagsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
-      tags = existingTags.filter { requestedNames.contains($0.name) }
+      tags = requestedNames.map { name in
+        existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
+      }
     }
 
     if let frequencyObject = changes["frequency"]?.objectValue,
@@ -193,7 +197,9 @@ extension Activity: Updateable {
     if let labelsChanges = changes["labelsIdentifiers"] {
       let existingLabels = try await activityLabelRepository.loadLabels(id, [])
       let requestedNames = Set(labelsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
-      labels = existingLabels.filter { requestedNames.contains($0.name) }
+      labels = requestedNames.map { name in
+        existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
+      }
     }
 
     // TASKS
@@ -233,11 +239,13 @@ extension ActivityTask: Updateable {
   }
 }
 
+#warning("CO Z pozostałymi polami z templatki? co jeśli użytkownik poprosi czas o ignorowanie icon z templatki?")
+
 extension DayActivity: Updateable {
   init(
     uuid: UUIDGenerator,
     action: ManageActivityAction,
-    activity: Activity?,
+    activityRepository: ActivityRepository,
     tagRepository: TagRepository,
     activityLabelRepository: ActivityLabelRepository,
     iconRepository: IconRepository,
@@ -250,6 +258,11 @@ extension DayActivity: Updateable {
       throw AIModuleError.requiredFieldNotFound(fieldName: "date")
     }
 
+    var activity: Activity?
+    if let templateIdentifier = fields["templateIdentifier"]?.uuidValue {
+      activity = try await activityRepository.getActivity(identifier: templateIdentifier.uuidString)
+    }
+
     let name = fields["name"]?.stringValue ?? activity?.name
     guard let name else {
       throw AIModuleError.requiredFieldNotFound(fieldName: "name")
@@ -257,13 +270,17 @@ extension DayActivity: Updateable {
 
     let existingTags = try await tagRepository.loadTags([])
     let requestedNames = Set(fields["tagsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? [])
-    let tags = existingTags.filter { requestedNames.contains($0.name) }
+    let tags = requestedNames.map { name in
+      existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
+    }
 
     var labels = [ActivityLabel]()
     if let activityId = activity?.id {
       let existingLabels = try await activityLabelRepository.loadLabels(activityId, [])
       let requestedNames = Set(fields["labelsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? [])
-      labels = existingLabels.filter { requestedNames.contains($0.name) }
+      labels = requestedNames.map { name in
+        existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
+      }
     }
 
     var iconIdentifier: UUID?
@@ -320,13 +337,17 @@ extension DayActivity: Updateable {
     if let tagsChanges = changes["tagsIdentifiers"] {
       let existingTags = try await tagRepository.loadTags([])
       let requestedNames = Set(tagsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
-      tags = existingTags.filter { requestedNames.contains($0.name) }
+      tags = requestedNames.map { name in
+        existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
+      }
     }
 
     if let labelsChanges = changes["labelsIdentifiers"], let activityId = activity?.id {
       let existingLabels = try await activityLabelRepository.loadLabels(activityId, [])
       let requestedNames = Set(labelsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
-      labels = existingLabels.filter { requestedNames.contains($0.name) }
+      labels = requestedNames.map { name in
+        existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
+      }
     }
 
     if let iconParameters = changes["icon"]?.objectValue,
