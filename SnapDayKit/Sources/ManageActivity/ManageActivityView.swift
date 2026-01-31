@@ -3,12 +3,6 @@ import ComposableArchitecture
 import Resources
 import UiComponents
 
-struct UserDecisionCard: Equatable {
-  let title: String
-  let subtitle: String?
-  let item: ListItem
-}
-
 @MainActor
 public struct ManageActivityView: View {
 
@@ -39,22 +33,24 @@ public struct ManageActivityView: View {
           .focused($focus, equals: .request)
           .disabled(store.isTextFieldDisabled)
 
-          if let userDecisionCard = store.userDecisionCard {
-            VStack(alignment: .leading, spacing: 16) {
-              VStack(alignment: .leading, spacing: 4) {
-                Text(userDecisionCard.title)
-                  .font(.system(size: 16, weight: .semibold))
-                  .foregroundStyle(Color.primaryText)
-
-                if let subtitle = userDecisionCard.subtitle {
-                  Text(subtitle)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(Color.secondaryText)
+          if !store.listItemsSections.isEmpty {
+            ScrollView{
+              VStack(spacing: 15.0) {
+                ForEach(store.listItemsSections) { section in
+                  VStack(spacing: .zero) {
+                    ForEach(section.listItems) { decisionListItem in
+                      ListItemView(item: .constant(decisionListItem.listItem))
+                        .padding(.leading, CGFloat(decisionListItem.indent) * 15.0)
+                        .opacity(decisionListItem.disabled ? 0.3 : 1.0)
+                        .disabled(decisionListItem.disabled)
+                        .onListItemAction { actionId, item in
+                          store.send(.view(.listItemTapped(actionId, item)))
+                        }
+                    }
+                  }
+                  .formBackgroundModifier(padding: EdgeInsets(.zero))
                 }
               }
-
-              ListItemView(item: .constant(userDecisionCard.item))
-                .formBackgroundModifier(padding: EdgeInsets(.zero))
             }
           } else if store.showProcessingState {
             AIProcessingStateView()
@@ -65,7 +61,7 @@ public struct ManageActivityView: View {
               .foregroundStyle(Color.secondaryText)
               .multilineTextAlignment(.leading)
               .maxWidth()
-              .padding(.horizontal, 8.0)
+              .padding(.horizontal, 10.0)
               .fixedSize(horizontal: false, vertical: true)
           }
         }
@@ -182,17 +178,17 @@ public struct ManageActivityView: View {
           store.send(.view(.acceptButtonTapped))
         },
         label: {
-          Text("Accept", bundle: .module)
+          Text("Accept all", bundle: .module)
         }
       )
       .buttonStyle(PrimaryButtonStyle())
 
       Button(
         action: {
-          store.send(.view(.discardButtonPressed))
+          store.send(.view(.discardButtonTapped))
         },
         label: {
-          Text("Discard", bundle: .module)
+          Text("Discard all", bundle: .module)
         }
       )
       .buttonStyle(DestructiveButtonStyle())

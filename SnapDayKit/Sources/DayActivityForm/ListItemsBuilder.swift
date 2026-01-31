@@ -43,6 +43,7 @@ fileprivate extension ListItem {
     self.init(
       id: form.id.uuidString,
       parentId: nil,
+      headerItem: nil,
       title: form.name,
       subtitle: SubtitleFormatter.format(
         overview: form.overview,

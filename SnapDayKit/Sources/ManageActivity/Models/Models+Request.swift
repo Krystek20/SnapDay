@@ -245,6 +245,7 @@ extension DayActivity: Updateable {
   init(
     uuid: UUIDGenerator,
     action: ManageActivityAction,
+    newActivity: Activity?,
     activityRepository: ActivityRepository,
     tagRepository: TagRepository,
     activityLabelRepository: ActivityLabelRepository,
@@ -259,7 +260,9 @@ extension DayActivity: Updateable {
     }
 
     var activity: Activity?
-    if let templateIdentifier = fields["templateIdentifier"]?.uuidValue {
+    if let newActivity {
+      activity = newActivity
+    } else if let templateIdentifier = fields["templateIdentifier"]?.uuidValue {
       activity = try await activityRepository.getActivity(identifier: templateIdentifier.uuidString)
     }
 

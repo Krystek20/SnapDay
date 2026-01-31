@@ -8,6 +8,10 @@ public struct ListItemView: View {
     case medium
   }
 
+  // MARK: - Environment
+
+  @Environment(\.actionHandler) private var actionHandler
+
   // MARK: - Properties
 
   @Binding private var item: ListItem
@@ -93,32 +97,43 @@ public struct ListItemView: View {
 
   public var body: some View {
     VStack(spacing: .zero) {
-      HStack(spacing: 5.0) {
-        ImageView(
-          type: item.iconType,
-          size: imageSize.size,
-          cornerRadius: imageSize.cornerRadius
-        )
-        leftView
-        Spacer(minLength: 5.0)
-        rightView
-          .padding(.trailing, 5.0)
+      VStack(alignment: .leading, spacing: 5.0) {
+        headerView
+        HStack(spacing: 5.0) {
+          ImageView(
+            type: item.iconType,
+            size: imageSize.size,
+            cornerRadius: imageSize.cornerRadius
+          )
+          leftView
+          Spacer(minLength: 5.0)
+          rightView
+            .padding(.trailing, 5.0)
+        }
       }
       .padding(padding)
       .padding(.leading, item.isSubtask ? 10.0 : .zero)
 
-      switch item.divider {
-      case .full:
-        Divider()
-          .padding(.leading, .zero)
-      case .indented:
-        Divider()
-          .padding(.leading, 20.0)
-      case .none:
-        EmptyView()
-      }
+      divider
     }
     .bind($item.focus, to: $focus)
+  }
+
+  @ViewBuilder
+  private var divider: some View {
+    switch item.divider {
+    case .full:
+      Divider()
+        .padding(.leading, .zero)
+    case .aligned:
+      Divider()
+        .padding(.leading, padding.leading)
+    case .indented:
+      Divider()
+        .padding(.leading, 20.0)
+    case .none:
+      EmptyView()
+    }
   }
 
   @ViewBuilder
@@ -160,6 +175,26 @@ public struct ListItemView: View {
         })
         .font(.system(size: 12.0, weight: .bold))
         .foregroundStyle(Color.actionBlue)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var headerView: some View {
+    if let headerItem = item.headerItem {
+      HStack(alignment: .top, spacing: 5.0) {
+        Text(headerItem.title)
+          .font(.system(size: 12.0, weight: .semibold))
+          .foregroundStyle(Color.primaryText)
+        Spacer()
+        if let trailingAction = headerItem.trailingAction {
+          Button(trailingAction.title) {
+            actionHandler?(trailingAction.identifier, item)
+          }
+          .foregroundStyle(Color.actionBlue)
+          .font(.system(size: 12.0, weight: .semibold))
+          .padding(.trailing, 5.0)
+        }
       }
     }
   }
@@ -237,13 +272,15 @@ public struct ListItemView: View {
   }
 
   private func rowItemsView(_ items: [ListTrailingRowItem]) -> some View {
-    HStack(spacing: 10.0) {
+    HStack(spacing: .zero) {
       ForEach(items) { rowItem in
         Button {
+          actionHandler?(rowItem.id, item)
           action?(.rowAction(ListItemAction.RowParameters(actionId: rowItem.id, itemId: item.id)))
         } label: {
           Image(systemName: rowItem.imageName)
             .iconable(color: rowItem.color)
+            .padding(.all, 5.0)
         }
       }
     }
@@ -268,6 +305,8 @@ public struct ListItemView: View {
     if menuItem.subitems.isEmpty {
       Button(
         action: {
+          actionHandler?(menuItem.id, item)
+
           action?(
             .menuAction(
               menuParameters: ListItemAction.MenuParameters(actionId: menuItem.id, itemId: item.id, parentId: item.parentId),
@@ -285,6 +324,8 @@ public struct ListItemView: View {
         ForEach(menuItem.subitems) { subitem in
           Button(
             action: {
+              actionHandler?(menuItem.id, item)
+
               action?(
                 .menuAction(
                   menuParameters: ListItemAction.MenuParameters(actionId: menuItem.id, itemId: item.id, parentId: item.parentId),

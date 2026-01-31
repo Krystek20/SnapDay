@@ -114,7 +114,7 @@ public struct DashboardView: View {
         NavigationStack {
           ManageActivityView(store: store)
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
       }
       .task {
         store.send(.view(.appeared))

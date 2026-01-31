@@ -15,6 +15,7 @@ public struct ListItem: Equatable, Identifiable {
 
   public enum DividerType: Equatable {
     case full
+    case aligned
     case indented
     case none
   }
@@ -70,6 +71,7 @@ public struct ListItem: Equatable, Identifiable {
 
   public let id: String
   let parentId: String?
+  let headerItem: ListViewHeaderItem?
   public internal(set) var title: String
   let subtitle: String
   let fieldType: FieldType
@@ -90,6 +92,7 @@ public struct ListItem: Equatable, Identifiable {
   public init(
     id: String,
     parentId: String?,
+    headerItem: ListViewHeaderItem?,
     title: String,
     subtitle: String,
     fieldType: FieldType,
@@ -106,6 +109,7 @@ public struct ListItem: Equatable, Identifiable {
   ) {
     self.id = id
     self.parentId = parentId
+    self.headerItem = headerItem
     self.title = title
     self.subtitle = subtitle
     self.fieldType = fieldType
@@ -133,6 +137,7 @@ extension ListItem {
     ListItem(
       id: id,
       parentId: parentId,
+      headerItem: nil,
       title: "",
       subtitle: "",
       fieldType: .textEdit,

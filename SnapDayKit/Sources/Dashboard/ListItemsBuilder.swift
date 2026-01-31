@@ -176,17 +176,12 @@ extension DayActivityTaskAction {
 
 extension DayActivityInvitationAction {
   var trailingMenuItem: ListTrailingRowItem {
-    let (imageName, color) = switch self {
+    switch self {
     case .accept:
-      ("checkmark.circle.fill", Color.greenSuccess)
+      .accept(actionId: rawValue)
     case .discard:
-      ("xmark.circle.fill", Color.alertText)
+      .discard(actionId: rawValue)
     }
-    return ListTrailingRowItem(
-      actionId: rawValue,
-      imageName: imageName,
-      color: color
-    )
   }
 }
 
