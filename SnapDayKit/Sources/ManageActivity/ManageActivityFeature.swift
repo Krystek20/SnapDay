@@ -172,7 +172,7 @@ public struct ManageActivityFeature: TodayProvidable {
     state.focus = nil
     state.isThinking = true
 //    return .send(.internal(.connection(.connect)))
-    let data = test2.data(using: .utf8)!
+    let data = test.data(using: .utf8)!
     let response = try! JSONDecoder().decode(ManageActivitiesResponse.self, from: data)
     return handleActions(state: &state, actions: response.actions)
   }
@@ -384,7 +384,7 @@ let test = """
       "fields": {
         "identifier": "7F6E5D4C-3B2A-1C0D-9E8F-0123456789AB",
         "templateIdentifier": "D4F8A1B2-C3D4-4E5F-8A9B-0C1D2E3F4A5B",
-        "date": "2026-01-24T00:00:00Z"
+        "date": "2026-01-31T00:00:00Z"
       }
     },
     {
@@ -408,7 +408,7 @@ let test = """
       "action": "createDayActivity",
       "fields": {
         "identifier": "7F6E5D4C-3B2A-1C0D-9E8F-0123456789AA",
-        "date": "2026-01-25T00:00:00Z",
+        "date": "2026-02-01T00:00:00Z",
         "name": "Biegi"
       }
     },
@@ -418,7 +418,7 @@ let test = """
         "fields": {
           "identifier": "D2F6C1A3-7B2E-4D6B-9F8A-1A2B3C4D5E6F",
           "templateIdentifier": "458A0499-9962-46C3-8A04-8ABE8EF20DA4",
-          "date": "2026-01-25T00:00:00Z"
+          "date": "2026-02-01T00:00:00Z"
         }
       },
       {
@@ -454,7 +454,7 @@ let test = """
         "fields": {
           "identifier": "E3A7B2C4-1D3F-4A6B-8C9D-0F1E2D3C4B5A",
           "templateIdentifier": "4934C155-CE7B-4E78-95F1-96C33C056B83",
-          "date": "2026-01-25T00:00:00Z"
+          "date": "2026-02-01T00:00:00Z"
         }
       },
       {
@@ -481,7 +481,7 @@ let test = """
         "fields": {
           "identifier": "F1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D",
           "templateIdentifier": "A0145C46-A537-4C93-B1DD-3DE14F552891",
-          "date": "2026-01-25T00:00:00Z"
+          "date": "2026-02-01T00:00:00Z"
         }
       },
       {
@@ -510,7 +510,7 @@ let test = """
       "fields": {
         "identifier": "0A1B2C3D-4E5F-6789-0ABC-DEF123456789",
         "name": "Kupno yerby",
-        "date": "2026-01-24T00:00:00Z",
+        "date": "2026-01-31T00:00:00Z",
         "templateIdentifier": "F1A2B3C4-D5E6-47F8-9A0B-C1D2E3F4A5B6"
       }
     },
@@ -536,7 +536,7 @@ let test = """
       "fields": {
         "identifier": "11111111-1111-1111-1111-111111111111",
         "name": "Praca",
-        "date": "2026-01-24T00:00:00Z",
+        "date": "2026-01-31T00:00:00Z",
         "icon": {
           "value": "💼"
         }
@@ -548,7 +548,7 @@ let test = """
       "fields": {
         "identifier": "22222222-2222-2222-2222-222222222222",
         "name": "Sport",
-        "date": "2026-01-24T00:00:00Z",
+        "date": "2026-01-31T00:00:00Z",
         "templateIdentifier": "4934C155-CE7B-4E78-95F1-96C33C056B83",
         "icon": {
           "value": "🏃"
@@ -607,7 +607,7 @@ let test2 = """
             "identifier": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
             "name": "Sport",
             "overview": "Wieczorna sesja sportowa: rozgrzewka, trening główny i rozciąganie.",
-            "date": "2026-01-25T00:00:00Z",
+            "date": "2026-02-01T00:00:00Z",
             "icon": {
               "value": "🏃"
             }
@@ -620,7 +620,7 @@ let test2 = """
             "identifier": "9f1b5c2e-3d4a-4b6f-9a2b-1c2d3e4f5a6b",
             "name": "Odpoczynek",
             "overview": "Wieczorny relaks i wyciszenie przed snem.",
-            "date": "2026-01-25T00:00:00Z",
+            "date": "2026-02-01T00:00:00Z",
             "icon": {
               "value": "😴"
             }

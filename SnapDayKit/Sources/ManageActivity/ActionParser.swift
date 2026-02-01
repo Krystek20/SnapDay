@@ -112,10 +112,12 @@ struct ActionParser {
   }
 
   mutating func accept(_ decision: Decision, actionsResult: ActionsResult, acceptAll: Bool, today: Date) async -> ActionsResult {
-    guard decision.parameters.result == nil else { return actionsResult }
-    var updatedActionsResult = await accept(decision, actionsResult: actionsResult, today: today)
+    var updatedActionsResult = actionsResult
+    if decision.parameters.result == nil {
+      updatedActionsResult = await accept(decision, actionsResult: actionsResult, today: today)
+    }
     if acceptAll, case .chain(_, let nextDecisions) = decision {
-      for decision in nextDecisions.all where decision.parameters.result != nil {
+      for decision in nextDecisions.all where decision.parameters.result == nil {
         updatedActionsResult = await accept(decision, actionsResult: updatedActionsResult, today: today)
       }
     }
@@ -209,13 +211,21 @@ struct ActionParser {
 
   mutating func discard(_ decision: Decision, actionsResult: ActionsResult) async -> ActionsResult {
     guard decision.parameters.result == nil else { return actionsResult }
-    var updatedActionsResult = await discard(decision: decision, actionsResult: actionsResult)
+    var allDecisions = actionsResult.decisions.all
+    var results = actionsResult.decisionResults
+
+    results.append(ManageActivityActionResultRequest(action: decision.parameters.action, decisionResult: .userCancelled))
+    allDecisions.removeAll(where: { $0.parameters.action == decision.parameters.action })
+
     if case .chain(_, let nextDecisions) = decision {
-      for decision in nextDecisions.all where decision.parameters.result != nil {
-        updatedActionsResult = await discard(decision: decision, actionsResult: updatedActionsResult)
+      for decision in nextDecisions.all where decision.parameters.result == nil {
+        results.append(ManageActivityActionResultRequest(action: decision.parameters.action, decisionResult: .userCancelled))
+        allDecisions.removeAll(where: { $0.parameters.action == decision.parameters.action })
       }
     }
-    return updatedActionsResult
+
+    setDecisionResults(results)
+    return await parse(actions: allDecisions.map(\.parameters.action))
   }
 
   private mutating func discard(decision: Decision, actionsResult: ActionsResult) async -> ActionsResult {
@@ -254,19 +264,27 @@ struct ActionParser {
     nextActions: inout [ManageActivityAction]
   ) async -> (decision: Decision?, results: [OperateResult]) {
     do {
-      let dayActivity = try await DayActivity(
-        uuid: uuid,
-        action: action,
-        newActivity: newActivity,
-        activityRepository: activityRepository,
-        tagRepository: tagRepository,
-        activityLabelRepository: activityLabelRepository,
-        iconRepository: iconRepository,
-        calendar: calendar
-      )
+      let dayActivity: DayActivity
+      if let decisionResult = decisionResult(for: action.actionId),
+         decisionResult == .accepted,
+         let identifier = action.fields?["identifier"]?.stringValue,
+         let createdDayActivity = try await dayUpdater.dayActivity(identifier: identifier) {
+        dayActivity = createdDayActivity
+      } else {
+        dayActivity = try await DayActivity(
+          uuid: uuid,
+          action: action,
+          newActivity: newActivity,
+          activityRepository: activityRepository,
+          tagRepository: tagRepository,
+          activityLabelRepository: activityLabelRepository,
+          iconRepository: iconRepository,
+          calendar: calendar
+        )
+      }
 
       let decisionResult = decisionResult(for: action.actionId)
-      let (decisions, operateResults) = handleConnectedActions(for: dayActivity, nextActions: &nextActions)
+      let (decisions, operateResults) = await handleConnectedActions(for: dayActivity, nextActions: &nextActions)
       let decision: Decision = decisions.isEmpty
       ? .leaf(DecisionParameters(action, type: .createDayActivity(dayActivity), result: decisionResult))
       : .chain(DecisionParameters(action, type: .createDayActivity(dayActivity), result: decisionResult), nextDecisions: decisions)
@@ -280,7 +298,7 @@ struct ActionParser {
   private func handleConnectedActions(
     for dayActivity: DayActivity,
     nextActions: inout [ManageActivityAction]
-  ) -> ([Decision], [OperateResult]) {
+  ) async -> ([Decision], [OperateResult]) {
     var decisions: [Decision] = []
     var operateResults: [OperateResult] = []
     for nextAction in nextActions {
@@ -291,12 +309,18 @@ struct ActionParser {
         nextActions.remove(at: index)
       }
 
-      let decisionResult = decisionResult(for: nextAction.actionId)
-      guard decisionResult != .error && decisionResult != .rejected else { continue }
-
       do {
-        let dayActivityTask = try DayActivityTask(uuid: uuid, action: nextAction)
-        decisions.append(.leaf(DecisionParameters(nextAction, type: .createDayActivityTask(dayActivity, dayActivityTask), result: decisionResult)))
+        let dayActivityTask: DayActivityTask
+        if let decisionResult = decisionResult(for: nextAction.actionId),
+           decisionResult == .accepted,
+           let identifier = nextAction.fields?["identifier"]?.stringValue,
+           let createdDayActivityTask = try await dayUpdater.dayActivityTask(identifier: identifier) {
+          dayActivityTask = createdDayActivityTask
+        } else {
+          dayActivityTask = try DayActivityTask(uuid: uuid, action: nextAction)
+        }
+
+        decisions.append(.leaf(DecisionParameters(nextAction, type: .createDayActivityTask(dayActivity, dayActivityTask), result: decisionResult(for: nextAction.actionId))))
       } catch {
         operateResults.append(
           OperateResult(nextAction, fetchResult: .failed(errorMessage: error.localizedDescription))
@@ -376,18 +400,23 @@ struct ActionParser {
     nextActions: inout [ManageActivityAction]
   ) async -> (decision: Decision?, results: [OperateResult]) {
     do {
-      var activity = try await Activity(
-        uuid: uuid,
-        action: action,
-        tagRepository: tagRepository,
-        activityLabelRepository: activityLabelRepository,
-        iconRepository: iconRepository
-      )
+      var activity: Activity
+      if let decisionResult = decisionResult(for: action.actionId),
+         decisionResult == .accepted,
+         let identifier = action.fields?["identifier"]?.stringValue,
+         let createdActivity = try await activityRepository.getActivity(identifier: identifier) {
+        activity = createdActivity
+      } else {
+        activity = try await Activity(
+          uuid: uuid,
+          action: action,
+          tagRepository: tagRepository,
+          activityLabelRepository: activityLabelRepository,
+          iconRepository: iconRepository
+        )
+      }
 
-      let (decisions, operateResults) = await handleConnectedActions(
-        for: &activity,
-        nextActions: &nextActions
-      )
+      let (decisions, operateResults) = await handleConnectedActions(for: &activity, nextActions: &nextActions)
       let decision: Decision = decisions.isEmpty
       ? .leaf(DecisionParameters(action, type: .createActivity(activity), result: decisionResult(for: action.actionId)))
       : .chain(DecisionParameters(action, type: .createActivity(activity), result: decisionResult(for: action.actionId)), nextDecisions: decisions)
@@ -413,13 +442,20 @@ struct ActionParser {
         }
 
         do {
-          let activityTask = try ActivityTask(uuid: uuid, action: nextAction)
+          var activityTask: ActivityTask
+          if let decisionResult = decisionResult(for: nextAction.actionId),
+             decisionResult == .accepted,
+             let identifier = nextAction.fields?["identifier"]?.stringValue,
+             let createdActivityTask = try await activityRepository.activityTask(identifier) {
+            activityTask = createdActivityTask
+          } else {
+            activityTask = try ActivityTask(uuid: uuid, action: nextAction)
+          }
           activity.tasks.append(activityTask)
+
           decisions.append(.leaf(DecisionParameters(nextAction, type: .createActivityTask(activity, activityTask), result: decisionResult(for: nextAction.actionId))))
         } catch {
-          operateResults.append(
-            OperateResult(nextAction, fetchResult: .failed(errorMessage: error.localizedDescription))
-          )
+          operateResults.append(OperateResult(nextAction, fetchResult: .failed(errorMessage: error.localizedDescription)))
         }
       } else if case .createDayActivity = nextAction.action {
         let activityId = nextAction.fields?["templateIdentifier"]?.uuidValue
