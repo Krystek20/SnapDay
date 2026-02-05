@@ -108,6 +108,8 @@ public struct ManageActivityView: View {
           confirmButton(isDisabled: isDisabled)
         case .acceptDiscardButtons:
           acceptDiscardButtons
+        case .done:
+          doneButton
         }
       }
       .padding(.horizontal, 15)
@@ -193,6 +195,18 @@ public struct ManageActivityView: View {
       )
       .buttonStyle(DestructiveButtonStyle())
     }
+  }
+
+  private var doneButton: some View {
+    Button(
+      action: {
+        store.send(.view(.doneButtonTapped))
+      },
+      label: {
+        Text("Done", bundle: .module)
+      }
+    )
+    .buttonStyle(PrimaryButtonStyle())
   }
 }
 

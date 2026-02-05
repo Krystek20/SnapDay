@@ -1,15 +1,17 @@
 import Foundation
 import Models
+import Dependencies
 
 extension DayActivity {
   public static func create(
     from activity: Activity,
-    uuid: () -> UUID,
+    identifier: UUID? = nil,
+    uuid: UUIDGenerator,
     calendar: () -> Calendar,
     date: Date,
     createdByUser: Bool
   ) -> DayActivity {
-    let dayActivityId = uuid()
+    let dayActivityId = identifier ?? uuid()
     return DayActivity(
       id: dayActivityId,
       date: date,
@@ -46,7 +48,7 @@ extension DayActivity {
 
   public static func copy(
     from dayActivity: DayActivity,
-    uuid: () -> UUID,
+    uuid: UUIDGenerator,
     date: Date,
     calendar: () -> Calendar
   ) -> DayActivity {

@@ -28,6 +28,7 @@ public struct ManageActivityFeature: TodayProvidable {
       case confirmButton(isDisabled: Bool)
       case cancelButton
       case acceptDiscardButtons
+      case done
     }
 
     public enum Field: Hashable {
@@ -35,10 +36,12 @@ public struct ManageActivityFeature: TodayProvidable {
     }
     var focus: Field? = .request
 
-    var transcribedText = "a"
+    var transcribedText = ""
 
     var bottomSection: BottomSection {
-      if actionsResult?.decisions.isEmpty == false {
+      if (actionsResult?.decisions.all.allSatisfy { $0.parameters.result != nil }) ?? false {
+        .done
+      } else if actionsResult?.decisions.isEmpty == false {
         .acceptDiscardButtons
       } else if isThinking {
         .cancelButton
@@ -81,6 +84,7 @@ public struct ManageActivityFeature: TodayProvidable {
       case confirmButtonTapped
       case acceptButtonTapped
       case discardButtonTapped
+      case doneButtonTapped
       case listItemTapped(String, ListItem)
     }
     public enum InternalAction: Equatable {
@@ -123,7 +127,8 @@ public struct ManageActivityFeature: TodayProvidable {
           .send(.internal(.startSpeaking))
       case .view(.confirmButtonTapped):
         connectAndProceed(state: &state)
-      case .view(.cancelButtonTapped):
+      case .view(.cancelButtonTapped),
+          .view(.doneButtonTapped):
           .run { _ in
             await dismiss()
           }
@@ -171,10 +176,10 @@ public struct ManageActivityFeature: TodayProvidable {
   private func connectAndProceed(state: inout State) -> Effect<Action> {
     state.focus = nil
     state.isThinking = true
-//    return .send(.internal(.connection(.connect)))
-    let data = test.data(using: .utf8)!
-    let response = try! JSONDecoder().decode(ManageActivitiesResponse.self, from: data)
-    return handleActions(state: &state, actions: response.actions)
+    return .send(.internal(.connection(.connect)))
+//    let data = test.data(using: .utf8)!
+//    let response = try! JSONDecoder().decode(ManageActivitiesResponse.self, from: data)
+//    return handleActions(state: &state, actions: response.actions)
   }
 
   private func handleConnectionAction(state: inout State, action: Action.ConnectionAction) -> Effect<Action> {

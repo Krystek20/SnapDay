@@ -106,7 +106,7 @@ public struct ActivityListFeature: TodayProvidable {
       case .internal(.addToDay(let activity)):
         let dayActivity = DayActivity.create(
           from: activity,
-          uuid: { uuid() },
+          uuid: uuid,
           calendar: { calendar },
           date: state.day.date,
           createdByUser: true

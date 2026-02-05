@@ -115,6 +115,7 @@ public struct DashboardView: View {
           ManageActivityView(store: store)
         }
         .presentationDetents([.large])
+        .interactiveDismissDisabled()
       }
       .task {
         store.send(.view(.appeared))

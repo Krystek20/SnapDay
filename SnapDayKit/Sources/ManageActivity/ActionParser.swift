@@ -186,8 +186,17 @@ struct ActionParser {
         try await dayUpdater.updateDaysByRemovedActivity(activity, from: today)
         try await activityRepository.deleteActivity(activity)
       }
-    case.createActivityTask(let activity, let activityTask),
-        .updateActivityTask(let activity, let activityTask):
+    case.createActivityTask(let activity, let activityTask):
+      await accept(decision.parameters.action, objectId: activityTask.id.uuidString) {
+        if var activity = try await activityRepository.getActivity(identifier: activity.id.uuidString) {
+          activity.tasks.append(activityTask)
+          try await activityRepository.saveActivity(activity)
+          try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
+        } else {
+          throw NSError(domain: "Activity not found: \(activity.id)", code: 7777)
+        }
+      }
+    case .updateActivityTask(let activity, let activityTask):
       await accept(decision.parameters.action, objectId: activityTask.id.uuidString) {
         try await activityRepository.saveActivity(activity)
         try await dayUpdater.updateDaysByUpdatedActivity(activity, from: today)
@@ -271,16 +280,34 @@ struct ActionParser {
          let createdDayActivity = try await dayUpdater.dayActivity(identifier: identifier) {
         dayActivity = createdDayActivity
       } else {
-        dayActivity = try await DayActivity(
-          uuid: uuid,
-          action: action,
-          newActivity: newActivity,
-          activityRepository: activityRepository,
-          tagRepository: tagRepository,
-          activityLabelRepository: activityLabelRepository,
-          iconRepository: iconRepository,
-          calendar: calendar
-        )
+        var activity: Activity?
+        if let newActivity {
+          activity = newActivity
+        } else if let identifier = action.fields?["templateIdentifier"]?.stringValue {
+          activity = try await activityRepository.getActivity(identifier: identifier)
+        }
+
+        if let activity {
+          dayActivity = try await DayActivity.create(
+            uuid: uuid,
+            activity: activity,
+            action: action,
+            tagRepository: tagRepository,
+            activityLabelRepository: activityLabelRepository,
+            iconRepository: iconRepository,
+            calendar: calendar
+          )
+        } else {
+          dayActivity = try await DayActivity(
+            uuid: uuid,
+            action: action,
+            activityRepository: activityRepository,
+            tagRepository: tagRepository,
+            activityLabelRepository: activityLabelRepository,
+            iconRepository: iconRepository,
+            calendar: calendar
+          )
+        }
       }
 
       let decisionResult = decisionResult(for: action.actionId)
@@ -451,7 +478,6 @@ struct ActionParser {
           } else {
             activityTask = try ActivityTask(uuid: uuid, action: nextAction)
           }
-          activity.tasks.append(activityTask)
 
           decisions.append(.leaf(DecisionParameters(nextAction, type: .createActivityTask(activity, activityTask), result: decisionResult(for: nextAction.actionId))))
         } catch {

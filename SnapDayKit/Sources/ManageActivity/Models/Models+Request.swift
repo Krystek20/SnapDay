@@ -239,13 +239,10 @@ extension ActivityTask: Updateable {
   }
 }
 
-#warning("CO Z pozostałymi polami z templatki? co jeśli użytkownik poprosi czas o ignorowanie icon z templatki?")
-
 extension DayActivity: Updateable {
   init(
     uuid: UUIDGenerator,
     action: ManageActivityAction,
-    newActivity: Activity?,
     activityRepository: ActivityRepository,
     tagRepository: TagRepository,
     activityLabelRepository: ActivityLabelRepository,
@@ -259,14 +256,7 @@ extension DayActivity: Updateable {
       throw AIModuleError.requiredFieldNotFound(fieldName: "date")
     }
 
-    var activity: Activity?
-    if let newActivity {
-      activity = newActivity
-    } else if let templateIdentifier = fields["templateIdentifier"]?.uuidValue {
-      activity = try await activityRepository.getActivity(identifier: templateIdentifier.uuidString)
-    }
-
-    let name = fields["name"]?.stringValue ?? activity?.name
+    let name = fields["name"]?.stringValue
     guard let name else {
       throw AIModuleError.requiredFieldNotFound(fieldName: "name")
     }
@@ -275,15 +265,6 @@ extension DayActivity: Updateable {
     let requestedNames = Set(fields["tagsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? [])
     let tags = requestedNames.map { name in
       existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
-    }
-
-    var labels = [ActivityLabel]()
-    if let activityId = activity?.id {
-      let existingLabels = try await activityLabelRepository.loadLabels(activityId, [])
-      let requestedNames = Set(fields["labelsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? [])
-      labels = requestedNames.map { name in
-        existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
-      }
     }
 
     var iconIdentifier: UUID?
@@ -303,7 +284,7 @@ extension DayActivity: Updateable {
     self.init(
       id: fields["identifier"]?.uuidValue ?? uuid(),
       date: calendar.dayFormat(iso8601Date),
-      activity: activity,
+      activity: nil,
       name: name,
       iconId: iconIdentifier,
       dueDate: ISO8601DateFormatter.date(from: fields["dueDate"]?.stringValue),
@@ -312,13 +293,47 @@ extension DayActivity: Updateable {
       overview: fields["overview"]?.stringValue,
       isGeneratedAutomatically: false,
       tags: tags,
-      labels: labels,
+      labels: [],
       dayActivityTasks: [],
       reminderDate: ISO8601DateFormatter.date(from: fields["reminderDate"]?.stringValue, timeZone: .autoupdatingCurrent),
       important: fields["important"]?.boolValue ?? false,
       position: fields["position"]?.intValue ?? -1,
       share: nil
     )
+  }
+
+  static func create(
+    uuid: UUIDGenerator,
+    activity: Activity,
+    action: ManageActivityAction,
+    tagRepository: TagRepository,
+    activityLabelRepository: ActivityLabelRepository,
+    iconRepository: IconRepository,
+    calendar: Calendar
+  ) async throws -> DayActivity {
+    guard let fields = action.fields else {
+      throw AIModuleError.fieldsNotFound
+    }
+    guard let iso8601Date = ISO8601DateFormatter.date(from: action.fields?["date"]?.stringValue) else {
+      throw AIModuleError.requiredFieldNotFound(fieldName: "date")
+    }
+
+    var dayActivity = DayActivity.create(
+      from: activity,
+      identifier: action.fields?["identifier"]?.uuidValue,
+      uuid: uuid,
+      calendar: { calendar },
+      date: iso8601Date,
+      createdByUser: false
+    )
+    try await dayActivity.update(
+      with: fields,
+      uuid: uuid,
+      tagRepository: tagRepository,
+      activityLabelRepository: activityLabelRepository,
+      iconRepository: iconRepository
+    )
+    return dayActivity
   }
 
   mutating func update(
@@ -328,7 +343,22 @@ extension DayActivity: Updateable {
     activityLabelRepository: ActivityLabelRepository,
     iconRepository: IconRepository
   ) async throws {
-    let changes = try extractChanges(from: action)
+    try await update(
+      with: try extractChanges(from: action),
+      uuid: uuid,
+      tagRepository: tagRepository,
+      activityLabelRepository: activityLabelRepository,
+      iconRepository: iconRepository
+    )
+  }
+
+  private mutating func update(
+    with changes: [String: JSONValue],
+    uuid: UUIDGenerator,
+    tagRepository: TagRepository,
+    activityLabelRepository: ActivityLabelRepository,
+    iconRepository: IconRepository
+  ) async throws {
     updateField(changes["date"], field: &date, decode: FieldDecoder.date)
     updateField(changes["name"], field: &name, decode: { $0.stringValue })
     updateField(changes["iconId"], field: &iconId, decode: { $0.uuidValue })
