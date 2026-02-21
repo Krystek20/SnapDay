@@ -2,21 +2,29 @@ import Foundation
 import AIModule
 import Models
 
+extension ToolResponse {
+  init(id: String, object: Encodable, encoder: JSONEncoder = JSONEncoder()) throws {
+    let data = try encoder.encode(object)
+    let value = String(data: data, encoding: .utf8) ?? "Can't encode object"
+    self.init(id: id, value: value)
+  }
+}
+
 enum OperateResult {
-  case result(ManageActivityActionResultRequest)
+  case result(UserResponse)
   case decisition(Decision)
 
-  init(_ action: ManageActivityAction, fetchResult: ManageActivityActionResultRequest.FetchResult) {
+  init(_ action: ManageActivityAction, decision: UserDecision) {
     self = .result(
-      ManageActivityActionResultRequest(action: action, fetchResult: fetchResult)
+      UserResponse(action: action, decision: decision)
     )
   }
 
-  init(leafAction: ManageActivityAction, type: DecisionType, result: DecisionParameters.DecisionResult?) {
+  init(leafAction: ManageActivityAction, type: DecisionType, result: UserDecision?) {
     self = .decisition(
       .leaf(
         DecisionParameters(
-          leafAction,
+          action: leafAction,
           type: type,
           result: result
         )
@@ -25,37 +33,13 @@ enum OperateResult {
   }
 }
 
-public struct DecisionParameters: Equatable {
-
-  enum DecisionResult {
-    case accepted
-    case rejected
-    case error
-
-    init(_ decisionResult: ManageActivityActionResultRequest.DecisionResult) {
-      switch decisionResult {
-      case .success:
-        self = .accepted
-      case .userCancelled:
-        self = .rejected
-      case .failed:
-        self = .error
-      }
-    }
-  }
-
+struct DecisionParameters: Equatable {
   let action: ManageActivityAction
-  let decisionType: DecisionType
-  let result: DecisionResult?
-
-  init(_ action: ManageActivityAction, type: DecisionType, result: DecisionResult?) {
-    self.action = action
-    self.decisionType = type
-    self.result = result
-  }
+  let type: DecisionType
+  let result: UserDecision?
 }
 
-public indirect enum Decision: Equatable {
+indirect enum Decision: Equatable {
   case leaf(DecisionParameters)
   case chain(DecisionParameters, nextDecisions: [Decision])
 
@@ -81,7 +65,7 @@ extension [Decision] {
   }
 }
 
-public enum DecisionType: Equatable {
+enum DecisionType: Equatable {
   case createDayActivity(DayActivity)
   case updateDayActivity(DayActivity)
   case deleteDayActivity(DayActivity)

@@ -35,7 +35,7 @@ extension [DecisionListItem] {
           listItem: ListItem(
             configuration: ListItemConfiguration(
               identifier: parameters.action.actionId,
-              decisionType: parameters.decisionType,
+              decisionType: parameters.type,
               showDivider: !isLast,
               showAcceptAll: false,
               showTrailingView: parameters.result == nil
@@ -51,7 +51,7 @@ extension [DecisionListItem] {
           listItem: ListItem(
             configuration: ListItemConfiguration(
               identifier: parameters.action.actionId,
-              decisionType: parameters.decisionType,
+              decisionType: parameters.type,
               showDivider: !next.isEmpty,
               showAcceptAll: next.all.contains(where: { $0.parameters.result == nil }),
               showTrailingView: parameters.result == nil
@@ -66,7 +66,7 @@ extension [DecisionListItem] {
           indent: indent + 1,
           isLast: next.last == decision,
           isFirst: false,
-          parentAccepted: parameters.result == .accepted
+          parentAccepted: parameters.result?.isAccepted == true
         )
       }
       .joined()

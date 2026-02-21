@@ -178,8 +178,15 @@ public struct ManageActivityFeature: TodayProvidable {
     state.isThinking = true
     return .send(.internal(.connection(.connect)))
 //    let data = test.data(using: .utf8)!
-//    let response = try! JSONDecoder().decode(ManageActivitiesResponse.self, from: data)
-//    return handleActions(state: &state, actions: response.actions)
+//    let decoder = JSONDecoder()
+//    decoder.dateDecodingStrategy = .iso8601
+//    do {
+//      let request = try decoder .decode(ManageActivitiesRequest.self, from: data)
+//      return handleActions(state: &state, actions: request.actions)
+//    } catch {
+//      print("error: \(error)")
+//      return .none
+//    }
   }
 
   private func handleConnectionAction(state: inout State, action: Action.ConnectionAction) -> Effect<Action> {
@@ -236,7 +243,7 @@ public struct ManageActivityFeature: TodayProvidable {
       guard let connection = state.connection else { return .none }
       let encoder = JSONEncoder()
       encoder.dateEncodingStrategy = .iso8601
-      let request = ManageActivitiesRequest(message: message, userContext: UserContext(now: .now))
+      let request = ManageActivitiesResponse(message: message, userContext: UserContext(now: .now))
       do {
         let data = try encoder.encode(request)
         guard let string = String(data: data, encoding: .utf8) else {
@@ -260,9 +267,12 @@ public struct ManageActivityFeature: TodayProvidable {
     case .error(let errorMessage):
       print("ReceivedMessage: .error(\(errorMessage)")
       return .none
-    case .response(let response):
-      print("ReceivedMessage: .response(\(response)")
-      return handleActions(state: &state, actions: response.actions)
+    case .actions(let request):
+      print("ReceivedMessage: .request(\(request)")
+      return handleActions(state: &state, actions: request.actions)
+    case .tools(let tools):
+      print("ReceivedMessage: .tools(\(tools)")
+      return handleTools(state: &state, tools: tools)
     }
   }
 
@@ -285,6 +295,14 @@ public struct ManageActivityFeature: TodayProvidable {
     } else {
       state.actionsResult = actionsResult
       return .none
+    }
+  }
+
+  private func handleTools(state: inout State, tools: [ToolRequest]) -> Effect<Action> {
+    .run { send in
+      let toolParser = ToolParser()
+      let toolsResponse = await toolParser.actions(on: tools)
+      await send(.internal(.connection(.send(.toolResponse(toolsResponse)))))
     }
   }
 
@@ -366,384 +384,83 @@ public struct ManageActivityFeature: TodayProvidable {
 
 let test = """
 {
-  "actions": [
-    {
-      "actionId": "0",
-      "action": "createActivityTemplate",
-      "fields": {
-        "identifier": "D4F8A1B2-C3D4-4E5F-8A9B-0C1D2E3F4A5B",
-        "name": "Kupno yerby"
-      }
-    },
-    {
-      "actionId": "1",
-      "action": "createActivityTemplateTask",
-      "fields": {
-        "activityTemplateIdentifier": "D4F8A1B2-C3D4-4E5F-8A9B-0C1D2E3F4A5B",
-        "name": "wypłacić 30 zł"
-      }
-    },
-    {
-      "actionId": "2",
-      "action": "createDayActivity",
-      "fields": {
-        "identifier": "7F6E5D4C-3B2A-1C0D-9E8F-0123456789AB",
-        "templateIdentifier": "D4F8A1B2-C3D4-4E5F-8A9B-0C1D2E3F4A5B",
-        "date": "2026-01-31T00:00:00Z"
-      }
-    },
-    {
-      "actionId": "3",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "7F6E5D4C-3B2A-1C0D-9E8F-0123456789AB",
-        "name": "umyć bombiję"
-      }
-    },
-    {
-      "actionId": "4",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "7F6E5D4C-3B2A-1C0D-9E8F-0123456789AB",
-        "name": "znaleźć słoik"
-      }
-    },
-    {
-      "actionId": "5",
-      "action": "createDayActivity",
-      "fields": {
-        "identifier": "7F6E5D4C-3B2A-1C0D-9E8F-0123456789AA",
-        "date": "2026-02-01T00:00:00Z",
-        "name": "Biegi"
-      }
-    },
-      {
-        "actionId": "6",
-        "action": "createDayActivity",
-        "fields": {
-          "identifier": "D2F6C1A3-7B2E-4D6B-9F8A-1A2B3C4D5E6F",
-          "templateIdentifier": "458A0499-9962-46C3-8A04-8ABE8EF20DA4",
-          "date": "2026-02-01T00:00:00Z"
-        }
-      },
-      {
-        "actionId": "7",
-        "action": "createDayActivityTask",
-        "fields": {
-          "dayActivityId": "D2F6C1A3-7B2E-4D6B-9F8A-1A2B3C4D5E6F",
-          "name": "Śniadanie",
-          "position": 0
-        }
-      },
-      {
-        "actionId": "8",
-        "action": "createDayActivityTask",
-        "fields": {
-          "dayActivityId": "D2F6C1A3-7B2E-4D6B-9F8A-1A2B3C4D5E6F",
-          "name": "Obiad",
-          "position": 1
-        }
-      },
-      {
-        "actionId": "9",
-        "action": "createDayActivityTask",
-        "fields": {
-          "dayActivityId": "D2F6C1A3-7B2E-4D6B-9F8A-1A2B3C4D5E6F",
-          "name": "Kolacja",
-          "position": 2
-        }
-      },
-      {
-        "actionId": "10",
-        "action": "createDayActivity",
-        "fields": {
-          "identifier": "E3A7B2C4-1D3F-4A6B-8C9D-0F1E2D3C4B5A",
-          "templateIdentifier": "4934C155-CE7B-4E78-95F1-96C33C056B83",
-          "date": "2026-02-01T00:00:00Z"
-        }
-      },
-      {
-        "actionId": "11",
-        "action": "createDayActivityTask",
-        "fields": {
-          "dayActivityId": "E3A7B2C4-1D3F-4A6B-8C9D-0F1E2D3C4B5A",
-          "name": "Rozgrzewka",
-          "position": 0
-        }
-      },
-      {
-        "actionId": "12",
-        "action": "createDayActivityTask",
-        "fields": {
-          "dayActivityId": "E3A7B2C4-1D3F-4A6B-8C9D-0F1E2D3C4B5A",
-          "name": "Trening główny",
-          "position": 1
-        }
-      },
-      {
-        "actionId": "13",
-        "action": "createDayActivity",
-        "fields": {
-          "identifier": "F1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D",
-          "templateIdentifier": "A0145C46-A537-4C93-B1DD-3DE14F552891",
-          "date": "2026-02-01T00:00:00Z"
-        }
-      },
-      {
-        "actionId": "14",
-        "action": "createDayActivityTask",
-        "fields": {
-          "dayActivityId": "F1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D",
-          "name": "Przeczytaj rozdział",
-          "position": 0
-        }
-      },
-    {
-      "actionId": "15",
-      "action": "createActivityTemplate",
-      "fields": {
-        "identifier": "F1A2B3C4-D5E6-47F8-9A0B-C1D2E3F4A5B6",
-        "name": "Kupno yerby",
-        "icon": {
-          "value": "🍃"
-        }
-      }
-    },
-    {
-      "actionId": "16",
-      "action": "createDayActivity",
-      "fields": {
-        "identifier": "0A1B2C3D-4E5F-6789-0ABC-DEF123456789",
-        "name": "Kupno yerby",
-        "date": "2026-01-31T00:00:00Z",
-        "templateIdentifier": "F1A2B3C4-D5E6-47F8-9A0B-C1D2E3F4A5B6"
-      }
-    },
-    {
-      "actionId": "17",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "0A1B2C3D-4E5F-6789-0ABC-DEF123456789",
-        "name": "umyć bombiję"
-      }
-    },
-    {
-      "actionId": "18",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "0A1B2C3D-4E5F-6789-0ABC-DEF123456789",
-        "name": "znaleźć słoik"
-      }
-    },
-    {
-      "actionId": "19",
-      "action": "createDayActivity",
-      "fields": {
-        "identifier": "11111111-1111-1111-1111-111111111111",
-        "name": "Praca",
-        "date": "2026-01-31T00:00:00Z",
-        "icon": {
-          "value": "💼"
-        }
-      }
-    },
-    {
-      "actionId": "20",
-      "action": "createDayActivity",
-      "fields": {
-        "identifier": "22222222-2222-2222-2222-222222222222",
-        "name": "Sport",
-        "date": "2026-01-31T00:00:00Z",
-        "templateIdentifier": "4934C155-CE7B-4E78-95F1-96C33C056B83",
-        "icon": {
-          "value": "🏃"
-        }
-      }
-    },
-    {
-      "actionId": "21",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "11111111-1111-1111-1111-111111111111",
-        "name": "Sprawdzić e-maile",
-        "position": 0
-      }
-    },
-    {
-      "actionId": "22",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "11111111-1111-1111-1111-111111111111",
-        "name": "Skoncentrowana praca nad projektem",
-        "position": 1
-      }
-    },
-    {
-      "actionId": "23",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "22222222-2222-2222-2222-222222222222",
-        "name": "Rozgrzewka 10 min",
-        "position": 0
-      }
-    },
-    {
-      "actionId": "24",
-      "action": "createDayActivityTask",
-      "fields": {
-        "dayActivityId": "22222222-2222-2222-2222-222222222222",
-        "name": "Trening główny 30 min",
-        "position": 1
-      }
-    }
-  ],
-  "error": null,
-  "_thinking": "Creating the template with its task, making today's activity from it, and adding the two requested tasks to that activity."
-}
-"""
-
-let test2 = """
-{
-  "actions": [
-    {
-          "actionId": "0",
-          "action": "createDayActivity",
-          "fields": {
-            "identifier": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-            "name": "Sport",
-            "overview": "Wieczorna sesja sportowa: rozgrzewka, trening główny i rozciąganie.",
-            "date": "2026-02-01T00:00:00Z",
-            "icon": {
-              "value": "🏃"
-            }
-          }
+    "actions": [
+        {
+            "payload": {
+                "updateDayActivity": {
+                    "name": "Walk with dog — split: morning, afternoon, evening",
+                    "tags": [
+                        "pies"
+                    ],
+                    "position": 3,
+                    "reference": {
+                        "byIdentifier": "4D124B35-A578-4AE1-87CB-C0A1D6CEFF16"
+                    },
+                    "dueDate": null,
+                    "icon": null,
+                    "doneDate": null,
+                    "overview": "15-minute walk with the dog split into three short walks (morning, afternoon, evening).",
+                    "reminderDate": null,
+                    "labels": [
+                    ],
+                    "duration": 45,
+                    "date": "2026-02-22T00:00:00Z",
+                    "important": false
+                }
+            },
+            "actionId": "1"
         },
         {
-          "actionId": "1",
-          "action": "createDayActivity",
-          "fields": {
-            "identifier": "9f1b5c2e-3d4a-4b6f-9a2b-1c2d3e4f5a6b",
-            "name": "Odpoczynek",
-            "overview": "Wieczorny relaks i wyciszenie przed snem.",
-            "date": "2026-02-01T00:00:00Z",
-            "icon": {
-              "value": "😴"
-            }
-          }
+            "payload": {
+                "createDayActivityTask": {
+                    "doneDate": null,
+                    "name": "Morning 15‑minute walk",
+                    "duration": 15,
+                    "reference": {
+                        "byActionId": "1"
+                    },
+                    "overview": null,
+                    "position": 0,
+                    "reminderDate": null
+                }
+            },
+            "actionId": "2"
         },
         {
-          "actionId": "2",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-            "name": "Rozgrzewka",
-            "overview": "Łagodne rozruszanie stawów i mięśni",
-            "position": 0,
-            "duration": 10
-          }
+            "payload": {
+                "createDayActivityTask": {
+                    "doneDate": null,
+                    "name": "Afternoon 15‑minute walk",
+                    "duration": 15,
+                    "reference": {
+                        "byActionId": "1"
+                    },
+                    "overview": null,
+                    "position": 1,
+                    "reminderDate": null
+                }
+            },
+            "actionId": "3"
         },
         {
-          "actionId": "3",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-            "name": "Cardio / trucht",
-            "overview": "Krótki bieg lub intensywny marsz",
-            "position": 1,
-            "duration": 20
-          }
-        },
-        {
-          "actionId": "4",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-            "name": "Ćwiczenia siłowe",
-            "overview": "Zestaw ćwiczeń na dużą grupę mięśniową",
-            "position": 2,
-            "duration": 25
-          }
-        },
-        {
-          "actionId": "5",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-            "name": "Core / brzuch",
-            "overview": "Ćwiczenia na mięśnie głębokie tułowia",
-            "position": 3,
-            "duration": 10
-          }
-        },
-        {
-          "actionId": "6",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-            "name": "Rozciąganie i cool-down",
-            "overview": "Łagodne rozciąganie i uspokojenie oddechu",
-            "position": 4,
-            "duration": 10
-          }
-        },
-        {
-          "actionId": "7",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "9f1b5c2e-3d4a-4b6f-9a2b-1c2d3e4f5a6b",
-            "name": "Wyłączenie ekranów",
-            "overview": "Odłączenie od urządzeń elektronicznych",
-            "position": 0,
-            "duration": 30
-          }
-        },
-        {
-          "actionId": "8",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "9f1b5c2e-3d4a-4b6f-9a2b-1c2d3e4f5a6b",
-            "name": "Ciepła kąpiel / prysznic",
-            "overview": "Relaksująca kąpiel lub prysznic",
-            "position": 1,
-            "duration": 20
-          }
-        },
-        {
-          "actionId": "9",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "9f1b5c2e-3d4a-4b6f-9a2b-1c2d3e4f5a6b",
-            "name": "Lekka lektura",
-            "overview": "Czytanie relaksującej książki",
-            "position": 2,
-            "duration": 20
-          }
-        },
-        {
-          "actionId": "10",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "9f1b5c2e-3d4a-4b6f-9a2b-1c2d3e4f5a6b",
-            "name": "Krótka medytacja / oddech",
-            "overview": "5–10 minut ćwiczeń oddechowych lub medytacji",
-            "position": 3,
-            "duration": 10
-          }
-        },
-        {
-          "actionId": "11",
-          "action": "createDayActivityTask",
-          "fields": {
-            "dayActivityId": "9f1b5c2e-3d4a-4b6f-9a2b-1c2d3e4f5a6b",
-            "name": "Przygotowanie do snu",
-            "overview": "Higiena wieczorna i położenie się do snu",
-            "position": 4,
-            "duration": 10
-          }
+            "payload": {
+                "createDayActivityTask": {
+                    "doneDate": null,
+                    "name": "Evening 15‑minute walk",
+                    "duration": 15,
+                    "reference": {
+                        "byActionId": "1"
+                    },
+                    "overview": null,
+                    "position": 2,
+                    "reminderDate": null
+                }
+            },
+            "actionId": "4"
         }
-  ],
-  "error": null,
-  "_thinking": "Creating the template with its task, making today's activity from it, and adding the two requested tasks to that activity."
+    ],
+    "_thinking": "Validated existing DayActivity and will update its name/overview and add three tasks of 15 minutes each. References use the existing activity identifier for the update and action-scoped reference for the new tasks.",
+    "error": "NONE"
 }
 """
 

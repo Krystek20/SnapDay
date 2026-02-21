@@ -6,9 +6,9 @@ import AIModule
 import Models
 
 public struct ActionsResult: Equatable {
-  let results: [ManageActivityActionResultRequest]
+  let results: [UserResponse]
   let decisions: [Decision]
-  let decisionResults: [ManageActivityActionResultRequest]
+  let decisionResults: [UserResponse]
 }
 
 struct ActionParser {
@@ -23,65 +23,57 @@ struct ActionParser {
   @Dependency(\.activityLabelRepository) private var activityLabelRepository
   @Dependency(\.iconRepository) private var iconRepository
 
-  private var decisionResults: [ManageActivityActionResultRequest] = []
+  private var decisionResults: [UserResponse] = []
 
   // MARK: - Initialization
 
   init() { }
 
-  // MARK: - Parsing
+  // MARK: - Actions
 
   func parse(
     actions: [ManageActivityAction]
   ) async -> ActionsResult {
     var mutableActions = actions
 
-    var results = [ManageActivityActionResultRequest]()
+    var results = [UserResponse]()
     var decisions = [Decision]()
 
     while mutableActions.isEmpty == false {
       let action = mutableActions.removeFirst()
 
       var operateResults: [OperateResult] = []
-      switch action.action {
-      case .getDayActivities:
-        operateResults.append(await getDayActivities(action: action))
-      case .getDayActivity:
-        operateResults.append(await getDayActivity(action: action))
-      case .createDayActivity:
-        let (decision, results) = await createDayActivity(action: action, nextActions: &mutableActions)
+      switch action.payload {
+      case .createDayActivity(let payload):
+        let (decision, results) = await createDayActivity(action: action, payload: payload, nextActions: &mutableActions)
         if let decision { operateResults.append(.decisition(decision)) }
         operateResults.append(contentsOf: results)
-      case .updateDayActivity:
-        operateResults.append(await updateDayActivity(action: action))
-      case .deleteDayActivity:
-        operateResults.append(await deleteDayActivity(action: action))
-      case .createDayActivityTask:
-        operateResults.append(await createDayActivityTask(action: action))
-      case .getActivityTemplates:
-        operateResults.append(await getActivityTemplates(action: action))
-      case .getActivityTemplate:
-        operateResults.append(await getActivityTemplate(action: action))
-      case .updateDayActivityTask:
-        operateResults.append(await updateDayActivityTask(action: action))
-      case .deleteDayActivityTask:
-        operateResults.append(await deleteDayActivityTask(action: action))
-      case .createActivityTemplate:
-        let (decision, results) = await createActivityTemplate(action: action, nextActions: &mutableActions)
+      case .updateDayActivity(let payload):
+        let (decision, results) = await updateDayActivity(action: action, payload: payload, nextActions: &mutableActions)
         if let decision { operateResults.append(.decisition(decision)) }
         operateResults.append(contentsOf: results)
-      case .updateActivityTemplate:
-        operateResults.append(await updateActivityTemplate(action: action))
-      case .deleteActivityTemplate:
-        operateResults.append(await deleteActivityTemplate(action: action))
-      case .createActivityTemplateTask:
-        operateResults.append(await createActivityTaskTemplate(action: action))
-      case .updateActivityTemplateTask:
-        operateResults.append(await updateActivityTaskTemplate(action: action))
-      case .deleteActivityTemplateTask:
-        operateResults.append(await deleteActivityTaskTemplate(action: action))
-      case .getTags:
-        operateResults.append(await getTags(action: action))
+      case .deleteDayActivity(let payload):
+        operateResults.append(await deleteDayActivity(action: action, payload: payload))
+      case .createDayActivityTask(let payload):
+        operateResults.append(await createDayActivityTask(action: action, payload: payload))
+      case .updateDayActivityTask(let payload):
+        operateResults.append(await updateDayActivityTask(action: action, payload: payload))
+      case .deleteDayActivityTask(let payload):
+        operateResults.append(await deleteDayActivityTask(action: action, payload: payload))
+      case .createActivityTemplate(let payload):
+        let (decision, results) = await createActivityTemplate(action: action, payload: payload, nextActions: &mutableActions)
+        if let decision { operateResults.append(.decisition(decision)) }
+        operateResults.append(contentsOf: results)
+      case .updateActivityTemplate(let payload):
+        operateResults.append(await updateActivityTemplate(action: action, payload: payload))
+      case .deleteActivityTemplate(let payload):
+        operateResults.append(await deleteActivityTemplate(action: action, payload: payload))
+      case .createActivityTemplateTask(let payload):
+        operateResults.append(await createActivityTaskTemplate(action: action, payload: payload))
+      case .updateActivityTemplateTask(let payload):
+        operateResults.append(await updateActivityTaskTemplate(action: action, payload: payload))
+      case .deleteActivityTemplateTask(let payload):
+        operateResults.append(await deleteActivityTaskTemplate(action: action, payload: payload))
       }
 
       for operateResult in operateResults {
@@ -134,8 +126,8 @@ struct ActionParser {
   private func accept(
     _ decision: Decision,
     today: Date
-  ) async -> ManageActivityActionResultRequest {
-    switch decision.parameters.decisionType {
+  ) async -> UserResponse {
+    switch decision.parameters.type {
     case .createDayActivity(let dayActivity),
          .updateDayActivity(let dayActivity):
       await accept(decision.parameters.action, objectId: dayActivity.id.uuidString) {
@@ -223,12 +215,12 @@ struct ActionParser {
     var allDecisions = actionsResult.decisions.all
     var results = actionsResult.decisionResults
 
-    results.append(ManageActivityActionResultRequest(action: decision.parameters.action, decisionResult: .userCancelled))
+    results.append(UserResponse(action: decision.parameters.action, decision: .cancelled))
     allDecisions.removeAll(where: { $0.parameters.action == decision.parameters.action })
 
     if case .chain(_, let nextDecisions) = decision {
       for decision in nextDecisions.all where decision.parameters.result == nil {
-        results.append(ManageActivityActionResultRequest(action: decision.parameters.action, decisionResult: .userCancelled))
+        results.append(UserResponse(action: decision.parameters.action, decision: .cancelled))
         allDecisions.removeAll(where: { $0.parameters.action == decision.parameters.action })
       }
     }
@@ -238,7 +230,7 @@ struct ActionParser {
   }
 
   private mutating func discard(decision: Decision, actionsResult: ActionsResult) async -> ActionsResult {
-    let result = ManageActivityActionResultRequest(action: decision.parameters.action, decisionResult: .userCancelled)
+    let result = UserResponse(action: decision.parameters.action, decision: .cancelled)
     print(result)
     setDecisionResults(actionsResult.decisionResults + [result])
     let actionsToParse = actionsResult.decisions.all.filter { $0 != decision }.map(\.parameters.action)
@@ -247,51 +239,27 @@ struct ActionParser {
 
   // MARK: - DayActivity
 
-  private func getDayActivities(action: ManageActivityAction) async -> OperateResult {
-    do {
-      guard let iso8601Date = ISO8601DateFormatter.date(from: action.fields?["date"]?.stringValue) else {
-        throw NSError(domain: "fieldsNotFound: date", code: 9999)
-      }
-      let date = calendar.dayFormat(iso8601Date)
-      let configuration = ActivitiesFetchConfiguration(range: date...date)
-      let dayActivities = try await dayUpdater.dayActivities(configuration: configuration)
-      return OperateResult(action, fetchResult: .fetched(dayActivities.map(DayActivityRequest.init)))
-    } catch {
-      return OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
-    }
-  }
-
-  private func getDayActivity(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: dayUpdater.dayActivity) { dayActivity in
-      OperateResult(action, fetchResult: .fetched(DayActivityRequest(dayActivity: dayActivity)))
-    }
-  }
-
   private func createDayActivity(
     action: ManageActivityAction,
+    payload: CreateDayActivity,
     newActivity: Activity? = nil,
     nextActions: inout [ManageActivityAction]
   ) async -> (decision: Decision?, results: [OperateResult]) {
     do {
       let dayActivity: DayActivity
       if let decisionResult = decisionResult(for: action.actionId),
-         decisionResult == .accepted,
-         let identifier = action.fields?["identifier"]?.stringValue,
+         case .accepted(let identifier) = decisionResult,
          let createdDayActivity = try await dayUpdater.dayActivity(identifier: identifier) {
         dayActivity = createdDayActivity
       } else {
-        var activity: Activity?
-        if let newActivity {
-          activity = newActivity
-        } else if let identifier = action.fields?["templateIdentifier"]?.stringValue {
-          activity = try await activityRepository.getActivity(identifier: identifier)
-        }
+        let activityFromReference = try await getActivityFromReference(payload.reference)
+        let activity = newActivity ?? activityFromReference
 
         if let activity {
           dayActivity = try await DayActivity.create(
             uuid: uuid,
             activity: activity,
-            action: action,
+            payload: payload,
             tagRepository: tagRepository,
             activityLabelRepository: activityLabelRepository,
             iconRepository: iconRepository,
@@ -300,10 +268,8 @@ struct ActionParser {
         } else {
           dayActivity = try await DayActivity(
             uuid: uuid,
-            action: action,
-            activityRepository: activityRepository,
+            payload: payload,
             tagRepository: tagRepository,
-            activityLabelRepository: activityLabelRepository,
             iconRepository: iconRepository,
             calendar: calendar
           )
@@ -311,46 +277,98 @@ struct ActionParser {
       }
 
       let decisionResult = decisionResult(for: action.actionId)
-      let (decisions, operateResults) = await handleConnectedActions(for: dayActivity, nextActions: &nextActions)
+      let (decisions, operateResults) = await handleConnectedActions(
+        action: action,
+        dayActivity: dayActivity,
+        nextActions: &nextActions
+      )
       let decision: Decision = decisions.isEmpty
-      ? .leaf(DecisionParameters(action, type: .createDayActivity(dayActivity), result: decisionResult))
-      : .chain(DecisionParameters(action, type: .createDayActivity(dayActivity), result: decisionResult), nextDecisions: decisions)
+      ? .leaf(DecisionParameters(action: action, type: .createDayActivity(dayActivity), result: decisionResult))
+      : .chain(DecisionParameters(action: action, type: .createDayActivity(dayActivity), result: decisionResult), nextDecisions: decisions)
       return (decision: decision, results: operateResults)
     } catch {
-      let result = OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
+      let result = OperateResult(action, decision: .failed(errorMessage: error.localizedDescription))
+      return (decision: nil, results: [result])
+    }
+  }
+
+  private func updateDayActivity(
+    action: ManageActivityAction,
+    payload: UpdateDayActivity,
+    nextActions: inout [ManageActivityAction]
+  ) async -> (decision: Decision?, results: [OperateResult]) {
+    do {
+      guard case .identifier(let identifier) = payload.reference else {
+        throw NSError(domain: "Identifier not provided in reference", code: 8887)
+      }
+      guard var dayActivity = try await dayUpdater.dayActivity(identifier: identifier) else {
+        throw NSError(domain: "[\(action.payload.name)] objectNotFound: \(identifier)", code: 8888)
+      }
+
+      let decisionResult = decisionResult(for: action.actionId)
+      if decisionResult == nil {
+        try await dayActivity.update(
+          with: payload,
+          uuid: uuid,
+          tagRepository: tagRepository,
+          activityLabelRepository: activityLabelRepository,
+          iconRepository: iconRepository
+        )
+      }
+
+      let (decisions, operateResults) = await handleConnectedActions(
+        action: action,
+        dayActivity: dayActivity,
+        nextActions: &nextActions
+      )
+      let decision: Decision = decisions.isEmpty
+      ? .leaf(DecisionParameters(action: action, type: .updateDayActivity(dayActivity), result: decisionResult))
+      : .chain(DecisionParameters(action: action, type: .updateDayActivity(dayActivity), result: decisionResult), nextDecisions: decisions)
+      return (decision: decision, results: operateResults)
+    } catch {
+      let result = OperateResult(action, decision: .failed(errorMessage: error.localizedDescription))
       return (decision: nil, results: [result])
     }
   }
 
   private func handleConnectedActions(
-    for dayActivity: DayActivity,
+    action: ManageActivityAction,
+    dayActivity: DayActivity,
     nextActions: inout [ManageActivityAction]
   ) async -> ([Decision], [OperateResult]) {
     var decisions: [Decision] = []
     var operateResults: [OperateResult] = []
     for nextAction in nextActions {
-      guard case .createDayActivityTask = nextAction.action,
-            dayActivity.id == nextAction.fields?["dayActivityId"]?.uuidValue else { continue }
+      guard case .createDayActivityTask(let payload) = nextAction.payload,
+            isReference(to: dayActivity.id.uuidString, actionId: action.actionId, reference: payload.reference) else { continue }
 
       if let index = nextActions.firstIndex(of: nextAction) {
         nextActions.remove(at: index)
       }
 
       do {
-        let dayActivityTask: DayActivityTask
-        if let decisionResult = decisionResult(for: nextAction.actionId),
-           decisionResult == .accepted,
-           let identifier = nextAction.fields?["identifier"]?.stringValue,
+        let dayActivityTask = if let decisionResult = decisionResult(for: nextAction.actionId),
+           case .accepted(let identifier) = decisionResult,
            let createdDayActivityTask = try await dayUpdater.dayActivityTask(identifier: identifier) {
-          dayActivityTask = createdDayActivityTask
+          createdDayActivityTask
         } else {
-          dayActivityTask = try DayActivityTask(uuid: uuid, action: nextAction)
+          try DayActivityTask(
+            uuid: uuid,
+            dayActivityId: dayActivity.id,
+            payload: payload
+          )
         }
 
-        decisions.append(.leaf(DecisionParameters(nextAction, type: .createDayActivityTask(dayActivity, dayActivityTask), result: decisionResult(for: nextAction.actionId))))
+        decisions.append(.leaf(
+          DecisionParameters(
+            action: nextAction,
+            type: .createDayActivityTask(dayActivity, dayActivityTask),
+            result: decisionResult(for: nextAction.actionId)
+          )
+        ))
       } catch {
         operateResults.append(
-          OperateResult(nextAction, fetchResult: .failed(errorMessage: error.localizedDescription))
+          OperateResult(nextAction, decision: .failed(errorMessage: error.localizedDescription))
         )
       }
     }
@@ -358,112 +376,110 @@ struct ActionParser {
     return (decisions, operateResults)
   }
 
-  private func updateDayActivity(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: dayUpdater.dayActivity) { dayActivity in
-      try await dayActivity.update(
-        with: action,
-        uuid: uuid,
-        tagRepository: tagRepository,
-        activityLabelRepository: activityLabelRepository,
-        iconRepository: iconRepository
-      )
-      return OperateResult(leafAction: action, type: .updateDayActivity(dayActivity), result: decisionResult(for: action.actionId))
-    }
-  }
-
-  private func deleteDayActivity(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: dayUpdater.dayActivity) { dayActivity in
+  private func deleteDayActivity(
+    action: ManageActivityAction,
+    payload: DeleteDayActivity
+  ) async -> OperateResult {
+    await operateOnObject(for: payload.identifier.uuidString, action: action, fetcher: dayUpdater.dayActivity) { dayActivity in
       OperateResult(leafAction: action, type: .deleteDayActivity(dayActivity), result: decisionResult(for: action.actionId))
     }
   }
 
   // MARK: - DayActivityTask
 
-  private func createDayActivityTask(action: ManageActivityAction) async -> OperateResult {
+  private func createDayActivityTask(
+    action: ManageActivityAction,
+    payload: CreateDayActivityTask
+  ) async -> OperateResult {
     do {
-      let dayActivityTask = try DayActivityTask(uuid: uuid, action: action)
+      guard let dayActivityId = getUUIDFrom(reference: payload.reference) else {
+        throw NSError(domain: "Day activity id not found: \(payload.reference)", code: 7777)
+      }
+      let dayActivityTask = try DayActivityTask(
+        uuid: uuid,
+        dayActivityId: dayActivityId,
+        payload: payload,
+      )
       guard var dayActivity = try await dayUpdater.dayActivity(identifier: dayActivityTask.dayActivityId.uuidString) else {
         throw NSError(domain: "Day activity not found: \(dayActivityTask.dayActivityId)", code: 7777)
       }
       dayActivity.dayActivityTasks.append(dayActivityTask)
       return OperateResult(leafAction: action, type: .createDayActivityTask(dayActivity, dayActivityTask), result: decisionResult(for: action.actionId))
     } catch {
-      return OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
+      return OperateResult(action, decision: .failed(errorMessage: error.localizedDescription))
     }
   }
 
-  private func updateDayActivityTask(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: dayUpdater.dayActivityTask) { dayActivityTask in
-      try dayActivityTask.update(with: action)
+  private func updateDayActivityTask(
+    action: ManageActivityAction,
+    payload: UpdateDayActivityTask
+  ) async -> OperateResult {
+    guard case .identifier(let identifier) = payload.reference else {
+      return OperateResult(action, decision: .failed(errorMessage: "Identifier not provided in reference"))
+    }
+    return await operateOnObject(for: identifier, action: action, fetcher: dayUpdater.dayActivityTask) { dayActivityTask in
+      try dayActivityTask.update(with: payload)
       return OperateResult(leafAction: action, type: .updateDayActivityTask(dayActivityTask), result: decisionResult(for: action.actionId))
     }
   }
 
-  private func deleteDayActivityTask(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: dayUpdater.dayActivityTask) { dayActivityTask in
+  private func deleteDayActivityTask(
+    action: ManageActivityAction,
+    payload: DeleteDayActivityTask
+  ) async -> OperateResult {
+    await operateOnObject(for: payload.identifier.uuidString, action: action, fetcher: dayUpdater.dayActivityTask) { dayActivityTask in
       OperateResult(leafAction: action, type: .deleteDayActivityTask(dayActivityTask), result: decisionResult(for: action.actionId))
     }
   }
 
   // MARK: - Activity
 
-  private func getActivityTemplates(action: ManageActivityAction) async -> OperateResult {
-    do {
-      let activities = try await activityRepository.loadActivities()
-      return OperateResult(action, fetchResult: .fetched(activities.map(ActivityTemplateRequest.init)))
-    } catch {
-      return OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
-    }
-  }
-
-  private func getActivityTemplate(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: activityRepository.getActivity) { activity in
-      OperateResult(action, fetchResult: .fetched(ActivityTemplateRequest(activity: activity)))
-    }
-  }
-
   private func createActivityTemplate(
     action: ManageActivityAction,
+    payload: CreateActivityTemplate,
     nextActions: inout [ManageActivityAction]
   ) async -> (decision: Decision?, results: [OperateResult]) {
     do {
-      var activity: Activity
-      if let decisionResult = decisionResult(for: action.actionId),
-         decisionResult == .accepted,
-         let identifier = action.fields?["identifier"]?.stringValue,
+      var activity = if let decisionResult = decisionResult(for: action.actionId),
+         case .accepted(let identifier) = decisionResult,
          let createdActivity = try await activityRepository.getActivity(identifier: identifier) {
-        activity = createdActivity
+        createdActivity
       } else {
-        activity = try await Activity(
+        try await Activity(
           uuid: uuid,
-          action: action,
+          payload: payload,
           tagRepository: tagRepository,
           activityLabelRepository: activityLabelRepository,
           iconRepository: iconRepository
         )
       }
 
-      let (decisions, operateResults) = await handleConnectedActions(for: &activity, nextActions: &nextActions)
+      let (decisions, operateResults) = await handleConnectedActions(
+        action: action,
+        activity: &activity,
+        nextActions: &nextActions
+      )
       let decision: Decision = decisions.isEmpty
-      ? .leaf(DecisionParameters(action, type: .createActivity(activity), result: decisionResult(for: action.actionId)))
-      : .chain(DecisionParameters(action, type: .createActivity(activity), result: decisionResult(for: action.actionId)), nextDecisions: decisions)
+      ? .leaf(DecisionParameters(action: action, type: .createActivity(activity), result: decisionResult(for: action.actionId)))
+      : .chain(DecisionParameters(action: action, type: .createActivity(activity), result: decisionResult(for: action.actionId)), nextDecisions: decisions)
       return (decision: decision, results: operateResults)
     } catch {
-      let result = OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
+      let result = OperateResult(action, decision: .failed(errorMessage: error.localizedDescription))
       return (decision: nil, results: [result])
     }
   }
 
   private func handleConnectedActions(
-    for activity: inout Activity,
+    action: ManageActivityAction,
+    activity: inout Activity,
     nextActions: inout [ManageActivityAction]
   ) async -> ([Decision], [OperateResult]) {
     var decisions: [Decision] = []
     var operateResults: [OperateResult] = []
     for nextAction in nextActions {
-      if case .createActivityTemplateTask = nextAction.action {
-        let activityId = nextAction.fields?["activityTemplateIdentifier"]?.uuidValue
-        guard activityId == activity.id else { continue }
+      if case .createActivityTemplateTask(let payload) = nextAction.payload,
+         isReference(to: activity.id.uuidString, actionId: action.actionId, reference: payload.reference) {
+
         if let index = nextActions.firstIndex(of: nextAction) {
           nextActions.remove(at: index)
         }
@@ -471,27 +487,32 @@ struct ActionParser {
         do {
           var activityTask: ActivityTask
           if let decisionResult = decisionResult(for: nextAction.actionId),
-             decisionResult == .accepted,
-             let identifier = nextAction.fields?["identifier"]?.stringValue,
+             case .accepted(let identifier) = decisionResult,
              let createdActivityTask = try await activityRepository.activityTask(identifier) {
             activityTask = createdActivityTask
           } else {
-            activityTask = try ActivityTask(uuid: uuid, action: nextAction)
+            activityTask = try ActivityTask(uuid: uuid, activityId: activity.id, payload: payload)
           }
 
-          decisions.append(.leaf(DecisionParameters(nextAction, type: .createActivityTask(activity, activityTask), result: decisionResult(for: nextAction.actionId))))
+          decisions.append(.leaf(
+            DecisionParameters(
+              action: nextAction,
+              type: .createActivityTask(activity, activityTask),
+              result: decisionResult(for: nextAction.actionId)
+            )
+          ))
         } catch {
-          operateResults.append(OperateResult(nextAction, fetchResult: .failed(errorMessage: error.localizedDescription)))
+          operateResults.append(OperateResult(nextAction, decision: .failed(errorMessage: error.localizedDescription)))
         }
-      } else if case .createDayActivity = nextAction.action {
-        let activityId = nextAction.fields?["templateIdentifier"]?.uuidValue
-        guard activityId == activity.id else { continue }
+      } else if case .createDayActivity(let payload) = nextAction.payload,
+                isReference(to: activity.id.uuidString, actionId: action.actionId, reference: payload.reference) {
         if let index = nextActions.firstIndex(of: nextAction) {
           nextActions.remove(at: index)
         }
 
         let (decision, results) = await createDayActivity(
           action: nextAction,
+          payload: payload,
           newActivity: activity,
           nextActions: &nextActions
         )
@@ -504,10 +525,16 @@ struct ActionParser {
     return (decisions, operateResults)
   }
 
-  private func updateActivityTemplate(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: activityRepository.getActivity) { activity in
+  private func updateActivityTemplate(
+    action: ManageActivityAction,
+    payload: UpdateActivityTemplate
+  ) async -> OperateResult {
+    guard case .identifier(let identifier) = payload.reference else {
+      return OperateResult(action, decision: .failed(errorMessage: "Identifier not provided in reference"))
+    }
+    return await operateOnObject(for: identifier, action: action, fetcher: activityRepository.getActivity) { activity in
       try await activity.update(
-        with: action,
+        with: payload,
         uuid: uuid,
         tagRepository: tagRepository,
         activityLabelRepository: activityLabelRepository,
@@ -517,30 +544,49 @@ struct ActionParser {
     }
   }
 
-  private func deleteActivityTemplate(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: activityRepository.getActivity) { activity in
+  private func deleteActivityTemplate(
+    action: ManageActivityAction,
+    payload: DeleteActivityTemplate
+  ) async -> OperateResult {
+    await operateOnObject(for: payload.identifier.uuidString, action: action, fetcher: activityRepository.getActivity) { activity in
       OperateResult(leafAction: action, type: .deleteActivity(activity), result: decisionResult(for: action.actionId))
     }
   }
 
   // MARK: - ActivityTask
 
-  private func createActivityTaskTemplate(action: ManageActivityAction) async -> OperateResult {
+  private func createActivityTaskTemplate(
+    action: ManageActivityAction,
+    payload: CreateActivityTemplateTask
+  ) async -> OperateResult {
     do {
-      let activityTask = try ActivityTask(uuid: uuid, action: action)
+      guard let activityId = getUUIDFrom(reference: payload.reference) else {
+        throw NSError(domain: "Activity id not found: \(payload.reference)", code: 7777)
+      }
+      let activityTask = try ActivityTask(
+        uuid: uuid,
+        activityId: activityId,
+        payload: payload
+      )
       guard var activity = try await activityRepository.activity(.id(activityTask.activityId.uuidString)) else {
         throw NSError(domain: "Activity not found: \(activityTask.activityId)", code: 7777)
       }
       activity.tasks.append(activityTask)
       return OperateResult(leafAction: action, type: .createActivityTask(activity, activityTask), result: decisionResult(for: action.actionId))
     } catch {
-      return OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
+      return OperateResult(action, decision: .failed(errorMessage: error.localizedDescription))
     }
   }
 
-  private func updateActivityTaskTemplate(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: activityRepository.activityTask) { activityTask in
-      try activityTask.update(with: action)
+  private func updateActivityTaskTemplate(
+    action: ManageActivityAction,
+    payload: UpdateActivityTemplateTask
+  ) async -> OperateResult {
+    guard case .identifier(let identifier) = payload.reference else {
+      return OperateResult(action, decision: .failed(errorMessage: "Identifier not provided in reference"))
+    }
+    return await operateOnObject(for: identifier, action: action, fetcher: activityRepository.activityTask) { activityTask in
+      try activityTask.update(with: payload)
       guard var activity = try await activityRepository.activity(.id(activityTask.activityId.uuidString)) else {
         throw NSError(domain: "Activity not found: \(activityTask.activityId)", code: 7777)
       }
@@ -550,8 +596,11 @@ struct ActionParser {
     }
   }
 
-  private func deleteActivityTaskTemplate(action: ManageActivityAction) async -> OperateResult {
-    await operateOnObject(for: action, fetcher: activityRepository.activityTask) { activityTask in
+  private func deleteActivityTaskTemplate(
+    action: ManageActivityAction,
+    payload: DeleteActivityTemplateTask
+  ) async -> OperateResult {
+    await operateOnObject(for: payload.identifier.uuidString, action: action, fetcher: activityRepository.activityTask) { activityTask in
       guard var activity = try await activityRepository.activity(.id(activityTask.activityId.uuidString)) else {
         throw NSError(domain: "Activity not found: \(activityTask.activityId)", code: 7777)
       }
@@ -560,32 +609,21 @@ struct ActionParser {
     }
   }
 
-  private func getTags(action: ManageActivityAction) async -> OperateResult {
-    do {
-      let tags = try await tagRepository.loadTags([])
-      return OperateResult(action, fetchResult: .fetched(tags.map(MarkerRequest.init)))
-    } catch {
-      return OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
-    }
-  }
-
   // MARK: - Helpers
 
   private func operateOnObject<T>(
-    for action: ManageActivityAction,
+    for objectId: String,
+    action: ManageActivityAction,
     fetcher: @escaping (String) async throws -> T?,
     operate: @escaping (inout T) async throws -> OperateResult
   ) async -> OperateResult {
     do {
-      guard let objectId = action.fields?["identifier"]?.stringValue else {
-        throw NSError(domain: "[\(action.actionId)] fieldsNotFound: identifier", code: 9999)
-      }
       guard var object = try await fetcher(objectId) else {
-        throw NSError(domain: "[\(action.actionId)] objectNotFound: \(objectId)", code: 8888)
+        throw NSError(domain: "[\(action.payload.name)] objectNotFound: \(objectId)", code: 8888)
       }
       return try await operate(&object)
     } catch {
-      return OperateResult(action, fetchResult: .failed(errorMessage: error.localizedDescription))
+      return OperateResult(action, decision: .failed(errorMessage: error.localizedDescription))
     }
   }
 
@@ -593,29 +631,60 @@ struct ActionParser {
     _ action: ManageActivityAction,
     objectId: String,
     operate: @escaping () async throws -> Void
-  ) async -> ManageActivityActionResultRequest {
+  ) async -> UserResponse {
+    let decision: UserDecision
     do {
       try await operate()
-      let result = ManageActivityActionResultRequest(
-        action: action,
-        decisionResult: .success(objectId)
-      )
-      return result
+      decision = .accepted(objectId)
     } catch {
-      let result = ManageActivityActionResultRequest(
-        action: action,
-        decisionResult: .failed(errorMessage: "can not perform operation: \(error.localizedDescription)")
-      )
-      return result
+      decision = .failed(errorMessage: "can not perform operation: \(error.localizedDescription)")
+    }
+    return UserResponse(action: action, decision: decision)
+  }
+
+  // MARK: - Helpers
+
+  private func getActivityFromReference(_ reference: Reference) async throws -> Activity? {
+    guard let identifier = getIdFrom(reference: reference) else { return nil }
+    return try await activityRepository.getActivity(identifier: identifier)
+  }
+
+  private func getUUIDFrom(reference: Reference) -> UUID? {
+    guard let identifier = getIdFrom(reference: reference) else { return nil }
+    return UUID(uuidString: identifier)
+  }
+
+  private func isReference(to identifier: String, actionId: String, reference: Reference) -> Bool {
+    if let referenceIdentifier = getIdFrom(reference: reference) {
+      identifier == referenceIdentifier
+    } else if case .actionId(let referenceActionId) = reference {
+      actionId == referenceActionId
+    } else {
+      false
     }
   }
 
-  private mutating func setDecisionResults(_ decisionResults: [ManageActivityActionResultRequest]) {
+  private func getIdFrom(reference: Reference) -> String? {
+    switch reference {
+    case .actionId(let actionId):
+      switch decisionResult(for: actionId) {
+      case .accepted(let identifier):
+        identifier
+      default:
+        nil
+      }
+    case .identifier(let identifier):
+      identifier
+    case .none:
+      nil
+    }
+  }
+
+  private mutating func setDecisionResults(_ decisionResults: [UserResponse]) {
     self.decisionResults = decisionResults
   }
 
-  private func decisionResult(for actionId: String) -> DecisionParameters.DecisionResult? {
-    guard let decisionResult = decisionResults.first(where: { $0.actionId == actionId })?.decisionResult else { return nil }
-    return DecisionParameters.DecisionResult(decisionResult)
+  private func decisionResult(for actionId: String) -> UserDecision? {
+    decisionResults.first(where: { $0.actionId == actionId })?.decision
   }
 }

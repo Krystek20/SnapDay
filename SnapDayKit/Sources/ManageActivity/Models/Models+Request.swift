@@ -4,126 +4,85 @@ import Dependencies
 import AIModule
 import Repositories
 
-enum AIModuleError: LocalizedError {
-  case fieldsNotFound
-  case requiredFieldNotFound(fieldName: String)
-  case changesNotFound
-
-  var errorDescription: String? {
-    switch self {
-    case .fieldsNotFound:
-      "Fields not found"
-    case .requiredFieldNotFound(let fieldName):
-      "Required field not found \(fieldName)"
-    case .changesNotFound:
-      "Changes not found"
-    }
-  }
-}
-
 extension ActivityFrequency {
-  init?(action: [String: JSONValue]) {
-    guard let type = action["type"]?.stringValue else {
-      return nil
-    }
-    switch type {
-    case "daily":
+  init?(frequency: Frequency) {
+    switch frequency {
+    case .daily:
       self = .daily
-    case "weekly":
-      let days = action["days"]?.arrayValue?.compactMap(\.intValue) ?? []
-      self = .weekly(days: days)
-    case "biweekly":
-      let days = action["days"]?.arrayValue?.compactMap(\.intValue) ?? []
-      self = .biweekly(days: days, startWeek: .current)
-    case "monthly":
-      guard let monthly = action["monthly"]?.objectValue,
-            let monthlyType = monthly["type"]?.stringValue else {
-        return nil
+    case .weekly(let days):
+      self = .weekly(days: days.map(\.rawValue))
+    case .biweekly(let days):
+      self = .biweekly(days: days.map(\.rawValue), startWeek: .current)
+    case .monthly(let frequencyMonthly):
+      switch frequencyMonthly {
+      case .fixedPosition(let fixed):
+        switch fixed {
+        case .firstDay:
+          self = .monthly(monthlySchedule: .firstDay)
+        case .secondDay:
+          self = .monthly(monthlySchedule: .secondDay)
+        case .middleOfMonth:
+          self = .monthly(monthlySchedule: .midMonth)
+        case .penultimateDay:
+          self = .monthly(monthlySchedule: .secondToLastDay)
+        case .lastDay:
+          self = .monthly(monthlySchedule: .lastDay)
+        }
+      case .specificDay(let days):
+        self = .monthly(monthlySchedule: .monthlySpecificDate(days.map(\.rawValue)))
+      case .dayOfWeek(let rules):
+        let weekdayOrdinals = rules.map { rule in
+          switch rule.type {
+          case .first:
+            WeekdayOrdinal(position: .first, weekdays: rule.days.map(\.rawValue))
+          case .second:
+            WeekdayOrdinal(position: .second, weekdays: rule.days.map(\.rawValue))
+          case .third:
+            WeekdayOrdinal(position: .third, weekdays: rule.days.map(\.rawValue))
+          case .fourth:
+            WeekdayOrdinal(position: .fourth, weekdays: rule.days.map(\.rawValue))
+          case .penultimate:
+            WeekdayOrdinal(position: .secondToLastDay, weekdays: rule.days.map(\.rawValue))
+          case .last:
+            WeekdayOrdinal(position: .last, weekdays: rule.days.map(\.rawValue))
+          }
+        }
+        self = .monthly(monthlySchedule: .weekdayOrdinal(weekdayOrdinals))
       }
-      switch monthlyType {
-      case "specificDay":
-        let days = action["days"]?.arrayValue?.compactMap(\.intValue) ?? []
-        self = .monthly(monthlySchedule: .monthlySpecificDate(days))
-      case "dayOfWeek":
-        let dayOfWeekRules = monthly["rules"]?.arrayValue?
-          .compactMap(\.objectValue)
-          .compactMap { jsonObject -> WeekdayOrdinal? in
-            let weekdays = jsonObject["days"]?.arrayValue?.compactMap(\.intValue) ?? []
-            guard let type = jsonObject["type"]?.stringValue else { return nil }
-
-            let weekdayOrdinalPosition: WeekdayOrdinal.Position? = switch type {
-            case "first": .first
-            case "second": .second
-            case "third": .third
-            case "fourth": .fourth
-            case "penultimate": .secondToLastDay
-            case "last": .last
-            default: nil
-            }
-
-            guard let position = weekdayOrdinalPosition else { return nil }
-            return WeekdayOrdinal(position: position, weekdays: weekdays)
-          } ?? []
-        self = .monthly(monthlySchedule: .weekdayOrdinal(dayOfWeekRules))
-      case "firstDay":
-        self = .monthly(monthlySchedule: .firstDay)
-      case "secondDay":
-        self = .monthly(monthlySchedule: .secondDay)
-      case "middleOfMonth":
-        self = .monthly(monthlySchedule: .midMonth)
-      case "penultimateDay":
-        self = .monthly(monthlySchedule: .secondToLastDay)
-      case "lastDay":
-        self = .monthly(monthlySchedule: .lastDay)
-      default:
-        return nil
-      }
-    default:
-      return nil
     }
   }
 }
 
-extension Activity: Updateable {
+extension Activity {
   init(
     uuid: UUIDGenerator,
-    action: ManageActivityAction,
+    payload: CreateActivityTemplate,
     tagRepository: TagRepository,
     activityLabelRepository: ActivityLabelRepository,
     iconRepository: IconRepository
   ) async throws {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let name = fields["name"]?.stringValue else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "name")
-    }
-
     var activityFrequency = ActivityFrequency.daily
-    if let frequencyObject = fields["frequency"]?.objectValue,
-       let frequency = ActivityFrequency(action: frequencyObject) {
+    if let frequencyObject = payload.frequency,
+       let frequency = ActivityFrequency(frequency: frequencyObject) {
       activityFrequency = frequency
     }
 
     let existingTags = try await tagRepository.loadTags([])
-    let requestedNames = Set(fields["tagsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? [])
-    let tags = requestedNames.map { name in
+    let requestedTags = Set(payload.tags)
+    let tags = requestedTags.map { name in
       existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
     }
 
     var labels = [ActivityLabel]()
-    let labelsNames = fields["labelsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? []
-    for labelsName in labelsNames {
+    for labelsName in payload.labels {
       let activityLabel = ActivityLabel(name: labelsName)
       try await activityLabelRepository.saveLabel(activityLabel)
       labels.append(activityLabel)
     }
 
     var iconIdentifier: UUID?
-    if let iconParameters = fields["icon"]?.objectValue,
-       let emoji = iconParameters["value"]?.stringValue,
+    if let emoji = payload.icon,
        let data = emoji.emojiToImage(size: 140.0).pngData() {
-
       let icon = Icon(
         id: uuid(),
         data: data,
@@ -133,53 +92,32 @@ extension Activity: Updateable {
       iconIdentifier = icon.id
     }
 
-    let identifier = fields["identifier"]?.uuidValue ?? uuid()
-
     self.init(
-      id: identifier,
-      name: name,
+      id: uuid(),
+      name: payload.name,
       iconId: iconIdentifier,
       tags: tags,
       frequency: activityFrequency,
-      isFrequentEnabled: fields["isFrequentEnabled"]?.boolValue ?? false,
-      defaultDuration: fields["defaultDuration"]?.intValue,
-      dueDaysCount: fields["dueDaysCount"]?.intValue,
-      startDate: ISO8601DateFormatter.date(from: fields["startDate"]?.stringValue),
+      isFrequentEnabled: payload.isFrequentEnabled,
+      defaultDuration: payload.defaultDuration,
+      dueDaysCount: payload.dueDaysCount,
+      startDate: payload.startDate,
       labels: labels,
       tasks: [],
-      defaultReminderDate: ISO8601DateFormatter.date(from: fields["defaultReminderDate"]?.stringValue, timeZone: .autoupdatingCurrent),
-      important: fields["important"]?.boolValue ?? false
+      defaultReminderDate: payload.defaultReminderDate,
+      important: payload.important
     )
   }
 
   mutating func update(
-    with action: ManageActivityAction,
+    with payload: UpdateActivityTemplate,
     uuid: UUIDGenerator,
     tagRepository: TagRepository,
     activityLabelRepository: ActivityLabelRepository,
     iconRepository: IconRepository
   ) async throws {
-    let changes = try extractChanges(from: action)
-    updateField(changes["name"], field: &name, decode: { $0.stringValue })
-    updateField(changes["iconId"], field: &iconId, decode: { $0.uuidValue })
-
-    if let tagsChanges = changes["tagsIdentifiers"] {
-      let existingTags = try await tagRepository.loadTags([])
-      let requestedNames = Set(tagsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
-      tags = requestedNames.map { name in
-        existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
-      }
-    }
-
-    if let frequencyObject = changes["frequency"]?.objectValue,
-       let activityFrequency = ActivityFrequency(action: frequencyObject) {
-      frequency = activityFrequency
-    }
-
-    if let iconParameters = changes["icon"]?.objectValue,
-       let emoji = iconParameters["value"]?.stringValue,
+    if let emoji = payload.icon,
        let data = emoji.emojiToImage(size: 140.0).pngData() {
-
       let icon = Icon(
         id: uuid(),
         data: data,
@@ -189,89 +127,71 @@ extension Activity: Updateable {
       iconId = icon.id
     }
 
-    updateField(changes["isFrequentEnabled"], field: &isFrequentEnabled, decode: { $0.boolValue })
-    updateField(changes["defaultDuration"], field: &defaultDuration, decode: { $0.intValue })
-    updateField(changes["dueDaysCount"], field: &dueDaysCount, decode: { $0.intValue })
-    updateField(changes["startDate"], field: &startDate, decode: FieldDecoder.date)
-
-    if let labelsChanges = changes["labelsIdentifiers"] {
-      let existingLabels = try await activityLabelRepository.loadLabels(id, [])
-      let requestedNames = Set(labelsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
-      labels = requestedNames.map { name in
-        existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
-      }
+    let existingTags = try await tagRepository.loadTags([])
+    tags = Set(payload.tags).map { name in
+      existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
     }
 
-    // TASKS
-    updateField(changes["defaultReminderDate"], field: &defaultReminderDate, decode: FieldDecoder.date)
-    updateField(changes["important"], field: &important, decode: { $0.boolValue })
+    let existingLabels = try await activityLabelRepository.loadLabels(id, [])
+    labels = Set(payload.labels).map { name in
+      existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
+    }
+
+    if let frequencyObject = payload.frequency,
+       let activityFrequency = ActivityFrequency(frequency: frequencyObject) {
+      frequency = activityFrequency
+    }
+
+    name = payload.name
+    isFrequentEnabled = payload.isFrequentEnabled ?? false
+    defaultDuration = payload.defaultDuration
+    dueDaysCount = payload.dueDaysCount
+    startDate = payload.startDate
+    defaultReminderDate = payload.defaultReminderDate
+    important = payload.important ?? false
   }
 }
 
-extension ActivityTask: Updateable {
-  init(uuid: UUIDGenerator, action: ManageActivityAction) throws {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let name = fields["name"]?.stringValue else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "name")
-    }
-    guard let activityId = fields["activityTemplateIdentifier"]?.uuidValue else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "activityTemplateIdentifier")
-    }
-
+extension ActivityTask {
+  init(
+    uuid: UUIDGenerator,
+    activityId: UUID,
+    payload: CreateActivityTemplateTask
+  ) throws {
     self.init(
-      id: fields["identifier"]?.uuidValue ?? uuid(),
+      id: uuid(),
       activityId: activityId,
-      name: name,
-      defaultDuration: fields["defaultDuration"]?.intValue,
-      defaultReminderDate: ISO8601DateFormatter.date(from: fields["defaultReminderDate"]?.stringValue, timeZone: .autoupdatingCurrent),
-      defaultPosition: fields["defaultPosition"]?.intValue ?? .zero
+      name: payload.name,
+      defaultDuration: payload.defaultDuration,
+      defaultReminderDate: payload.defaultReminderDate,
+      defaultPosition: payload.defaultPosition ?? -1
     )
   }
 
-  mutating func update(with action: ManageActivityAction) throws {
-    let changes = try extractChanges(from: action)
-    updateField(changes["name"], field: &name, decode: { $0.stringValue })
-    updateField(changes["defaultDuration"], field: &defaultDuration, decode: { $0.intValue })
-    updateField(changes["defaultReminderDate"], field: &defaultReminderDate, decode: FieldDecoder.date)
-    updateField(changes["defaultPosition"], field: &defaultPosition, decode: { $0.intValue })
+  mutating func update(with payload: UpdateActivityTemplateTask) throws {
+    name = payload.name
+    defaultDuration = payload.defaultDuration
+    defaultReminderDate = payload.defaultReminderDate
+    defaultPosition = payload.defaultPosition ?? -1
   }
 }
 
-extension DayActivity: Updateable {
+extension DayActivity {
   init(
     uuid: UUIDGenerator,
-    action: ManageActivityAction,
-    activityRepository: ActivityRepository,
+    payload: CreateDayActivity,
     tagRepository: TagRepository,
-    activityLabelRepository: ActivityLabelRepository,
     iconRepository: IconRepository,
     calendar: Calendar
   ) async throws {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let iso8601Date = ISO8601DateFormatter.date(from: action.fields?["date"]?.stringValue) else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "date")
-    }
-
-    let name = fields["name"]?.stringValue
-    guard let name else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "name")
-    }
-
     let existingTags = try await tagRepository.loadTags([])
-    let requestedNames = Set(fields["tagsIdentifiers"]?.arrayValue?.compactMap(\.stringValue) ?? [])
-    let tags = requestedNames.map { name in
+    let tags = Set(payload.tags).map { name in
       existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
     }
 
     var iconIdentifier: UUID?
-    if let iconParameters = fields["icon"]?.objectValue,
-       let emoji = iconParameters["value"]?.stringValue,
+    if let emoji = payload.icon,
        let data = emoji.emojiToImage(size: 140.0).pngData() {
-
       let icon = Icon(
         id: uuid(),
         data: data,
@@ -282,22 +202,22 @@ extension DayActivity: Updateable {
     }
 
     self.init(
-      id: fields["identifier"]?.uuidValue ?? uuid(),
-      date: calendar.dayFormat(iso8601Date),
+      id: uuid(),
+      date: calendar.dayFormat(payload.date),
       activity: nil,
-      name: name,
+      name: payload.name,
       iconId: iconIdentifier,
-      dueDate: ISO8601DateFormatter.date(from: fields["dueDate"]?.stringValue),
-      doneDate: ISO8601DateFormatter.date(from: fields["doneDate"]?.stringValue),
-      duration: fields["duration"]?.intValue ?? .zero,
-      overview: fields["overview"]?.stringValue,
+      dueDate: payload.dueDate,
+      doneDate: payload.doneDate,
+      duration: payload.duration ?? .zero,
+      overview: payload.overview,
       isGeneratedAutomatically: false,
       tags: tags,
       labels: [],
       dayActivityTasks: [],
-      reminderDate: ISO8601DateFormatter.date(from: fields["reminderDate"]?.stringValue, timeZone: .autoupdatingCurrent),
-      important: fields["important"]?.boolValue ?? false,
-      position: fields["position"]?.intValue ?? -1,
+      reminderDate: payload.reminderDate,
+      important: payload.important ?? false,
+      position: payload.position ?? -1,
       share: nil
     )
   }
@@ -305,88 +225,86 @@ extension DayActivity: Updateable {
   static func create(
     uuid: UUIDGenerator,
     activity: Activity,
-    action: ManageActivityAction,
+    payload: CreateDayActivity,
     tagRepository: TagRepository,
     activityLabelRepository: ActivityLabelRepository,
     iconRepository: IconRepository,
     calendar: Calendar
   ) async throws -> DayActivity {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let iso8601Date = ISO8601DateFormatter.date(from: action.fields?["date"]?.stringValue) else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "date")
-    }
-
     var dayActivity = DayActivity.create(
       from: activity,
-      identifier: action.fields?["identifier"]?.uuidValue,
       uuid: uuid,
       calendar: { calendar },
-      date: iso8601Date,
+      date: payload.date,
       createdByUser: false
     )
-    try await dayActivity.update(
-      with: fields,
-      uuid: uuid,
-      tagRepository: tagRepository,
-      activityLabelRepository: activityLabelRepository,
-      iconRepository: iconRepository
-    )
+
+    dayActivity.name = payload.name
+    dayActivity.overview = payload.overview
+    dayActivity.date = payload.date
+    dayActivity.doneDate = payload.doneDate
+    dayActivity.dueDate = payload.dueDate
+    dayActivity.reminderDate = payload.reminderDate
+    dayActivity.duration = payload.duration ?? .zero
+    dayActivity.position = payload.position ?? -1
+    dayActivity.important = payload.important ?? false
+
+    let existingTags = try await tagRepository.loadTags([])
+    dayActivity.tags = Set(payload.tags).map { name in
+      existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
+    }
+
+    let existingLabels = try await activityLabelRepository.loadLabels(activity.id, [])
+    dayActivity.labels = Set(payload.labels).map { name in
+      existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
+    }
+
+    if let emoji = payload.icon,
+       let data = emoji.emojiToImage(size: 140.0).pngData() {
+      let icon = Icon(
+        id: uuid(),
+        data: data,
+        lastUpdated: Date()
+      )
+      try await iconRepository.saveIcon(icon)
+      dayActivity.iconId = icon.id
+    }
+
     return dayActivity
   }
 
   mutating func update(
-    with action: ManageActivityAction,
+    with payload: UpdateDayActivity,
     uuid: UUIDGenerator,
     tagRepository: TagRepository,
     activityLabelRepository: ActivityLabelRepository,
     iconRepository: IconRepository
   ) async throws {
-    try await update(
-      with: try extractChanges(from: action),
-      uuid: uuid,
-      tagRepository: tagRepository,
-      activityLabelRepository: activityLabelRepository,
-      iconRepository: iconRepository
-    )
-  }
+    name = payload.name
+    overview = payload.overview
+    date = payload.date
+    doneDate = payload.doneDate
+    dueDate = payload.dueDate
+    reminderDate = payload.reminderDate
+    duration = payload.duration ?? .zero
+    position = payload.position ?? -1
+    important = payload.important ?? false
 
-  private mutating func update(
-    with changes: [String: JSONValue],
-    uuid: UUIDGenerator,
-    tagRepository: TagRepository,
-    activityLabelRepository: ActivityLabelRepository,
-    iconRepository: IconRepository
-  ) async throws {
-    updateField(changes["date"], field: &date, decode: FieldDecoder.date)
-    updateField(changes["name"], field: &name, decode: { $0.stringValue })
-    updateField(changes["iconId"], field: &iconId, decode: { $0.uuidValue })
-    updateField(changes["dueDate"], field: &dueDate, decode: FieldDecoder.date)
-    updateField(changes["doneDate"], field: &doneDate, decode: FieldDecoder.date)
-    updateField(changes["duration"], field: &duration, decode: { $0.intValue })
-    updateField(changes["overview"], field: &overview, decode: { $0.stringValue })
-
-    if let tagsChanges = changes["tagsIdentifiers"] {
-      let existingTags = try await tagRepository.loadTags([])
-      let requestedNames = Set(tagsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
-      tags = requestedNames.map { name in
-        existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
-      }
+    let existingTags = try await tagRepository.loadTags([])
+    tags = Set(payload.tags).map { name in
+      existingTags.first(where: { $0.name == name }) ?? Tag(name: name)
     }
 
-    if let labelsChanges = changes["labelsIdentifiers"], let activityId = activity?.id {
+    if let activityId = activity?.id {
       let existingLabels = try await activityLabelRepository.loadLabels(activityId, [])
-      let requestedNames = Set(labelsChanges.arrayValue?.compactMap(\.stringValue) ?? [])
+      let requestedNames = Set(payload.labels)
       labels = requestedNames.map { name in
         existingLabels.first(where: { $0.name == name }) ?? ActivityLabel(name: name)
       }
     }
 
-    if let iconParameters = changes["icon"]?.objectValue,
-       let emoji = iconParameters["value"]?.stringValue,
+    if let emoji = payload.icon,
        let data = emoji.emojiToImage(size: 140.0).pngData() {
-
       let icon = Icon(
         id: uuid(),
         data: data,
@@ -394,15 +312,13 @@ extension DayActivity: Updateable {
       )
       try await iconRepository.saveIcon(icon)
       iconId = icon.id
+    } else {
+      iconId = nil
     }
-
-    updateField(changes["reminderDate"], field: &reminderDate, decode: FieldDecoder.date)
-    updateField(changes["important"], field: &important, decode: { $0.boolValue })
-    updateField(changes["position"], field: &position, decode: { $0.intValue })
   }
 }
 
-extension DayActivityRequest {
+extension DayActivityResponse {
   init(dayActivity: DayActivity) {
     self.init(
       identifier: dayActivity.id,
@@ -414,9 +330,9 @@ extension DayActivityRequest {
       doneDate: dayActivity.doneDate,
       duration: dayActivity.duration,
       overview: dayActivity.overview,
-      tags: dayActivity.tags.map(MarkerRequest.init),
-      labels: dayActivity.labels.map(MarkerRequest.init),
-      tasks: dayActivity.dayActivityTasks.map(DayActivityTaskRequest.init),
+      tags: dayActivity.tags.map(MarkerResponse.init),
+      labels: dayActivity.labels.map(MarkerResponse.init),
+      tasks: dayActivity.dayActivityTasks.map(DayActivityTaskResponse.init),
       reminderDate: dayActivity.reminderDate,
       important: dayActivity.important,
       position: dayActivity.position
@@ -424,45 +340,36 @@ extension DayActivityRequest {
   }
 }
 
-extension DayActivityTask: Updateable {
+extension DayActivityTask {
   init(
     uuid: UUIDGenerator,
-    action: ManageActivityAction
+    dayActivityId: UUID,
+    payload: CreateDayActivityTask,
   ) throws {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let dayActivityId = fields["dayActivityId"]?.uuidValue else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "dayActivityId")
-    }
-    guard let name = fields["name"]?.stringValue else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "name")
-    }
     self.init(
-      id: fields["identifier"]?.uuidValue ?? uuid(),
+      id: uuid(),
       dayActivityId: dayActivityId,
       activityTask: nil,
-      name: name,
-      doneDate: ISO8601DateFormatter.date(from: fields["doneDate"]?.stringValue),
-      duration: fields["duration"]?.intValue ?? .zero,
-      overview: fields["overview"]?.stringValue,
-      reminderDate: ISO8601DateFormatter.date(from: fields["reminderDate"]?.stringValue, timeZone: .autoupdatingCurrent),
-      position: fields["position"]?.intValue ?? -1
+      name: payload.name,
+      doneDate: payload.doneDate,
+      duration: payload.duration ?? .zero,
+      overview: payload.overview,
+      reminderDate: payload.reminderDate,
+      position: payload.position ?? -1
     )
   }
 
-  mutating func update(with action: ManageActivityAction) throws {
-    let changes = try extractChanges(from: action)
-    updateField(changes["name"], field: &name, decode: { $0.stringValue })
-    updateField(changes["doneDate"], field: &doneDate, decode: FieldDecoder.date)
-    updateField(changes["duration"], field: &duration, decode: { $0.intValue })
-    updateField(changes["overview"], field: &overview, decode: { $0.stringValue })
-    updateField(changes["reminderDate"], field: &reminderDate, decode: FieldDecoder.date)
-    updateField(changes["position"], field: &position, decode: { $0.intValue })
+  mutating func update(with payload: UpdateDayActivityTask) throws {
+    name = payload.name
+    doneDate = payload.doneDate
+    duration = payload.duration ?? .zero
+    overview = payload.overview
+    reminderDate = payload.reminderDate
+    position = payload.position ?? -1
   }
 }
 
-extension DayActivityTaskRequest {
+extension DayActivityTaskResponse {
   init(task: DayActivityTask) {
     self.init(
       identifier: task.id,
@@ -478,7 +385,7 @@ extension DayActivityTaskRequest {
   }
 }
 
-extension MarkerRequest {
+extension MarkerResponse {
   init(tag: Tag) {
     self.init(name: tag.name)
   }
@@ -488,50 +395,26 @@ extension MarkerRequest {
   }
 }
 
-extension Tag {
-  init(action: ManageActivityAction) throws {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let name = fields["name"]?.stringValue else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "name")
-    }
-    self.init(name: name)
-  }
-}
-
-extension ActivityLabel {
-  init(action: ManageActivityAction) throws {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let name = fields["name"]?.stringValue else {
-      throw AIModuleError.requiredFieldNotFound(fieldName: "name")
-    }
-    self.init(name: name)
-  }
-}
-
-extension ActivityTemplateRequest {
+extension ActivityTemplateResponse {
   init(activity: Activity) {
     self.init(
       identifier: activity.id,
       name: activity.name,
       iconIdentifier: activity.iconId,
-      tags: activity.tags.map(MarkerRequest.init),
+      tags: activity.tags.map(MarkerResponse.init),
       isFrequentEnabled: activity.isFrequentEnabled,
       defaultDuration: activity.defaultDuration,
       dueDaysCount: activity.dueDaysCount,
       startDate: activity.startDate,
-      labels: activity.labels.map(MarkerRequest.init),
-      tasks: activity.tasks.map(ActivityTemplateTaskRequest.init),
+      labels: activity.labels.map(MarkerResponse.init),
+      tasks: activity.tasks.map(ActivityTemplateTaskResponse.init),
       defaultReminderDate: activity.defaultReminderDate,
       important: activity.important
     )
   }
 }
 
-extension ActivityTemplateTaskRequest {
+extension ActivityTemplateTaskResponse {
   init(activityTask: ActivityTask) {
     self.init(
       identifier: activityTask.id,
@@ -541,45 +424,5 @@ extension ActivityTemplateTaskRequest {
       defaultReminderDate: activityTask.defaultReminderDate,
       defaultPosition: activityTask.defaultPosition
     )
-  }
-}
-
-protocol Updateable { }
-
-extension Updateable {
-  func extractChanges(from action: ManageActivityAction) throws -> [String: JSONValue] {
-    guard let fields = action.fields else {
-      throw AIModuleError.fieldsNotFound
-    }
-    guard let changes = fields["changes"]?.objectValue else {
-      throw AIModuleError.changesNotFound
-    }
-
-    return changes
-  }
-
-  func updateField<T>(
-      _ value: JSONValue?,
-      field: inout T,
-      decode: (JSONValue) -> T?
-  ) {
-      guard let value, let decoded = decode(value) else { return }
-      field = decoded
-  }
-
-  func updateField<T>(
-      _ value: JSONValue?,
-      field: inout T?,
-      decode: (JSONValue) -> T?
-  ) {
-      guard let value else { return }
-      field = decode(value)
-  }
-}
-
-fileprivate struct FieldDecoder {
-  static func date(_ value: JSONValue) -> Date? {
-    guard let string = value.stringValue else { return nil }
-    return ISO8601DateFormatter().date(from: string)
   }
 }

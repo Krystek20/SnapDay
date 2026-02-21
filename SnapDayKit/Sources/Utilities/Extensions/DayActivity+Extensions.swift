@@ -5,13 +5,12 @@ import Dependencies
 extension DayActivity {
   public static func create(
     from activity: Activity,
-    identifier: UUID? = nil,
     uuid: UUIDGenerator,
     calendar: () -> Calendar,
     date: Date,
     createdByUser: Bool
   ) -> DayActivity {
-    let dayActivityId = identifier ?? uuid()
+    let dayActivityId = uuid()
     return DayActivity(
       id: dayActivityId,
       date: date,
