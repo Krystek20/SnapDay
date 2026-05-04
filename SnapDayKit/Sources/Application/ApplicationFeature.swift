@@ -5,7 +5,7 @@ import ActivityDetails
 import ComposableArchitecture
 import Utilities
 import TipKit
-#if DEBUG
+#if DEBUG || BETA
 import DeveloperTools
 #endif
 
@@ -35,7 +35,7 @@ public struct ApplicationFeature: TodayProvidable {
     var reports = ReportsFeature.State()
     var onboarding = OnboardingFeature.State()
 
-    #if DEBUG
+    #if DEBUG || BETA
     @Presents var developerTools: DeveloperToolsFeature.State?
     #endif
 
@@ -58,7 +58,7 @@ public struct ApplicationFeature: TodayProvidable {
     case path(StackAction<Path.State, Path.Action>)
     case reports(ReportsFeature.Action)
     case onboarding(OnboardingFeature.Action)
-    #if DEBUG
+    #if DEBUG || BETA
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
     case binding(BindingAction<State>)
@@ -148,7 +148,7 @@ public struct ApplicationFeature: TodayProvidable {
           }
         }
       case .deviceShaked:
-        #if DEBUG
+        #if DEBUG || BETA
         state.developerTools = DeveloperToolsFeature.State()
         #endif
         return .none
@@ -170,7 +170,7 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       case .onboarding:
         return .none
-      #if DEBUG
+      #if DEBUG || BETA
       case .developerTools:
         return .none
       #endif
@@ -180,7 +180,7 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       }
     }
-    #if DEBUG
+    #if DEBUG || BETA
     .ifLet(\.$developerTools, action: \.developerTools) {
       DeveloperToolsFeature()
     }

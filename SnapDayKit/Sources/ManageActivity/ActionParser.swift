@@ -25,10 +25,6 @@ struct ActionParser {
 
   private var decisionResults: [UserResponse] = []
 
-  // MARK: - Initialization
-
-  init() { }
-
   // MARK: - Actions
 
   func parse(

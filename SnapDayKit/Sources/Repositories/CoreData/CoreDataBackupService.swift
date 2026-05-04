@@ -7,6 +7,11 @@ private enum CoreDataStackError: Error {
   case backupNotExist
 }
 
+enum CoreDataRecoveryResult: Equatable {
+  case restoredFromBackup
+  case recreatedEmptyStore
+}
+
 final class CoreDataBackupService {
 
   // MARK: - Properties
@@ -61,20 +66,38 @@ final class CoreDataBackupService {
     )
   }
 
-  func loadFromBackup(
+  func recoverStore(
+    persistentContainer: PersistentContainerType,
+    description: NSPersistentStoreDescription
+  ) throws -> CoreDataRecoveryResult {
+    do {
+      try restoreStoreFromBackup(
+        persistentContainer: persistentContainer,
+        description: description
+      )
+      return .restoredFromBackup
+    } catch {
+      try recreateStore(
+        persistentContainer: persistentContainer,
+        description: description
+      )
+      return .recreatedEmptyStore
+    }
+  }
+
+  private func restoreStoreFromBackup(
     persistentContainer: PersistentContainerType,
     description: NSPersistentStoreDescription
   ) throws {
     guard let storeURL = description.url else { return }
-    try persistentContainer.persistentStoreCoordinator.destroyPersistentStore(
-      at: storeURL,
-      ofType: description.type,
-      options: description.options
-    )
     let backupURL = try fileManager.getURLToRestore()
     if !fileManager.fileExists(atPath: backupURL.path()) {
       throw CoreDataStackError.backupNotExist
     }
+    try destroyStore(
+      persistentContainer: persistentContainer,
+      description: description
+    )
     let backupStore = try persistentContainer.persistentStoreCoordinator.addPersistentStore(
       ofType: description.type,
       configurationName: description.configuration,
@@ -86,6 +109,34 @@ final class CoreDataBackupService {
       to: storeURL,
       options: description.options,
       type: NSPersistentStore.StoreType(rawValue: description.type)
+    )
+  }
+
+  private func recreateStore(
+    persistentContainer: PersistentContainerType,
+    description: NSPersistentStoreDescription
+  ) throws {
+    try destroyStore(
+      persistentContainer: persistentContainer,
+      description: description
+    )
+    _ = try persistentContainer.persistentStoreCoordinator.addPersistentStore(
+      ofType: description.type,
+      configurationName: description.configuration,
+      at: description.url,
+      options: description.options
+    )
+  }
+
+  private func destroyStore(
+    persistentContainer: PersistentContainerType,
+    description: NSPersistentStoreDescription
+  ) throws {
+    guard let storeURL = description.url else { return }
+    try persistentContainer.persistentStoreCoordinator.destroyPersistentStore(
+      at: storeURL,
+      ofType: description.type,
+      options: description.options
     )
   }
 }

@@ -8,7 +8,6 @@ import Models
 import Common
 import CalendarPicker
 import Combine
-import WidgetKit
 import Friends
 import ManageActivity
 
@@ -28,6 +27,7 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.utcCalendar) private var calendar
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.deeplinkService) private var deeplinkService
+  @Dependency(\.widgetReloader) private var widgetReloader
   private let userDefaults: UserDefaults
 
   // MARK: - State & Action
@@ -336,7 +336,7 @@ public struct DashboardFeature: TodayProvidable {
         do {
           let day = try await dayUpdater.day(date)
           await send(.internal(.setDay(day)))
-          WidgetCenter.shared.reloadAllTimelines()
+          await widgetReloader.requestReload()
         } catch {
           print("error: \(error)")
         }

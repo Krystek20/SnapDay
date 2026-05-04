@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || BETA
 import SwiftUI
 import ComposableArchitecture
 import UiComponents
@@ -91,6 +91,9 @@ public struct DeveloperToolsView: View {
               .font(.caption)
           }
           Toggle("Background updated notification", isOn: $store.backgroundUpdatedNotificationEnabled)
+            .font(.title2)
+
+          Toggle("Switch Testing Host", isOn: $store.testingHostEnabled)
             .font(.title2)
         }
         .maxFrame()

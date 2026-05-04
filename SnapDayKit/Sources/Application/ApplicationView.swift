@@ -6,7 +6,7 @@ import Onboarding
 import ActivityDetails
 import Resources
 import UIKit.UIDevice
-#if DEBUG
+#if DEBUG || BETA
 import DeveloperTools
 #endif
 
@@ -50,7 +50,7 @@ public struct ApplicationView: View {
         .onAppear {
           store.send(.appeared)
         }
-        #if DEBUG
+        #if DEBUG || BETA
         .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
           NavigationStack {
             DeveloperToolsView(store: store)

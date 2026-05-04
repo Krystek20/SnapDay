@@ -54,28 +54,7 @@ public struct DashboardView: View {
           }
         )
 
-        VStack {
-          Spacer()
-          HStack {
-            Spacer()
-            Button(
-              action: {
-                store.send(.view(.assistantButtonTapped))
-              },
-              label: {
-                Image(systemName: "sparkles")
-                  .foregroundStyle(Color.pureWhite)
-                  .font(.system(size: 20.0))
-                  .padding(.all, 8.0)
-                  .background(
-                    Circle()
-                      .fill(Color.actionBlue)
-                  )
-              }
-            )
-          }
-        }
-        .padding(20.0)
+        aiAssistantButton
 
         alertViewIfVisible
       }
@@ -246,6 +225,31 @@ public struct DashboardView: View {
       )
       .formBackgroundModifier(padding: EdgeInsets(.zero))
     }
+  }
+
+  private var aiAssistantButton: some View {
+    VStack {
+      Spacer()
+      HStack {
+        Spacer()
+        Button(
+          action: {
+            store.send(.view(.assistantButtonTapped))
+          },
+          label: {
+            Image(systemName: "sparkles")
+              .foregroundStyle(Color.pureWhite)
+              .font(.system(size: 20.0))
+              .padding(.all, 8.0)
+              .background(
+                Circle()
+                  .fill(Color.actionBlue)
+              )
+          }
+        )
+      }
+    }
+    .padding(20.0)
   }
 }
 

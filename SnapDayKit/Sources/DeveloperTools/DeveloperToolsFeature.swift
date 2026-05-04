@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || BETA
 import Foundation
 import ComposableArchitecture
 import Repositories
@@ -40,6 +40,14 @@ public struct DeveloperToolsFeature: TodayProvidable {
       }
       set {
         UserDefaults.standard.setValue(newValue, forKey: key)
+      }
+    }
+    var testingHostEnabled: Bool {
+      get {
+        UserDefaults.standard.bool(forKey: "isTestingHost")
+      }
+      set {
+        UserDefaults.standard.setValue(newValue, forKey: "isTestingHost")
       }
     }
     var allShared: [Shared] = []

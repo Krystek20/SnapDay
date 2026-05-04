@@ -192,22 +192,26 @@ public struct ManageActivityFeature: TodayProvidable {
   private func handleConnectionAction(state: inout State, action: Action.ConnectionAction) -> Effect<Action> {
     switch action {
     case .connect:
-      let path = "wss://relieved-manatee-wildly.ngrok-free.app/api/v1/manage-activities"
-      guard let url = URL(string: path) else { return .none }
-      let (connection, stream) = webSocket.connect(url)
-      return .merge(
-        .send(.internal(.connection(.connected(connection)))),
-        .run { send in
-          do {
-            for try await message in stream {
-              await send(.internal(.connection(.received(message))))
+      do {
+        let url = try URLProvider.url(for: "/api/v1/manage-activities", isWebSocket: true)
+        let (connection, stream) = webSocket.connect(url)
+        return .merge(
+          .send(.internal(.connection(.connected(connection)))),
+          .run { send in
+            do {
+              for try await message in stream {
+                await send(.internal(.connection(.received(message))))
+              }
+              await send(.internal(.connection(.disconnected)))
+            } catch {
+              await send(.internal(.connection(.disconnected)))
             }
-            await send(.internal(.connection(.disconnected)))
-          } catch {
-            await send(.internal(.connection(.disconnected)))
           }
-        }
-      )
+        )
+      } catch {
+        print("error: \(error.localizedDescription)")
+        return .none
+      }
     case .connected(let connection):
       state.isConnected = true
       state.connection = connection

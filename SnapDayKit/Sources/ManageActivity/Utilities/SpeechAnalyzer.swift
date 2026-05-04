@@ -60,7 +60,6 @@ final class SpeechAnalyzer {
         if let result = result {
           text = result.bestTranscription.formattedString
           self?.lastSpeechTime = Date()
-          print(["ELO_TEST_\(text)"])
         }
         if let error {
           self?.stop()
@@ -74,7 +73,6 @@ final class SpeechAnalyzer {
   }
 
   func stop() {
-    print(["ELO_TEST_STOP"])
     audioEngine.stop()
     audioEngine.inputNode.removeTap(onBus: 0)
     recognitionRequest?.endAudio()
@@ -104,7 +102,6 @@ final class SpeechAnalyzer {
 
     silenceTimerTask = Task { [weak self] in
       while Date().timeIntervalSince(self?.lastSpeechTime ?? Date()) <= 3, self?.silenceTimerTask?.isCancelled == false {
-        print(["ELO_TEST_\(Date().timeIntervalSince(self?.lastSpeechTime ?? Date()))"])
         try? await Task.sleep(for: .seconds(2))
       }
       self?.stop()

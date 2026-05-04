@@ -82,12 +82,24 @@ final class CoreDataStack {
     persistentContainer.loadPersistentStores { description, error in
       guard let loadPersistentStoresError = error as NSError? else { return }
       do {
-        try coreDataBackupService.loadFromBackup(
+        let recoveryResult = try coreDataBackupService.recoverStore(
           persistentContainer: persistentContainer,
           description: description
         )
+        print(
+          """
+          CoreDataStack recovered store after load failure.
+          store: \(description.url?.lastPathComponent ?? "unknown")
+          originalError: \(loadPersistentStoresError)
+          recovery: \(String(describing: recoveryResult))
+          """
+        )
       } catch {
-        fatalError("loadPersistentStores failed: \(loadPersistentStoresError.localizedDescription) backupError: \(error.localizedDescription)")
+        Self.handlePersistentStoreLoadFailure(
+          loadPersistentStoresError,
+          recoveryError: error,
+          description: description
+        )
       }
     }
 
@@ -207,6 +219,25 @@ extension CoreDataStack: DependencyKey {
 
   static var previewValue: CoreDataStack {
     CoreDataStack(name: "SnapDay", inMemoryStore: true)
+  }
+}
+
+private extension CoreDataStack {
+  static func handlePersistentStoreLoadFailure(
+    _ loadError: NSError,
+    recoveryError: Error,
+    description: NSPersistentStoreDescription
+  ) {
+    let message =
+      """
+      loadPersistentStores failed.
+      store: \(description.url?.path ?? "unknown")
+      type: \(description.type)
+      originalError: \(loadError)
+      recoveryError: \(recoveryError)
+      """
+    assertionFailure(message)
+    print(message)
   }
 }
 

@@ -317,7 +317,7 @@ public actor CloudService {
   }
 }
 
-#if DEBUG
+#if DEBUG || BETA
 import CoreData
 
 extension CloudService {

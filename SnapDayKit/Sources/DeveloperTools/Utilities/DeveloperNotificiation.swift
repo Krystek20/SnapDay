@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG || BETA
 import Models
 import UserNotifications
 

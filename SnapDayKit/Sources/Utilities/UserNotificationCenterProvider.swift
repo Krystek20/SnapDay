@@ -214,7 +214,7 @@ extension UserNotificationCenterProvider {
   }
 }
 
-#if DEBUG
+#if DEBUG || BETA
 extension UserNotificationCenterProvider {
   public var pendingRequests: [String] {
     get async {
