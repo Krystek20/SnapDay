@@ -10,11 +10,11 @@ public struct URLProvider {
 
   public static func url(for path: String, isWebSocket: Bool = false) throws -> URL {
     var urlComponents = URLComponents()
-    #if DEBUG || BETA
-    urlComponents.host = "relieved-manatee-wildly.ngrok-free.app"
-    #else
+//    #if DEBUG
     urlComponents.host = host
-    #endif
+//    #else
+//    urlComponents.host = "snapday-server.onrender.com"
+//    #endif
     urlComponents.scheme = isWebSocket ? "wss" : "https"
     urlComponents.path = path
 

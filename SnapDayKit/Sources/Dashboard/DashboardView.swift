@@ -14,7 +14,7 @@ public struct DashboardView: View {
 
   // MARK: - Properties
 
-  @Perception.Bindable private var store: StoreOf<DashboardFeature>
+  @Bindable private var store: StoreOf<DashboardFeature>
   @State private var alertSize = CGSize.zero
 
   private var additionalButtomPadding: Double {
@@ -31,160 +31,158 @@ public struct DashboardView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithPerceptionTracking {
-      ZStack(alignment: .top) {
-        ScrollView {
-          Spacer()
-            .frame(height: 50.0)
-          dayList
-            .padding(.horizontal, 15.0)
-            .padding(.top, 15.0)
-            .padding(.bottom, 15.0 + additionalButtomPadding)
-        }
-        .maxWidth()
-        .scrollIndicators(.hidden)
+    ZStack(alignment: .top) {
+      ScrollView {
+        Spacer()
+          .frame(height: 50.0)
+        dayList
+          .padding(.horizontal, 15.0)
+          .padding(.top, 15.0)
+          .padding(.bottom, 15.0 + additionalButtomPadding)
+      }
+      .maxWidth()
+      .scrollIndicators(.hidden)
 
-        Switcher(
-          title: store.title,
-          leftArrowAction: {
-            store.send(.view(.decreaseButtonTapped))
-          },
-          rightArrowAction: {
-            store.send(.view(.increaseButtonTapped))
-          }
-        )
+      Switcher(
+        title: store.title,
+        leftArrowAction: {
+          store.send(.view(.decreaseButtonTapped))
+        },
+        rightArrowAction: {
+          store.send(.view(.increaseButtonTapped))
+        }
+      )
 
-        aiAssistantButton
+      aiAssistantButton
 
-        alertViewIfVisible
+      alertViewIfVisible
+    }
+    .background
+    .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
+      NavigationStack {
+        ActivityListView(store: store)
       }
-      .background
-      .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
-        NavigationStack {
-          ActivityListView(store: store)
-        }
-        .presentationDetents([.large])
+      .presentationDetents([.large])
+    }
+    .sheet(item: $store.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
+      NavigationStack {
+        DayActivityFormView(store: store)
       }
-      .sheet(item: $store.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
-        NavigationStack {
-          DayActivityFormView(store: store)
-        }
-        .presentationDetents([.large])
+      .presentationDetents([.large])
+    }
+    .sheet(item: $store.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
+      NavigationStack {
+        DayActivityFormView(store: store)
       }
-      .sheet(item: $store.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
-        NavigationStack {
-          DayActivityFormView(store: store)
-        }
-        .presentationDetents([.large])
+      .presentationDetents([.large])
+    }
+    .sheet(item: $store.scope(state: \.calendarPicker, action: \.calendarPicker)) { store in
+      NavigationStack {
+        CalendarPickerView(store: store)
       }
-      .sheet(item: $store.scope(state: \.calendarPicker, action: \.calendarPicker)) { store in
-        NavigationStack {
-          CalendarPickerView(store: store)
-        }
-        .presentationDetents([.medium])
+      .presentationDetents([.medium])
+    }
+    .sheet(item: $store.scope(state: \.friends, action: \.friends)) { store in
+      NavigationStack {
+        FriendsView(store: store)
       }
-      .sheet(item: $store.scope(state: \.friends, action: \.friends)) { store in
-        NavigationStack {
-          FriendsView(store: store)
-        }
-        .presentationDetents([.large])
+      .presentationDetents([.large])
+    }
+    .sheet(item: $store.scope(state: \.manageActivity, action: \.manageActivity)) { store in
+      NavigationStack {
+        ManageActivityView(store: store)
       }
-      .sheet(item: $store.scope(state: \.manageActivity, action: \.manageActivity)) { store in
-        NavigationStack {
-          ManageActivityView(store: store)
-        }
-        .presentationDetents([.large])
-        .interactiveDismissDisabled()
-      }
-      .task {
-        store.send(.view(.appeared))
-      }
-      .navigationTitle(String(localized: "Dashboard", bundle: .module))
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .topBarLeading) {
-          HStack {
-            Button(
-              action: {
-                store.send(.view(.todayButtonTapped))
-              },
-              label: {
-                Image(systemName: "smallcircle.filled.circle.fill")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
-            Button(
-              action: {
-                store.send(.view(.calendarButtonTapped))
-              },
-              label: {
-                Image(systemName: "calendar.circle.fill")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
-            Menu(
-              content: {
-                Button(
-                  action: {
-                    store.send(.view(.toggleShowCompletedActivities))
-                  },
-                  label: {
-                    Text("Show completed", bundle: .module)
-                    if !store.hideCompleted {
-                      Image(systemName: "checkmark.circle.fill")
-                    }
+      .presentationDetents([.large])
+      .interactiveDismissDisabled()
+    }
+    .task {
+      store.send(.view(.appeared))
+    }
+    .navigationTitle(String(localized: "Dashboard", bundle: .module))
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .topBarLeading) {
+        HStack {
+          Button(
+            action: {
+              store.send(.view(.todayButtonTapped))
+            },
+            label: {
+              Image(systemName: "smallcircle.filled.circle.fill")
+                .foregroundStyle(Color.actionBlue)
+            }
+          )
+          Button(
+            action: {
+              store.send(.view(.calendarButtonTapped))
+            },
+            label: {
+              Image(systemName: "calendar.circle.fill")
+                .foregroundStyle(Color.actionBlue)
+            }
+          )
+          Menu(
+            content: {
+              Button(
+                action: {
+                  store.send(.view(.toggleShowCompletedActivities))
+                },
+                label: {
+                  Text("Show completed", bundle: .module)
+                  if !store.hideCompleted {
+                    Image(systemName: "checkmark.circle.fill")
                   }
-                )
-                Button(
-                  action: {
-                    store.send(.view(.toggleShowTasks))
-                  },
-                  label: {
-                    Text("Show tasks", bundle: .module)
-                    if !store.hideTasks {
-                      Image(systemName: "checkmark.circle.fill")
-                    }
+                }
+              )
+              Button(
+                action: {
+                  store.send(.view(.toggleShowTasks))
+                },
+                label: {
+                  Text("Show tasks", bundle: .module)
+                  if !store.hideTasks {
+                    Image(systemName: "checkmark.circle.fill")
                   }
-                )
-              }, label: {
-                Image(systemName: "gearshape.circle.fill")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
-          }
+                }
+              )
+            }, label: {
+              Image(systemName: "gearshape.circle.fill")
+                .foregroundStyle(Color.actionBlue)
+            }
+          )
         }
-        ToolbarItem(placement: .topBarTrailing) {
-          HStack {
-            Button(
-              action: {
-                store.send(.view(.showFriendsTapped))
-              },
-              label: {
-                Image(systemName: "person.2.circle.fill")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
+      }
+      ToolbarItem(placement: .topBarTrailing) {
+        HStack {
+          Button(
+            action: {
+              store.send(.view(.showFriendsTapped))
+            },
+            label: {
+              Image(systemName: "person.2.circle.fill")
+                .foregroundStyle(Color.actionBlue)
+            }
+          )
 
-            Button(
-              action: {
-                store.send(.view(.activityListButtonTapped))
-              },
-              label: {
-                Image(systemName: "list.bullet.circle.fill")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
-            .modifier(SaveActivityTipModifier())
-            Button(
-              action: {
-                store.send(.view(.newButtonTapped))
-              },
-              label: {
-                Image(systemName: "plus.circle.fill")
-                  .foregroundStyle(Color.actionBlue)
-              }
-            )
-          }
+          Button(
+            action: {
+              store.send(.view(.activityListButtonTapped))
+            },
+            label: {
+              Image(systemName: "list.bullet.circle.fill")
+                .foregroundStyle(Color.actionBlue)
+            }
+          )
+          .modifier(SaveActivityTipModifier())
+          Button(
+            action: {
+              store.send(.view(.newButtonTapped))
+            },
+            label: {
+              Image(systemName: "plus.circle.fill")
+                .foregroundStyle(Color.actionBlue)
+            }
+          )
         }
       }
     }
@@ -192,39 +190,35 @@ public struct DashboardView: View {
 
   @ViewBuilder
   private var alertViewIfVisible: some View {
-    WithPerceptionTracking {
-      if let alertConfiguration = store.alert?.configuration {
-        VStack {
-          Spacer()
-          ComplateAlertView(
-            configuration: alertConfiguration,
-            confirmButtonTapped: {
-              store.send(.view(.confirmAlertButtonTapped))
-            },
-            cancelButtonTapped: {
-              store.send(.view(.cancelAlertButtonTapped))
-            }
-          )
-          .extractSize(in: $alertSize)
-          .padding(.all, 15.0)
-        }
+    if let alertConfiguration = store.alert?.configuration {
+      VStack {
+        Spacer()
+        ComplateAlertView(
+          configuration: alertConfiguration,
+          confirmButtonTapped: {
+            store.send(.view(.confirmAlertButtonTapped))
+          },
+          cancelButtonTapped: {
+            store.send(.view(.cancelAlertButtonTapped))
+          }
+        )
+        .extractSize(in: $alertSize)
+        .padding(.all, 15.0)
       }
     }
   }
 
   private var dayList: some View {
-    WithPerceptionTracking {
-      DaysSelectorView(
-        selectedDay: $store.selectedDay,
-        items: $store.items,
-        daySummary: store.daySummary,
-        informationConfiguration: store.dayInformation,
-        dayActivityAction: { action in
-          store.send(.view(.listItemActionPerfomed(action)))
-        }
-      )
-      .formBackgroundModifier(padding: EdgeInsets(.zero))
-    }
+    DaysSelectorView(
+      selectedDay: $store.selectedDay,
+      items: $store.items,
+      daySummary: store.daySummary,
+      informationConfiguration: store.dayInformation,
+      dayActivityAction: { action in
+        store.send(.view(.listItemActionPerfomed(action)))
+      }
+    )
+    .formBackgroundModifier(padding: EdgeInsets(.zero))
   }
 
   private var aiAssistantButton: some View {
@@ -255,11 +249,7 @@ public struct DashboardView: View {
 
 struct SaveActivityTipModifier: ViewModifier {
   func body(content: Content) -> some View {
-    if #available(iOS 17.0, *) {
-      return content
-        .popoverTip(SaveActivityTip())
-    } else {
-      return content
-    }
+    content
+      .popoverTip(SaveActivityTip())
   }
 }

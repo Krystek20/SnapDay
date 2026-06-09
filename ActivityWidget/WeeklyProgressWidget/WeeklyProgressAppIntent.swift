@@ -1,7 +1,6 @@
 import WidgetKit
 import AppIntents
 
-@available(iOS 17.0, *)
 struct WeeklyProgressAppIntent: WidgetConfigurationIntent {
   static var title: LocalizedStringResource = "Weekly Progress"
   static var description = IntentDescription("Collect all your activities!")

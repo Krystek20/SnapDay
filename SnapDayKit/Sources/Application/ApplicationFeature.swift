@@ -5,9 +5,9 @@ import ActivityDetails
 import ComposableArchitecture
 import Utilities
 import TipKit
-#if DEBUG || BETA
+//#if DEBUG
 import DeveloperTools
-#endif
+//#endif
 
 @Reducer
 public struct ApplicationFeature: TodayProvidable {
@@ -35,9 +35,9 @@ public struct ApplicationFeature: TodayProvidable {
     var reports = ReportsFeature.State()
     var onboarding = OnboardingFeature.State()
 
-    #if DEBUG || BETA
+//    #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
-    #endif
+//    #endif
 
     private let userDefaults: UserDefaults
 
@@ -58,9 +58,9 @@ public struct ApplicationFeature: TodayProvidable {
     case path(StackAction<Path.State, Path.Action>)
     case reports(ReportsFeature.Action)
     case onboarding(OnboardingFeature.Action)
-    #if DEBUG || BETA
+//    #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
-    #endif
+//    #endif
     case binding(BindingAction<State>)
   }
 
@@ -114,9 +114,7 @@ public struct ApplicationFeature: TodayProvidable {
       case .appeared:
         return .merge(
           .run { _ in
-            if #available(iOS 17.0, *) {
-              try? Tips.configure()
-            }
+            try? Tips.configure()
           },
           .run { send in
             for await deeplink in deeplinkService.deeplinkPublisher.values {
@@ -148,9 +146,9 @@ public struct ApplicationFeature: TodayProvidable {
           }
         }
       case .deviceShaked:
-        #if DEBUG || BETA
+//        #if DEBUG
         state.developerTools = DeveloperToolsFeature.State()
-        #endif
+//        #endif
         return .none
       case .handleUrl(let url):
         deeplinkService.handleUrl(url)
@@ -170,21 +168,21 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       case .onboarding:
         return .none
-      #if DEBUG || BETA
+//      #if DEBUG
       case .developerTools:
         return .none
-      #endif
+//      #endif
       case .path:
         return .none
       case .binding:
         return .none
       }
     }
-    #if DEBUG || BETA
+//    #if DEBUG
     .ifLet(\.$developerTools, action: \.developerTools) {
       DeveloperToolsFeature()
     }
-    #endif
+//    #endif
     .forEach(\.path, action: \.path) {
       Path()
     }

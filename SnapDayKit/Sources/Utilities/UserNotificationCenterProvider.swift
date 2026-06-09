@@ -214,7 +214,7 @@ extension UserNotificationCenterProvider {
   }
 }
 
-#if DEBUG || BETA
+//#if DEBUG
 extension UserNotificationCenterProvider {
   public var pendingRequests: [String] {
     get async {
@@ -240,7 +240,7 @@ extension UserNotificationCenterProvider {
     try await userNotificationCenter.add(request)
   }
 }
-#endif
+//#endif
 
 extension UserNotificationCenterProvider: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {

@@ -1,4 +1,3 @@
-import SwiftUINavigationCore
 import struct UiComponents.ComplateAlertViewConfiguration
 
 extension ComplateAlertViewConfiguration {

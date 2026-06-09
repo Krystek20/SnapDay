@@ -1,4 +1,4 @@
-#if DEBUG || BETA
+//#if DEBUG
 import Foundation
 import ComposableArchitecture
 import Repositories
@@ -304,4 +304,4 @@ fileprivate extension BGTaskRequest {
     return identifier + " - " + date
   }
 }
-#endif
+//#endif

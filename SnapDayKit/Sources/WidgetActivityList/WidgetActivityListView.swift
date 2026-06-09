@@ -7,12 +7,11 @@ import Models
 import AppIntents
 import Utilities
 
-@available(iOS 17.0, *)
 public struct WidgetActivityListView: View {
 
   // MARK: - Properties
 
-  @Perception.Bindable private var store: StoreOf<WidgetActivityListFeature>
+  @Bindable private var store: StoreOf<WidgetActivityListFeature>
   @Environment(\.widgetRenderingMode) var widgetRenderingMode
   private let listUpIntent: () -> any AppIntent
   private let listDownIntent: () -> any AppIntent
@@ -45,77 +44,72 @@ public struct WidgetActivityListView: View {
   }
 
   private var headerView: some View {
-    WithPerceptionTracking {
-      HStack(spacing: 10.0) {
-        if !store.isButtonSectionShown {
-          Spacer()
-        }
-
-        Text(store.title)
-          .font(.system(size: 14.0, weight: .regular))
-          .foregroundStyle(Color.primaryText)
-          .widgetAccentable()
-
+    HStack(spacing: 10.0) {
+      if !store.isButtonSectionShown {
         Spacer()
-
-        if store.isButtonSectionShown {
-          buttonSection
-        }
       }
-      .padding(.horizontal, 10.0)
-      .frame(height: 50.0)
+
+      Text(store.title)
+        .font(.system(size: 14.0, weight: .regular))
+        .foregroundStyle(Color.primaryText)
+        .widgetAccentable()
+
+      Spacer()
+
+      if store.isButtonSectionShown {
+        buttonSection
+      }
     }
+    .padding(.horizontal, 10.0)
+    .frame(height: 50.0)
   }
 
   @ViewBuilder
   private var buttonSection: some View {
-    if #available(iOS 17.0, *) {
-      HStack(spacing: 10.0) {
-        Button(intent: listUpIntent()) {
-          Image(systemName: "chevron.up.circle.fill")
-            .resizable()
-            .makeAccented(widgetRenderingMode: widgetRenderingMode)
-            .foregroundStyle(
-              Color.actionBlue.opacity(store.isUpButtonDisabled ? 0.3 : 1.0)
-            )
-            .frame(width: 20.0, height: 20.0)
-        }
-        .buttonStyle(.plain)
-        .disabled(store.isUpButtonDisabled)
-
-        Button(intent: listDownIntent()) {
-          Image(systemName: "chevron.down.circle.fill")
-            .resizable()
-            .makeAccented(widgetRenderingMode: widgetRenderingMode)
-            .foregroundStyle(
-              Color.actionBlue.opacity(store.isDownButtonDisabled ? 0.3 : 1.0)
-            )
-            .frame(width: 20.0, height: 20.0)
-        }
-        .buttonStyle(.plain)
-        .disabled(store.isDownButtonDisabled)
-
-        Link(destination: DeeplinkService.addActivity, label: {
-          Image(systemName: "plus.circle.fill")
-            .resizable()
-            .makeAccented(widgetRenderingMode: widgetRenderingMode)
-            .foregroundStyle(Color.actionBlue)
-            .frame(width: 20.0, height: 20.0)
-        })
+    HStack(spacing: 10.0) {
+      Button(intent: listUpIntent()) {
+        Image(systemName: "chevron.up.circle.fill")
+          .resizable()
+          .makeAccented(widgetRenderingMode: widgetRenderingMode)
+          .foregroundStyle(
+            Color.actionBlue.opacity(store.isUpButtonDisabled ? 0.3 : 1.0)
+          )
+          .frame(width: 20.0, height: 20.0)
       }
+      .buttonStyle(.plain)
+      .disabled(store.isUpButtonDisabled)
+
+      Button(intent: listDownIntent()) {
+        Image(systemName: "chevron.down.circle.fill")
+          .resizable()
+          .makeAccented(widgetRenderingMode: widgetRenderingMode)
+          .foregroundStyle(
+            Color.actionBlue.opacity(store.isDownButtonDisabled ? 0.3 : 1.0)
+          )
+          .frame(width: 20.0, height: 20.0)
+      }
+      .buttonStyle(.plain)
+      .disabled(store.isDownButtonDisabled)
+
+      Link(destination: DeeplinkService.addActivity, label: {
+        Image(systemName: "plus.circle.fill")
+          .resizable()
+          .makeAccented(widgetRenderingMode: widgetRenderingMode)
+          .foregroundStyle(Color.actionBlue)
+          .frame(width: 20.0, height: 20.0)
+      })
     }
   }
 
+  @ViewBuilder
   private var contentView: some View {
-    WithPerceptionTracking {
-      switch store.contentType {
-      case .list(let items):
-        listView(items: items)
-      case .success:
-        successView
-      case .empty:
-        emptyView
-      }
+    switch store.contentType {
+    case .list(let items):
+      listView(items: items)
+    case .success:
+      successView
+    case .empty:
+      emptyView
     }
   }
 
@@ -186,24 +180,22 @@ public struct WidgetActivityListView: View {
 
   @ViewBuilder
   private var bottomView: some View {
-    WithPerceptionTracking {
-      if let completedActivities = store.completedActivities {
-        let showAllViews = switch widgetRenderingMode {
-        case .accented, .vibrant:
-          if #available(iOS 18.0, *) {
-            false
-          } else {
-            true
-          }
-        default:
+    if let completedActivities = store.completedActivities {
+      let showAllViews = switch widgetRenderingMode {
+      case .accented, .vibrant:
+        if #available(iOS 18.0, *) {
+          false
+        } else {
           true
         }
-        CompletedActivitiesView(
-          completedActivities: completedActivities,
-          showBackground: showAllViews,
-          showProgressView: showAllViews
-        )
+      default:
+        true
       }
+      CompletedActivitiesView(
+        completedActivities: completedActivities,
+        showBackground: showAllViews,
+        showProgressView: showAllViews
+      )
     }
   }
 

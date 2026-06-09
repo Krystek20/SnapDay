@@ -59,9 +59,9 @@ extension AppDelegate: TodayProvidable {
         DeveloperToolsLogger.shared.append(.refresh(.runInBackground))
         _ = try await dayUpdater.day(tomorrow)
         try await userNotificationCenterProvider.reloadReminders()
-        #if DEBUG || BETA
+//        #if DEBUG
         try await userNotificationCenterProvider.sendDeveloperMessage("Next day set and reminders scheduled")
-        #endif
+//        #endif
         DeveloperToolsLogger.shared.append(.refresh(.setupInBackground))
       }
       DeveloperToolsLogger.shared.append(.refresh(.setup))

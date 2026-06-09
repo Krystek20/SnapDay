@@ -581,9 +581,7 @@ public struct DashboardFeature: TodayProvidable {
       dayActivity.activity = activity
       return .run { [dayActivity, activity] send in
         try await activityRepository.saveActivity(activity)
-        if #available(iOS 17.0, *) {
-          SaveActivityTip.show = true
-        }
+        SaveActivityTip.show = true
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
         await send(.internal(.loadDay))
       }

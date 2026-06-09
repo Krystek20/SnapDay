@@ -5,7 +5,6 @@ import ComposableArchitecture
 import Models
 import Utilities
 
-@available(iOSApplicationExtension 17.0, *)
 struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
 
   @Dependency(\.iconProvider) private var iconProvider
@@ -30,28 +29,36 @@ struct ActivityListProvider: AppIntentTimelineProvider, TodayProvidable {
   }
 
   func timeline(for configuration: ActivityListAppIntent, in context: Context) async -> Timeline<DayEntry> {
-    var entries = [DayEntry]()
-    let reloadPolicy: TimelineReloadPolicy
     do {
       let day = try await dayUpdater.day(today)
       let icons = await iconProvider.getIcons(ids: day.iconIds)
-      entries.append(
-        DayEntry(
-          day: day,
-          icons: icons,
-          date: today,
-          configuration: configuration
-        )
+      return Timeline(
+        entries: [
+          DayEntry(
+            day: day,
+            icons: icons,
+            date: today,
+            configuration: configuration
+          )
+        ],
+        policy: .after(try tomorrow)
       )
-      reloadPolicy = .after(try tomorrow)
     } catch {
-      reloadPolicy = .never
+      return Timeline(
+        entries: [
+          DayEntry(
+            day: nil,
+            icons: [],
+            date: Date(),
+            configuration: configuration
+          )
+        ],
+        policy: .after(Date.now.addingTimeInterval(15 * 60))
+      )
     }
-    return Timeline(entries: entries, policy: reloadPolicy)
   }
 }
 
-@available(iOSApplicationExtension 17.0, *)
 struct DayEntry: TimelineEntry {
   let day: Day?
   let icons: [Icon]
@@ -59,7 +66,6 @@ struct DayEntry: TimelineEntry {
   let configuration: ActivityListAppIntent
 }
 
-@available(iOSApplicationExtension 17.0, *)
 struct ActivityListWidgetEntryView : View {
   var entry: ActivityListProvider.Entry
 
@@ -80,7 +86,6 @@ struct ActivityListWidgetEntryView : View {
   }
 }
 
-@available(iOSApplicationExtension 17.0, *)
 struct ActivityListWidget: Widget {
   let kind: String = "ActivityListWidget"
 

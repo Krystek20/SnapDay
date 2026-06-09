@@ -7,7 +7,7 @@ public struct EveningSummaryView: View {
 
   // MARK: - Properties
 
-  @Perception.Bindable private var store: StoreOf<EveningSummaryFeature>
+  @Bindable private var store: StoreOf<EveningSummaryFeature>
   public var sizeChanged: ((CGSize) -> Void)?
 
   // MARK: - Initialization
@@ -19,64 +19,60 @@ public struct EveningSummaryView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithPerceptionTracking {
-      VStack(alignment: .leading, spacing: .zero) {
-        VStack(alignment: .leading, spacing: 10.0) {
-          VStack(alignment: .leading, spacing: 5.0) {
-            Text("TODAY'S TRIUMPHS", bundle: .module)
-              .font(.system(size: 14.0, weight: .regular))
-              .foregroundStyle(Color.sectionText)
-            description
-              .fixedSize(horizontal: false, vertical: true)
-          }
+    VStack(alignment: .leading, spacing: .zero) {
+      VStack(alignment: .leading, spacing: 10.0) {
+        VStack(alignment: .leading, spacing: 5.0) {
+          Text("TODAY'S TRIUMPHS", bundle: .module)
+            .font(.system(size: 14.0, weight: .regular))
+            .foregroundStyle(Color.sectionText)
+          description
+            .fixedSize(horizontal: false, vertical: true)
+        }
 
-          ForEach(store.eveningTagSummaries) { eveningTagSummary in
-            VStack(alignment: .leading, spacing: 5.0) {
-              HStack {
-                MarkerView(marker: eveningTagSummary.tag)
-                Spacer()
-                if eveningTagSummary.totalDuration > .zero {
-                  DurationLabel(duration: eveningTagSummary.totalDuration)
-                }
-              }
-              ForEach(eveningTagSummary.dayActivities) { dayActivity in
-                ActivitySummaryRow(
-                  activityType: .dayActivity(dayActivity),
-                  durationType: .fromActivity
-                )
+        ForEach(store.eveningTagSummaries) { eveningTagSummary in
+          VStack(alignment: .leading, spacing: 5.0) {
+            HStack {
+              MarkerView(marker: eveningTagSummary.tag)
+              Spacer()
+              if eveningTagSummary.totalDuration > .zero {
+                DurationLabel(duration: eveningTagSummary.totalDuration)
               }
             }
+            ForEach(eveningTagSummary.dayActivities) { dayActivity in
+              ActivitySummaryRow(
+                activityType: .dayActivity(dayActivity),
+                durationType: .fromActivity
+              )
+            }
           }
-          .formBackgroundModifier()
         }
-        .padding(.top, 10.0)
-        .padding(.horizontal, 10.0)
+        .formBackgroundModifier()
+      }
+      .padding(.top, 10.0)
+      .padding(.horizontal, 10.0)
 
-        CompletedActivitiesView(completedActivities: store.completedActivities)
-          .padding(.top, 10.0)
+      CompletedActivitiesView(completedActivities: store.completedActivities)
+        .padding(.top, 10.0)
+    }
+    .background(
+      GeometryReader { geometry in
+        contentViewChanged(size: geometry.size)
       }
-      .background(
-        GeometryReader { geometry in
-          contentViewChanged(size: geometry.size)
-        }
-      )
-      .onAppear {
-        store.send(.view(.appeared))
-      }
+    )
+    .onAppear {
+      store.send(.view(.appeared))
     }
   }
 
   private var description: some View {
-    WithPerceptionTracking {
-      Group {
-        if store.doneActivitiesCount > 0 {
-          allDoneText + totalTimeText + Text(" ") + greatWorkText
-        } else {
-          noActivitiesText
-        }
+    Group {
+      if store.doneActivitiesCount > 0 {
+        allDoneText + totalTimeText + Text(" ") + greatWorkText
+      } else {
+        noActivitiesText
       }
-      .font(.system(size: 14.0, weight: .regular))
     }
+    .font(.system(size: 14.0, weight: .regular))
   }
 
   private var totalTimeText: Text {

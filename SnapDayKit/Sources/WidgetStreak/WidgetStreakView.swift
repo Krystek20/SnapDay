@@ -11,7 +11,7 @@ public struct WidgetStreakView: View {
 
   // MARK: - Properties
 
-  @Perception.Bindable private var store: StoreOf<WidgetStreakFeature>
+  @Bindable private var store: StoreOf<WidgetStreakFeature>
   @Environment(\.widgetRenderingMode) var widgetRenderingMode
 
   // MARK: - Initialization
@@ -29,9 +29,7 @@ public struct WidgetStreakView: View {
 
   @ViewBuilder
   private var content: some View {
-    WithPerceptionTracking {
-      content(image: store.image, contentType: store.contentType)
-    }
+    content(image: store.image, contentType: store.contentType)
   }
 
   private func content(
