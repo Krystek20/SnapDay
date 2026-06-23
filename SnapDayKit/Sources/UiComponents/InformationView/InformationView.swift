@@ -30,10 +30,10 @@ public struct InformationView: View {
       VStack(alignment: .leading, spacing: 5.0) {
         Text(configuration.title)
           .font(.system(size: 14.0, weight: .medium))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
         Text(configuration.subtitle)
           .font(.system(size: 12.0, weight: .regular))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
           .multilineTextAlignment(.leading)
       }
     }

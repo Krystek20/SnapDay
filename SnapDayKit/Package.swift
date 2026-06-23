@@ -8,7 +8,7 @@ let package = Package(
     name: "SnapDayKit",
     defaultLocalization: "en",
     platforms: [
-      .iOS(.v16)
+      .iOS(.v17)
     ],
     products: products,
     dependencies: packageDependencies,
@@ -29,6 +29,7 @@ private var products: [Product] {
 @PackageDependenciesBuilder
 private var packageDependencies: [Package.Dependency] {
   Module.composableArchitecture
+  Module.snapDayCore
 }
 
 @TargetsBuilder
@@ -36,7 +37,7 @@ private var targets: [Target] {
   TargetParamenters(module: .application, dependencies: sceneDependecies + [
     .onboarding, .dashboard, .reports, .activityDetails, .developerTools
   ])
-  TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends])
+  TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends, .manageActivity])
   TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
@@ -50,6 +51,7 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
+  TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .calendarPicker, dependencies: [.common, .uiComponents, .resources])
@@ -93,6 +95,7 @@ private enum Module: String {
   case widgetWeeklyProgress
   case dayActivityReminder
   case onboarding
+  case manageActivity
   case developerTools
   case utilities
   case repositories
@@ -102,6 +105,7 @@ private enum Module: String {
   case uiComponents
   case resources
   case composableArchitecture
+  case snapDayCore
 
   var name: String {
     rawValue.capitalizingFirstLetter
@@ -111,6 +115,8 @@ private enum Module: String {
     switch self {
     case .composableArchitecture:
       .product(name: name, package: "swift-composable-architecture")
+    case .snapDayCore:
+      .product(name: "AIModule", package: "snapday-core")
     default:
       .byName(name: name)
     }
@@ -128,6 +134,8 @@ private enum Module: String {
     switch self {
     case .composableArchitecture:
       [.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.9.2")]
+    case .snapDayCore:
+      [.package(path: "/Users/krystian/snapday-core")]
     default:
       nil
     }
@@ -135,7 +143,7 @@ private enum Module: String {
 
   var targetConfiguration: [ModuleTargetConfiguration] {
     switch self {
-    case .composableArchitecture:
+    case .composableArchitecture, .snapDayCore:
       []
     case .previews, .uiComponents, .resources, .developerTools:
       [.source]

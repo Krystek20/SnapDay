@@ -3,6 +3,12 @@
   "strings" : {
     "Add Label" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة تسمية"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -27,12 +33,6 @@
             "value" : "Ajouter une étiquette"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicionar rótulo"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -43,12 +43,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ラベルを追加"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إضافة تسمية"
           }
         },
         "ko" : {
@@ -62,11 +56,23 @@
             "state" : "translated",
             "value" : "Dodaj etykietę"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar rótulo"
+          }
         }
       }
     },
     "Add Tag" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة علامة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -91,12 +97,6 @@
             "value" : "Ajouter un tag"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicionar tag"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -107,12 +107,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タグを追加"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إضافة علامة"
           }
         },
         "ko" : {
@@ -126,11 +120,26 @@
             "state" : "translated",
             "value" : "Dodaj tag"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar tag"
+          }
         }
       }
     },
+    "Cancel" : {
+
+    },
     "Color" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لون"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -155,12 +164,6 @@
             "value" : "Couleur"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cor"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -171,12 +174,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "色"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لون"
           }
         },
         "ko" : {
@@ -190,11 +187,23 @@
             "state" : "translated",
             "value" : "Kolor"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cor"
+          }
         }
       }
     },
     "Name" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاسم"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -219,12 +228,6 @@
             "value" : "Nom"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nome"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -235,12 +238,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名前"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الاسم"
           }
         },
         "ko" : {
@@ -254,11 +251,23 @@
             "state" : "translated",
             "value" : "Nazwa"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
         }
       }
     },
     "Save" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حفظ"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -283,12 +292,6 @@
             "value" : "Enregistrer"
           }
         },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Salvar"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -301,12 +304,6 @@
             "value" : "保存"
           }
         },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حفظ"
-          }
-        },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
@@ -317,6 +314,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zapisz"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvar"
           }
         }
       }

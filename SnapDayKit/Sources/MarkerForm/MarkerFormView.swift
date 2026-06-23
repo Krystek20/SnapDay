@@ -9,7 +9,7 @@ public struct MarkerFormView: View {
 
   // MARK: - Properties
 
-  @Perception.Bindable private var store: StoreOf<MarkerFormFeature>
+  @Bindable private var store: StoreOf<MarkerFormFeature>
 
   // MARK: - Initialization
 
@@ -20,66 +20,66 @@ public struct MarkerFormView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithPerceptionTracking {
-      content
-        .navigationTitle(store.title)
-        .navigationBarTitleDisplayMode(.large)
-    }
+    content
+      .navigationTitle(store.title)
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
+      .toolbar {
+        ToolbarItem(placement: .topBarLeading) {
+          Button(String(localized: "Cancel", bundle: .module)) {
+            store.send(.view(.cancelButtonTapped))
+          }
+          .font(.system(size: 12.0, weight: .bold))
+          .foregroundStyle(Color.actionBlue)
+        }
+      }
   }
 
   private var content: some View {
-    WithPerceptionTracking {
-      VStack(spacing: .zero) {
-        formView
-        Spacer(minLength: 15.0)
-        bottomView
-          .padding(.bottom, 15.0)
-      }
-      .padding(.horizontal, 15.0)
-      .padding(.top, 25.0)
-      .activityBackground
+    VStack(spacing: .zero) {
+      formView
+      Spacer(minLength: 15.0)
+      bottomView
+        .padding(.bottom, 15.0)
     }
+    .padding(.horizontal, 15.0)
+    .padding(.top, 25.0)
+    .backgroundSoft
   }
 
   private var formView: some View {
-    WithPerceptionTracking {
-      VStack(alignment: .leading, spacing: 15.0) {
-        FormTextField(
-          title: String(localized: "Name", bundle: .module),
-          value: $store.name
-        )
-        colorsSection
-      }
-      .maxWidth()
+    VStack(alignment: .leading, spacing: 15.0) {
+      FormTextField(
+        title: String(localized: "Name", bundle: .module),
+        value: $store.name
+      )
+      colorsSection
     }
+    .maxWidth()
   }
 
   @ViewBuilder
   private var colorsSection: some View {
-    WithPerceptionTracking {
-      FormColorField(
-        title: String(localized: "Color", bundle: .module),
-        color: Binding(
-          get: {
-            store.color.color
-          },
-          set: { value in
-            $store.color.wrappedValue = value.rgbColor
-          }
-        )
+    FormColorField(
+      title: String(localized: "Color", bundle: .module),
+      color: Binding(
+        get: {
+          store.color.color
+        },
+        set: { value in
+          $store.color.wrappedValue = value.rgbColor
+        }
       )
-    }
+    )
   }
 
   private var bottomView: some View {
-    WithPerceptionTracking {
-      VStack(spacing: 10.0) {
-        Button(String(localized: "Save", bundle: .module)) {
-          store.send(.view(.saveButtonTapped))
-        }
-        .disabled(store.name.isEmpty)
-        .buttonStyle(PrimaryButtonStyle(disabled: store.name.isEmpty))
+    VStack(spacing: 10.0) {
+      Button(String(localized: "Save", bundle: .module)) {
+        store.send(.view(.saveButtonTapped))
       }
+      .disabled(store.name.isEmpty)
+      .buttonStyle(PrimaryButtonStyle())
     }
   }
 }

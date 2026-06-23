@@ -25,6 +25,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
+  @Dependency(\.dismiss) private var dismiss
 
   // MARK: - State & Action
 
@@ -41,6 +42,14 @@ public struct DeveloperToolsFeature: TodayProvidable {
         UserDefaults.standard.setValue(newValue, forKey: key)
       }
     }
+    var testingHostEnabled: Bool {
+      get {
+        UserDefaults.standard.bool(forKey: "isTestingHost")
+      }
+      set {
+        UserDefaults.standard.setValue(newValue, forKey: "isTestingHost")
+      }
+    }
     var allShared: [Shared] = []
     public init() { }
   }
@@ -48,6 +57,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
   public enum Action: BindableAction, Equatable {
     public enum ViewAction: Equatable {
       case appeared
+      case cancelButtonTapped
       case cleanShared(String)
       case cleanKeyValueStore
       case cleanZones
@@ -102,6 +112,10 @@ public struct DeveloperToolsFeature: TodayProvidable {
 
   private func handleViewAction(_ action: Action.ViewAction, state: inout State) -> Effect<Action> {
     switch action {
+    case .cancelButtonTapped:
+      return .run { _ in
+        await dismiss()
+      }
     case .appeared:
       return .merge(
         .send(.internal(.loadPendingRequests)),

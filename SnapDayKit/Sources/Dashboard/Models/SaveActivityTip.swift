@@ -1,6 +1,5 @@
 import TipKit
 
-@available(iOS 17.0, *)
 struct SaveActivityTip: Tip, Equatable {
 
   // MARK: - Paramenters

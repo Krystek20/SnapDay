@@ -6,7 +6,6 @@ import Repositories
 import WidgetStreak
 import ComposableArchitecture
 
-@available(iOSApplicationExtension 17.0, *)
 struct StreakWidgetProvider: AppIntentTimelineProvider, TodayProvidable {
 
   private let activityRepository = ActivityRepository.liveValue
@@ -31,9 +30,6 @@ struct StreakWidgetProvider: AppIntentTimelineProvider, TodayProvidable {
   }
 
   func timeline(for configuration: StreakAppIntent, in context: Context) async -> Timeline<StreakEntry> {
-    var entries = [StreakEntry]()
-    let reloadPolicy: TimelineReloadPolicy
-
     do {
       var activity: Activity?
       var streak: Streak?
@@ -44,24 +40,33 @@ struct StreakWidgetProvider: AppIntentTimelineProvider, TodayProvidable {
         streak = try await streakProvider.streak(for: fetchedActivity)
       }
 
-      entries.append(
-        StreakEntry(
-          activity: activity,
-          date: today,
-          streak: streak,
-          configuration: configuration
-        )
+      return Timeline(
+        entries: [
+          StreakEntry(
+            activity: activity,
+            date: today,
+            streak: streak,
+            configuration: configuration
+          )
+        ],
+        policy: .after(try tomorrow)
       )
-
-      reloadPolicy = .after(try tomorrow)
     } catch {
-      reloadPolicy = .never
+      return Timeline(
+        entries: [
+          StreakEntry(
+            activity: nil,
+            date: Date(),
+            streak: nil,
+            configuration: configuration
+          )
+        ],
+        policy: .after(Date.now.addingTimeInterval(15 * 60))
+      )
     }
-    return Timeline(entries: entries, policy: reloadPolicy)
   }
 }
 
-@available(iOSApplicationExtension 17.0, *)
 struct StreakEntry: TimelineEntry {
   let activity: Activity?
   let date: Date
@@ -69,7 +74,6 @@ struct StreakEntry: TimelineEntry {
   let configuration: StreakAppIntent
 }
 
-@available(iOS 17.0, *)
 struct StreakEntryView : View {
   var entry: StreakWidgetProvider.Entry
 
@@ -86,7 +90,6 @@ struct StreakEntryView : View {
   }
 }
 
-@available(iOS 17.0, *)
 struct StreakWidget: Widget {
   let kind: String = "ActivityWidget"
 

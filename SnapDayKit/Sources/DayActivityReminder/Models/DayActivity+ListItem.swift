@@ -18,6 +18,7 @@ extension DayActivity {
     return ListItem(
       id: id.uuidString,
       parentId: nil,
+      headerItem: nil,
       title: name,
       subtitle: SubtitleFormatter.format(
         overview: overview,

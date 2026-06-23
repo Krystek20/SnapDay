@@ -114,9 +114,7 @@ public struct ApplicationFeature: TodayProvidable {
       case .appeared:
         return .merge(
           .run { _ in
-            if #available(iOS 17.0, *) {
-              try? Tips.configure()
-            }
+            try? Tips.configure()
           },
           .run { send in
             for await deeplink in deeplinkService.deeplinkPublisher.values {

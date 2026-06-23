@@ -25,5 +25,9 @@
 	<false/>
 	<key>NSContactsUsageDescription</key>
 	<string>We need access to your contacts to help you invite others to collaborate. This allows you to easily select people from your address book and send them invitations to join your projects or teams. Your contacts will only be used for this purpose and will not be shared with anyone else.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to the microphone so you can dictate your daily goals and notes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app uses speech recognition to convert your spoken goals into text.</string>
 </dict>
 </plist>

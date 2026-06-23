@@ -70,7 +70,7 @@ struct ListItemsBuilder {
         contentsOf: sortedTasks.map { task in
           task.listItem(
             parentId: dayActivity.id,
-            divider: task == dayActivity.dayActivityTasks.last
+            divider: task == sortedTasks.last
             ? isLast ? .none : .full
             : .indented
           )
@@ -176,17 +176,12 @@ extension DayActivityTaskAction {
 
 extension DayActivityInvitationAction {
   var trailingMenuItem: ListTrailingRowItem {
-    let (imageName, color) = switch self {
+    switch self {
     case .accept:
-      ("checkmark.circle.fill", Color.greenSuccess)
+      .accept(actionId: rawValue)
     case .discard:
-      ("xmark.circle.fill", Color.alertText)
+      .discard(actionId: rawValue)
     }
-    return ListTrailingRowItem(
-      actionId: rawValue,
-      imageName: imageName,
-      color: color
-    )
   }
 }
 

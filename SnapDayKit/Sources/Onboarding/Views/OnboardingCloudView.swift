@@ -30,12 +30,12 @@ struct OnboardingCloudView: View {
           .frame(width: 100.0, height: 100.0)
         Text("Your Data, Your Control", bundle: .module)
           .font(.system(size: 20.0, weight: .semibold))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
           .padding(.bottom, 5.0)
         Text("To help you track your habits, achieve goals, and manage your time, all your data is stored securely on your device or in iCloud.", bundle: .module)
           .fixedSize(horizontal: false, vertical: true)
           .font(.system(size: 14.0, weight: .regular))
-          .foregroundStyle(Color.standardText)
+          .foregroundStyle(Color.primaryText)
           .lineSpacing(5.0)
           .multilineTextAlignment(.center)
       }
@@ -48,7 +48,7 @@ struct OnboardingCloudView: View {
             VStack(alignment: .leading, spacing: .zero) {
               Text(benefit.0)
                 .font(.system(size: 16.0, weight: .medium))
-                .foregroundStyle(Color.standardText)
+                .foregroundStyle(Color.primaryText)
               Text(benefit.1)
                 .font(.system(size: 14.0, weight: .regular))
                 .foregroundStyle(Color.sectionText)

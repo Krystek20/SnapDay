@@ -8,7 +8,7 @@ public struct CalendarPickerView: View {
 
   // MARK: - Properties
 
-  @Perception.Bindable private var store: StoreOf<CalendarPickerFeature>
+  @Bindable private var store: StoreOf<CalendarPickerFeature>
 
   // MARK: - Initialization
 
@@ -19,63 +19,57 @@ public struct CalendarPickerView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithPerceptionTracking {
-      picker
-        .padding(.horizontal, 15.0)
-        .maxFrame()
-        .activityBackground
-        .toolbar {
-          if let buttonTitle = store.buttonTitle {
-            ToolbarItem(placement: .topBarTrailing) {
-              Button(buttonTitle) {
-                store.send(.view(.trailingButtonTapped))
-              }
-              .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.actionBlue)
+    picker
+      .padding(.horizontal, 15.0)
+      .maxFrame()
+      .backgroundSoft
+      .toolbar {
+        if let buttonTitle = store.buttonTitle {
+          ToolbarItem(placement: .topBarTrailing) {
+            Button(buttonTitle) {
+              store.send(.view(.trailingButtonTapped))
             }
-            ToolbarItem(placement: .topBarLeading) {
-              Button(String(localized: "Cancel", bundle: .module)) {
-                store.send(.view(.cancelButtonTapped))
-              }
-              .font(.system(size: 12.0, weight: .bold))
-              .foregroundStyle(Color.actionBlue)
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
+          }
+          ToolbarItem(placement: .topBarLeading) {
+            Button(String(localized: "Cancel", bundle: .module)) {
+              store.send(.view(.cancelButtonTapped))
             }
+            .font(.system(size: 12.0, weight: .bold))
+            .foregroundStyle(Color.actionBlue)
           }
         }
-    }
+      }
+      .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
   }
 
+  @ViewBuilder
   private var picker: some View {
-    WithPerceptionTracking {
-      switch store.type {
-      case .singleSelection:
-        datePicker
-      case .multiSelection:
-        multiDatePicker
-      }
+    switch store.type {
+    case .singleSelection:
+      datePicker
+    case .multiSelection:
+      multiDatePicker
     }
   }
 
   private var datePicker: some View {
-    WithPerceptionTracking {
-      DatePicker(
-        "",
-        selection: $store.date,
-        displayedComponents: [.date]
-      )
-      .datePickerStyle(.graphical)
-      .environment(\.locale, Locale.preferred)
-      .activityBackground
-    }
+    DatePicker(
+      "",
+      selection: $store.date,
+      displayedComponents: [.date]
+    )
+    .datePickerStyle(.graphical)
+    .environment(\.locale, Locale.preferred)
+    .backgroundSoft
   }
 
   private var multiDatePicker: some View {
-    WithPerceptionTracking {
-      MultiDatePicker(
-        "",
-        selection: $store.dates
-      )
-      .activityBackground
-    }
+    MultiDatePicker(
+      "",
+      selection: $store.dates
+    )
+    .backgroundSoft
   }
 }

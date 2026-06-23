@@ -1,0 +1,97 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Accept all" : {
+
+    },
+    "Add a new task to %@" : {
+
+    },
+    "Add a new task to %@ for %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add a new task to %1$@ for %2$@"
+          }
+        }
+      }
+    },
+    "Add a new task to saved %@" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Confirm" : {
+
+    },
+    "Create a new activity for %@" : {
+
+    },
+    "Create a new day activity" : {
+
+    },
+    "Create a new saved activity" : {
+
+    },
+    "Delete the activity for %@" : {
+
+    },
+    "Delete this day activity" : {
+
+    },
+    "Delete this saved activity" : {
+
+    },
+    "Discard all" : {
+
+    },
+    "Done" : {
+
+    },
+    "e.g. add gym on Monday evening, set reminder 10 minutes before..." : {
+
+    },
+    "Listening..." : {
+
+    },
+    "or" : {
+
+    },
+    "Remove this task from saved %@" : {
+
+    },
+    "Remove this task from the day activity" : {
+
+    },
+    "Tap to speak" : {
+
+    },
+    "This won’t take long" : {
+
+    },
+    "Type your request..." : {
+
+    },
+    "Update the activity for %@" : {
+
+    },
+    "Update this day activity" : {
+
+    },
+    "Update this saved activity" : {
+
+    },
+    "Update this task in saved %@" : {
+
+    },
+    "Update this task in the day activity" : {
+
+    },
+    "What Should I Do?" : {
+
+    }
+  },
+  "version" : "1.1"
+}

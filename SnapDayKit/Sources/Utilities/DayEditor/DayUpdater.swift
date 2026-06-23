@@ -355,7 +355,7 @@ public actor DayUpdater: TodayProvidable {
   ) async throws -> DayActivity {
     let dayActivity = DayActivity.create(
       from: activity,
-      uuid: { uuid() },
+      uuid: uuid,
       calendar: { calendar },
       date: date,
       createdByUser: createdByUser
@@ -367,7 +367,7 @@ public actor DayUpdater: TodayProvidable {
   private func copy(dayActivity: DayActivity, date: Date) -> DayActivity {
     DayActivity.copy(
       from: dayActivity,
-      uuid: { uuid() },
+      uuid: uuid,
       date: date,
       calendar: { calendar }
     )

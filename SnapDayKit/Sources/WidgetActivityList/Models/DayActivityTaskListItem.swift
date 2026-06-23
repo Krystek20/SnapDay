@@ -12,6 +12,7 @@ extension DayActivityTask {
     ListItem(
       id: id.uuidString,
       parentId: parentId.uuidString,
+      headerItem: nil,
       title: name,
       subtitle: SubtitleFormatter.format(
         overview: overview,

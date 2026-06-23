@@ -4,6 +4,7 @@ import Models
 
 public struct TagRepository {
   public var saveTag: @Sendable (Tag) async throws -> Void
+  public var saveTags: @Sendable ([Tag]) async throws -> Void
   public var deleteTag: @Sendable (Tag) async throws -> Void
   public var loadTags: @Sendable (_ excludedTags: [Tag]) async throws -> [Tag]
 }
@@ -21,6 +22,12 @@ extension TagRepository: DependencyKey {
       saveTag: { tag in
         try await EntityHandler().save(tag.rgbColor)
         try await EntityHandler().save(tag)
+      },
+      saveTags: { tags in
+        for tag in tags {
+          try await EntityHandler().save(tag.rgbColor)
+          try await EntityHandler().save(tag)
+        }
       },
       deleteTag: { tag in
         try await EntityHandler().delete(tag)
@@ -45,6 +52,7 @@ extension TagRepository: DependencyKey {
   public static var previewValue: TagRepository {
     TagRepository(
       saveTag: { _ in },
+      saveTags: { _ in },
       deleteTag: { _ in },
       loadTags: { _ in [] }
     )

@@ -47,6 +47,7 @@ public struct ActivityListFeature: TodayProvidable {
       case appeared
       case newButtonTapped
       case listItemActionPerfomed(ListItemAction)
+      case cancelButtonTapped
     }
     public enum InternalAction: Equatable {
       case loadActivities
@@ -83,6 +84,10 @@ public struct ActivityListFeature: TodayProvidable {
       case .view(.newButtonTapped):
         state.newField = .activityName
         return .send(.internal(.setItems))
+      case .view(.cancelButtonTapped):
+        return .run { _ in
+          await dismiss()
+        }
       case .internal(.loadActivities):
         return .run { send in
           let activities = try await activityRepository.loadActivities()
@@ -101,7 +106,7 @@ public struct ActivityListFeature: TodayProvidable {
       case .internal(.addToDay(let activity)):
         let dayActivity = DayActivity.create(
           from: activity,
-          uuid: { uuid() },
+          uuid: uuid,
           calendar: { calendar },
           date: state.day.date,
           createdByUser: true

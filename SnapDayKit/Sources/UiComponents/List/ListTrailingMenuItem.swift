@@ -57,3 +57,21 @@ public struct ListTrailingRowItem: Identifiable, Equatable {
     self.color = color
   }
 }
+
+public extension ListTrailingRowItem {
+  static func accept(actionId: String) -> ListTrailingRowItem {
+    ListTrailingRowItem(
+      actionId: actionId,
+      imageName: "checkmark.circle.fill",
+      color: Color.greenSuccess
+    )
+  }
+
+  static func discard(actionId: String) -> ListTrailingRowItem {
+    ListTrailingRowItem(
+      actionId: actionId,
+      imageName: "xmark.circle.fill",
+      color: Color.alertText
+    )
+  }
+}

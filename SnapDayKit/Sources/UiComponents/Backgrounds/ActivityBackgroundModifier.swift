@@ -2,19 +2,25 @@ import SwiftUI
 import Resources
 
 public extension View {
-  var activityBackground: some View {
-    modifier(ActivityBackgroundModifier())
+  var background: some View {
+    modifier(BackgroundModifier(backgroundColor: .background))
+  }
+
+  var backgroundSoft: some View {
+    modifier(BackgroundModifier(backgroundColor: .backgroundSoft))
   }
 }
 
-struct ActivityBackgroundModifier: ViewModifier {
+private struct BackgroundModifier: ViewModifier {
+
+  let backgroundColor: Color
 
   // MARK: - ViewModifier
 
   func body(content: Content) -> some View {
     content
       .background(
-        Color.background
+        backgroundColor
           .ignoresSafeArea()
       )
   }

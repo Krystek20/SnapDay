@@ -8,8 +8,8 @@ import Models
 import Common
 import CalendarPicker
 import Combine
-import WidgetKit
 import Friends
+import ManageActivity
 
 import protocol UiComponents.InformationViewConfigurable
 import struct UiComponents.ListItem
@@ -27,6 +27,7 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.utcCalendar) private var calendar
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.deeplinkService) private var deeplinkService
+  @Dependency(\.widgetReloader) private var widgetReloader
   private let userDefaults: UserDefaults
 
   // MARK: - State & Action
@@ -75,6 +76,7 @@ public struct DashboardFeature: TodayProvidable {
     @Presents var dayActivityTaskForm: DayActivityFormFeature.State?
     @Presents var calendarPicker: CalendarPickerFeature.State?
     @Presents var friends: FriendsFeature.State?
+    @Presents var manageActivity: ManageActivityFeature.State?
 
     public init(
       date: Date,
@@ -101,6 +103,7 @@ public struct DashboardFeature: TodayProvidable {
       case confirmAlertButtonTapped
       case cancelAlertButtonTapped
       case showFriendsTapped
+      case assistantButtonTapped
     }
 
     public enum InternalAction: Equatable {
@@ -114,6 +117,7 @@ public struct DashboardFeature: TodayProvidable {
       case dayActivityAction(DayActivityAction)
       case dayActivityTaskAction(DayActivityTaskAction)
       case saveOrder
+      case manageActivity
       case newItemForm(NewItemFormAction)
 
       public enum DayActivityAction: Equatable {
@@ -156,6 +160,7 @@ public struct DashboardFeature: TodayProvidable {
     case dayActivityTaskForm(PresentationAction<DayActivityFormFeature.Action>)
     case calendarPicker(PresentationAction<CalendarPickerFeature.Action>)
     case friends(PresentationAction<FriendsFeature.Action>)
+    case manageActivity(PresentationAction<ManageActivityFeature.Action>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
@@ -182,6 +187,10 @@ public struct DashboardFeature: TodayProvidable {
         return handleCalendarPickerAction(action, state: &state)
       case .friends:
         return .none
+      case .manageActivity(.dismiss):
+        return .send(.internal(.loadDay))
+      case .manageActivity:
+        return .none
       case .delegate:
         return .none
       case .binding:
@@ -202,6 +211,9 @@ public struct DashboardFeature: TodayProvidable {
     }
     .ifLet(\.$friends, action: \.friends) {
       FriendsFeature()
+    }
+    .ifLet(\.$manageActivity, action: \.manageActivity) {
+      ManageActivityFeature()
     }
   }
 
@@ -298,6 +310,9 @@ public struct DashboardFeature: TodayProvidable {
     case .showFriendsTapped:
       state.friends = FriendsFeature.State()
       return .none
+    case .assistantButtonTapped:
+      state.manageActivity = ManageActivityFeature.State()
+      return .none
     }
   }
 
@@ -321,7 +336,7 @@ public struct DashboardFeature: TodayProvidable {
         do {
           let day = try await dayUpdater.day(date)
           await send(.internal(.setDay(day)))
-          WidgetCenter.shared.reloadAllTimelines()
+          await widgetReloader.requestReload()
         } catch {
           print("error: \(error)")
         }
@@ -353,9 +368,11 @@ public struct DashboardFeature: TodayProvidable {
       state.dayActivityTaskForm = nil
       state.calendarPicker = nil
       state.alert = nil
-      switch deeplink {
+      return switch deeplink {
       case .addActivity:
-        return .send(.internal(.dayActivityAction(.showNewForm)))
+        .send(.internal(.dayActivityAction(.showNewForm)))
+      case .dictate:
+        .send(.internal(.manageActivity))
       }
     case .saveOrder:
       return .run { [selectedDay = state.selectedDay] send in
@@ -366,6 +383,9 @@ public struct DashboardFeature: TodayProvidable {
         }
         await send(.internal(.loadDay))
       }
+    case .manageActivity:
+      state.manageActivity = ManageActivityFeature.State()
+      return .none
     case .newItemForm(let action):
       return handleNewItemFormAction(action, state: &state)
     }
@@ -561,9 +581,7 @@ public struct DashboardFeature: TodayProvidable {
       dayActivity.activity = activity
       return .run { [dayActivity, activity] send in
         try await activityRepository.saveActivity(activity)
-        if #available(iOS 17.0, *) {
-          SaveActivityTip.show = true
-        }
+        SaveActivityTip.show = true
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
         await send(.internal(.loadDay))
       }

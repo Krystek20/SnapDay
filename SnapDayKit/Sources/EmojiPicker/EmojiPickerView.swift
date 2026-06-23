@@ -8,7 +8,7 @@ public struct EmojiPickerView: View {
 
   // MARK: - Properties
 
-  @Perception.Bindable private var store: StoreOf<EmojiPickerFeature>
+  @Bindable private var store: StoreOf<EmojiPickerFeature>
   @FocusState private var focus: EmojiPickerFeature.State.Field?
 
   // MARK: - Initialization
@@ -20,33 +20,33 @@ public struct EmojiPickerView: View {
   // MARK: - Views
 
   public var body: some View {
-    WithPerceptionTracking {
-      VStack(alignment: .leading, spacing: 20.0) {
-        titleSection
-          .padding(.top, 5.0)
-        emojiTextField
+    VStack(alignment: .leading, spacing: 20.0) {
+      titleSection
+        .padding(.top, 5.0)
+      emojiTextField
+    }
+    .padding(.horizontal, 15.0)
+    .backgroundSoft
+    .bind($store.focus, to: $focus)
+    .navigationTitle(String(localized: "Set Your Activity Emoji", bundle: .module))
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button(String(localized: "Save", bundle: .module)) {
+          store.send(.view(.saveButtonTapped))
+        }
+        .font(.system(size: 12.0, weight: .bold))
+        .foregroundStyle(Color.actionBlue)
       }
-      .padding(.horizontal, 15.0)
-      .activityBackground
-      .bind($store.focus, to: $focus)
-      .navigationTitle(String(localized: "Set Your Activity Emoji", bundle: .module))
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button(String(localized: "Save", bundle: .module)) {
-            store.send(.view(.saveButtonTapped))
-          }
-          .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.actionBlue)
+      ToolbarItem(placement: .topBarLeading) {
+        Button(String(localized: "Cancel", bundle: .module)) {
+          store.send(.view(.cancelButtonTapped))
         }
-        ToolbarItem(placement: .topBarLeading) {
-          Button(String(localized: "Cancel", bundle: .module)) {
-            store.send(.view(.cancelButtonTapped))
-          }
-          .font(.system(size: 12.0, weight: .bold))
-          .foregroundStyle(Color.actionBlue)
-        }
+        .font(.system(size: 12.0, weight: .bold))
+        .foregroundStyle(Color.actionBlue)
       }
     }
+    .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
   }
 
   private var titleSection: some View {
@@ -60,9 +60,7 @@ public struct EmojiPickerView: View {
   }
 
   private var emojiTextField: some View {
-    WithPerceptionTracking {
-      EmojiTextField(text: $store.emoji)
-        .focused($focus, equals: .searchEmoji)
-    }
+    EmojiTextField(text: $store.emoji)
+      .focused($focus, equals: .searchEmoji)
   }
 }

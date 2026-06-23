@@ -12,6 +12,7 @@ enum Host: String {
 
 enum Path: String {
   case addActivity
+  case dictate
 }
 
 public extension DeeplinkService {
@@ -20,6 +21,14 @@ public extension DeeplinkService {
     components.scheme = Schema.widget.rawValue
     components.host = Host.dashboard.rawValue
     components.path = "/" + Path.addActivity.rawValue
+    return components.url ?? URL(filePath: "")
+  }
+
+  static var dictate: URL {
+    var components = URLComponents()
+    components.scheme = Schema.widget.rawValue
+    components.host = Host.dashboard.rawValue
+    components.path = "/" + Path.dictate.rawValue
     return components.url ?? URL(filePath: "")
   }
 }
@@ -32,6 +41,7 @@ public final class DeeplinkService {
 
   public enum DashboardAction {
     case addActivity
+    case dictate
   }
 
   // MARK: - Properties
@@ -58,6 +68,8 @@ public final class DeeplinkService {
           switch path {
           case .addActivity:
             deeplinkSubject.send(.dashboard(.addActivity))
+          case .dictate:
+            deeplinkSubject.send(.dashboard(.dictate))
           }
         } else {
           deeplinkSubject.send(.dashboard(nil))

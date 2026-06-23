@@ -49,7 +49,7 @@ public struct ComplateAlertView: View {
       content
       progressView
     }
-    .clipShape(RoundedRectangle(cornerRadius: 10.0))
+    .clipShape(RoundedRectangle(cornerRadius: 12.0))
     .background(background)
   }
 
@@ -62,10 +62,10 @@ public struct ComplateAlertView: View {
         VStack(alignment: .leading) {
           Text(configuration.title)
             .font(.system(size: 14.0, weight: .medium))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
           Text(configuration.subtitle)
             .font(.system(size: 12.0, weight: .regular))
-            .foregroundStyle(Color.standardText)
+            .foregroundStyle(Color.primaryText)
         }
         Spacer()
       }
@@ -106,8 +106,8 @@ public struct ComplateAlertView: View {
   }
 
   private var background: some View {
-    RoundedRectangle(cornerRadius: 10.0)
+    RoundedRectangle(cornerRadius: 12.0)
       .fill(Color.formBackground)
-      .shadow(color: Color.standardText.opacity(0.15), radius: 5.0, x: .zero, y: .zero)
+      .shadow(color: Color.primaryText.opacity(0.15), radius: 5.0, x: .zero, y: .zero)
   }
 }
