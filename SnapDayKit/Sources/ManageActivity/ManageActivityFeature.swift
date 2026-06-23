@@ -177,16 +177,6 @@ public struct ManageActivityFeature: TodayProvidable {
     state.focus = nil
     state.isThinking = true
     return .send(.internal(.connection(.connect)))
-//    let data = test.data(using: .utf8)!
-//    let decoder = JSONDecoder()
-//    decoder.dateDecodingStrategy = .iso8601
-//    do {
-//      let request = try decoder .decode(ManageActivitiesRequest.self, from: data)
-//      return handleActions(state: &state, actions: request.actions)
-//    } catch {
-//      print("error: \(error)")
-//      return .none
-//    }
   }
 
   private func handleConnectionAction(state: inout State, action: Action.ConnectionAction) -> Effect<Action> {
@@ -385,88 +375,6 @@ public struct ManageActivityFeature: TodayProvidable {
     }
   }
 }
-
-let test = """
-{
-    "actions": [
-        {
-            "payload": {
-                "updateDayActivity": {
-                    "name": "Walk with dog — split: morning, afternoon, evening",
-                    "tags": [
-                        "pies"
-                    ],
-                    "position": 3,
-                    "reference": {
-                        "byIdentifier": "4D124B35-A578-4AE1-87CB-C0A1D6CEFF16"
-                    },
-                    "dueDate": null,
-                    "icon": null,
-                    "doneDate": null,
-                    "overview": "15-minute walk with the dog split into three short walks (morning, afternoon, evening).",
-                    "reminderDate": null,
-                    "labels": [
-                    ],
-                    "duration": 45,
-                    "date": "2026-02-22T00:00:00Z",
-                    "important": false
-                }
-            },
-            "actionId": "1"
-        },
-        {
-            "payload": {
-                "createDayActivityTask": {
-                    "doneDate": null,
-                    "name": "Morning 15‑minute walk",
-                    "duration": 15,
-                    "reference": {
-                        "byActionId": "1"
-                    },
-                    "overview": null,
-                    "position": 0,
-                    "reminderDate": null
-                }
-            },
-            "actionId": "2"
-        },
-        {
-            "payload": {
-                "createDayActivityTask": {
-                    "doneDate": null,
-                    "name": "Afternoon 15‑minute walk",
-                    "duration": 15,
-                    "reference": {
-                        "byActionId": "1"
-                    },
-                    "overview": null,
-                    "position": 1,
-                    "reminderDate": null
-                }
-            },
-            "actionId": "3"
-        },
-        {
-            "payload": {
-                "createDayActivityTask": {
-                    "doneDate": null,
-                    "name": "Evening 15‑minute walk",
-                    "duration": 15,
-                    "reference": {
-                        "byActionId": "1"
-                    },
-                    "overview": null,
-                    "position": 2,
-                    "reminderDate": null
-                }
-            },
-            "actionId": "4"
-        }
-    ],
-    "_thinking": "Validated existing DayActivity and will update its name/overview and add three tasks of 15 minutes each. References use the existing activity identifier for the update and action-scoped reference for the new tasks.",
-    "error": "NONE"
-}
-"""
 
 extension DecisionType {
 

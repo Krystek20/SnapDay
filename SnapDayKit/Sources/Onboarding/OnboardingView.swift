@@ -73,7 +73,6 @@ public struct OnboardingView: View {
           .modifier(OnboardingViewModifier(tag: .notification))
       }
       .tabViewStyle(.page(indexDisplayMode: .never))
-      // PrimaryButtonStyle height + bottom padding + CancelButtonStyle is shown
       .offset(y: -55.0 - (store.isSkipButtonShown ? 40 : .zero))
       .animation(.easeInOut, value: store.selectedTab)
     }
