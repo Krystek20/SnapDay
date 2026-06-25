@@ -295,5 +295,6 @@ private struct DashboardPlansAllPlansRow: View {
     }
     .accessibilityElement(children: .combine)
     .frame(maxWidth: .infinity, alignment: .leading)
+    .contentShape(Rectangle())
   }
 }

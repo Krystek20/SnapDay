@@ -2,6 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 import Dashboard
 import Reports
+import Plans
 import Onboarding
 import ActivityDetails
 import Resources
@@ -86,13 +87,15 @@ public struct ApplicationView: View {
     TabView(
       selection: $store.selectedTab,
       content: {
-        NavigationStack {
+        NavigationStack(path: $store.scope(state: \.dashboardPath, action: \.dashboardPath)) {
           DashboardView(
             store: store.scope(
               state: \.dashboard,
               action: \.dashboard
             )
           )
+        } destination: { store in
+          destinationView(store: store)
         }
         .tabItem {
           Text("Dashboard", bundle: .module)
@@ -101,7 +104,7 @@ public struct ApplicationView: View {
         .tag(ApplicationFeature.Tab.dashboard)
         .toolbarBackground(.visible, for: .tabBar)
 
-        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
+        NavigationStack(path: $store.scope(state: \.reportsPath, action: \.reportsPath)) {
           ReportsView(
             store: store.scope(
               state: \.reports,
@@ -109,12 +112,7 @@ public struct ApplicationView: View {
             )
           )
         } destination: { store in
-          switch store.state {
-          case .activityDetails:
-            if let store = store.scope(state: \.activityDetails, action: \.activityDetails) {
-              ActivityDetailsView(store: store)
-            }
-          }
+          destinationView(store: store)
         }
         .tabItem {
           Text("Reports", bundle: .module)
@@ -124,5 +122,19 @@ public struct ApplicationView: View {
         .toolbarBackground(.visible, for: .tabBar)
       }
     )
+  }
+
+  @ViewBuilder
+  private func destinationView(store: StoreOf<ApplicationFeature.Path>) -> some View {
+    switch store.state {
+    case .activityDetails:
+      if let store = store.scope(state: \.activityDetails, action: \.activityDetails) {
+        ActivityDetailsView(store: store)
+      }
+    case .plans:
+      if let store = store.scope(state: \.plans, action: \.plans) {
+        PlansView(store: store)
+      }
+    }
   }
 }

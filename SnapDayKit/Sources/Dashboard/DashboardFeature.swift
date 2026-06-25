@@ -104,6 +104,7 @@ public struct DashboardFeature: TodayProvidable {
       case cancelAlertButtonTapped
       case showFriendsTapped
       case assistantButtonTapped
+      case allPlansButtonTapped
     }
 
     public enum InternalAction: Equatable {
@@ -152,7 +153,9 @@ public struct DashboardFeature: TodayProvidable {
         case remove(DayActivityTask)
       }
     }
-    public enum DelegateAction: Equatable { }
+    public enum DelegateAction: Equatable {
+      case allPlansTapped
+    }
 
     case binding(BindingAction<State>)
     case activityList(PresentationAction<ActivityListFeature.Action>)
@@ -313,6 +316,8 @@ public struct DashboardFeature: TodayProvidable {
     case .assistantButtonTapped:
       state.manageActivity = ManageActivityFeature.State()
       return .none
+    case .allPlansButtonTapped:
+      return .send(.delegate(.allPlansTapped))
     }
   }
 

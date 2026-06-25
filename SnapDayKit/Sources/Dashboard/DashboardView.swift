@@ -222,7 +222,10 @@ public struct DashboardView: View {
           title: String(localized: "No active Plan", bundle: .module),
           subtitle: String(localized: "Recurring routines will appear here when scheduled.", bundle: .module)
         )
-      ]
+      ],
+      allPlansAction: {
+        store.send(.view(.allPlansButtonTapped))
+      }
     )
   }
 

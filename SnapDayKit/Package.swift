@@ -23,6 +23,7 @@ private var products: [Product] {
   Module.widgetActivityList
   Module.widgetStreak
   Module.widgetWeeklyProgress
+  Module.plans
   Module.previews
 }
 
@@ -35,13 +36,14 @@ private var packageDependencies: [Package.Dependency] {
 @TargetsBuilder
 private var targets: [Target] {
   TargetParamenters(module: .application, dependencies: sceneDependecies + [
-    .onboarding, .dashboard, .reports, .activityDetails, .developerTools
+    .onboarding, .dashboard, .reports, .plans, .activityDetails, .developerTools
   ])
   TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends, .manageActivity])
   TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
   TargetParamenters(module: .reports, dependencies: sceneDependecies)
+  TargetParamenters(module: .plans, dependencies: sceneDependecies)
   TargetParamenters(module: .friends, dependencies: sceneDependecies)
   TargetParamenters(module: .activityDetails, dependencies: sceneDependecies + [.selectableList])
   TargetParamenters(module: .selectableList, dependencies: sceneDependecies)
@@ -86,6 +88,7 @@ private enum Module: String {
   case emojiPicker
   case calendarPicker
   case reports
+  case plans
   case friends
   case activityDetails
   case selectableList

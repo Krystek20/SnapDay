@@ -1,5 +1,6 @@
 import Dashboard
 import Reports
+import Plans
 import Onboarding
 import ActivityDetails
 import ComposableArchitecture
@@ -21,7 +22,8 @@ public struct ApplicationFeature: TodayProvidable {
 
   @ObservableState
   public struct State: Equatable {
-    var path = StackState<Path.State>()
+    var dashboardPath = StackState<Path.State>()
+    var reportsPath = StackState<Path.State>()
 
     var showOnboarding: Bool {
       didSet {
@@ -55,7 +57,8 @@ public struct ApplicationFeature: TodayProvidable {
     case handleUrl(URL)
     case setTab(Tab)
     case dashboard(DashboardFeature.Action)
-    case path(StackAction<Path.State, Path.Action>)
+    case dashboardPath(StackAction<Path.State, Path.Action>)
+    case reportsPath(StackAction<Path.State, Path.Action>)
     case reports(ReportsFeature.Action)
     case onboarding(OnboardingFeature.Action)
     #if DEBUG
@@ -70,15 +73,20 @@ public struct ApplicationFeature: TodayProvidable {
     @ObservableState
     public enum State: Equatable {
       case activityDetails(ActivityDetailsFeature.State)
+      case plans(PlansFeature.State)
     }
 
     public enum Action: Equatable {
       case activityDetails(ActivityDetailsFeature.Action)
+      case plans(PlansFeature.Action)
     }
 
     public var body: some ReducerOf<Self> {
       Scope(state: /State.activityDetails, action: /Action.activityDetails) {
         ActivityDetailsFeature()
+      }
+      Scope(state: /State.plans, action: /Action.plans) {
+        PlansFeature()
       }
     }
   }
@@ -157,6 +165,9 @@ public struct ApplicationFeature: TodayProvidable {
         guard state.selectedTab != tab else { return .none }
         state.selectedTab = tab
         return .none
+      case .dashboard(.delegate(.allPlansTapped)):
+        state.dashboardPath.append(.plans(PlansFeature.State()))
+        return .none
       case .dashboard:
         return .none
       case .reports(.delegate(let action)):
@@ -172,7 +183,9 @@ public struct ApplicationFeature: TodayProvidable {
       case .developerTools:
         return .none
       #endif
-      case .path:
+      case .dashboardPath:
+        return .none
+      case .reportsPath:
         return .none
       case .binding:
         return .none
@@ -183,7 +196,10 @@ public struct ApplicationFeature: TodayProvidable {
       DeveloperToolsFeature()
     }
     #endif
-    .forEach(\.path, action: \.path) {
+    .forEach(\.dashboardPath, action: \.dashboardPath) {
+      Path()
+    }
+    .forEach(\.reportsPath, action: \.reportsPath) {
       Path()
     }
   }
@@ -196,7 +212,7 @@ public struct ApplicationFeature: TodayProvidable {
   ) -> EffectOf<Self> {
     switch action {
     case .activityTapped(let activity, let activities, let period):
-      state.path.append(
+      state.reportsPath.append(
         .activityDetails(
           ActivityDetailsFeature.State(
             reportType: .activity(activity, activities, nil),
@@ -206,7 +222,7 @@ public struct ApplicationFeature: TodayProvidable {
       )
       return .none
     case .tagTapped(let tag, let tags, let period):
-      state.path.append(
+      state.reportsPath.append(
         .activityDetails(
           ActivityDetailsFeature.State(
             reportType: .tag(tag, tags, nil),
