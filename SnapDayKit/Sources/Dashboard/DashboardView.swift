@@ -35,7 +35,7 @@ public struct DashboardView: View {
       ScrollView {
         Spacer()
           .frame(height: 50.0)
-        dayList
+        dashboardContent
           .padding(.horizontal, 15.0)
           .padding(.top, 15.0)
           .padding(.bottom, 15.0 + additionalButtomPadding)
@@ -206,6 +206,24 @@ public struct DashboardView: View {
         .padding(.all, 15.0)
       }
     }
+  }
+
+  private var dashboardContent: some View {
+    VStack(spacing: 15.0) {
+      plansSummary
+      dayList
+    }
+  }
+
+  private var plansSummary: some View {
+    DashboardPlansSectionView(
+      configurations: [
+        DashboardPlansSummaryView.Configuration(
+          title: String(localized: "No active Plan", bundle: .module),
+          subtitle: String(localized: "Recurring routines will appear here when scheduled.", bundle: .module)
+        )
+      ]
+    )
   }
 
   private var dayList: some View {

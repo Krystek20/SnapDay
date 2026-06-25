@@ -321,6 +321,9 @@
         }
       }
     },
+    "All Plans" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "ar" : {
@@ -1088,6 +1091,12 @@
           }
         }
       }
+    },
+    "No active Plan" : {
+
+    },
+    "Recurring routines will appear here when scheduled." : {
+
     },
     "Remove" : {
       "localizations" : {

@@ -14,6 +14,8 @@ extension Color {
   public static let emphasisBackground = Color(.emphasisBackground)
   public static let greenSuccess = Color(.greenSuccess)
   public static let sunburstOrange = Color(.sunburstOrange)
+  public static let planStatePillBackground = Color(.planStatePillBackground)
+  public static let planStatePillBorder = Color(.planStatePillBorder)
   public static let border = Color(.border)
 }
 
