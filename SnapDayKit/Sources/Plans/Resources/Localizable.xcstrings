@@ -1,6 +1,109 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
+    "Active" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active"
+          }
+        }
+      }
+    },
+    "ACTIVE PLANS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACTIVE PLANS"
+          }
+        }
+      }
+    },
+    "ARCHIVED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ARCHIVED"
+          }
+        }
+      }
+    },
+    "Create a Plan from your existing activities and SnapDay will add them to the right days." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a Plan from your existing activities and SnapDay will add them to the right days."
+          }
+        }
+      }
+    },
+    "Create Plan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Plan"
+          }
+        }
+      }
+    },
+    "Create your first Plan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your first Plan"
+          }
+        }
+      }
+    },
+    "FINISHED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FINISHED"
+          }
+        }
+      }
+    },
+    "Finished and archived Plans will appear in History." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished and archived Plans will appear in History."
+          }
+        }
+      }
+    },
+    "History" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History"
+          }
+        }
+      }
+    },
+    "No active Plans" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No active Plans"
+          }
+        }
+      }
+    },
     "Plans" : {
       "localizations" : {
         "en" : {
