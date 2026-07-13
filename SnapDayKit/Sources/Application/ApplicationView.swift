@@ -22,25 +22,6 @@ public struct ApplicationView: View {
 
   public init(store: StoreOf<ApplicationFeature>) {
     self.store = store
-
-#warning("Move it")
-    let appearance = UINavigationBarAppearance()
-    appearance.backgroundColor = UIColor.background
-    appearance.shadowImage = nil
-    appearance.shadowColor = nil
-
-    appearance.titleTextAttributes = [
-      .font: UIFont.systemFont(ofSize: 16.0, weight: .medium),
-      .foregroundColor: UIColor.primaryText
-    ]
-
-    let scrollEdgeAppearance = appearance.copy()
-    scrollEdgeAppearance.shadowImage = nil
-    scrollEdgeAppearance.shadowColor = nil
-
-    UINavigationBar.appearance().standardAppearance = appearance
-    UINavigationBar.appearance().compactAppearance = appearance
-    UINavigationBar.appearance().scrollEdgeAppearance = scrollEdgeAppearance
   }
 
   // MARK: - Views

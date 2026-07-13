@@ -189,7 +189,7 @@ private extension ListViewHeaderItem {
   static func header(configuration: ListItemConfiguration) -> ListViewHeaderItem {
     let trailingAction = ListViewHeaderItem.ListViewHeaderAction(
       identifier: ListItemHeaderAction.acceptAll.rawValue,
-      title: String(localized: "Accept all", bundle: .module)
+      title: "Accept all"
     )
     return ListViewHeaderItem(
       title: configuration.decisionType.title,

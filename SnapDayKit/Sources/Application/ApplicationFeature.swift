@@ -4,6 +4,7 @@ import Plans
 import Onboarding
 import ActivityDetails
 import ComposableArchitecture
+import Repositories
 import Utilities
 import TipKit
 #if DEBUG
@@ -84,12 +85,13 @@ public struct ApplicationFeature: TodayProvidable {
     }
 
     public var body: some ReducerOf<Self> {
-      Scope(state: /State.activityDetails, action: /Action.activityDetails) {
-        ActivityDetailsFeature()
-      }
-      Scope(state: /State.plans, action: /Action.plans) {
-        PlansFeature()
-      }
+      EmptyReducer<State, Action>()
+        .ifCaseLet(\.activityDetails, action: \.activityDetails) {
+          ActivityDetailsFeature()
+        }
+        .ifCaseLet(\.plans, action: \.plans) {
+          PlansFeature()
+        }
     }
   }
 

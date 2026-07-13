@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 import ComposableArchitecture
 import UiComponents
 import Common

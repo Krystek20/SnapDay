@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 
 public protocol Entity {
-  associatedtype ManagedObject: NSManagedObject & Sendable
+  associatedtype ManagedObject: NSManagedObject
   static var fetchRequest: NSFetchRequest<ManagedObject> { get }
   init?(object: ManagedObject?, context: NSManagedObjectContext) throws
   @discardableResult

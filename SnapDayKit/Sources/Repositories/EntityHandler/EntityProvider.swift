@@ -1,6 +1,6 @@
 import Foundation
 import Dependencies
-import CoreData
+@preconcurrency import CoreData
 
 public struct EntityHandler {
 
@@ -66,7 +66,7 @@ public struct EntityHandler {
     return try await context.perform {
       try context.fetch(request)
         .compactMap {
-          try objectType.init(object: $0, context: context)
+          try T(object: $0, context: context)
         }
     }
   }

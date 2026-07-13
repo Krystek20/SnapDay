@@ -30,19 +30,28 @@ final class CoreDataBackupService {
     persistentContainer: PersistentContainerType,
     storeURL: URL,
     description: NSPersistentStoreDescription
-  ) throws {
+  ) {
     Task {
-      try await createBackup(
-        persistentContainer: persistentContainer,
-        description: description
-      )
+      do {
+        try await createBackup(
+          persistentContainer: persistentContainer,
+          description: description
+        )
+      } catch {
+        print("Initial Core Data backup failed: \(error)")
+      }
+
       let contextObjectsDidChangePublished = NotificationCenter
         .default
         .publisher(for: .NSManagedObjectContextObjectsDidChange)
         .debounce(for: .seconds(15), scheduler: DispatchQueue.main)
 
       for await _ in contextObjectsDidChangePublished.values {
-        try await createBackup(persistentContainer: persistentContainer, description: description)
+        do {
+          try await createBackup(persistentContainer: persistentContainer, description: description)
+        } catch {
+          print("Core Data backup failed: \(error)")
+        }
       }
     }
   }

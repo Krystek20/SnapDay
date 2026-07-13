@@ -116,32 +116,36 @@ final class CoreDataStack {
 
     guard Bundle.main.isMainApp else { return }
 
-    do {
-      try coreDataBackupService.scheduleBackups(
-        persistentContainer: persistentContainer,
-        storeURL: storeUrl,
-        description: description
-      )
-    } catch {
-      print("Backup schedule failed: \(error)")
+    coreDataBackupService.scheduleBackups(
+      persistentContainer: persistentContainer,
+      storeURL: storeUrl,
+      description: description
+    )
+
+    Task {
+      do {
+        await remoteChangeObserver.startObservingRemoteChanges(
+          persistentContainer: persistentContainer,
+          store: try privatePersistentStore,
+          sharedStore: try sharedPersistentStore,
+          backgroundContextProvider: { [weak self] in self?.backgroundContext }
+        )
+      } catch {
+        print("Remote change observation failed: \(error)")
+      }
     }
 
     Task {
-      await remoteChangeObserver.startObservingRemoteChanges(
-        persistentContainer: persistentContainer,
-        store: try privatePersistentStore,
-        sharedStore: try sharedPersistentStore,
-        backgroundContextProvider: { [weak self] in self?.backgroundContext }
-      )
-    }
-
-    Task {
-      await remoteChangeObserver.startObservingCloudKitChanges(
-        persistentContainer: persistentContainer,
-        store: try privatePersistentStore,
-        shareStore: try sharedPersistentStore,
-        backgroundContextProvider: { [weak self] in self?.backgroundContext }
-      )
+      do {
+        await remoteChangeObserver.startObservingCloudKitChanges(
+          persistentContainer: persistentContainer,
+          store: try privatePersistentStore,
+          shareStore: try sharedPersistentStore,
+          backgroundContextProvider: { [weak self] in self?.backgroundContext }
+        )
+      } catch {
+        print("CloudKit change observation failed: \(error)")
+      }
     }
   }
 

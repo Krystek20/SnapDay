@@ -61,7 +61,7 @@ public struct DayActivityFormView: View {
         }
         .presentationDetents([.large])
       }
-      .onChange(of: scenePhase) { newPhase in
+      .onChange(of: scenePhase) { _, newPhase in
         guard newPhase == .active else { return }
         store.send(.view(.appeared))
       }

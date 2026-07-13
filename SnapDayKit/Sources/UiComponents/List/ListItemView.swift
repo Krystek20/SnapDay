@@ -183,12 +183,12 @@ public struct ListItemView: View {
   private var headerView: some View {
     if let headerItem = item.headerItem {
       HStack(alignment: .top, spacing: 5.0) {
-        Text(headerItem.title)
+        Text(String(localized: headerItem.title, bundle: .module))
           .font(.system(size: 12.0, weight: .semibold))
           .foregroundStyle(Color.primaryText)
         Spacer()
         if let trailingAction = headerItem.trailingAction {
-          Button(trailingAction.title) {
+          Button(String(localized: trailingAction.title, bundle: .module)) {
             actionHandler?(trailingAction.identifier, item)
           }
           .foregroundStyle(Color.actionBlue)

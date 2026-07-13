@@ -1,4 +1,4 @@
-import CoreData
+@preconcurrency import CoreData
 import Models
 import CloudKit
 
@@ -8,6 +8,7 @@ final class RemoteChangeObserver {
 
   private let notificationCenter: NotificationCenter
   private let userDefaults: UserDefaults
+  private let deduplicator: RemoteChangeDeduplicator
   private let lock = Lock()
   private let deduplicationIdentifier = "Deduplication"
 
@@ -15,10 +16,12 @@ final class RemoteChangeObserver {
 
   init(
     notificationCenter: NotificationCenter = .default,
-    userDefaults: UserDefaults = .standard
+    userDefaults: UserDefaults = .standard,
+    deduplicator: RemoteChangeDeduplicator = RemoteChangeDeduplicator()
   ) {
     self.notificationCenter = notificationCenter
     self.userDefaults = userDefaults
+    self.deduplicator = deduplicator
   }
 
   // MARK: - Public
@@ -128,35 +131,14 @@ final class RemoteChangeObserver {
     store: NSPersistentStore,
     context: NSManagedObjectContext
   ) async throws {
-    try await context.perform { [weak self] in
-      for entity in SupportedDeduplicable.entities {
-        try self?.removeDeduplicatedObjects(
-          entity: entity,
-          beforeDate: beforeDate,
-          store: store,
-          context: context
-        )
-      }
+    let deduplicator = deduplicator
+    try await context.perform {
+      try deduplicator.removeDeduplicatedObjects(
+        beforeDate: beforeDate,
+        store: store,
+        context: context
+      )
     }
-  }
-
-  private func removeDeduplicatedObjects<T: Deduplicable>(
-    entity: T.Type,
-    beforeDate: Date,
-    store: NSPersistentStore,
-    context: NSManagedObjectContext
-  ) throws {
-    let fetchRequest = entity.fetchRequest()
-    fetchRequest.affectedStores = [store]
-    let format = "(deduplicatedDate != nil) AND (deduplicatedDate < %@)"
-    fetchRequest.predicate = NSPredicate(format: format, beforeDate as CVarArg)
-
-    guard let objects = try? context.fetch(fetchRequest) as? [Deduplicable], !objects.isEmpty else { return }
-    print("\(#function): Removing deduplicated objects with identifier: \(objects.first?.identifier ?? "nil"), count: \(objects.count).")
-    for object in objects {
-      context.delete(object)
-    }
-    try context.save()
   }
 
   private func performHistory(
@@ -223,66 +205,16 @@ final class RemoteChangeObserver {
   ) async throws {
     print("[TEST_DEDUPLICATION] - START: \(inserted.count)")
 
+    let deduplicator = deduplicator
     try await lock.perform(for: deduplicationIdentifier) {
-      try await context.perform { [weak self] in
-        for managedObjectIds in inserted.values {
-          print("[TEST_DEDUPLICATION] - managedObjectIdsCount \(managedObjectIds.count)")
-          for managedObjectId in managedObjectIds {
-            self?.deduplicate(managedObjectId, context: context, persistentContainer: persistentContainer)
-          }
-        }
-        try context.save()
+      try await context.perform {
+        try deduplicator.deduplicate(
+          inserted,
+          context: context,
+          persistentContainer: persistentContainer
+        )
       }
       print("[TEST_DEDUPLICATION] - Deduplicated")
     }
-  }
-
-  private func deduplicate(
-    _ objectId: NSManagedObjectID,
-    context: NSManagedObjectContext,
-    persistentContainer: PersistentContainer
-  ) {
-    guard let deduplicable = context.object(with: objectId) as? Deduplicable,
-          let identifier = deduplicable.identifier else {
-      print("\(#function): Ignore an object that was deleted: \(objectId)")
-      return
-    }
-
-    guard let name = objectId.entity.name else {
-      print("\(#function): No entity name for: \(objectId)")
-      return
-    }
-
-    let fetchRequest: NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: name)
-    fetchRequest.sortDescriptors = [
-      NSSortDescriptor(key: "version", ascending: false),
-      NSSortDescriptor(key: "identifier", ascending: true)
-    ]
-    fetchRequest.predicate = NSCompoundPredicate(
-      andPredicateWithSubpredicates: [
-        NSPredicate(format: "identifier == %@", identifier as CVarArg),
-        NSPredicate(format: "deduplicatedDate == nil")
-      ]
-    )
-
-    guard var duplicated = try? context.fetch(fetchRequest) as? [Deduplicable], duplicated.count > 1 else {
-      return
-    }
-
-    let tagZoneID = persistentContainer.recordID(for: deduplicable.objectID)?.zoneID
-    duplicated = duplicated.filter {
-      persistentContainer.recordID(for: $0.objectID)?.zoneID == tagZoneID
-    }
-
-    guard duplicated.count > 1, let indexToReserve = duplicated.indexToReserve else {
-      return
-    }
-
-    print("\(#function): Deduplicating \(name) with id: \(identifier), count: \(duplicated.count)")
-
-    let objectToReserve = duplicated[indexToReserve]
-    duplicated.remove(at: indexToReserve)
-    duplicated.deduplicate(to: objectToReserve)
-    duplicated.markAsDeduplicated()
   }
 }

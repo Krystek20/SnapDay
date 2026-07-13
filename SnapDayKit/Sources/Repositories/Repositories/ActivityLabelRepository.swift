@@ -50,9 +50,7 @@ extension ActivityLabelRepository: DependencyKey {
         return labels.filter(activity.labels.contains)
       },
       loadLabel: { activityId, name in
-        let activity = try await EntityHandler().fetch(Activity.self, identifier: activityId as CVarArg)
-        guard let activity else { return nil }
-
+        guard try await EntityHandler().fetch(Activity.self, identifier: activityId as CVarArg) != nil else { return nil }
         return try await EntityHandler().fetch(ActivityLabel.self) {
           NSPredicate(format: "name == %@", name)
         }
