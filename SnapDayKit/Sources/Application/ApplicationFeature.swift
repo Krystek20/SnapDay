@@ -36,6 +36,7 @@ public struct ApplicationFeature: TodayProvidable {
     var dashboard = DashboardFeature.State(date: Calendar.today)
     var reports = ReportsFeature.State()
     var onboarding = OnboardingFeature.State()
+    @Presents var newPlan: NewPlanFeature.State?
 
     #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
@@ -61,6 +62,7 @@ public struct ApplicationFeature: TodayProvidable {
     case reportsPath(StackAction<Path.State, Path.Action>)
     case reports(ReportsFeature.Action)
     case onboarding(OnboardingFeature.Action)
+    case newPlan(PresentationAction<NewPlanFeature.Action>)
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
@@ -179,10 +181,18 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       case .onboarding:
         return .none
+      case .newPlan(.presented(.delegate(.cancelTapped))):
+        state.newPlan = nil
+        return .none
+      case .newPlan:
+        return .none
       #if DEBUG
       case .developerTools:
         return .none
       #endif
+      case .dashboardPath(.element(id: _, action: .plans(.delegate(.createPlanTapped)))):
+        state.newPlan = NewPlanFeature.State()
+        return .none
       case .dashboardPath:
         return .none
       case .reportsPath:
@@ -196,6 +206,9 @@ public struct ApplicationFeature: TodayProvidable {
       DeveloperToolsFeature()
     }
     #endif
+    .ifLet(\.$newPlan, action: \.newPlan) {
+      NewPlanFeature()
+    }
     .forEach(\.dashboardPath, action: \.dashboardPath) {
       Path()
     }

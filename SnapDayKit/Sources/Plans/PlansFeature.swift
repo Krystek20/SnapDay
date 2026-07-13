@@ -34,8 +34,13 @@ public struct PlansFeature {
       case planTapped(Plan.ID)
     }
 
+    public enum DelegateAction: Equatable {
+      case createPlanTapped
+    }
+
     case binding(BindingAction<State>)
     case view(ViewAction)
+    case delegate(DelegateAction)
   }
 
   // MARK: - Initialization
@@ -53,8 +58,10 @@ public struct PlansFeature {
       case .view(.appeared):
         return .none
       case .view(.createPlanButtonTapped):
-        return .none
+        return .send(.delegate(.createPlanTapped))
       case .view(.planTapped):
+        return .none
+      case .delegate:
         return .none
       }
     }
