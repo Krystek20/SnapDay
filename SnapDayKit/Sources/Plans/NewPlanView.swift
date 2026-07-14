@@ -1,5 +1,6 @@
 import ActivityList
 import ComposableArchitecture
+import Models
 import Resources
 import SwiftUI
 import UiComponents

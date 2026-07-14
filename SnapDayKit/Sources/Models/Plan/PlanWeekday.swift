@@ -11,15 +11,15 @@ public enum PlanWeekday: Int, CaseIterable, Equatable, Hashable, Identifiable {
 
   public var id: Self { self }
 
-  var title: String {
+  public var title: String {
     title(using: .autoupdatingCurrent)
   }
 
-  func title(using calendar: Calendar) -> String {
+  public func title(using calendar: Calendar) -> String {
     calendar.standaloneWeekdaySymbols[rawValue - 1]
   }
 
-  static func ordered(using calendar: Calendar) -> [Self] {
+  public static func ordered(using calendar: Calendar) -> [Self] {
     let rawValues = Array(1...7)
     let firstIndex = max(0, min(6, calendar.firstWeekday - 1))
     return (rawValues[firstIndex...] + rawValues[..<firstIndex]).compactMap(Self.init(rawValue:))

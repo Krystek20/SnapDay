@@ -1,6 +1,6 @@
 import Foundation
 
-public enum PlanDuration: String, CaseIterable, Equatable, Identifiable {
+public enum PlanDuration: String, CaseIterable, Equatable, Hashable, Identifiable {
   case sevenDays
   case twoWeeks
   case oneMonth
@@ -11,19 +11,10 @@ public enum PlanDuration: String, CaseIterable, Equatable, Identifiable {
 
   public var id: Self { self }
 
-  var title: String.LocalizationValue {
-    switch self {
-    case .sevenDays: "7 days"
-    case .twoWeeks: "2 weeks"
-    case .oneMonth: "1 month"
-    case .threeMonths: "3 months"
-    case .sixMonths: "6 months"
-    case .oneYear: "1 year"
-    case .custom: "Custom"
-    }
-  }
-
-  func endDate(from startDate: Date, calendar: Calendar = .autoupdatingCurrent) -> Date {
+  public func endDate(
+    from startDate: Date,
+    calendar: Calendar = .autoupdatingCurrent
+  ) -> Date {
     switch self {
     case .sevenDays:
       return calendar.date(byAdding: .day, value: 6, to: startDate) ?? startDate
