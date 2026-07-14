@@ -97,9 +97,7 @@ struct RemoteChangeDeduplicator: Sendable {
 
     print("\(#function): Deduplicating \(name) with id: \(identifier), count: \(duplicated.count)")
 
-    let objectToReserve = duplicated[indexToReserve]
     duplicated.remove(at: indexToReserve)
-    duplicated.deduplicate(to: objectToReserve)
     duplicated.markAsDeduplicated()
   }
 }
