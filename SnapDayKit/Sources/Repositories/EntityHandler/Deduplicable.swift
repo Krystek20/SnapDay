@@ -42,6 +42,9 @@ enum SupportedDeduplicable {
       DayActivityEntity.self,
       DayActivityTaskEntity.self,
       IconEntity.self,
+      PlanEntity.self,
+      PlanOccurrenceEntity.self,
+      PlanScheduleEntryEntity.self,
       RGBColorEntity.self,
       TagEntity.self
     ]

@@ -6,7 +6,7 @@ enum NSManagedObjectError: Error {
 
 extension NSManagedObject {
   static func object<T: NSManagedObject>(
-    identifier: String,
+    identifier: CVarArg,
     fetchRequest: NSFetchRequest<T>,
     context: NSManagedObjectContext
   ) throws -> T {
