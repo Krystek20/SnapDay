@@ -3,6 +3,7 @@ import Models
 
 public struct NewPlanDraft: Equatable {
   let name: String
+  let duration: PlanDuration
   let startDate: Date
   let endDate: Date
   let schedule: [ScheduledPlanDay]
@@ -10,6 +11,29 @@ public struct NewPlanDraft: Equatable {
   var uniqueActivities: [Activity] {
     var seen = Set<Activity.ID>()
     return schedule.flatMap(\.activities).filter { seen.insert($0.id).inserted }
+  }
+
+  func plan(
+    id: Plan.ID,
+    scheduleEntryID: () -> PlanScheduleEntry.ID
+  ) -> Plan {
+    Plan(
+      id: id,
+      name: name,
+      startDate: startDate,
+      endDate: endDate,
+      duration: duration,
+      schedule: schedule.flatMap { day in
+        day.activities.enumerated().map { position, activity in
+          PlanScheduleEntry(
+            id: scheduleEntryID(),
+            weekday: day.weekday,
+            activityID: activity.id,
+            position: position
+          )
+        }
+      }
+    )
   }
 
   func plannedActivityCount(calendar: Calendar = .autoupdatingCurrent) -> Int {

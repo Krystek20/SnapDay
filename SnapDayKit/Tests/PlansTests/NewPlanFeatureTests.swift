@@ -57,9 +57,8 @@ struct NewPlanFeatureTests {
       reducer: { NewPlanFeature() }
     )
 
-    await store.send(.binding(.set(\.endDate, earlierDate))) {
-      $0.endDate = startDate
-    }
+    await store.send(.binding(.set(\.endDate, earlierDate)))
+    #expect(store.state.endDate == startDate)
   }
 
   @Test
@@ -135,7 +134,7 @@ struct NewPlanFeatureTests {
       $0.activityPickerDay = .monday
       $0.activityPicker = ActivityListFeature.State(
         selectedActivityIDs: [],
-        title: "Add to Monday"
+        title: "Add to \(PlanWeekday.monday.title)"
       )
     }
     await store.send(
@@ -167,7 +166,7 @@ struct NewPlanFeatureTests {
       $0.activityPickerDay = .monday
       $0.activityPicker = ActivityListFeature.State(
         selectedActivityIDs: [],
-        title: "Add to Monday"
+        title: "Add to \(PlanWeekday.monday.title)"
       )
     }
     #expect(store.state.name == initialState.name)

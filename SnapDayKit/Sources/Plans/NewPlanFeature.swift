@@ -252,6 +252,7 @@ public struct NewPlanFeature {
             .planCreated(
               NewPlanDraft(
                 name: state.name.trimmingCharacters(in: .whitespacesAndNewlines),
+                duration: state.selectedDuration,
                 startDate: state.startDate,
                 endDate: state.endDate,
                 schedule: state.schedule

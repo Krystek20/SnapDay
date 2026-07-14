@@ -85,6 +85,62 @@ struct PlanRepositoryTests {
     }
   }
 
+  @Test
+  func synchronizesFutureOccurrencesWithoutChangingLinkedHistory() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      let calendar = Calendar.autoupdatingCurrent
+      let monday = try #require(
+        calendar.date(from: DateComponents(year: 2026, month: 7, day: 13))
+      )
+      let sunday = try #require(calendar.date(byAdding: .day, value: 6, to: monday))
+      let tuesday = try #require(calendar.date(byAdding: .day, value: 1, to: monday))
+      let activityID = UUID()
+      var plan = Plan(
+        id: UUID(),
+        name: "Weekly plan",
+        startDate: monday,
+        endDate: sunday,
+        duration: .sevenDays,
+        schedule: [
+          PlanScheduleEntry(id: UUID(), weekday: .monday, activityID: activityID, position: 0),
+          PlanScheduleEntry(id: UUID(), weekday: .wednesday, activityID: activityID, position: 0),
+          PlanScheduleEntry(id: UUID(), weekday: .thursday, activityID: activityID, position: 0)
+        ]
+      )
+
+      try await repository.savePlan(plan)
+      var initialOccurrences = try await repository.synchronizeOccurrences(plan, monday)
+      #expect(initialOccurrences.count == 3)
+
+      for index in initialOccurrences.indices where initialOccurrences[index].date != calendar.date(
+        byAdding: .day,
+        value: 3,
+        to: monday
+      ) {
+        initialOccurrences[index].dayActivityID = UUID()
+      }
+      try await repository.saveOccurrences(initialOccurrences)
+
+      plan.schedule = [
+        PlanScheduleEntry(id: UUID(), weekday: .friday, activityID: activityID, position: 0)
+      ]
+      try await repository.savePlan(plan)
+      let synchronized = try await repository.synchronizeOccurrences(plan, tuesday)
+      let synchronizedAgain = try await repository.synchronizeOccurrences(plan, tuesday)
+
+      #expect(synchronized.count == 3)
+      #expect(synchronizedAgain == synchronized)
+      #expect(synchronized.contains { $0.date == monday && $0.dayActivityID != nil })
+      #expect(synchronized.contains { calendar.component(.weekday, from: $0.date) == 4 && $0.dayActivityID != nil })
+      #expect(synchronized.contains { calendar.component(.weekday, from: $0.date) == 6 && $0.dayActivityID == nil })
+      #expect(!synchronized.contains { calendar.component(.weekday, from: $0.date) == 5 })
+      #expect(try await repository.loadOccurrences(plan.id) == synchronized)
+    }
+  }
+
   private func makePlan(
     id: UUID = UUID(),
     startDate: Date = Date(timeIntervalSinceReferenceDate: 800_000_000),

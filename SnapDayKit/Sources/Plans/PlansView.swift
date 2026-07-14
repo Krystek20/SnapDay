@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Models
 import Resources
 import SwiftUI
 import UiComponents
@@ -23,11 +24,13 @@ public struct PlansView: View {
       VStack(alignment: .leading, spacing: 15.0) {
         sectionPicker
 
-        switch store.selectedSection {
-        case .active:
-          activeSection
-        case .history:
-          historySection
+        switch store.loadState {
+        case .idle, .loading:
+          loadingContent
+        case .loaded:
+          selectedSectionContent
+        case .failed(let message):
+          errorContent(message: message)
         }
       }
       .padding(.horizontal, 15.0)
@@ -73,6 +76,47 @@ public struct PlansView: View {
       }
     )
     .pickerStyle(.segmented)
+  }
+
+  @ViewBuilder
+  private var selectedSectionContent: some View {
+    switch store.selectedSection {
+    case .active:
+      activeSection
+    case .history:
+      historySection
+    }
+  }
+
+  private var loadingContent: some View {
+    ProgressView()
+      .maxWidth()
+      .padding(.vertical, 30.0)
+  }
+
+  private func errorContent(message: String) -> some View {
+    VStack(spacing: 10.0) {
+      Text("Plans couldn't be loaded", bundle: .module)
+        .font(.system(size: 16.0, weight: .semibold))
+        .foregroundStyle(Color.primaryText)
+
+      Text(message)
+        .font(.system(size: 13.0, weight: .regular))
+        .foregroundStyle(Color.secondaryText)
+        .multilineTextAlignment(.center)
+
+      Button(
+        action: {
+          store.send(.view(.retryButtonTapped))
+        },
+        label: {
+          Text("Try again", bundle: .module)
+        }
+      )
+      .buttonStyle(PrimaryButtonStyle())
+    }
+    .padding(15.0)
+    .maxWidth()
   }
 
   private var activeSection: some View {
@@ -152,7 +196,7 @@ public struct PlansView: View {
   private func historyGroup(
     title: String,
     trailingTitle: String,
-    plans: [Plan]
+    plans: [PlanListItem]
   ) -> some View {
     VStack(alignment: .leading, spacing: 10.0) {
       PlansSectionHeader(title: title, trailingTitle: trailingTitle)
@@ -188,14 +232,14 @@ private struct PlansSectionHeader: View {
 
 private struct PlansGroup: View {
 
-  let plans: [Plan]
+  let plans: [PlanListItem]
   let action: (Plan.ID) -> Void
 
   var body: some View {
     VStack(spacing: .zero) {
-      ForEach(Array(plans.enumerated()), id: \.element.id) { index, plan in
-        PlanRow(plan: plan) {
-          action(plan.id)
+      ForEach(Array(plans.enumerated()), id: \.element.id) { index, item in
+        PlanRow(item: item) {
+          action(item.id)
         }
 
         if index < plans.index(before: plans.endIndex) {
@@ -213,14 +257,14 @@ private struct PlansGroup: View {
 
 private struct PlanRow: View {
 
-  let plan: Plan
+  let item: PlanListItem
   let action: () -> Void
 
   var body: some View {
     Button(action: action) {
       VStack(alignment: .leading, spacing: 10.0) {
         HStack(alignment: .top, spacing: 10.0) {
-          Text(plan.title)
+          Text(item.plan.name)
             .font(.system(size: 16.0, weight: .semibold))
             .foregroundStyle(Color.primaryText)
             .lineLimit(1)
@@ -228,10 +272,12 @@ private struct PlanRow: View {
 
           Spacer(minLength: 10.0)
 
-          PlanProgressBadge(title: plan.progressTitle)
+          PlanProgressBadge(title: "\(item.progress.percentComplete)%")
         }
 
-        Text(plan.summary)
+        Text(
+          "\(item.progress.completedPlannedActivityCount) of \(item.progress.totalPlannedActivityCount) planned activities complete"
+        )
           .font(.system(size: 13.0, weight: .regular))
           .foregroundStyle(Color.secondaryText)
           .lineLimit(2)
@@ -239,7 +285,7 @@ private struct PlanRow: View {
         activityChips
 
         HStack(alignment: .center, spacing: 10.0) {
-          PlanProgressBar(value: plan.progress)
+          PlanProgressBar(value: item.progress.fractionComplete)
         }
       }
       .padding(.horizontal, 15.0)
@@ -252,8 +298,8 @@ private struct PlanRow: View {
   private var activityChips: some View {
     ScrollView(.horizontal) {
       HStack(spacing: 5.0) {
-        ForEach(plan.activities, id: \.self) { activity in
-          Chip(title: activity)
+        ForEach(item.activities) { activity in
+          Chip(title: activity.name)
         }
       }
     }

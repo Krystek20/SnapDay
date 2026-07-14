@@ -11,6 +11,7 @@ public struct PlanRepository {
   public var archivePlan: @Sendable (_ identifier: Plan.ID) async throws -> Void
   public var loadOccurrences: @Sendable (_ planID: Plan.ID) async throws -> [PlanOccurrence]
   public var saveOccurrences: @Sendable (_ occurrences: [PlanOccurrence]) async throws -> Void
+  public var synchronizeOccurrences: @Sendable (_ plan: Plan, _ from: Date) async throws -> [PlanOccurrence]
 }
 
 extension DependencyValues {
@@ -30,11 +31,18 @@ extension PlanRepository: DependencyKey {
         )
       },
       loadActivePlans: { date in
-        try await EntityHandler().fetch(
+        let calendar = Calendar.autoupdatingCurrent
+        let startOfDay = calendar.startOfDay(for: date)
+        let startOfNextDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? startOfDay
+        return try await EntityHandler().fetch(
           Plan.self,
           predicates: {
             NSPredicate(format: "isArchived == NO")
-            NSPredicate(format: "endDate >= %@", Calendar.autoupdatingCurrent.startOfDay(for: date) as NSDate)
+            NSPredicate(
+              format: "startDate < %@ AND endDate >= %@",
+              startOfNextDay as NSDate,
+              startOfDay as NSDate
+            )
           },
           sorts: { NSSortDescriptor(key: "startDate", ascending: true) }
         )
@@ -71,6 +79,36 @@ extension PlanRepository: DependencyKey {
       },
       saveOccurrences: { occurrences in
         try await EntityHandler().save(occurrences)
+      },
+      synchronizeOccurrences: { plan, from in
+        let entityHandler = EntityHandler()
+        let calendar = Calendar.autoupdatingCurrent
+        let lowerBound = max(
+          calendar.startOfDay(for: plan.startDate),
+          calendar.startOfDay(for: from)
+        )
+        let existing = try await entityHandler.fetch(
+          PlanOccurrence.self,
+          predicates: { NSPredicate(format: "planIdentifier == %@", plan.id as CVarArg) },
+          sorts: { NSSortDescriptor(key: "date", ascending: true) }
+        )
+        let generated = plan.scheduledOccurrences(from: lowerBound, calendar: calendar)
+        let generatedIDs = Set(generated.map(\.id))
+        let obsolete = existing.filter {
+          $0.date >= lowerBound && $0.dayActivityID == nil && !generatedIDs.contains($0.id)
+        }
+        if !obsolete.isEmpty {
+          try await entityHandler.delete(obsolete)
+        }
+
+        let retained = existing.filter { !obsolete.contains($0) }
+        let retainedByID = Dictionary(uniqueKeysWithValues: retained.map { ($0.id, $0) })
+        let occurrences = generated.map { retainedByID[$0.id] ?? $0 }
+          + retained.filter { $0.date < lowerBound || !generatedIDs.contains($0.id) }
+        if !occurrences.isEmpty {
+          try await entityHandler.save(occurrences)
+        }
+        return occurrences.sorted { $0.date < $1.date }
       }
     )
   }

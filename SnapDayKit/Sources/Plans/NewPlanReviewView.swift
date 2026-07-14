@@ -101,6 +101,7 @@ struct NewPlanReviewView: View {
   private var plannedActivityCount: Int {
     NewPlanDraft(
       name: store.name,
+      duration: store.selectedDuration,
       startDate: store.startDate,
       endDate: store.endDate,
       schedule: store.schedule

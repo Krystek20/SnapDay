@@ -8,22 +8,18 @@ struct PlanModelTests {
   func presetDurationsHaveInclusiveEndDates() throws {
     let calendar = testCalendar()
     let startDate = try date(year: 2026, month: 6, day: 8, calendar: calendar)
-    let sevenDayEndDate = try date(year: 2026, month: 6, day: 14, calendar: calendar)
-    let twoWeekEndDate = try date(year: 2026, month: 6, day: 21, calendar: calendar)
-    let oneMonthEndDate = try date(year: 2026, month: 7, day: 7, calendar: calendar)
+    let expectations: [(PlanDuration, Date)] = [
+      (.sevenDays, try date(year: 2026, month: 6, day: 14, calendar: calendar)),
+      (.twoWeeks, try date(year: 2026, month: 6, day: 21, calendar: calendar)),
+      (.oneMonth, try date(year: 2026, month: 7, day: 7, calendar: calendar)),
+      (.threeMonths, try date(year: 2026, month: 9, day: 7, calendar: calendar)),
+      (.sixMonths, try date(year: 2026, month: 12, day: 7, calendar: calendar)),
+      (.oneYear, try date(year: 2027, month: 6, day: 7, calendar: calendar))
+    ]
 
-    #expect(
-      PlanDuration.sevenDays.endDate(from: startDate, calendar: calendar)
-        == sevenDayEndDate
-    )
-    #expect(
-      PlanDuration.twoWeeks.endDate(from: startDate, calendar: calendar)
-        == twoWeekEndDate
-    )
-    #expect(
-      PlanDuration.oneMonth.endDate(from: startDate, calendar: calendar)
-        == oneMonthEndDate
-    )
+    for (duration, expectedEndDate) in expectations {
+      #expect(duration.endDate(from: startDate, calendar: calendar) == expectedEndDate)
+    }
   }
 
   @Test
@@ -74,6 +70,29 @@ struct PlanModelTests {
 
     #expect(allOccurrences.map(\.date) == [monday, nextMonday])
     #expect(futureOccurrences.map(\.date) == [nextMonday])
+  }
+
+  @Test
+  func occurrenceIdentityIsStableAndUsesNormalizedCalendarDate() throws {
+    let calendar = testCalendar()
+    let startDate = try date(
+      year: 2026,
+      month: 6,
+      day: 8,
+      hour: 15,
+      calendar: calendar
+    )
+    let normalizedDate = calendar.startOfDay(for: startDate)
+    let entry = scheduleEntry(weekday: .monday, position: 0)
+    let plan = plan(startDate: startDate, endDate: startDate, schedule: [entry])
+
+    let firstOccurrence = try #require(plan.scheduledOccurrences(calendar: calendar).first)
+    let regeneratedOccurrence = try #require(plan.scheduledOccurrences(calendar: calendar).first)
+
+    #expect(firstOccurrence.date == normalizedDate)
+    #expect(firstOccurrence.id == regeneratedOccurrence.id)
+    #expect(firstOccurrence.id.planID == plan.id)
+    #expect(firstOccurrence.id.activityID == entry.activityID)
   }
 
   @Test
@@ -157,6 +176,29 @@ struct PlanModelTests {
   }
 
   @Test
+  func progressRoundsPercentageToWholeNumber() throws {
+    let calendar = testCalendar()
+    let monday = try date(year: 2026, month: 6, day: 8, calendar: calendar)
+    let plan = plan(
+      startDate: monday,
+      endDate: monday,
+      schedule: (0..<6).map {
+        scheduleEntry(weekday: .monday, position: $0)
+      }
+    )
+    var occurrences = plan.scheduledOccurrences(calendar: calendar)
+    let completedDayActivityID = UUID()
+    occurrences[0].dayActivityID = completedDayActivityID
+
+    let progress = plan.progress(
+      from: occurrences,
+      dayActivities: [dayActivity(id: completedDayActivityID, date: monday, doneDate: monday)]
+    )
+
+    #expect(progress.percentComplete == 17)
+  }
+
+  @Test
   func progressKeepsHistoricalOccurrencesAfterScheduleChanges() throws {
     let calendar = testCalendar()
     let monday = try date(year: 2026, month: 6, day: 8, calendar: calendar)
@@ -181,7 +223,8 @@ struct PlanModelTests {
       doneDate: monday
     )
 
-    plan.schedule = [scheduleEntry(weekday: .monday, position: 0)]
+    plan.schedule = []
+    #expect(plan.scheduledOccurrences(calendar: calendar).isEmpty)
     let progress = plan.progress(
       from: historicalOccurrences,
       dayActivities: [completedDayActivity]
@@ -252,9 +295,14 @@ private extension PlanModelTests {
     year: Int,
     month: Int,
     day: Int,
+    hour: Int = 0,
     calendar: Calendar
   ) throws -> Date {
-    try #require(calendar.date(from: DateComponents(year: year, month: month, day: day)))
+    try #require(
+      calendar.date(
+        from: DateComponents(year: year, month: month, day: day, hour: hour)
+      )
+    )
   }
 
   func testCalendar() -> Calendar {

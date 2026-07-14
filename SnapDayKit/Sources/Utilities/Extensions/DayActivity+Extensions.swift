@@ -3,6 +3,14 @@ import Models
 import Dependencies
 
 extension DayActivity {
+  public mutating func refreshTemplatePresentation(from activity: Activity) {
+    self.activity = activity
+    name = activity.name
+    iconId = activity.iconId
+    tags = activity.tags
+    important = activity.important
+  }
+
   public static func create(
     from activity: Activity,
     uuid: UUIDGenerator,

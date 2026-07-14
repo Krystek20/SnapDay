@@ -15,7 +15,7 @@ extension Activity: Entity {
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> ActivityEntity {
     let activityEntity = try ActivityEntity.object(
-      identifier: id.uuidString,
+      identifier: id as CVarArg,
       fetchRequest: Activity.fetchRequest,
       context: context
     )

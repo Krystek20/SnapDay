@@ -1,11 +1,17 @@
 import ComposableArchitecture
 import Foundation
+import Models
+import Repositories
 
 @Reducer
 public struct PlansFeature {
 
   @Dependency(\.date.now) private var now
   @Dependency(\.uuid) private var uuid
+  @Dependency(\.calendar) private var calendar
+  @Dependency(\.activityRepository.loadActivities) private var loadActivities
+  @Dependency(\.dayActivityRepository) private var dayActivityRepository
+  @Dependency(\.planRepository) private var planRepository
 
   // MARK: - State & Action
 
@@ -13,21 +19,24 @@ public struct PlansFeature {
   public struct State: Equatable {
 
     var selectedSection: PlansSection = .active
-    var activePlans: [Plan] = Plan.activeMocks
-    var finishedPlans: [Plan] = Plan.finishedMocks
-    var archivedPlans: [Plan] = Plan.archivedMocks
+    var loadState: PlansLoadState = .idle
+    var activePlans: [PlanListItem] = []
+    var finishedPlans: [PlanListItem] = []
+    var archivedPlans: [PlanListItem] = []
     @Presents var newPlan: NewPlanFeature.State?
 
     public init() { }
 
     init(
       selectedSection: PlansSection,
-      activePlans: [Plan] = Plan.activeMocks,
-      finishedPlans: [Plan] = Plan.finishedMocks,
-      archivedPlans: [Plan] = Plan.archivedMocks,
+      loadState: PlansLoadState = .loaded,
+      activePlans: [PlanListItem] = [],
+      finishedPlans: [PlanListItem] = [],
+      archivedPlans: [PlanListItem] = [],
       newPlan: NewPlanFeature.State? = nil
     ) {
       self.selectedSection = selectedSection
+      self.loadState = loadState
       self.activePlans = activePlans
       self.finishedPlans = finishedPlans
       self.archivedPlans = archivedPlans
@@ -40,11 +49,19 @@ public struct PlansFeature {
     public enum ViewAction: Equatable {
       case appeared
       case createPlanButtonTapped
-      case planTapped(String)
+      case planTapped(Plan.ID)
+      case retryButtonTapped
+    }
+
+    public enum InternalAction: Equatable {
+      case loadPlans
+      case plansLoaded(PlansSnapshot)
+      case plansLoadFailed(String)
     }
 
     case binding(BindingAction<State>)
     case view(ViewAction)
+    case `internal`(InternalAction)
     case newPlan(PresentationAction<NewPlanFeature.Action>)
   }
 
@@ -61,31 +78,49 @@ public struct PlansFeature {
       case .binding:
         return .none
       case .view(.appeared):
-        return .none
+        guard state.loadState == .idle else { return .none }
+        return .send(.internal(.loadPlans))
+      case .view(.retryButtonTapped):
+        return .send(.internal(.loadPlans))
       case .view(.createPlanButtonTapped):
         state.newPlan = NewPlanFeature.State(startDate: now)
         return .none
       case .view(.planTapped):
         return .none
+      case .internal(.loadPlans):
+        state.loadState = .loading
+        return .run { [now] send in
+          do {
+            await send(.internal(.plansLoaded(try await loadSnapshot(on: now))))
+          } catch {
+            await send(.internal(.plansLoadFailed(error.localizedDescription)))
+          }
+        }
+      case .internal(.plansLoaded(let snapshot)):
+        state.activePlans = snapshot.activePlans
+        state.finishedPlans = snapshot.finishedPlans
+        state.archivedPlans = snapshot.archivedPlans
+        state.loadState = .loaded
+        return .none
+      case .internal(.plansLoadFailed(let message)):
+        state.loadState = .failed(message)
+        return .none
       case .newPlan(.presented(.delegate(.cancelTapped))):
         state.newPlan = nil
         return .none
       case .newPlan(.presented(.delegate(.planCreated(let draft)))):
-        let total = draft.plannedActivityCount()
-        state.activePlans.insert(
-          Plan(
-            id: uuid().uuidString,
-            title: draft.name,
-            summary: "0 of \(total) planned activities complete",
-            activities: draft.uniqueActivities.map(\.name),
-            progress: 0.0,
-            progressTitle: "0%"
-          ),
-          at: 0
-        )
-        state.selectedSection = .active
+        let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
         state.newPlan = nil
-        return .none
+        state.loadState = .loading
+        return .run { send in
+          do {
+            try await planRepository.savePlan(plan)
+            _ = try await planRepository.synchronizeOccurrences(plan, plan.startDate)
+            await send(.internal(.loadPlans))
+          } catch {
+            await send(.internal(.plansLoadFailed(error.localizedDescription)))
+          }
+        }
       case .newPlan:
         return .none
       }
@@ -93,5 +128,64 @@ public struct PlansFeature {
     .ifLet(\.$newPlan, action: \.newPlan) {
       NewPlanFeature()
     }
+  }
+
+  private func loadSnapshot(on date: Date) async throws -> PlansSnapshot {
+    let plans = try await planRepository.loadPlans()
+    let activities = try await loadActivities()
+    let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+    var occurrencesByPlanID: [Plan.ID: [PlanOccurrence]] = [:]
+
+    for plan in plans {
+      occurrencesByPlanID[plan.id] = try await planRepository.loadOccurrences(plan.id)
+    }
+
+    let dayActivityIDs = Set(
+      occurrencesByPlanID.values
+        .joined()
+        .compactMap(\.dayActivityID)
+    )
+    let dayActivities: [DayActivity]
+    if dayActivityIDs.isEmpty {
+      dayActivities = []
+    } else {
+      dayActivities = try await dayActivityRepository.dayActivities(
+        configuration: ActivitiesFetchConfiguration(
+          predicates: [NSPredicate(format: "identifier IN %@", Array(dayActivityIDs))]
+        )
+      )
+    }
+    let dayActivitiesByID = Dictionary(uniqueKeysWithValues: dayActivities.map { ($0.id, $0) })
+    var activePlans: [PlanListItem] = []
+    var finishedPlans: [PlanListItem] = []
+    var archivedPlans: [PlanListItem] = []
+
+    for plan in plans {
+      let activityIDs = Set(plan.schedule.map(\.activityID))
+      let occurrences = occurrencesByPlanID[plan.id, default: []]
+      let item = PlanListItem(
+        plan: plan,
+        activities: activityIDs.compactMap { activitiesByID[$0] }.sorted { $0.name < $1.name },
+        occurrences: occurrences,
+        dayActivities: occurrences.compactMap { occurrence in
+          occurrence.dayActivityID.flatMap { dayActivitiesByID[$0] }
+        }
+      )
+
+      switch plan.status(on: date, calendar: calendar) {
+      case .active:
+        activePlans.append(item)
+      case .finished:
+        finishedPlans.append(item)
+      case .archived:
+        archivedPlans.append(item)
+      }
+    }
+
+    return PlansSnapshot(
+      activePlans: activePlans,
+      finishedPlans: finishedPlans,
+      archivedPlans: archivedPlans
+    )
   }
 }
