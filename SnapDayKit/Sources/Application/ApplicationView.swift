@@ -42,12 +42,6 @@ public struct ApplicationView: View {
       .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification)) { _ in
         store.send(.deviceShaked)
       }
-      .sheet(item: $store.scope(state: \.newPlan, action: \.newPlan)) { store in
-        NavigationStack {
-          NewPlanView(store: store)
-        }
-        .presentationDetents([.large])
-      }
   }
 
   @ViewBuilder

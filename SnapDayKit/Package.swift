@@ -43,7 +43,7 @@ private var targets: [Target] {
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
   TargetParamenters(module: .reports, dependencies: sceneDependecies)
-  TargetParamenters(module: .plans, dependencies: sceneDependecies)
+  TargetParamenters(module: .plans, dependencies: sceneDependecies + [.activityList])
   TargetParamenters(module: .friends, dependencies: sceneDependecies)
   TargetParamenters(module: .activityDetails, dependencies: sceneDependecies + [.selectableList])
   TargetParamenters(module: .selectableList, dependencies: sceneDependecies)

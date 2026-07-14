@@ -4,6 +4,12 @@
     "" : {
       "shouldTranslate" : false
     },
+    "Add %lld activities" : {
+
+    },
+    "Add 1 activity" : {
+
+    },
     "Add to day" : {
       "localizations" : {
         "ar" : {

@@ -1,3 +1,4 @@
+import ActivityList
 import ComposableArchitecture
 import Resources
 import SwiftUI
@@ -19,36 +20,142 @@ public struct NewPlanView: View {
   // MARK: - Views
 
   public var body: some View {
+    NavigationStack(path: navigationPath) {
+      stepView(for: .details)
+        .navigationDestination(for: NewPlanStep.self) { step in
+          stepView(for: step)
+        }
+    }
+    .sheet(item: $store.scope(state: \.activityPicker, action: \.activityPicker)) { store in
+      NavigationStack {
+        ActivityListView(store: store)
+      }
+        .presentationDetents([.medium, .large])
+    }
+    .sheet(item: applySourceDayBinding) { weekday in
+      ApplyToDaysView(store: store, sourceWeekday: weekday)
+        .presentationDetents([.large])
+    }
+  }
+
+  private func stepView(for step: NewPlanStep) -> some View {
+    Group {
+      switch step {
+      case .details:
+        NewPlanDetailsView(store: store)
+      case .weeklySchedule:
+        WeeklyScheduleView(store: store)
+      case .review:
+        NewPlanReviewView(store: store)
+      }
+    }
+    .background
+    .navigationTitle(navigationTitle(for: step))
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .cancellationAction) {
+        if step == .details {
+          Button(
+            action: { store.send(.view(.cancelButtonTapped)) },
+            label: { Text("Cancel", bundle: .module) }
+          )
+          .foregroundStyle(Color.actionBlue)
+        }
+      }
+    }
+    .safeAreaInset(edge: .bottom) {
+      bottomAction(for: step)
+    }
+  }
+
+  private var navigationPath: Binding<[NewPlanStep]> {
+    Binding(
+      get: {
+        switch store.step {
+        case .details:
+          []
+        case .weeklySchedule:
+          [.weeklySchedule]
+        case .review:
+          [.weeklySchedule, .review]
+        }
+      },
+      set: { path in
+        store.send(.view(.navigationPathChanged(path)))
+      }
+    )
+  }
+
+  private func navigationTitle(for step: NewPlanStep) -> String {
+    switch step {
+    case .details:
+      String(localized: "New Plan", bundle: .module)
+    case .weeklySchedule:
+      String(localized: "Weekly Schedule", bundle: .module)
+    case .review:
+      String(localized: "Review Plan", bundle: .module)
+    }
+  }
+
+  @ViewBuilder
+  private func bottomAction(for step: NewPlanStep) -> some View {
+    switch step {
+    case .details:
+      actionButton(title: String(localized: "Continue", bundle: .module)) {
+        store.send(.view(.continueButtonTapped))
+      }
+      .disabled(!store.canContinue)
+    case .weeklySchedule:
+      actionButton(title: String(localized: "Review Plan", bundle: .module)) {
+        store.send(.view(.continueButtonTapped))
+      }
+      .disabled(!store.canReview)
+    case .review:
+      actionButton(title: String(localized: "Start Plan", bundle: .module)) {
+        store.send(.view(.startPlanButtonTapped))
+      }
+    }
+  }
+
+  private func actionButton(title: String, action: @escaping () -> Void) -> some View {
+    Button(action: action) {
+      Text(title)
+    }
+    .buttonStyle(PrimaryButtonStyle())
+    .padding(.horizontal, 15.0)
+    .padding(.vertical, 10.0)
+    .background(Color.background)
+  }
+
+  private var applySourceDayBinding: Binding<PlanWeekday?> {
+    Binding(
+      get: { store.applySourceDay },
+      set: { value in
+        if value == nil {
+          store.send(.view(.applyCancelled))
+        }
+      }
+    )
+  }
+}
+
+@MainActor
+private struct NewPlanDetailsView: View {
+
+  @Bindable var store: StoreOf<NewPlanFeature>
+  @FocusState private var isNameFocused: Bool
+
+  var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 15.0) {
         nameSection
         durationSection
         dateRangeSection
       }
-      .padding(.horizontal, 15.0)
-      .padding(.vertical, 15.0)
+      .padding(15.0)
     }
-    .scrollDismissesKeyboard(.interactively)
+    .scrollDismissesKeyboard(.immediately)
     .scrollIndicators(.hidden)
-    .background
-    .navigationTitle(String(localized: "New Plan", bundle: .module))
-    .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .cancellationAction) {
-        Button(
-          action: {
-            store.send(.view(.cancelButtonTapped))
-          },
-          label: {
-            Text("Cancel", bundle: .module)
-          }
-        )
-        .foregroundStyle(Color.actionBlue)
-      }
-    }
-    .safeAreaInset(edge: .bottom) {
-      continueButton
-    }
   }
 
   private var nameSection: some View {
@@ -67,10 +174,18 @@ public struct NewPlanView: View {
         .multilineTextAlignment(.trailing)
         .textInputAutocapitalization(.words)
         .submitLabel(.done)
+        .focused($isNameFocused)
+        .onSubmit {
+          isNameFocused = false
+        }
       }
       .font(.system(size: 15.0, weight: .regular))
       .padding(.horizontal, 15.0)
       .frame(minHeight: 55.0)
+      .contentShape(Rectangle())
+      .onTapGesture {
+        isNameFocused = true
+      }
       .background(
         Color.formBackground
           .clipShape(RoundedRectangle(cornerRadius: 14.0))
@@ -85,9 +200,7 @@ public struct NewPlanView: View {
           DurationChip(
             title: String(localized: duration.title, bundle: .module),
             isSelected: store.selectedDuration == duration,
-            action: {
-              store.send(.view(.durationTapped(duration)))
-            }
+            action: { store.send(.view(.durationTapped(duration))) }
           )
         }
       }
@@ -152,25 +265,9 @@ public struct NewPlanView: View {
     .padding(.horizontal, 15.0)
     .frame(minHeight: 55.0)
   }
-
-  private var continueButton: some View {
-    Button(
-      action: {
-        store.send(.view(.continueButtonTapped))
-      },
-      label: {
-        Text("Continue", bundle: .module)
-      }
-    )
-    .buttonStyle(PrimaryButtonStyle())
-    .disabled(!store.canContinue)
-    .padding(.horizontal, 15.0)
-    .padding(.vertical, 10.0)
-    .background(Color.background)
-  }
 }
 
-private struct NewPlanSection<Content: View>: View {
+struct NewPlanSection<Content: View>: View {
 
   let title: String
   @ViewBuilder let content: () -> Content

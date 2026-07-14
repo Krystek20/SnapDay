@@ -4,6 +4,15 @@
     "" : {
 
     },
+    "%lld" : {
+
+    },
+    "%lld activities" : {
+
+    },
+    "1 activity" : {
+
+    },
     "1 month" : {
       "localizations" : {
         "en" : {
@@ -84,6 +93,24 @@
         }
       }
     },
+    "Add activity" : {
+
+    },
+    "Add at least one activity to review this Plan." : {
+
+    },
+    "Add to %@" : {
+
+    },
+    "Apply to %lld days" : {
+
+    },
+    "Apply to 1 day" : {
+
+    },
+    "Apply to days" : {
+
+    },
     "ARCHIVED" : {
       "localizations" : {
         "en" : {
@@ -94,35 +121,8 @@
         }
       }
     },
-    "Create a Plan from your existing activities and SnapDay will add them to the right days." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create a Plan from your existing activities and SnapDay will add them to the right days."
-          }
-        }
-      }
-    },
-    "Create Plan" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create Plan"
-          }
-        }
-      }
-    },
-    "Create your first Plan" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create your first Plan"
-          }
-        }
-      }
+    "At least one selected day already has activities. Applying will replace them." : {
+
     },
     "Cancel" : {
       "localizations" : {
@@ -140,6 +140,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continue"
+          }
+        }
+      }
+    },
+    "Create a Plan from your existing activities and SnapDay will add them to the right days." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a Plan from your existing activities and SnapDay will add them to the right days."
+          }
+        }
+      }
+    },
+    "Create your first Plan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your first Plan"
           }
         }
       }
@@ -163,6 +183,9 @@
           }
         }
       }
+    },
+    "Day actions" : {
+
     },
     "Ends" : {
       "localizations" : {
@@ -193,6 +216,9 @@
           }
         }
       }
+    },
+    "Has existing activities" : {
+
     },
     "History" : {
       "localizations" : {
@@ -254,15 +280,14 @@
         }
       }
     },
-    "Plans" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plans"
-          }
-        }
-      }
+    "No activities" : {
+
+    },
+    "No activities planned" : {
+
+    },
+    "PLAN" : {
+
     },
     "PLAN NAME" : {
       "localizations" : {
@@ -270,6 +295,19 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PLAN NAME"
+          }
+        }
+      }
+    },
+    "Planned activities" : {
+
+    },
+    "Plans" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plans"
           }
         }
       }
@@ -284,6 +322,27 @@
         }
       }
     },
+    "Repeats weekly" : {
+
+    },
+    "Replace activities" : {
+
+    },
+    "Replace existing activities?" : {
+
+    },
+    "Review Plan" : {
+
+    },
+    "Selected days will use the source day's activities. Days with existing activities ask for confirmation." : {
+
+    },
+    "SOURCE DAY" : {
+
+    },
+    "Start Plan" : {
+
+    },
     "Starts" : {
       "localizations" : {
         "en" : {
@@ -293,6 +352,15 @@
           }
         }
       }
+    },
+    "TARGET DAYS" : {
+
+    },
+    "Weekly Schedule" : {
+
+    },
+    "WEEKLY SCHEDULE" : {
+
     }
   },
   "version" : "1.0"

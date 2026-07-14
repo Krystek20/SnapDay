@@ -54,6 +54,11 @@ public struct PlansView: View {
     .task {
       store.send(.view(.appeared))
     }
+    .sheet(item: $store.scope(state: \.newPlan, action: \.newPlan)) { store in
+      NewPlanView(store: store)
+        .presentationDetents([.large])
+        .interactiveDismissDisabled()
+    }
   }
 
   private var sectionPicker: some View {
@@ -83,17 +88,6 @@ public struct PlansView: View {
         PlansGroup(plans: store.activePlans) { id in
           store.send(.view(.planTapped(id)))
         }
-
-        Button(
-          action: {
-            store.send(.view(.createPlanButtonTapped))
-          },
-          label: {
-            Text("Create Plan", bundle: .module)
-          }
-        )
-        .buttonStyle(PrimaryButtonStyle())
-        .padding(.top, 5.0)
       }
     }
   }
@@ -259,7 +253,7 @@ private struct PlanRow: View {
     ScrollView(.horizontal) {
       HStack(spacing: 5.0) {
         ForEach(plan.activities, id: \.self) { activity in
-          PlanActivityChip(title: activity)
+          Chip(title: activity)
         }
       }
     }
@@ -286,34 +280,6 @@ private struct PlanProgressBadge: View {
         Capsule()
           .stroke(Color.planStatePillBorder, lineWidth: 1.0)
       }
-  }
-}
-
-private struct PlanActivityChip: View {
-
-  let title: String
-
-  var body: some View {
-    HStack(spacing: 5.0) {
-      Circle()
-        .fill(Color.actionBlueLight)
-        .frame(width: 8.0, height: 8.0)
-
-      Text(title)
-        .font(.system(size: 12.0, weight: .semibold))
-        .foregroundStyle(Color.primaryText)
-        .lineLimit(1)
-    }
-    .padding(.horizontal, 10.0)
-    .frame(height: 26.0)
-    .background(
-      Color.emphasisBackground
-        .clipShape(RoundedRectangle(cornerRadius: 5.0))
-    )
-    .overlay(
-      RoundedRectangle(cornerRadius: 5.0)
-        .stroke(Color.border, lineWidth: 1.0)
-    )
   }
 }
 

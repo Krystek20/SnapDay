@@ -19,7 +19,7 @@ import SwiftUI
   NavigationStack {
     PlansView(
       store: Store(
-        initialState: PlansFeature.State(activePlans: []),
+        initialState: PlansFeature.State(selectedSection: .active, activePlans: []),
         reducer: {
           PlansFeature()
         }
