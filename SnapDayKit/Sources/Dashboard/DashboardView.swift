@@ -15,6 +15,8 @@ public struct DashboardView: View {
   // MARK: - Properties
 
   @Bindable private var store: StoreOf<DashboardFeature>
+  @Environment(\.calendar) private var calendar
+  @Environment(\.locale) private var locale
   @State private var alertSize = CGSize.zero
 
   private var additionalButtomPadding: Double {
@@ -217,16 +219,31 @@ public struct DashboardView: View {
 
   private var plansSummary: some View {
     DashboardPlansSectionView(
-      configurations: [
-        DashboardPlansSummaryView.Configuration(
-          title: String(localized: "No active Plan", bundle: .module),
-          subtitle: String(localized: "Recurring routines will appear here when scheduled.", bundle: .module)
-        )
-      ],
+      configurations: planSummaryConfigurations,
       allPlansAction: {
         store.send(.view(.allPlansButtonTapped))
       }
     )
+  }
+
+  private var planSummaryConfigurations: [DashboardPlansSummaryView.Configuration] {
+    guard !store.planSummaries.isEmpty else {
+      return [
+        DashboardPlansSummaryView.Configuration(
+          title: String(localized: "No active Plan", bundle: .module),
+          subtitle: String(localized: "Recurring routines will appear here when scheduled.", bundle: .module)
+        )
+      ]
+    }
+
+    return store.planSummaries.map {
+      DashboardPlansSummaryView.Configuration(
+        summary: $0,
+        relativeTo: store.date,
+        calendar: calendar,
+        locale: locale
+      )
+    }
   }
 
   private var dayList: some View {

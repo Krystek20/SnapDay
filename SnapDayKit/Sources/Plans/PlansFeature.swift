@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import Models
 import Repositories
+import Utilities
 
 @Reducer
 public struct PlansFeature {
@@ -10,7 +11,6 @@ public struct PlansFeature {
   @Dependency(\.uuid) private var uuid
   @Dependency(\.calendar) private var calendar
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
-  @Dependency(\.dayActivityRepository) private var dayActivityRepository
   @Dependency(\.planRepository) private var planRepository
 
   // MARK: - State & Action
@@ -134,42 +134,19 @@ public struct PlansFeature {
     let plans = try await planRepository.loadPlans()
     let activities = try await loadActivities()
     let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
-    var occurrencesByPlanID: [Plan.ID: [PlanOccurrence]] = [:]
-
-    for plan in plans {
-      occurrencesByPlanID[plan.id] = try await planRepository.loadOccurrences(plan.id)
-    }
-
-    let dayActivityIDs = Set(
-      occurrencesByPlanID.values
-        .joined()
-        .compactMap(\.dayActivityID)
-    )
-    let dayActivities: [DayActivity]
-    if dayActivityIDs.isEmpty {
-      dayActivities = []
-    } else {
-      dayActivities = try await dayActivityRepository.dayActivities(
-        configuration: ActivitiesFetchConfiguration(
-          predicates: [NSPredicate(format: "identifier IN %@", Array(dayActivityIDs))]
-        )
-      )
-    }
-    let dayActivitiesByID = Dictionary(uniqueKeysWithValues: dayActivities.map { ($0.id, $0) })
+    let progressSnapshots = try await PlanProgressProvider().snapshots(for: plans)
     var activePlans: [PlanListItem] = []
     var finishedPlans: [PlanListItem] = []
     var archivedPlans: [PlanListItem] = []
 
-    for plan in plans {
+    for snapshot in progressSnapshots {
+      let plan = snapshot.plan
       let activityIDs = Set(plan.schedule.map(\.activityID))
-      let occurrences = occurrencesByPlanID[plan.id, default: []]
       let item = PlanListItem(
         plan: plan,
         activities: activityIDs.compactMap { activitiesByID[$0] }.sorted { $0.name < $1.name },
-        occurrences: occurrences,
-        dayActivities: occurrences.compactMap { occurrence in
-          occurrence.dayActivityID.flatMap { dayActivitiesByID[$0] }
-        }
+        occurrences: snapshot.occurrences,
+        dayActivities: snapshot.dayActivities
       )
 
       switch plan.status(on: date, calendar: calendar) {

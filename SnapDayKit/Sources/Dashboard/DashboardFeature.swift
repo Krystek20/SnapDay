@@ -22,6 +22,7 @@ public struct DashboardFeature: TodayProvidable {
 
   @Dependency(\.activityRepository) var activityRepository
   @Dependency(\.dayUpdater) private var dayUpdater
+  @Dependency(\.planRepository) private var planRepository
   @Dependency(\.uuid) private var uuid
   @Dependency(\.date) private var date
   @Dependency(\.utcCalendar) private var calendar
@@ -49,6 +50,7 @@ public struct DashboardFeature: TodayProvidable {
 
     var newField: DayNewField?
     var items: [ListItem] = []
+    var planSummaries: [DashboardPlanSummary] = []
 
     var dayInformation: InformationViewConfiguration? {
       guard !hideDayInformation, let selectedDay, newField == nil else { return nil }
@@ -109,7 +111,10 @@ public struct DashboardFeature: TodayProvidable {
 
     public enum InternalAction: Equatable {
       case changesApplied(AppliedChanges)
+      case load
       case loadDay
+      case loadPlans
+      case plansLoaded([DashboardPlanSummary])
       case setDate(_ date: Date)
       case setDay(_ day: Day)
       case setItems
@@ -191,7 +196,7 @@ public struct DashboardFeature: TodayProvidable {
       case .friends:
         return .none
       case .manageActivity(.dismiss):
-        return .send(.internal(.loadDay))
+        return .send(.internal(.load))
       case .manageActivity:
         return .none
       case .delegate:
@@ -235,17 +240,17 @@ public struct DashboardFeature: TodayProvidable {
       state.streamSetup = true
       return .merge(
         .run { send in
-          await send(.internal(.loadDay))
+          await send(.internal(.load))
         },
         .run { send in
           for await _ in NotificationCenter.default.publisher(for: .snapDayCloudKitChanged).values {
             try await dayUpdater.syncShared()
-            await send(.internal(.loadDay))
+            await send(.internal(.load))
           }
         },
         .run { send in
           for await _ in userNotificationCenterProvider.userActionStream {
-            await send(.internal(.loadDay))
+            await send(.internal(.load))
           }
         },
         .run { _ in
@@ -286,13 +291,13 @@ public struct DashboardFeature: TodayProvidable {
       return .send(.internal(.setItems))
     case .increaseButtonTapped:
       state.date = calendar.date(byAdding: .day, value: 1, to: state.date) ?? state.date
-      return .send(.internal(.loadDay))
+      return .send(.internal(.load))
     case .decreaseButtonTapped:
       state.date = calendar.date(byAdding: .day, value: -1, to: state.date) ?? state.date
-      return .send(.internal(.loadDay))
+      return .send(.internal(.load))
     case .todayButtonTapped:
       state.date = today
-      return .send(.internal(.loadDay))
+      return .send(.internal(.load))
     case .confirmAlertButtonTapped:
       defer { state.alert = nil }
       guard let alert = state.alert else { return .none }
@@ -329,13 +334,18 @@ public struct DashboardFeature: TodayProvidable {
       }
       return .run { [shouldReload] send in
         guard shouldReload else { return }
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .calendarDayChanged:
-      return .send(.internal(.loadDay))
+      return .send(.internal(.load))
     case .setDate(let date):
       state.date = date
-      return .send(.internal(.loadDay))
+      return .send(.internal(.load))
+    case .load:
+      return .merge(
+        .send(.internal(.loadDay)),
+        .send(.internal(.loadPlans))
+      )
     case .loadDay:
       return .run { [date = state.date] send in
         do {
@@ -346,6 +356,17 @@ public struct DashboardFeature: TodayProvidable {
           print("error: \(error)")
         }
       }
+    case .loadPlans:
+      return .run { [date = state.date] send in
+        do {
+          await send(.internal(.plansLoaded(try await loadPlanSummaries(on: date))))
+        } catch {
+          print("error: \(error)")
+        }
+      }
+    case .plansLoaded(let summaries):
+      state.planSummaries = summaries
+      return .none
     case .setDay(let day):
       state.selectedDay = day
       state.hideDayInformation = false
@@ -386,13 +407,26 @@ public struct DashboardFeature: TodayProvidable {
           selectedDay.activities[index].position = index
           try await dayUpdater.saveDayActivity(selectedDay.activities[index], syncSharable: false)
         }
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .manageActivity:
       state.manageActivity = ManageActivityFeature.State()
       return .none
     case .newItemForm(let action):
       return handleNewItemFormAction(action, state: &state)
+    }
+  }
+
+  private func loadPlanSummaries(on date: Date) async throws -> [DashboardPlanSummary] {
+    let plans = try await planRepository.loadActivePlans(date)
+    return try await PlanProgressProvider().snapshots(for: plans).map { snapshot in
+      DashboardPlanSummary(
+        plan: snapshot.plan,
+        occurrences: snapshot.occurrences,
+        dayActivities: snapshot.dayActivities,
+        date: date,
+        calendar: calendar
+      )
     }
   }
 
@@ -507,7 +541,7 @@ public struct DashboardFeature: TodayProvidable {
       dayActivity.doneDate = dayActivity.doneDate == nil ? date() : nil
       return .run { [dayActivity] send in
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
         try await userNotificationCenterProvider.reloadReminders()
         guard dayActivity.hasIncompletedSubtasksAndDone else { return }
         await send(.internal(.dayActivityAction(.showAlertSelectAll(dayActivity))))
@@ -516,7 +550,7 @@ public struct DashboardFeature: TodayProvidable {
       state.hideDayInformation = true
       return .run { [dayActivity] send in
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .update(let dayActivity):
       let activityBeforeUpdate = findActivity(id: dayActivity.id, state: state)
@@ -524,7 +558,7 @@ public struct DashboardFeature: TodayProvidable {
       let showAlertSelectDayActivity = activityBeforeUpdate?.hasCompletedSubtasks == false && dayActivity.hasCompletedSubtasksAndNotDone
       return .run { [showAlertSelectAll, dayActivity] send in
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
         if showAlertSelectAll {
           await send(.internal(.dayActivityAction(.showAlertSelectAll(dayActivity))))
         } else if showAlertSelectDayActivity {
@@ -534,17 +568,17 @@ public struct DashboardFeature: TodayProvidable {
     case .move(let dayActivity, let toDate):
       return .run { send in
         try await dayUpdater.moveDayActivity(dayActivity, toDate: toDate)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .copy(let dayActivity, let dates):
       return .run { send in
         try await dayUpdater.copyDayActivity(dayActivity, to: dates)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .remove(let dayActivity):
       return .run { [dayActivity] send in
         try await dayUpdater.removeDayActivity(dayActivity)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .showDatePicker(let dayActivity):
       guard let selectedDay = state.selectedDay else { return .none }
@@ -588,7 +622,7 @@ public struct DashboardFeature: TodayProvidable {
         try await activityRepository.saveActivity(activity)
         SaveActivityTip.show = true
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: false)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .reorder(let dayActivity, let destinationDayActivity):
       guard dayActivity.priority(calendar: calendar) == destinationDayActivity.priority(calendar: calendar),
@@ -605,13 +639,13 @@ public struct DashboardFeature: TodayProvidable {
       dayActivity.important = isImportant
       return .run { [dayActivity] send in
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .addParticipant(let participantId, let dayActivity):
       return .run { send in
         do {
           try await dayUpdater.addParticipant(participantId, to: dayActivity)
-          await send(.internal(.loadDay))
+          await send(.internal(.load))
         } catch {
           print(error)
         }
@@ -619,22 +653,22 @@ public struct DashboardFeature: TodayProvidable {
     case .stopCollaboration(let dayActivity):
       return .run { send in
         try await dayUpdater.stopCollaboration(in: dayActivity)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .removeParticipant(let participantId, let dayActivity):
       return .run { send in
         try await dayUpdater.removeParticipant(participantId, to: dayActivity)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .acceptInvitation(let dayActivity):
       return .run { send in
         try await dayUpdater.acceptInvitation(for: dayActivity)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .discardInvitation(let dayActivity):
       return .run { send in
         try await dayUpdater.discardInvitation(for: dayActivity)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     }
   }
@@ -656,7 +690,7 @@ public struct DashboardFeature: TodayProvidable {
       dayActivityTask.doneDate = dayActivityTask.doneDate == nil ? date() : nil
       return .run { [dayActivityTask] send in
         try await dayUpdater.saveDayActivityTask(dayActivityTask, syncSharable: true)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
         try await userNotificationCenterProvider.reloadReminders()
         guard let dayActivity = try await dayUpdater.dayActivity(identifier: dayActivityTask.dayActivityId.uuidString),
               dayActivity.hasCompletedSubtasksAndNotDone else { return }
@@ -667,14 +701,14 @@ public struct DashboardFeature: TodayProvidable {
       dayActivity.dayActivityTasks.append(dayActivityTask)
       return .run { [dayActivity] send in
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     case .update(let dayActivityTask):
       let dayActivityTaskBeforeUpdate = findActivityTask(id: dayActivityTask.id, activityId: dayActivityTask.dayActivityId, state: state)
       let wasCompleted = dayActivityTaskBeforeUpdate?.isDone == false && dayActivityTask.isDone
       return .run { [wasCompleted, dayActivityTask] send in
         try await dayUpdater.saveDayActivityTask(dayActivityTask, syncSharable: true)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
         guard wasCompleted,
               let dayActivity = try await dayUpdater.dayActivity(identifier: dayActivityTask.dayActivityId.uuidString),
               dayActivity.hasCompletedSubtasksAndNotDone
@@ -684,7 +718,7 @@ public struct DashboardFeature: TodayProvidable {
     case .remove(let dayActivityTask):
       return .run { [dayActivityTask] send in
         try await dayUpdater.removeDayActivityTask(dayActivityTask)
-        await send(.internal(.loadDay))
+        await send(.internal(.load))
       }
     }
   }
@@ -706,7 +740,7 @@ public struct DashboardFeature: TodayProvidable {
   private func handleActivityListAction(_ action: PresentationAction<ActivityListFeature.Action>, state: inout State) -> Effect<Action> {
     switch action {
     case .presented(.delegate(.daysUpdated)):
-      return .send(.internal(.loadDay))
+      return .send(.internal(.load))
     default:
       return .none
     }
