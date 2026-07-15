@@ -7,6 +7,7 @@ import Models
 public struct NewPlanFeature {
 
   @Dependency(\.calendar) private var calendar
+  @Dependency(\.date.now) private var now
 
   // MARK: - State & Action
 
@@ -100,6 +101,10 @@ public struct NewPlanFeature {
     Reduce { state, action in
       switch action {
       case .binding(\.startDate):
+        state.startDate = max(
+          calendar.startOfDay(for: state.startDate),
+          calendar.startOfDay(for: now)
+        )
         if state.selectedDuration == .custom {
           state.endDate = max(state.endDate, state.startDate)
         } else {
@@ -109,6 +114,7 @@ public struct NewPlanFeature {
 
       case .binding(\.endDate):
         state.endDate = max(state.endDate, state.startDate)
+        state.selectedDuration = .custom
         return .none
 
       case .binding:

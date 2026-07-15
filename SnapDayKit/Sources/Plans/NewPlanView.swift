@@ -219,7 +219,7 @@ private struct NewPlanDetailsView: View {
         datePicker(
           title: String(localized: "Starts", bundle: .module),
           selection: $store.startDate,
-          range: Date.distantPast...Date.distantFuture
+          range: Calendar.autoupdatingCurrent.startOfDay(for: .now)...Date.distantFuture
         )
 
         Divider()
@@ -230,14 +230,13 @@ private struct NewPlanDetailsView: View {
           selection: $store.endDate,
           range: store.startDate...Date.distantFuture
         )
-        .allowsHitTesting(store.selectedDuration == .custom)
       }
       .background(
         Color.formBackground
           .clipShape(RoundedRectangle(cornerRadius: 14.0))
       )
 
-      Text("Preset duration keeps the same length when start date changes. Custom lets you choose the end date.", bundle: .module)
+      Text("Preset duration keeps the same length when start date changes. Changing the end date switches to Custom.", bundle: .module)
         .font(.system(size: 13.0, weight: .regular))
         .foregroundStyle(Color.sectionText)
         .lineSpacing(2.0)

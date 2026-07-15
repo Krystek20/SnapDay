@@ -325,12 +325,12 @@
     "Plans couldn't be loaded" : {
 
     },
-    "Preset duration keeps the same length when start date changes. Custom lets you choose the end date." : {
+    "Preset duration keeps the same length when start date changes. Changing the end date switches to Custom." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preset duration keeps the same length when start date changes. Custom lets you choose the end date."
+            "value" : "Preset duration keeps the same length when start date changes. Changing the end date switches to Custom."
           }
         }
       }

@@ -34,14 +34,55 @@ struct NewPlanFeatureTests {
     let newStartDate = try date(year: 2026, month: 7, day: 1)
     let exclusiveEndDate = try adding(.month, value: 1, to: newStartDate)
     let expectedEndDate = try adding(.day, value: -1, to: exclusiveEndDate)
-    let store = TestStore(
-      initialState: NewPlanFeature.State(startDate: initialStartDate),
-      reducer: { NewPlanFeature() }
-    )
+    let store = withDependencies {
+      $0.date.now = initialStartDate
+    } operation: {
+      TestStore(
+        initialState: NewPlanFeature.State(startDate: initialStartDate),
+        reducer: { NewPlanFeature() }
+      )
+    }
 
     await store.send(.binding(.set(\.startDate, newStartDate))) {
       $0.startDate = newStartDate
       $0.endDate = expectedEndDate
+    }
+  }
+
+  @Test
+  func startDateCannotBeInThePast() async throws {
+    let today = try date(year: 2026, month: 7, day: 15)
+    let pastDate = try date(year: 2025, month: 1, day: 1)
+    let store = withDependencies {
+      $0.date.now = today
+    } operation: {
+      TestStore(
+        initialState: NewPlanFeature.State(startDate: today),
+        reducer: { NewPlanFeature() }
+      )
+    }
+
+    await store.send(.binding(.set(\.startDate, pastDate))) {
+      $0.startDate = today
+      $0.endDate = PlanDuration.oneMonth.endDate(from: today)
+    }
+  }
+
+  @Test
+  func changingPresetEndDateSwitchesDurationToCustom() async throws {
+    let startDate = try date(year: 2026, month: 7, day: 15)
+    let customEndDate = try date(year: 2026, month: 8, day: 1)
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        selectedDuration: .sevenDays,
+        startDate: startDate
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.binding(.set(\.endDate, customEndDate))) {
+      $0.endDate = customEndDate
+      $0.selectedDuration = .custom
     }
   }
 
