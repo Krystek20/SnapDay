@@ -47,15 +47,22 @@ public struct PlanProgressProvider {
         )
       )
     }
-    let dayActivitiesByID = Dictionary(uniqueKeysWithValues: dayActivities.map { ($0.id, $0) })
+    let dayActivitiesByID = Dictionary(
+      dayActivities.map { ($0.id, $0) },
+      uniquingKeysWith: { _, latest in latest }
+    )
 
     return plans.map { plan in
       let occurrences = occurrencesByPlanID[plan.id, default: []]
+      var includedDayActivityIDs = Set<DayActivity.ID>()
       return PlanProgressSnapshot(
         plan: plan,
         occurrences: occurrences,
         dayActivities: occurrences.compactMap { occurrence in
-          occurrence.dayActivityID.flatMap { dayActivitiesByID[$0] }
+          guard let dayActivityID = occurrence.dayActivityID,
+                includedDayActivityIDs.insert(dayActivityID).inserted
+          else { return nil }
+          return dayActivitiesByID[dayActivityID]
         }
       )
     }

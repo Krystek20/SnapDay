@@ -1,6 +1,8 @@
 import ComposableArchitecture
+import Foundation
 import Models
 import Repositories
+import Utilities
 
 @Reducer
 public struct PlanDetailsFeature {
@@ -14,19 +16,36 @@ public struct PlanDetailsFeature {
   public struct State: Equatable, Identifiable {
     var plan: Plan
     let allowsManagement: Bool
+    var activities: [Activity]
+    var occurrences: [PlanOccurrence]
+    var dayActivities: [DayActivity]
+    var referenceDate: Date?
+    var isLoading = false
     var isArchiveConfirmationPresented = false
     @Presents var newPlan: NewPlanFeature.State?
 
     public var id: Plan.ID { plan.id }
 
-    public init(plan: Plan, allowsManagement: Bool) {
+    public init(
+      plan: Plan,
+      allowsManagement: Bool,
+      activities: [Activity] = [],
+      occurrences: [PlanOccurrence] = [],
+      dayActivities: [DayActivity] = [],
+      referenceDate: Date? = nil
+    ) {
       self.plan = plan
       self.allowsManagement = allowsManagement
+      self.activities = activities
+      self.occurrences = occurrences
+      self.dayActivities = dayActivities
+      self.referenceDate = referenceDate
     }
   }
 
   public enum Action: Equatable {
     public enum ViewAction: Equatable {
+      case task
       case editButtonTapped
       case archiveButtonTapped
       case archiveCancelled
@@ -34,6 +53,7 @@ public struct PlanDetailsFeature {
     }
 
     public enum InternalAction: Equatable {
+      case detailsLoaded([Activity], PlanProgressSnapshot)
       case editActivitiesLoaded([Activity])
       case operationFailed
       case planSaved(Plan)
@@ -55,6 +75,25 @@ public struct PlanDetailsFeature {
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+      case .view(.task):
+        state.isLoading = true
+        state.referenceDate = now
+        let plan = state.plan
+        let activityIDs = Set(plan.schedule.map(\.activityID))
+        return .run { send in
+          do {
+            async let loadedActivities = loadActivities()
+            async let snapshots = PlanProgressProvider().snapshots(for: [plan])
+            let activities = try await loadedActivities.filter { activityIDs.contains($0.id) }
+            guard let snapshot = try await snapshots.first else {
+              await send(.internal(.operationFailed))
+              return
+            }
+            await send(.internal(.detailsLoaded(activities, snapshot)))
+          } catch {
+            await send(.internal(.operationFailed))
+          }
+        }
       case .view(.editButtonTapped):
         guard state.allowsManagement else { return .none }
         let activityIDs = Set(state.plan.schedule.map(\.activityID))
@@ -86,10 +125,20 @@ public struct PlanDetailsFeature {
           calendar: calendar
         )
         return .none
+      case .internal(.detailsLoaded(let activities, let snapshot)):
+        state.activities = activities
+        state.occurrences = snapshot.occurrences
+        state.dayActivities = snapshot.dayActivities
+        state.isLoading = false
+        return .none
       case .internal(.planSaved(let plan)):
         state.plan = plan
-        return .send(.delegate(.planUpdated))
+        return .merge(
+          .send(.view(.task)),
+          .send(.delegate(.planUpdated))
+        )
       case .internal(.operationFailed):
+        state.isLoading = false
         return .none
       case .newPlan(.presented(.delegate(.cancelTapped))):
         state.newPlan = nil

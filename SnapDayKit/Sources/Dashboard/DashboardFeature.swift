@@ -37,9 +37,14 @@ public struct DashboardFeature: TodayProvidable {
   public struct State: Equatable, TodayProvidable {
 
     var title: String {
+      formattedTitle()
+    }
+
+    func formattedTitle(locale: Locale = .preferred) -> String {
       let formatter = DateFormatter()
       formatter.dateFormat = "EEEE, d MMM yyyy"
-      formatter.locale = .preferred
+      formatter.locale = locale
+      formatter.timeZone = TimeZone(secondsFromGMT: 0)
       return formatter.string(from: date)
     }
 
@@ -423,6 +428,9 @@ public struct DashboardFeature: TodayProvidable {
 
   private func loadPlanSummaries(on date: Date) async throws -> [DashboardPlanSummary] {
     let plans = try await planRepository.loadActivePlans(date)
+    for plan in plans {
+      _ = try await planRepository.synchronizeOccurrences(plan, date)
+    }
     return try await PlanProgressProvider().snapshots(for: plans).map { snapshot in
       DashboardPlanSummary(
         plan: snapshot.plan,

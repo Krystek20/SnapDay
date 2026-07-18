@@ -70,9 +70,14 @@ public struct PlansFeature {
       case plansLoadFailed(String)
     }
 
+    public enum DelegateAction: Equatable {
+      case plansChanged
+    }
+
     case binding(BindingAction<State>)
     case view(ViewAction)
     case `internal`(InternalAction)
+    case delegate(DelegateAction)
     case planDetails(PresentationAction<PlanDetailsFeature.Action>)
     case newPlan(PresentationAction<NewPlanFeature.Action>)
   }
@@ -88,6 +93,8 @@ public struct PlansFeature {
     Reduce { state, action in
       switch action {
       case .binding:
+        return .none
+      case .delegate:
         return .none
       case .view(.appeared):
         guard state.loadState == .idle else { return .none }
@@ -130,6 +137,7 @@ public struct PlansFeature {
           do {
             try await planRepository.archivePlan(id)
             await send(.internal(.loadPlans))
+            await send(.delegate(.plansChanged))
           } catch {
             await send(.internal(.plansLoadFailed(error.localizedDescription)))
           }
@@ -171,6 +179,7 @@ public struct PlansFeature {
             try await planRepository.savePlan(plan)
             _ = try await planRepository.synchronizeOccurrences(plan, plan.startDate)
             await send(.internal(.loadPlans))
+            await send(.delegate(.plansChanged))
           } catch {
             await send(.internal(.plansLoadFailed(error.localizedDescription)))
           }
@@ -188,6 +197,7 @@ public struct PlansFeature {
             try await planRepository.savePlan(plan)
             _ = try await planRepository.synchronizeOccurrences(plan, firstAffectedOccurrenceDate)
             await send(.internal(.loadPlans))
+            await send(.delegate(.plansChanged))
           } catch {
             await send(.internal(.plansLoadFailed(error.localizedDescription)))
           }
@@ -198,7 +208,10 @@ public struct PlansFeature {
         state.planDetails = nil
         return .send(.internal(.archivePlan(id)))
       case .planDetails(.presented(.delegate(.planUpdated))):
-        return .send(.internal(.loadPlans))
+        return .merge(
+          .send(.internal(.loadPlans)),
+          .send(.delegate(.plansChanged))
+        )
       case .planDetails:
         return .none
       }

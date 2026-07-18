@@ -31,7 +31,7 @@ extension PlanRepository: DependencyKey {
         )
       },
       loadActivePlans: { date in
-        let calendar = Calendar.autoupdatingCurrent
+        let calendar = Calendar.planRepositoryCalendar
         let startOfDay = calendar.startOfDay(for: date)
         let startOfNextDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? startOfDay
         return try await EntityHandler().fetch(
@@ -53,7 +53,7 @@ extension PlanRepository: DependencyKey {
           predicates: {
             NSPredicate(
               format: "isArchived == YES OR endDate < %@",
-              Calendar.autoupdatingCurrent.startOfDay(for: date) as NSDate
+              Calendar.planRepositoryCalendar.startOfDay(for: date) as NSDate
             )
           },
           sorts: { NSSortDescriptor(key: "endDate", ascending: false) }
@@ -82,7 +82,7 @@ extension PlanRepository: DependencyKey {
       },
       synchronizeOccurrences: { plan, from in
         let entityHandler = EntityHandler()
-        let calendar = Calendar.autoupdatingCurrent
+        let calendar = Calendar.planRepositoryCalendar
         let lowerBound = max(
           calendar.startOfDay(for: plan.startDate),
           calendar.startOfDay(for: from)
@@ -111,5 +111,13 @@ extension PlanRepository: DependencyKey {
         return occurrences.sorted { $0.date < $1.date }
       }
     )
+  }
+}
+
+private extension Calendar {
+  static var planRepositoryCalendar: Calendar {
+    var calendar = Calendar.autoupdatingCurrent
+    calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .current
+    return calendar
   }
 }

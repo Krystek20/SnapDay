@@ -91,7 +91,8 @@ struct PlanRepositoryTests {
       $0.coreDataStack = .testValue
     } operation: {
       let repository = PlanRepository.liveValue
-      let calendar = Calendar.autoupdatingCurrent
+      var calendar = Calendar.autoupdatingCurrent
+      calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
       let monday = try #require(
         calendar.date(from: DateComponents(year: 2026, month: 7, day: 13))
       )
@@ -138,6 +139,42 @@ struct PlanRepositoryTests {
       #expect(synchronized.contains { calendar.component(.weekday, from: $0.date) == 6 && $0.dayActivityID == nil })
       #expect(!synchronized.contains { calendar.component(.weekday, from: $0.date) == 5 })
       #expect(try await repository.loadOccurrences(plan.id) == synchronized)
+    }
+  }
+
+  @Test
+  func synchronizesSameActivityOnSaturdayAndSunday() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      var calendar = Calendar(identifier: .gregorian)
+      calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+      let saturday = try #require(
+        calendar.date(from: DateComponents(year: 2026, month: 7, day: 18))
+      )
+      let nextSunday = try #require(calendar.date(byAdding: .day, value: 8, to: saturday))
+      let activityID = UUID()
+      let plan = Plan(
+        id: UUID(),
+        name: "Weekend plan",
+        startDate: saturday,
+        endDate: nextSunday,
+        duration: .custom,
+        schedule: [
+          PlanScheduleEntry(id: UUID(), weekday: .saturday, activityID: activityID, position: 0),
+          PlanScheduleEntry(id: UUID(), weekday: .sunday, activityID: activityID, position: 0)
+        ]
+      )
+
+      try await repository.savePlan(plan)
+      let occurrences = try await repository.synchronizeOccurrences(plan, saturday)
+
+      #expect(occurrences.count == 4)
+      #expect(
+        occurrences.map { calendar.component(.weekday, from: $0.date) }
+          == [7, 1, 7, 1]
+      )
     }
   }
 

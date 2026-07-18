@@ -8,6 +8,18 @@ import Testing
 struct DashboardTests {
 
   @Test
+  func dashboardTitleFormatsStoredDayInUTC() throws {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+    let saturday = try #require(
+      calendar.date(from: DateComponents(year: 2026, month: 7, day: 18))
+    )
+    let state = DashboardFeature.State(date: saturday)
+
+    #expect(state.formattedTitle(locale: Locale(identifier: "en_US")) == "Saturday, 18 Jul 2026")
+  }
+
+  @Test
   func planSummaryCalculatesProgressAndNextIncompleteSession() throws {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
@@ -55,6 +67,58 @@ struct DashboardTests {
     #expect(summary.progress.totalPlannedActivityCount == 2)
     #expect(summary.progress.percentComplete == 50)
     #expect(summary.nextSessionDate == friday)
+  }
+
+  @Test
+  func planSummaryMovesFromCompletedSaturdayToSunday() throws {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+    let saturday = try #require(
+      calendar.date(from: DateComponents(year: 2026, month: 7, day: 18))
+    )
+    let sunday = try #require(calendar.date(byAdding: .day, value: 1, to: saturday))
+    let planID = UUID()
+    let activityID = UUID()
+    let completedDayActivityID = UUID()
+    let plan = Plan(
+      id: planID,
+      name: "Weekend plan",
+      startDate: saturday,
+      endDate: sunday,
+      duration: .custom,
+      schedule: []
+    )
+    let completedActivity = DayActivity(
+      id: completedDayActivityID,
+      date: saturday,
+      doneDate: saturday,
+      isGeneratedAutomatically: true
+    )
+
+    let summary = DashboardPlanSummary(
+      plan: plan,
+      occurrences: [
+        PlanOccurrence(
+          planID: planID,
+          activityID: activityID,
+          date: saturday,
+          dayActivityID: completedDayActivityID
+        ),
+        PlanOccurrence(planID: planID, activityID: activityID, date: sunday)
+      ],
+      dayActivities: [completedActivity],
+      date: saturday,
+      calendar: calendar
+    )
+    let configuration = DashboardPlansSummaryView.Configuration(
+      summary: summary,
+      relativeTo: saturday,
+      calendar: calendar,
+      locale: Locale(identifier: "en_US")
+    )
+
+    #expect(summary.nextSessionDate == sunday)
+    #expect(configuration.metadata?.leadingText == "Next session: Tomorrow")
   }
 
   @Test
