@@ -3,6 +3,7 @@ import Models
 
 public struct DashboardPlanSummary: Equatable, Identifiable {
   public let id: Plan.ID
+  public let plan: Plan
   let title: String
   let progress: PlanProgress
   let nextSessionDate: Date?
@@ -19,6 +20,7 @@ public struct DashboardPlanSummary: Equatable, Identifiable {
     let startOfDate = calendar.startOfDay(for: date)
 
     self.id = plan.id
+    self.plan = plan
     self.title = plan.name
     self.progress = progress
     self.nextSessionDate = occurrences.lazy

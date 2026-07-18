@@ -86,6 +86,26 @@ struct DashboardTests {
   }
 
   @Test
+  func planSummaryTapDelegatesSelectedPlan() async {
+    let date = Date(timeIntervalSince1970: 1_752_364_800)
+    let plan = Plan(
+      id: UUID(),
+      name: "Learn Spanish",
+      startDate: date,
+      endDate: date,
+      duration: .sevenDays,
+      schedule: []
+    )
+    let store = TestStore(
+      initialState: DashboardFeature.State(date: date),
+      reducer: { DashboardFeature() }
+    )
+
+    await store.send(.view(.planSummaryTapped(plan)))
+    await store.receive(.delegate(.planTapped(plan)))
+  }
+
+  @Test
   func planSummaryConfigurationFormatsTomorrowUsingProvidedCalendar() throws {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))

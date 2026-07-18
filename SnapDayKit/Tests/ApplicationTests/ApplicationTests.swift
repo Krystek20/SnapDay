@@ -1,5 +1,5 @@
 import XCTest
-@testable import SnapDayKit
+@testable import Application
 
 final class SnapDayKitTests: XCTestCase {
 

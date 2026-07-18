@@ -51,6 +51,23 @@ private var newPlanPreviewSchedule: [ScheduledPlanDay] {
   ))
 }
 
+#Preview("Edit Plan") {
+  let plan = NewPlanDraft(
+    name: "Learn Spanish",
+    duration: .oneMonth,
+    startDate: newPlanPreviewDate,
+    endDate: PlanDuration.oneMonth.endDate(from: newPlanPreviewDate),
+    schedule: newPlanPreviewSchedule
+  )
+  .plan(id: UUID(), scheduleEntryID: UUID.init)
+  newPlanPreview(state: NewPlanFeature.State(
+    plan: plan,
+    activities: newPlanPreviewActivities,
+    now: newPlanPreviewDate,
+    calendar: .autoupdatingCurrent
+  ))
+}
+
 #Preview("Weekly Schedule - dark") {
   newPlanPreview(state: NewPlanFeature.State(
     step: .weeklySchedule,

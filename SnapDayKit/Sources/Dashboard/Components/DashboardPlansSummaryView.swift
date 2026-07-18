@@ -82,6 +82,8 @@ struct DashboardPlansSummaryView: View {
       header
       progressSection
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .contentShape(Rectangle())
     .accessibilityElement(children: .combine)
   }
 
@@ -185,14 +187,14 @@ struct DashboardPlansSummaryView: View {
 struct DashboardPlansSectionView: View {
 
   private let configurations: [DashboardPlansSummaryView.Configuration]
-  private let planAction: (() -> Void)?
+  private let planAction: ((Int) -> Void)?
   private let allPlansAction: (() -> Void)?
 
   @State private var selectedIndex: Int?
 
   init(
     configurations: [DashboardPlansSummaryView.Configuration],
-    planAction: (() -> Void)? = nil,
+    planAction: ((Int) -> Void)? = nil,
     allPlansAction: (() -> Void)? = nil
   ) {
     self.configurations = configurations
@@ -217,7 +219,9 @@ struct DashboardPlansSectionView: View {
     } else if let configuration = configurations.first {
       DashboardPlansSummaryView(
         configuration: configuration,
-        action: planAction
+        action: planAction.map { action in
+          { action(.zero) }
+        }
       )
     }
   }
@@ -229,7 +233,9 @@ struct DashboardPlansSectionView: View {
           ForEach(Array(configurations.enumerated()), id: \.offset) { index, configuration in
             DashboardPlansSummaryView(
               configuration: configuration,
-              action: planAction
+              action: planAction.map { action in
+                { action(index) }
+              }
             )
             .containerRelativeFrame(.horizontal)
             .id(index)

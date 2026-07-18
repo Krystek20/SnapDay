@@ -62,6 +62,28 @@ public struct PlansView: View {
         .presentationDetents([.large])
         .interactiveDismissDisabled()
     }
+    .navigationDestination(
+      item: $store.scope(state: \.planDetails, action: \.planDetails)
+    ) { store in
+      PlanDetailsView(store: store)
+    }
+    .alert(
+      String(localized: "Archive this Plan?", bundle: .module),
+      isPresented: archiveConfirmationBinding
+    ) {
+      Button(
+        String(localized: "Archive Plan", bundle: .module),
+        role: .destructive,
+        action: { store.send(.view(.archivePlanConfirmed)) }
+      )
+      Button(
+        String(localized: "Cancel", bundle: .module),
+        role: .cancel,
+        action: { store.send(.view(.archivePlanCancelled)) }
+      )
+    } message: {
+      Text("The Plan will move to History. Completed activities and progress will be kept.", bundle: .module)
+    }
   }
 
   private var sectionPicker: some View {
@@ -129,9 +151,12 @@ public struct PlansView: View {
       if store.activePlans.isEmpty {
         emptyActiveContent
       } else {
-        PlansGroup(plans: store.activePlans) { id in
-          store.send(.view(.planTapped(id)))
-        }
+        PlansGroup(
+          plans: store.activePlans,
+          action: { store.send(.view(.planTapped($0))) },
+          editAction: { store.send(.view(.editPlanTapped($0))) },
+          archiveAction: { store.send(.view(.archivePlanTapped($0))) }
+        )
       }
     }
   }
@@ -200,10 +225,22 @@ public struct PlansView: View {
   ) -> some View {
     VStack(alignment: .leading, spacing: 10.0) {
       PlansSectionHeader(title: title, trailingTitle: trailingTitle)
-      PlansGroup(plans: plans) { id in
-        store.send(.view(.planTapped(id)))
-      }
+      PlansGroup(
+        plans: plans,
+        action: { store.send(.view(.planTapped($0))) }
+      )
     }
+  }
+
+  private var archiveConfirmationBinding: Binding<Bool> {
+    Binding(
+      get: { store.archiveConfirmationPlanID != nil },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.view(.archivePlanCancelled))
+        }
+      }
+    )
   }
 }
 
@@ -234,13 +271,22 @@ private struct PlansGroup: View {
 
   let plans: [PlanListItem]
   let action: (Plan.ID) -> Void
+  var editAction: ((Plan.ID) -> Void)? = nil
+  var archiveAction: ((Plan.ID) -> Void)? = nil
 
   var body: some View {
     VStack(spacing: .zero) {
       ForEach(Array(plans.enumerated()), id: \.element.id) { index, item in
-        PlanRow(item: item) {
-          action(item.id)
-        }
+        PlanRow(
+          item: item,
+          action: { action(item.id) },
+          editAction: editAction.map { editAction in
+            { editAction(item.id) }
+          },
+          archiveAction: archiveAction.map { archiveAction in
+            { archiveAction(item.id) }
+          }
+        )
 
         if index < plans.index(before: plans.endIndex) {
           Divider()
@@ -259,6 +305,8 @@ private struct PlanRow: View {
 
   let item: PlanListItem
   let action: () -> Void
+  let editAction: (() -> Void)?
+  let archiveAction: (() -> Void)?
 
   var body: some View {
     Button(action: action) {
@@ -293,6 +341,25 @@ private struct PlanRow: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
+    .contextMenu {
+      if let editAction {
+        Button(
+          action: editAction,
+          label: {
+            Label(String(localized: "Edit", bundle: .module), systemImage: "pencil")
+          }
+        )
+      }
+      if let archiveAction {
+        Button(
+          role: .destructive,
+          action: archiveAction,
+          label: {
+            Label(String(localized: "Archive Plan", bundle: .module), systemImage: "archivebox")
+          }
+        )
+      }
+    }
   }
 
   private var activityChips: some View {

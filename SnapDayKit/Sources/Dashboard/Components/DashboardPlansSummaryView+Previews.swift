@@ -4,7 +4,7 @@ import SwiftUI
 #Preview("Plans summary - active due today") {
   DashboardPlansSectionView(
     configurations: [.activePlanDueTodayPreview],
-    planAction: {},
+    planAction: { _ in },
     allPlansAction: {}
   )
   .padding(15.0)
@@ -13,7 +13,7 @@ import SwiftUI
 #Preview("Plans summary - active carousel") {
   DashboardPlansSectionView(
     configurations: DashboardPlansSummaryView.Configuration.activePlanCarouselPreviews,
-    planAction: {},
+    planAction: { _ in },
     allPlansAction: {}
   )
   .padding(15.0)

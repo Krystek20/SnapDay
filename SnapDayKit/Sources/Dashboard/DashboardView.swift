@@ -220,10 +220,20 @@ public struct DashboardView: View {
   private var plansSummary: some View {
     DashboardPlansSectionView(
       configurations: planSummaryConfigurations,
+      planAction: planSummaryAction,
       allPlansAction: {
         store.send(.view(.allPlansButtonTapped))
       }
     )
+  }
+
+  private var planSummaryAction: ((Int) -> Void)? {
+    guard !store.planSummaries.isEmpty else { return nil }
+
+    return { index in
+      guard store.planSummaries.indices.contains(index) else { return }
+      store.send(.view(.planSummaryTapped(store.planSummaries[index].plan)))
+    }
   }
 
   private var planSummaryConfigurations: [DashboardPlansSummaryView.Configuration] {

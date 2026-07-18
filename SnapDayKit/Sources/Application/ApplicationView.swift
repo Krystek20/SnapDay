@@ -112,6 +112,10 @@ public struct ApplicationView: View {
       if let store = store.scope(state: \.activityDetails, action: \.activityDetails) {
         ActivityDetailsView(store: store)
       }
+    case .planDetails:
+      if let store = store.scope(state: \.planDetails, action: \.planDetails) {
+        PlanDetailsView(store: store)
+      }
     case .plans:
       if let store = store.scope(state: \.plans, action: \.plans) {
         PlansView(store: store)

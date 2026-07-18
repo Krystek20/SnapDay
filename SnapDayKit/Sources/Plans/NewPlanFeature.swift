@@ -8,6 +8,7 @@ public struct NewPlanFeature {
 
   @Dependency(\.calendar) private var calendar
   @Dependency(\.date.now) private var now
+  @Dependency(\.uuid) private var uuid
 
   // MARK: - State & Action
 
@@ -20,6 +21,8 @@ public struct NewPlanFeature {
     var startDate: Date
     var endDate: Date
     var schedule: [ScheduledPlanDay]
+    var editingPlan: Plan?
+    var isStartDateEditable: Bool
 
     var activityPickerDay: PlanWeekday?
     @Presents var activityPicker: ActivityListFeature.State?
@@ -45,7 +48,9 @@ public struct NewPlanFeature {
       selectedDuration: PlanDuration = .oneMonth,
       startDate: Date = .now,
       endDate: Date? = nil,
-      schedule: [ScheduledPlanDay] = []
+      schedule: [ScheduledPlanDay] = [],
+      editingPlan: Plan? = nil,
+      isStartDateEditable: Bool = true
     ) {
       self.step = step
       self.name = name
@@ -53,11 +58,43 @@ public struct NewPlanFeature {
       self.startDate = startDate
       self.endDate = endDate ?? selectedDuration.endDate(from: startDate)
       self.schedule = schedule
+      self.editingPlan = editingPlan
+      self.isStartDateEditable = isStartDateEditable
       self.activityPickerDay = nil
       self.activityPicker = nil
       self.applySourceDay = nil
       self.applyTargetDays = []
       self.replacementTargetDays = []
+    }
+
+    init(
+      plan: Plan,
+      activities: [Activity],
+      now: Date,
+      calendar: Calendar
+    ) {
+      let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+      let scheduledDays = Dictionary(grouping: plan.schedule, by: \.weekday).mapValues { entries in
+        entries.sorted { $0.position < $1.position }.compactMap { activitiesByID[$0.activityID] }
+      }
+      self.init(
+        name: plan.name,
+        selectedDuration: plan.duration,
+        startDate: plan.startDate,
+        endDate: plan.endDate,
+        schedule: NewPlanFeature.makeSchedule(
+          from: plan.startDate,
+          through: plan.endDate,
+          preserving: scheduledDays.map { ScheduledPlanDay(weekday: $0.key, activities: $0.value) },
+          calendar: calendar
+        ),
+        editingPlan: plan,
+        isStartDateEditable: calendar.startOfDay(for: now) < calendar.startOfDay(for: plan.startDate)
+      )
+    }
+
+    var isEditing: Bool {
+      editingPlan != nil
     }
   }
 
@@ -82,6 +119,7 @@ public struct NewPlanFeature {
     public enum DelegateAction: Equatable {
       case cancelTapped
       case planCreated(NewPlanDraft)
+      case planUpdated(Plan)
     }
 
     case binding(BindingAction<State>)
@@ -101,6 +139,10 @@ public struct NewPlanFeature {
     Reduce { state, action in
       switch action {
       case .binding(\.startDate):
+        guard state.isStartDateEditable else {
+          state.startDate = state.editingPlan?.startDate ?? state.startDate
+          return .none
+        }
         state.startDate = max(
           calendar.startOfDay(for: state.startDate),
           calendar.startOfDay(for: now)
@@ -253,19 +295,18 @@ public struct NewPlanFeature {
 
       case .view(.startPlanButtonTapped):
         guard state.step == .review, state.canReview else { return .none }
-        return .send(
-          .delegate(
-            .planCreated(
-              NewPlanDraft(
-                name: state.name.trimmingCharacters(in: .whitespacesAndNewlines),
-                duration: state.selectedDuration,
-                startDate: state.startDate,
-                endDate: state.endDate,
-                schedule: state.schedule
-              )
-            )
-          )
+        let draft = NewPlanDraft(
+          name: state.name.trimmingCharacters(in: .whitespacesAndNewlines),
+          duration: state.selectedDuration,
+          startDate: state.startDate,
+          endDate: state.endDate,
+          schedule: state.schedule
         )
+        if let editingPlan = state.editingPlan {
+          return .send(.delegate(.planUpdated(draft.updating(editingPlan, scheduleEntryID: { uuid() }))))
+        }
+        return .send(.delegate(.planCreated(draft)))
+
       }
     }
     .ifLet(\.$activityPicker, action: \.activityPicker) {

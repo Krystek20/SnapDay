@@ -90,7 +90,9 @@ public struct NewPlanView: View {
   private func navigationTitle(for step: NewPlanStep) -> String {
     switch step {
     case .details:
-      String(localized: "New Plan", bundle: .module)
+      store.isEditing
+        ? String(localized: "Edit Plan", bundle: .module)
+        : String(localized: "New Plan", bundle: .module)
     case .weeklySchedule:
       String(localized: "Weekly Schedule", bundle: .module)
     case .review:
@@ -112,7 +114,11 @@ public struct NewPlanView: View {
       }
       .disabled(!store.canReview)
     case .review:
-      actionButton(title: String(localized: "Start Plan", bundle: .module)) {
+      actionButton(
+        title: store.isEditing
+          ? String(localized: "Save Changes", bundle: .module)
+          : String(localized: "Start Plan", bundle: .module)
+      ) {
         store.send(.view(.startPlanButtonTapped))
       }
     }
@@ -219,8 +225,12 @@ private struct NewPlanDetailsView: View {
         datePicker(
           title: String(localized: "Starts", bundle: .module),
           selection: $store.startDate,
-          range: Calendar.autoupdatingCurrent.startOfDay(for: .now)...Date.distantFuture
+          range: min(
+            store.startDate,
+            Calendar.autoupdatingCurrent.startOfDay(for: .now)
+          )...Date.distantFuture
         )
+        .disabled(!store.isStartDateEditable)
 
         Divider()
           .padding(.horizontal, 15.0)

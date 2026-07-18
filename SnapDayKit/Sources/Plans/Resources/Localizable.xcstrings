@@ -121,6 +121,15 @@
     "Apply to days" : {
 
     },
+    "Archive Plan" : {
+
+    },
+    "Archive this Plan?" : {
+
+    },
+    "Archived" : {
+
+    },
     "ARCHIVED" : {
       "localizations" : {
         "en" : {
@@ -143,6 +152,9 @@
           }
         }
       }
+    },
+    "Complete today's activities from your Dashboard." : {
+
     },
     "Continue" : {
       "localizations" : {
@@ -197,6 +209,12 @@
     "Day actions" : {
 
     },
+    "Edit" : {
+
+    },
+    "Edit Plan" : {
+
+    },
     "Ends" : {
       "localizations" : {
         "en" : {
@@ -206,6 +224,9 @@
           }
         }
       }
+    },
+    "Finished" : {
+
     },
     "FINISHED" : {
       "localizations" : {
@@ -250,6 +271,9 @@
         }
       }
     },
+    "It no longer generates activities. Its previous schedule and progress are kept for reference." : {
+
+    },
     "Learn Spanish" : {
       "localizations" : {
         "en" : {
@@ -280,6 +304,9 @@
         }
       }
     },
+    "NEXT PLANNED DAY" : {
+
+    },
     "No active Plans" : {
       "localizations" : {
         "en" : {
@@ -296,7 +323,16 @@
     "No activities planned" : {
 
     },
+    "No activities planned today" : {
+
+    },
     "PLAN" : {
+
+    },
+    "Plan actions" : {
+
+    },
+    "Plan Detail" : {
 
     },
     "PLAN NAME" : {
@@ -347,6 +383,9 @@
     "Review Plan" : {
 
     },
+    "Save Changes" : {
+
+    },
     "Selected days will use the source day's activities. Days with existing activities ask for confirmation." : {
 
     },
@@ -367,6 +406,18 @@
       }
     },
     "TARGET DAYS" : {
+
+    },
+    "The Plan will move to History. Completed activities and progress will be kept." : {
+
+    },
+    "This Plan does not generate anything today. Your daily list can still contain non-Plan activities." : {
+
+    },
+    "This Plan has reached its end date. Its schedule and progress are now read-only." : {
+
+    },
+    "This Plan is not active" : {
 
     },
     "Try again" : {

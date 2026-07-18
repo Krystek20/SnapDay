@@ -17,6 +17,7 @@ public struct ApplicationFeature: TodayProvidable {
   @Dependency(\.deeplinkService) private var deeplinkService
   @Dependency(\.cloudService) private var cloudService
   @Dependency(\.iconProvider) private var iconProvider
+  @Dependency(\.planRepository) private var planRepository
   private static let isOnboardingShownKey = "isOnboardingShown"
 
   // MARK: - State & Action
@@ -74,11 +75,13 @@ public struct ApplicationFeature: TodayProvidable {
     @ObservableState
     public enum State: Equatable {
       case activityDetails(ActivityDetailsFeature.State)
+      case planDetails(PlanDetailsFeature.State)
       case plans(PlansFeature.State)
     }
 
     public enum Action: Equatable {
       case activityDetails(ActivityDetailsFeature.Action)
+      case planDetails(PlanDetailsFeature.Action)
       case plans(PlansFeature.Action)
     }
 
@@ -86,6 +89,9 @@ public struct ApplicationFeature: TodayProvidable {
       EmptyReducer<State, Action>()
         .ifCaseLet(\.activityDetails, action: \.activityDetails) {
           ActivityDetailsFeature()
+        }
+        .ifCaseLet(\.planDetails, action: \.planDetails) {
+          PlanDetailsFeature()
         }
         .ifCaseLet(\.plans, action: \.plans) {
           PlansFeature()
@@ -170,6 +176,11 @@ public struct ApplicationFeature: TodayProvidable {
       case .dashboard(.delegate(.allPlansTapped)):
         state.dashboardPath.append(.plans(PlansFeature.State()))
         return .none
+      case .dashboard(.delegate(.planTapped(let plan))):
+        state.dashboardPath.append(
+          .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
+        )
+        return .none
       case .dashboard:
         return .none
       case .reports(.delegate(let action)):
@@ -185,6 +196,29 @@ public struct ApplicationFeature: TodayProvidable {
       case .developerTools:
         return .none
       #endif
+      case .dashboardPath(.element(
+        id: let pathID,
+        action: .planDetails(.delegate(.archivePlanTapped(let planID)))
+      )):
+        return .run { send in
+          do {
+            try await planRepository.archivePlan(planID)
+            await send(.dashboardPath(.popFrom(id: pathID)))
+            await send(.dashboard(.internal(.load)))
+          } catch {
+            return
+          }
+        }
+      case .dashboardPath(.element(
+        id: _,
+        action: .planDetails(.delegate(.planUpdated))
+      )):
+        return .send(.dashboard(.internal(.load)))
+      case .dashboardPath(.element(
+        id: _,
+        action: .plans(.delegate(.plansChanged))
+      )):
+        return .send(.dashboard(.internal(.load)))
       case .dashboardPath:
         return .none
       case .reportsPath:

@@ -23,6 +23,8 @@ public struct PlansFeature {
     var activePlans: [PlanListItem] = []
     var finishedPlans: [PlanListItem] = []
     var archivedPlans: [PlanListItem] = []
+    var archiveConfirmationPlanID: Plan.ID?
+    @Presents var planDetails: PlanDetailsFeature.State?
     @Presents var newPlan: NewPlanFeature.State?
 
     public init() { }
@@ -33,6 +35,8 @@ public struct PlansFeature {
       activePlans: [PlanListItem] = [],
       finishedPlans: [PlanListItem] = [],
       archivedPlans: [PlanListItem] = [],
+      archiveConfirmationPlanID: Plan.ID? = nil,
+      planDetails: PlanDetailsFeature.State? = nil,
       newPlan: NewPlanFeature.State? = nil
     ) {
       self.selectedSection = selectedSection
@@ -40,6 +44,8 @@ public struct PlansFeature {
       self.activePlans = activePlans
       self.finishedPlans = finishedPlans
       self.archivedPlans = archivedPlans
+      self.archiveConfirmationPlanID = archiveConfirmationPlanID
+      self.planDetails = planDetails
       self.newPlan = newPlan
     }
   }
@@ -50,10 +56,15 @@ public struct PlansFeature {
       case appeared
       case createPlanButtonTapped
       case planTapped(Plan.ID)
+      case editPlanTapped(Plan.ID)
+      case archivePlanTapped(Plan.ID)
+      case archivePlanCancelled
+      case archivePlanConfirmed
       case retryButtonTapped
     }
 
     public enum InternalAction: Equatable {
+      case archivePlan(Plan.ID)
       case loadPlans
       case plansLoaded(PlansSnapshot)
       case plansLoadFailed(String)
@@ -62,6 +73,7 @@ public struct PlansFeature {
     case binding(BindingAction<State>)
     case view(ViewAction)
     case `internal`(InternalAction)
+    case planDetails(PresentationAction<PlanDetailsFeature.Action>)
     case newPlan(PresentationAction<NewPlanFeature.Action>)
   }
 
@@ -85,8 +97,43 @@ public struct PlansFeature {
       case .view(.createPlanButtonTapped):
         state.newPlan = NewPlanFeature.State(startDate: now)
         return .none
-      case .view(.planTapped):
+      case .view(.planTapped(let id)):
+        guard let item = state.planItem(id: id) else { return .none }
+        state.planDetails = PlanDetailsFeature.State(
+          plan: item.plan,
+          allowsManagement: state.activePlans.contains(where: { $0.id == id })
+        )
         return .none
+      case .view(.editPlanTapped(let id)):
+        guard let item = state.activePlans.first(where: { $0.id == id }) else { return .none }
+        state.newPlan = NewPlanFeature.State(
+          plan: item.plan,
+          activities: item.activities,
+          now: now,
+          calendar: calendar
+        )
+        return .none
+      case .view(.archivePlanTapped(let id)):
+        guard state.activePlans.contains(where: { $0.id == id }) else { return .none }
+        state.archiveConfirmationPlanID = id
+        return .none
+      case .view(.archivePlanCancelled):
+        state.archiveConfirmationPlanID = nil
+        return .none
+      case .view(.archivePlanConfirmed):
+        guard let id = state.archiveConfirmationPlanID else { return .none }
+        state.archiveConfirmationPlanID = nil
+        return .send(.internal(.archivePlan(id)))
+      case .internal(.archivePlan(let id)):
+        state.loadState = .loading
+        return .run { send in
+          do {
+            try await planRepository.archivePlan(id)
+            await send(.internal(.loadPlans))
+          } catch {
+            await send(.internal(.plansLoadFailed(error.localizedDescription)))
+          }
+        }
       case .internal(.loadPlans):
         state.loadState = .loading
         return .run { [now] send in
@@ -97,9 +144,16 @@ public struct PlansFeature {
           }
         }
       case .internal(.plansLoaded(let snapshot)):
+        let selectedPlanID = state.planDetails?.id
         state.activePlans = snapshot.activePlans
         state.finishedPlans = snapshot.finishedPlans
         state.archivedPlans = snapshot.archivedPlans
+        if let selectedPlanID, let item = state.planItem(id: selectedPlanID) {
+          state.planDetails = PlanDetailsFeature.State(
+            plan: item.plan,
+            allowsManagement: state.activePlans.contains(where: { $0.id == selectedPlanID })
+          )
+        }
         state.loadState = .loaded
         return .none
       case .internal(.plansLoadFailed(let message)):
@@ -121,9 +175,36 @@ public struct PlansFeature {
             await send(.internal(.plansLoadFailed(error.localizedDescription)))
           }
         }
+      case .newPlan(.presented(.delegate(.planUpdated(let plan)))):
+        state.newPlan = nil
+        state.loadState = .loading
+        let firstAffectedOccurrenceDate = calendar.date(
+          byAdding: .day,
+          value: 1,
+          to: calendar.startOfDay(for: now)
+        ) ?? now
+        return .run { send in
+          do {
+            try await planRepository.savePlan(plan)
+            _ = try await planRepository.synchronizeOccurrences(plan, firstAffectedOccurrenceDate)
+            await send(.internal(.loadPlans))
+          } catch {
+            await send(.internal(.plansLoadFailed(error.localizedDescription)))
+          }
+        }
       case .newPlan:
         return .none
+      case .planDetails(.presented(.delegate(.archivePlanTapped(let id)))):
+        state.planDetails = nil
+        return .send(.internal(.archivePlan(id)))
+      case .planDetails(.presented(.delegate(.planUpdated))):
+        return .send(.internal(.loadPlans))
+      case .planDetails:
+        return .none
       }
+    }
+    .ifLet(\.$planDetails, action: \.planDetails) {
+      PlanDetailsFeature()
     }
     .ifLet(\.$newPlan, action: \.newPlan) {
       NewPlanFeature()
@@ -164,5 +245,12 @@ public struct PlansFeature {
       finishedPlans: finishedPlans,
       archivedPlans: archivedPlans
     )
+  }
+
+}
+
+private extension PlansFeature.State {
+  func planItem(id: Plan.ID) -> PlanListItem? {
+    (activePlans + finishedPlans + archivedPlans).first(where: { $0.id == id })
   }
 }

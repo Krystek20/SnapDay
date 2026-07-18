@@ -2,6 +2,7 @@ import ActivityList
 import ComposableArchitecture
 import Foundation
 import Models
+@testable import Repositories
 import Testing
 @testable import Plans
 
@@ -30,11 +31,14 @@ struct NewPlanFeatureTests {
 
   @Test
   func changingStartDatePreservesInclusivePresetDuration() async throws {
-    let initialStartDate = try date(year: 2026, month: 6, day: 8)
-    let newStartDate = try date(year: 2026, month: 7, day: 1)
-    let exclusiveEndDate = try adding(.month, value: 1, to: newStartDate)
-    let expectedEndDate = try adding(.day, value: -1, to: exclusiveEndDate)
+    let calendar = testCalendar()
+    let initialStartDate = try date(year: 2026, month: 6, day: 8, calendar: calendar)
+    let newStartDate = try date(year: 2026, month: 7, day: 1, calendar: calendar)
+    let normalizedStartDate = calendar.startOfDay(for: newStartDate)
+    let exclusiveEndDate = try adding(.month, value: 1, to: normalizedStartDate, calendar: calendar)
+    let expectedEndDate = try adding(.day, value: -1, to: exclusiveEndDate, calendar: calendar)
     let store = withDependencies {
+      $0.calendar = calendar
       $0.date.now = initialStartDate
     } operation: {
       TestStore(
@@ -44,16 +48,19 @@ struct NewPlanFeatureTests {
     }
 
     await store.send(.binding(.set(\.startDate, newStartDate))) {
-      $0.startDate = newStartDate
+      $0.startDate = normalizedStartDate
       $0.endDate = expectedEndDate
     }
   }
 
   @Test
   func startDateCannotBeInThePast() async throws {
-    let today = try date(year: 2026, month: 7, day: 15)
-    let pastDate = try date(year: 2025, month: 1, day: 1)
+    let calendar = testCalendar()
+    let today = try date(year: 2026, month: 7, day: 15, calendar: calendar)
+    let normalizedToday = calendar.startOfDay(for: today)
+    let pastDate = try date(year: 2025, month: 1, day: 1, calendar: calendar)
     let store = withDependencies {
+      $0.calendar = calendar
       $0.date.now = today
     } operation: {
       TestStore(
@@ -63,8 +70,8 @@ struct NewPlanFeatureTests {
     }
 
     await store.send(.binding(.set(\.startDate, pastDate))) {
-      $0.startDate = today
-      $0.endDate = PlanDuration.oneMonth.endDate(from: today)
+      $0.startDate = normalizedToday
+      $0.endDate = PlanDuration.oneMonth.endDate(from: normalizedToday, calendar: calendar)
     }
   }
 
@@ -322,6 +329,98 @@ struct NewPlanFeatureTests {
   }
 
   @Test
+  func editingStartedPlanLoadsScheduleAndLocksStartDate() async throws {
+    let calendar = testCalendar()
+    let now = try date(year: 2026, month: 7, day: 15, calendar: calendar)
+    let startDate = try date(year: 2026, month: 7, day: 13, calendar: calendar)
+    let endDate = try date(year: 2026, month: 7, day: 19, calendar: calendar)
+    let attemptedStartDate = try date(year: 2026, month: 7, day: 16, calendar: calendar)
+    let read = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let plan = Plan(
+      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
+      name: "Reading week",
+      startDate: startDate,
+      endDate: endDate,
+      duration: .sevenDays,
+      schedule: [
+        PlanScheduleEntry(
+          id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000011")),
+          weekday: .monday,
+          activityID: read.id,
+          position: 0
+        )
+      ]
+    )
+    let state = NewPlanFeature.State(
+      plan: plan,
+      activities: [read],
+      now: now,
+      calendar: calendar
+    )
+    #expect(!state.isStartDateEditable)
+    #expect(state.schedule.first(where: { $0.weekday == .monday })?.activities == [read])
+
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = now
+    } operation: {
+      TestStore(initialState: state, reducer: { NewPlanFeature() })
+    }
+    await store.send(.binding(.set(\.startDate, attemptedStartDate)))
+    #expect(store.state.startDate == startDate)
+  }
+
+  @Test
+  func savingEditedPlanPreservesExistingScheduleEntryIdentity() async throws {
+    let calendar = testCalendar()
+    let startDate = try date(year: 2026, month: 7, day: 20, calendar: calendar)
+    let endDate = try date(year: 2026, month: 7, day: 26, calendar: calendar)
+    let read = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let walk = try activity(id: "00000000-0000-0000-0000-000000000002", name: "Walk")
+    let planID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010"))
+    let entryID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000011"))
+    let newEntryID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000012"))
+    let plan = Plan(
+      id: planID,
+      name: "Reading week",
+      startDate: startDate,
+      endDate: endDate,
+      duration: .sevenDays,
+      schedule: [
+        PlanScheduleEntry(id: entryID, weekday: .monday, activityID: read.id, position: 0)
+      ]
+    )
+    var state = NewPlanFeature.State(
+      plan: plan,
+      activities: [read, walk],
+      now: startDate,
+      calendar: calendar
+    )
+    state.step = .review
+    state.name = "Updated week"
+    state.schedule = [ScheduledPlanDay(weekday: .monday, activities: [walk, read])]
+    let expectedPlan = Plan(
+      id: planID,
+      name: "Updated week",
+      startDate: startDate,
+      endDate: endDate,
+      duration: .sevenDays,
+      schedule: [
+        PlanScheduleEntry(id: newEntryID, weekday: .monday, activityID: walk.id, position: 0),
+        PlanScheduleEntry(id: entryID, weekday: .monday, activityID: read.id, position: 1)
+      ]
+    )
+    let store = withDependencies {
+      $0.uuid = .constant(newEntryID)
+    } operation: {
+      TestStore(initialState: state, reducer: { NewPlanFeature() })
+    }
+
+    await store.send(.view(.startPlanButtonTapped))
+    await store.receive(.delegate(.planUpdated(expectedPlan)))
+  }
+
+  @Test
   func plansFeatureOwnsNewPlanPresentation() async throws {
     let now = try date(year: 2026, month: 6, day: 8)
     let store = withDependencies {
@@ -338,6 +437,166 @@ struct NewPlanFeatureTests {
     }
     await store.send(.newPlan(.presented(.delegate(.cancelTapped)))) {
       $0.newPlan = nil
+    }
+  }
+
+  @Test
+  func activePlanOpensDetails() async throws {
+    let calendar = testCalendar()
+    let now = try date(year: 2026, month: 7, day: 15, calendar: calendar)
+    let endDate = try date(year: 2026, month: 7, day: 21, calendar: calendar)
+    let read = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let plan = Plan(
+      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
+      name: "Reading week",
+      startDate: now,
+      endDate: endDate,
+      duration: .sevenDays,
+      schedule: [
+        PlanScheduleEntry(
+          id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000011")),
+          weekday: .wednesday,
+          activityID: read.id,
+          position: 0
+        )
+      ]
+    )
+    let item = PlanListItem(
+      plan: plan,
+      activities: [read],
+      occurrences: [],
+      dayActivities: []
+    )
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = now
+    } operation: {
+      TestStore(
+        initialState: PlansFeature.State(selectedSection: .active, activePlans: [item]),
+        reducer: { PlansFeature() }
+      )
+    }
+
+    await store.send(.view(.planTapped(plan.id))) {
+      $0.planDetails = PlanDetailsFeature.State(plan: plan, allowsManagement: true)
+    }
+  }
+
+  @Test
+  func activePlanContextMenuOpensInEditMode() async throws {
+    let calendar = testCalendar()
+    let now = try date(year: 2026, month: 7, day: 15, calendar: calendar)
+    let read = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let plan = Plan(
+      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
+      name: "Reading week",
+      startDate: now,
+      endDate: now,
+      duration: .custom,
+      schedule: []
+    )
+    let item = PlanListItem(
+      plan: plan,
+      activities: [read],
+      occurrences: [],
+      dayActivities: []
+    )
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = now
+    } operation: {
+      TestStore(
+        initialState: PlansFeature.State(selectedSection: .active, activePlans: [item]),
+        reducer: { PlansFeature() }
+      )
+    }
+
+    await store.send(.view(.editPlanTapped(plan.id))) {
+      $0.newPlan = NewPlanFeature.State(
+        plan: plan,
+        activities: [read],
+        now: now,
+        calendar: calendar
+      )
+    }
+  }
+
+  @Test
+  func planDetailsOffersEditAndConfirmedArchive() async throws {
+    let calendar = testCalendar()
+    let now = try date(year: 2026, month: 7, day: 15, calendar: calendar)
+    let planID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010"))
+    let plan = Plan(
+      id: planID,
+      name: "Reading week",
+      startDate: now,
+      endDate: now,
+      duration: .custom,
+      schedule: []
+    )
+    let store = withDependencies {
+      $0.activityRepository = ActivityRepository(
+        activity: { _ in nil },
+        loadActivities: { [] },
+        saveActivity: { _ in },
+        deleteActivity: { _ in },
+        activityTask: { _ in nil },
+        deleteActivityTask: { _ in }
+      )
+      $0.calendar = calendar
+      $0.date.now = now
+    } operation: {
+      TestStore(
+        initialState: PlanDetailsFeature.State(plan: plan, allowsManagement: true),
+        reducer: { PlanDetailsFeature() }
+      )
+    }
+
+    await store.send(.view(.editButtonTapped))
+    await store.receive(.internal(.editActivitiesLoaded([]))) {
+      $0.newPlan = NewPlanFeature.State(
+        plan: plan,
+        activities: [],
+        now: now,
+        calendar: calendar
+      )
+    }
+    await store.send(.view(.archiveButtonTapped)) {
+      $0.isArchiveConfirmationPresented = true
+    }
+    await store.send(.view(.archiveConfirmed)) {
+      $0.isArchiveConfirmationPresented = false
+    }
+    await store.receive(.delegate(.archivePlanTapped(planID)))
+  }
+
+  @Test
+  func archiveFromPlanListRequiresConfirmation() async throws {
+    let planID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010"))
+    let plan = Plan(
+      id: planID,
+      name: "Reading week",
+      startDate: .now,
+      endDate: .now,
+      duration: .custom,
+      schedule: []
+    )
+    let item = PlanListItem(
+      plan: plan,
+      activities: [],
+      occurrences: [],
+      dayActivities: []
+    )
+    let store = TestStore(
+      initialState: PlansFeature.State(selectedSection: .active, activePlans: [item]),
+      reducer: { PlansFeature() }
+    )
+
+    await store.send(.view(.archivePlanTapped(planID))) {
+      $0.archiveConfirmationPlanID = planID
+    }
+    await store.send(.view(.archivePlanCancelled)) {
+      $0.archiveConfirmationPlanID = nil
     }
   }
 

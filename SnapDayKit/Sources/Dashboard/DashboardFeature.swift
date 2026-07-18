@@ -107,6 +107,7 @@ public struct DashboardFeature: TodayProvidable {
       case showFriendsTapped
       case assistantButtonTapped
       case allPlansButtonTapped
+      case planSummaryTapped(Plan)
     }
 
     public enum InternalAction: Equatable {
@@ -160,6 +161,7 @@ public struct DashboardFeature: TodayProvidable {
     }
     public enum DelegateAction: Equatable {
       case allPlansTapped
+      case planTapped(Plan)
     }
 
     case binding(BindingAction<State>)
@@ -323,6 +325,8 @@ public struct DashboardFeature: TodayProvidable {
       return .none
     case .allPlansButtonTapped:
       return .send(.delegate(.allPlansTapped))
+    case .planSummaryTapped(let plan):
+      return .send(.delegate(.planTapped(plan)))
     }
   }
 

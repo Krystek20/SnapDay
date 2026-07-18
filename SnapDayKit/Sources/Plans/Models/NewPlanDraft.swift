@@ -36,6 +36,31 @@ public struct NewPlanDraft: Equatable {
     )
   }
 
+  func updating(
+    _ plan: Plan,
+    scheduleEntryID: () -> PlanScheduleEntry.ID
+  ) -> Plan {
+    var updatedPlan = plan
+    updatedPlan.name = name
+    updatedPlan.startDate = startDate
+    updatedPlan.endDate = endDate
+    updatedPlan.duration = duration
+    updatedPlan.schedule = schedule.flatMap { day in
+      day.activities.enumerated().map { position, activity in
+        let existingID = plan.schedule.first {
+          $0.weekday == day.weekday && $0.activityID == activity.id
+        }?.id
+        return PlanScheduleEntry(
+          id: existingID ?? scheduleEntryID(),
+          weekday: day.weekday,
+          activityID: activity.id,
+          position: position
+        )
+      }
+    }
+    return updatedPlan
+  }
+
   func plannedActivityCount(calendar: Calendar = .autoupdatingCurrent) -> Int {
     let activitiesByWeekday = Dictionary(uniqueKeysWithValues: schedule.map { ($0.weekday, $0.activities.count) })
     let end = calendar.startOfDay(for: endDate)
