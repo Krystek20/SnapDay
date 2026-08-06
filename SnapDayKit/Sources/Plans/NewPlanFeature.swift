@@ -23,12 +23,15 @@ public struct NewPlanFeature {
     var schedule: [ScheduledPlanDay]
     var editingPlan: Plan?
     var isStartDateEditable: Bool
+    var isNameValidationErrorPresented: Bool
+    var isScheduleValidationErrorPresented: Bool
 
     var activityPickerDay: PlanWeekday?
     @Presents var activityPicker: ActivityListFeature.State?
     var applySourceDay: PlanWeekday?
     var applyTargetDays: Set<PlanWeekday>
     var replacementTargetDays: Set<PlanWeekday>
+    var scheduleRemovalWeekdays: [PlanWeekday]
 
     var canContinue: Bool {
       !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -42,6 +45,10 @@ public struct NewPlanFeature {
       !replacementTargetDays.isEmpty
     }
 
+    var needsScheduleRemovalConfirmation: Bool {
+      !scheduleRemovalWeekdays.isEmpty
+    }
+
     init(
       step: NewPlanStep = .details,
       name: String = "",
@@ -50,7 +57,10 @@ public struct NewPlanFeature {
       endDate: Date? = nil,
       schedule: [ScheduledPlanDay] = [],
       editingPlan: Plan? = nil,
-      isStartDateEditable: Bool = true
+      isStartDateEditable: Bool = true,
+      isNameValidationErrorPresented: Bool = false,
+      isScheduleValidationErrorPresented: Bool = false,
+      scheduleRemovalWeekdays: [PlanWeekday] = []
     ) {
       self.step = step
       self.name = name
@@ -60,11 +70,14 @@ public struct NewPlanFeature {
       self.schedule = schedule
       self.editingPlan = editingPlan
       self.isStartDateEditable = isStartDateEditable
+      self.isNameValidationErrorPresented = isNameValidationErrorPresented
+      self.isScheduleValidationErrorPresented = isScheduleValidationErrorPresented
       self.activityPickerDay = nil
       self.activityPicker = nil
       self.applySourceDay = nil
       self.applyTargetDays = []
       self.replacementTargetDays = []
+      self.scheduleRemovalWeekdays = scheduleRemovalWeekdays
     }
 
     init(
@@ -93,6 +106,50 @@ public struct NewPlanFeature {
       )
     }
 
+    init(
+      copying plan: Plan,
+      activities: [Activity],
+      startDate: Date,
+      calendar: Calendar
+    ) {
+      let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+      let scheduledDays = Dictionary(grouping: plan.schedule, by: \.weekday).mapValues { entries in
+        entries.sorted { $0.position < $1.position }.compactMap { activitiesByID[$0.activityID] }
+      }
+      let normalizedStartDate = calendar.startOfDay(for: startDate)
+      let copiedEndDate: Date
+      if plan.duration == .custom {
+        let dayCount = max(
+          0,
+          calendar.dateComponents(
+            [.day],
+            from: calendar.startOfDay(for: plan.startDate),
+            to: calendar.startOfDay(for: plan.endDate)
+          ).day ?? 0
+        )
+        copiedEndDate = calendar.date(
+          byAdding: .day,
+          value: dayCount,
+          to: normalizedStartDate
+        ) ?? normalizedStartDate
+      } else {
+        copiedEndDate = plan.duration.endDate(from: normalizedStartDate, calendar: calendar)
+      }
+
+      self.init(
+        name: plan.name,
+        selectedDuration: plan.duration,
+        startDate: normalizedStartDate,
+        endDate: copiedEndDate,
+        schedule: NewPlanFeature.makeSchedule(
+          from: normalizedStartDate,
+          through: copiedEndDate,
+          preserving: scheduledDays.map { ScheduledPlanDay(weekday: $0.key, activities: $0.value) },
+          calendar: calendar
+        )
+      )
+    }
+
     var isEditing: Bool {
       editingPlan != nil
     }
@@ -113,6 +170,8 @@ public struct NewPlanFeature {
       case applyConfirmed
       case replacementCancelled
       case replacementConfirmed
+      case scheduleRemovalCancelled
+      case scheduleRemovalConfirmed
       case startPlanButtonTapped
     }
 
@@ -138,6 +197,12 @@ public struct NewPlanFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case .binding(\.name):
+        if state.canContinue {
+          state.isNameValidationErrorPresented = false
+        }
+        return .none
+
       case .binding(\.startDate):
         guard state.isStartDateEditable else {
           state.startDate = state.editingPlan?.startDate ?? state.startDate
@@ -174,6 +239,9 @@ public struct NewPlanFeature {
               let index = state.schedule.firstIndex(where: { $0.weekday == weekday })
         else { return .none }
         state.schedule[index].activities = activities
+        if state.canReview {
+          state.isScheduleValidationErrorPresented = false
+        }
         state.activityPickerDay = nil
         state.activityPicker = nil
         return .none
@@ -198,16 +266,27 @@ public struct NewPlanFeature {
       case .view(.continueButtonTapped):
         switch state.step {
         case .details:
-          guard state.canContinue else { return .none }
-          state.schedule = Self.makeSchedule(
+          guard state.canContinue else {
+            state.isNameValidationErrorPresented = true
+            return .none
+          }
+          let updatedSchedule = Self.makeSchedule(
             from: state.startDate,
             through: state.endDate,
             preserving: state.schedule,
             calendar: calendar
           )
-          state.step = .weeklySchedule
+          state.scheduleRemovalWeekdays = Self.assignedWeekdaysRemoved(
+            from: state.schedule,
+            by: updatedSchedule
+          )
+          guard state.scheduleRemovalWeekdays.isEmpty else { return .none }
+          Self.applySchedule(updatedSchedule, to: &state)
         case .weeklySchedule:
-          guard state.canReview else { return .none }
+          guard state.canReview else {
+            state.isScheduleValidationErrorPresented = true
+            return .none
+          }
           state.step = .review
         case .review:
           break
@@ -235,6 +314,9 @@ public struct NewPlanFeature {
         return .none
 
       case .view(.addActivityTapped(let weekday)):
+        guard state.schedule.contains(where: { $0.weekday == weekday }) else {
+          return .none
+        }
         state.activityPickerDay = weekday
         let selectedActivityIDs = Set(
           state.schedule
@@ -261,6 +343,9 @@ public struct NewPlanFeature {
         return .none
 
       case .view(.applyTargetTapped(let weekday)):
+        guard weekday != state.applySourceDay,
+              state.schedule.contains(where: { $0.weekday == weekday })
+        else { return .none }
         if state.applyTargetDays.contains(weekday) {
           state.applyTargetDays.remove(weekday)
         } else {
@@ -293,8 +378,32 @@ public struct NewPlanFeature {
         Self.applyActivities(&state)
         return .none
 
+      case .view(.scheduleRemovalCancelled):
+        state.scheduleRemovalWeekdays = []
+        return .none
+
+      case .view(.scheduleRemovalConfirmed):
+        let updatedSchedule = Self.makeSchedule(
+          from: state.startDate,
+          through: state.endDate,
+          preserving: state.schedule,
+          calendar: calendar
+        )
+        Self.applySchedule(updatedSchedule, to: &state)
+        return .none
+
       case .view(.startPlanButtonTapped):
-        guard state.step == .review, state.canReview else { return .none }
+        guard state.step == .review else { return .none }
+        guard state.canContinue else {
+          state.isNameValidationErrorPresented = true
+          state.step = .details
+          return .none
+        }
+        guard state.canReview else {
+          state.isScheduleValidationErrorPresented = true
+          state.step = .weeklySchedule
+          return .none
+        }
         let draft = NewPlanDraft(
           name: state.name.trimmingCharacters(in: .whitespacesAndNewlines),
           duration: state.selectedDuration,
@@ -325,22 +434,45 @@ public struct NewPlanFeature {
     let start = calendar.startOfDay(for: startDate)
     let end = calendar.startOfDay(for: max(startDate, endDate))
     var includedWeekdays = Set<PlanWeekday>()
+    var orderedWeekdays: [PlanWeekday] = []
     var date = start
 
     while date <= end, includedWeekdays.count < PlanWeekday.allCases.count {
-      if let weekday = PlanWeekday(rawValue: calendar.component(.weekday, from: date)) {
-        includedWeekdays.insert(weekday)
+      if let weekday = PlanWeekday(rawValue: calendar.component(.weekday, from: date)),
+         includedWeekdays.insert(weekday).inserted {
+        orderedWeekdays.append(weekday)
       }
       guard let nextDate = calendar.date(byAdding: .day, value: 1, to: date) else { break }
       date = nextDate
     }
 
-    return PlanWeekday.ordered(using: calendar)
-      .filter(includedWeekdays.contains)
-      .map { weekday in
-        schedule.first(where: { $0.weekday == weekday })
-          ?? ScheduledPlanDay(weekday: weekday)
+    return orderedWeekdays.map { weekday in
+      schedule.first(where: { $0.weekday == weekday })
+        ?? ScheduledPlanDay(weekday: weekday)
+    }
+  }
+
+  private static func assignedWeekdaysRemoved(
+    from currentSchedule: [ScheduledPlanDay],
+    by updatedSchedule: [ScheduledPlanDay]
+  ) -> [PlanWeekday] {
+    let availableWeekdays = Set(updatedSchedule.map(\.weekday))
+    return currentSchedule.compactMap { day in
+      guard !day.activities.isEmpty, !availableWeekdays.contains(day.weekday) else {
+        return nil
       }
+      return day.weekday
+    }
+  }
+
+  private static func applySchedule(
+    _ schedule: [ScheduledPlanDay],
+    to state: inout State
+  ) {
+    state.schedule = schedule
+    state.scheduleRemovalWeekdays = []
+    clearApplyState(&state)
+    state.step = .weeklySchedule
   }
 
   private static func applyActivities(_ state: inout State) {
@@ -351,6 +483,9 @@ public struct NewPlanFeature {
 
     for index in state.schedule.indices where state.applyTargetDays.contains(state.schedule[index].weekday) {
       state.schedule[index].activities = sourceActivities
+    }
+    if state.canReview {
+      state.isScheduleValidationErrorPresented = false
     }
     clearApplyState(&state)
   }

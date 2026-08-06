@@ -39,3 +39,23 @@ public struct PlanOccurrence: Equatable, Hashable, Identifiable {
     self.dayActivityID = dayActivityID
   }
 }
+
+public extension Sequence where Element == PlanOccurrence {
+  func deduplicatedByID() -> [PlanOccurrence] {
+    var occurrences: [PlanOccurrence] = []
+    var indicesByID: [PlanOccurrence.ID: Int] = [:]
+
+    for occurrence in self {
+      if let index = indicesByID[occurrence.id] {
+        if occurrences[index].dayActivityID == nil, occurrence.dayActivityID != nil {
+          occurrences[index] = occurrence
+        }
+      } else {
+        indicesByID[occurrence.id] = occurrences.endIndex
+        occurrences.append(occurrence)
+      }
+    }
+
+    return occurrences
+  }
+}

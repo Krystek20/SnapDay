@@ -19,12 +19,22 @@ import SwiftUI
   PlanDetailsPreview.view(.archived)
 }
 
+#Preview("Finished - No Completions") {
+  PlanDetailsPreview.view(.finishedNoCompletions)
+}
+
+#Preview("Archived - Restorable") {
+  PlanDetailsPreview.view(.archivedRestorable)
+}
+
 @MainActor
 private enum PlanDetailsPreview {
   case activeToday
   case activeRestDay
   case finished
+  case finishedNoCompletions
   case archived
+  case archivedRestorable
 
   static func view(_ preview: Self) -> some View {
     NavigationStack {
@@ -59,14 +69,16 @@ private enum PlanDetailsPreview {
     let statusDates: (start: Date, end: Date, archived: Bool) = switch self {
     case .activeToday, .activeRestDay:
       (Self.date(day: 1), Self.date(day: 31), false)
-    case .finished:
+    case .finished, .finishedNoCompletions:
       (Self.date(month: 6, day: 1), Self.date(month: 6, day: 30), false)
     case .archived:
       (Self.date(month: 5, day: 1), Self.date(month: 5, day: 31), true)
+    case .archivedRestorable:
+      (Self.date(day: 1), Self.date(day: 31), true)
     }
     let plan = Plan(
       id: UUID(),
-      name: self == .archived ? "Morning reset" : "Learn Spanish",
+      name: self == .archived || self == .archivedRestorable ? "Morning reset" : "Learn Spanish",
       startDate: statusDates.start,
       endDate: statusDates.end,
       duration: .custom,
@@ -78,7 +90,8 @@ private enum PlanDetailsPreview {
     let completedCount: Int = switch self {
     case .activeToday, .activeRestDay: 7
     case .finished: 13
-    case .archived: 6
+    case .finishedNoCompletions: 0
+    case .archived, .archivedRestorable: 6
     }
     let linkedOccurrences = plannedOccurrences.enumerated().map { index, occurrence in
       PlanOccurrence(
@@ -105,7 +118,7 @@ private enum PlanDetailsPreview {
 
     return PlanDetailsFeature.State(
       plan: plan,
-      allowsManagement: !statusDates.archived && self != .finished,
+      allowsManagement: true,
       activities: activities,
       occurrences: linkedOccurrences,
       dayActivities: dayActivities,

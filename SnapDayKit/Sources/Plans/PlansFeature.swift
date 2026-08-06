@@ -27,6 +27,10 @@ public struct PlansFeature {
     @Presents var planDetails: PlanDetailsFeature.State?
     @Presents var newPlan: NewPlanFeature.State?
 
+    var isHistoryEmpty: Bool {
+      finishedPlans.isEmpty && archivedPlans.isEmpty
+    }
+
     public init() { }
 
     init(
@@ -56,7 +60,6 @@ public struct PlansFeature {
       case appeared
       case createPlanButtonTapped
       case planTapped(Plan.ID)
-      case editPlanTapped(Plan.ID)
       case archivePlanTapped(Plan.ID)
       case archivePlanCancelled
       case archivePlanConfirmed
@@ -108,16 +111,10 @@ public struct PlansFeature {
         guard let item = state.planItem(id: id) else { return .none }
         state.planDetails = PlanDetailsFeature.State(
           plan: item.plan,
-          allowsManagement: state.activePlans.contains(where: { $0.id == id })
-        )
-        return .none
-      case .view(.editPlanTapped(let id)):
-        guard let item = state.activePlans.first(where: { $0.id == id }) else { return .none }
-        state.newPlan = NewPlanFeature.State(
-          plan: item.plan,
+          allowsManagement: true,
           activities: item.activities,
-          now: now,
-          calendar: calendar
+          occurrences: item.occurrences,
+          dayActivities: item.dayActivities
         )
         return .none
       case .view(.archivePlanTapped(let id)):
@@ -153,13 +150,29 @@ public struct PlansFeature {
         }
       case .internal(.plansLoaded(let snapshot)):
         let selectedPlanID = state.planDetails?.id
+        let selectedPlanActivities = state.planDetails?.activities ?? []
         state.activePlans = snapshot.activePlans
         state.finishedPlans = snapshot.finishedPlans
         state.archivedPlans = snapshot.archivedPlans
         if let selectedPlanID, let item = state.planItem(id: selectedPlanID) {
+          var activitiesByID = Dictionary(
+            selectedPlanActivities.map { ($0.id, $0) },
+            uniquingKeysWith: { _, latest in latest }
+          )
+          for activity in item.activities {
+            activitiesByID[activity.id] = activity
+          }
+          var includedActivityIDs = Set<Activity.ID>()
+          let activities = item.plan.schedule.compactMap { entry -> Activity? in
+            guard includedActivityIDs.insert(entry.activityID).inserted else { return nil }
+            return activitiesByID[entry.activityID]
+          }
           state.planDetails = PlanDetailsFeature.State(
             plan: item.plan,
-            allowsManagement: state.activePlans.contains(where: { $0.id == selectedPlanID })
+            allowsManagement: true,
+            activities: activities,
+            occurrences: item.occurrences,
+            dayActivities: item.dayActivities
           )
         }
         state.loadState = .loaded
@@ -227,7 +240,6 @@ public struct PlansFeature {
   private func loadSnapshot(on date: Date) async throws -> PlansSnapshot {
     let plans = try await planRepository.loadPlans()
     let activities = try await loadActivities()
-    let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
     let progressSnapshots = try await PlanProgressProvider().snapshots(for: plans)
     var activePlans: [PlanListItem] = []
     var finishedPlans: [PlanListItem] = []
@@ -236,9 +248,20 @@ public struct PlansFeature {
     for snapshot in progressSnapshots {
       let plan = snapshot.plan
       let activityIDs = Set(plan.schedule.map(\.activityID))
+      var activitiesByID = Dictionary(
+        snapshot.dayActivities.compactMap(\.activity).map { ($0.id, $0) },
+        uniquingKeysWith: { _, latest in latest }
+      )
+      for activity in activities where activityIDs.contains(activity.id) {
+        activitiesByID[activity.id] = activity
+      }
+      var includedActivityIDs = Set<Activity.ID>()
       let item = PlanListItem(
         plan: plan,
-        activities: activityIDs.compactMap { activitiesByID[$0] }.sorted { $0.name < $1.name },
+        activities: plan.schedule.compactMap { entry -> Activity? in
+          guard includedActivityIDs.insert(entry.activityID).inserted else { return nil }
+          return activitiesByID[entry.activityID]
+        },
         occurrences: snapshot.occurrences,
         dayActivities: snapshot.dayActivities
       )

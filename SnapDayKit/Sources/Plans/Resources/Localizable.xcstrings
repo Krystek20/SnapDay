@@ -4,6 +4,12 @@
     "" : {
 
     },
+    "%@ already has activities. Applying will replace them, not merge them." : {
+
+    },
+    "%@ already have activities. Applying will replace them, not merge them." : {
+
+    },
     "%lld" : {
 
     },
@@ -106,7 +112,7 @@
     "Add activity" : {
 
     },
-    "Add at least one activity to review this Plan." : {
+    "Add at least one activity to one available day." : {
 
     },
     "Add to %@" : {
@@ -140,9 +146,6 @@
         }
       }
     },
-    "At least one selected day already has activities. Applying will replace them." : {
-
-    },
     "Cancel" : {
       "localizations" : {
         "en" : {
@@ -166,6 +169,16 @@
         }
       }
     },
+    "Create a Plan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a Plan"
+          }
+        }
+      }
+    },
     "Create a Plan from your existing activities and SnapDay will add them to the right days." : {
       "localizations" : {
         "en" : {
@@ -175,6 +188,9 @@
           }
         }
       }
+    },
+    "Create similar" : {
+
     },
     "Create your first Plan" : {
       "localizations" : {
@@ -209,6 +225,9 @@
     "Day actions" : {
 
     },
+    "Done" : {
+
+    },
     "Edit" : {
 
     },
@@ -225,6 +244,9 @@
         }
       }
     },
+    "Enter a name for this Plan." : {
+
+    },
     "Finished" : {
 
     },
@@ -238,12 +260,12 @@
         }
       }
     },
-    "Finished and archived Plans will appear in History." : {
+    "Finished and archived Plans will appear here." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finished and archived Plans will appear in History."
+            "value" : "Finished and archived Plans will appear here."
           }
         }
       }
@@ -274,6 +296,12 @@
     "It no longer generates activities. Its previous schedule and progress are kept for reference." : {
 
     },
+    "Its date range has ended or its schedule is empty. Create a similar Plan with a new schedule instead." : {
+
+    },
+    "Keep editing" : {
+
+    },
     "Learn Spanish" : {
       "localizations" : {
         "en" : {
@@ -283,6 +311,9 @@
           }
         }
       }
+    },
+    "Missed" : {
+
     },
     "Name" : {
       "localizations" : {
@@ -325,6 +356,19 @@
     },
     "No activities planned today" : {
 
+    },
+    "No activities were scheduled for this Plan." : {
+
+    },
+    "No plan history yet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No plan history yet"
+          }
+        }
+      }
     },
     "PLAN" : {
 
@@ -371,13 +415,25 @@
         }
       }
     },
+    "Remove activities" : {
+
+    },
+    "Remove activities from %@?" : {
+
+    },
     "Repeats weekly" : {
 
     },
     "Replace activities" : {
 
     },
-    "Replace existing activities?" : {
+    "Replace activities on %@?" : {
+
+    },
+    "Replace activities on selected days?" : {
+
+    },
+    "Restore Plan" : {
 
     },
     "Review Plan" : {
@@ -411,16 +467,22 @@
     "The Plan will move to History. Completed activities and progress will be kept." : {
 
     },
-    "This Plan does not generate anything today. Your daily list can still contain non-Plan activities." : {
+    "The selected date range no longer includes these days. Their scheduled activities will be removed." : {
 
     },
-    "This Plan has reached its end date. Its schedule and progress are now read-only." : {
+    "This Plan can't be restored" : {
+
+    },
+    "This Plan does not generate anything today. Your daily list can still contain non-Plan activities." : {
 
     },
     "This Plan is not active" : {
 
     },
     "Try again" : {
+
+    },
+    "Upcoming" : {
 
     },
     "Weekly Schedule" : {

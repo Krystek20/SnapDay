@@ -10,6 +10,93 @@ import Testing
 struct NewPlanFeatureTests {
 
   @Test
+  func recreatingFiveDayPlanAsSevenDaysIncludesWeekendActivities() async throws {
+    let calendar = testCalendar()
+    let originalStartDate = try date(year: 2026, month: 7, day: 6, calendar: calendar)
+    let originalEndDate = try date(year: 2026, month: 7, day: 10, calendar: calendar)
+    let recreatedStartDate = try date(year: 2026, month: 7, day: 13, calendar: calendar)
+    let recreatedEndDate = calendar.startOfDay(
+      for: try date(year: 2026, month: 7, day: 19, calendar: calendar)
+    )
+    let activity = try activity(
+      id: "00000000-0000-0000-0000-000000000001",
+      name: "Read"
+    )
+    let originalPlan = Plan(
+      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
+      name: "Reading week",
+      startDate: originalStartDate,
+      endDate: originalEndDate,
+      duration: .custom,
+      schedule: PlanWeekday.allCases
+        .filter { $0 != .saturday && $0 != .sunday }
+        .map {
+          PlanScheduleEntry(
+            id: UUID(),
+            weekday: $0,
+            activityID: activity.id,
+            position: 0
+          )
+        }
+    )
+    let state = NewPlanFeature.State(
+      copying: originalPlan,
+      activities: [activity],
+      startDate: recreatedStartDate,
+      calendar: calendar
+    )
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = recreatedStartDate
+    } operation: {
+      TestStore(initialState: state, reducer: { NewPlanFeature() })
+    }
+
+    await store.send(.view(.durationTapped(.sevenDays))) {
+      $0.selectedDuration = .sevenDays
+      $0.endDate = recreatedEndDate
+    }
+    await store.send(.view(.continueButtonTapped)) {
+      $0.step = .weeklySchedule
+      $0.schedule.append(ScheduledPlanDay(weekday: .saturday))
+      $0.schedule.append(ScheduledPlanDay(weekday: .sunday))
+    }
+    await store.send(.view(.applyToDaysTapped(.monday))) {
+      $0.applySourceDay = .monday
+    }
+    await store.send(.view(.applyTargetTapped(.saturday))) {
+      $0.applyTargetDays = [.saturday]
+    }
+    await store.send(.view(.applyTargetTapped(.sunday))) {
+      $0.applyTargetDays = [.saturday, .sunday]
+    }
+    await store.send(.view(.applyConfirmed)) {
+      $0.schedule[$0.schedule.count - 2].activities = [activity]
+      $0.schedule[$0.schedule.count - 1].activities = [activity]
+      $0.applySourceDay = nil
+      $0.applyTargetDays = []
+    }
+    await store.send(.view(.continueButtonTapped)) {
+      $0.step = .review
+    }
+
+    let draft = NewPlanDraft(
+      name: store.state.name,
+      duration: store.state.selectedDuration,
+      startDate: store.state.startDate,
+      endDate: store.state.endDate,
+      schedule: store.state.schedule
+    )
+    await store.send(.view(.startPlanButtonTapped))
+    await store.receive(.delegate(.planCreated(draft)))
+
+    #expect(draft.plannedActivityCount(calendar: calendar) == 7)
+    let recreatedPlan = draft.plan(id: UUID(), scheduleEntryID: UUID.init)
+    #expect(recreatedPlan.schedule.count == 7)
+    #expect(recreatedPlan.scheduledOccurrences(calendar: calendar).count == 7)
+  }
+
+  @Test
   func presetDurationsUseInclusiveEndDates() async throws {
     let startDate = try date(year: 2026, month: 6, day: 8)
     let sevenDayEndDate = try adding(.day, value: 6, to: startDate)
@@ -139,13 +226,14 @@ struct NewPlanFeatureTests {
   }
 
   @Test
-  func shortRangeOnlyIncludesWeekdaysThatOccur() async throws {
+  func shortRangeCrossingWeekBoundaryUsesChronologicalWeekdays() async throws {
     let calendar = testCalendar()
-    let friday = try date(year: 2026, month: 6, day: 12, calendar: calendar)
     let saturday = try date(year: 2026, month: 6, day: 13, calendar: calendar)
+    let monday = try date(year: 2026, month: 6, day: 15, calendar: calendar)
     let expectedSchedule = [
-      ScheduledPlanDay(weekday: .friday),
-      ScheduledPlanDay(weekday: .saturday)
+      ScheduledPlanDay(weekday: .saturday),
+      ScheduledPlanDay(weekday: .sunday),
+      ScheduledPlanDay(weekday: .monday)
     ]
     let store = withDependencies {
       $0.calendar = calendar
@@ -154,8 +242,8 @@ struct NewPlanFeatureTests {
         initialState: NewPlanFeature.State(
           name: "Weekend plan",
           selectedDuration: .custom,
-          startDate: friday,
-          endDate: saturday
+          startDate: saturday,
+          endDate: monday
         ),
         reducer: { NewPlanFeature() }
       )
@@ -164,6 +252,107 @@ struct NewPlanFeatureTests {
     await store.send(.view(.continueButtonTapped)) {
       $0.schedule = expectedSchedule
       $0.step = .weeklySchedule
+    }
+  }
+
+  @Test
+  func shorteningDateRangeRequiresConfirmationBeforeRemovingAssignments() async throws {
+    let calendar = testCalendar()
+    let monday = try date(year: 2026, month: 6, day: 8, calendar: calendar)
+    let wednesday = try date(year: 2026, month: 6, day: 10, calendar: calendar)
+    let sunday = try date(year: 2026, month: 6, day: 14, calendar: calendar)
+    let read = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let walk = try activity(id: "00000000-0000-0000-0000-000000000002", name: "Walk")
+    let originalSchedule = [
+      ScheduledPlanDay(weekday: .monday, activities: [read]),
+      ScheduledPlanDay(weekday: .saturday, activities: [walk])
+    ]
+    let store = withDependencies {
+      $0.calendar = calendar
+    } operation: {
+      TestStore(
+        initialState: NewPlanFeature.State(
+          name: "Reading week",
+          selectedDuration: .custom,
+          startDate: monday,
+          endDate: sunday,
+          schedule: originalSchedule
+        ),
+        reducer: { NewPlanFeature() }
+      )
+    }
+
+    await store.send(.binding(.set(\.endDate, wednesday))) {
+      $0.endDate = wednesday
+    }
+    await store.send(.view(.continueButtonTapped)) {
+      $0.scheduleRemovalWeekdays = [.saturday]
+    }
+    #expect(store.state.schedule == originalSchedule)
+    #expect(store.state.step == .details)
+
+    await store.send(.view(.scheduleRemovalCancelled)) {
+      $0.scheduleRemovalWeekdays = []
+    }
+    #expect(store.state.schedule == originalSchedule)
+
+    await store.send(.view(.continueButtonTapped)) {
+      $0.scheduleRemovalWeekdays = [.saturday]
+    }
+    await store.send(.view(.scheduleRemovalConfirmed)) {
+      $0.schedule = [
+        ScheduledPlanDay(weekday: .monday, activities: [read]),
+        ScheduledPlanDay(weekday: .tuesday),
+        ScheduledPlanDay(weekday: .wednesday)
+      ]
+      $0.scheduleRemovalWeekdays = []
+      $0.step = .weeklySchedule
+    }
+  }
+
+  @Test
+  func unavailableWeekdaysCannotReceiveActivities() async {
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        step: .weeklySchedule,
+        schedule: [ScheduledPlanDay(weekday: .monday)]
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.view(.addActivityTapped(.tuesday)))
+    await store.send(.view(.applyTargetTapped(.tuesday)))
+    #expect(store.state.activityPicker == nil)
+    #expect(store.state.applyTargetDays.isEmpty)
+  }
+
+  @Test
+  func blankNameShowsValidationErrorAndPreservesDraftUntilCorrected() async throws {
+    let startDate = try date(year: 2026, month: 7, day: 21)
+    let endDate = try date(year: 2026, month: 7, day: 27)
+    let schedule = [ScheduledPlanDay(weekday: .tuesday)]
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        name: "   ",
+        selectedDuration: .custom,
+        startDate: startDate,
+        endDate: endDate,
+        schedule: schedule
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.view(.continueButtonTapped)) {
+      $0.isNameValidationErrorPresented = true
+    }
+    #expect(store.state.step == .details)
+    #expect(store.state.startDate == startDate)
+    #expect(store.state.endDate == endDate)
+    #expect(store.state.schedule == schedule)
+
+    await store.send(.binding(.set(\.name, "Morning routine"))) {
+      $0.name = "Morning routine"
+      $0.isNameValidationErrorPresented = false
     }
   }
 
@@ -284,6 +473,87 @@ struct NewPlanFeatureTests {
   }
 
   @Test
+  func cancellingReplacementPreservesSelectionAndSchedules() async throws {
+    let sourceActivity = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let existingActivity = try activity(id: "00000000-0000-0000-0000-000000000002", name: "Walk")
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        step: .weeklySchedule,
+        schedule: [
+          ScheduledPlanDay(weekday: .monday, activities: [sourceActivity]),
+          ScheduledPlanDay(weekday: .tuesday, activities: [existingActivity])
+        ]
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.view(.applyToDaysTapped(.monday))) {
+      $0.applySourceDay = .monday
+    }
+    await store.send(.view(.applyTargetTapped(.tuesday))) {
+      $0.applyTargetDays = [.tuesday]
+    }
+    await store.send(.view(.applyConfirmed)) {
+      $0.replacementTargetDays = [.tuesday]
+    }
+    await store.send(.view(.replacementCancelled)) {
+      $0.replacementTargetDays = []
+    }
+
+    #expect(store.state.applySourceDay == .monday)
+    #expect(store.state.applyTargetDays == [.tuesday])
+    #expect(store.state.schedule[0].activities == [sourceActivity])
+    #expect(store.state.schedule[1].activities == [existingActivity])
+  }
+
+  @Test
+  func confirmingMixedTargetsReplacesEverySelectedTargetOnly() async throws {
+    let sourceActivity = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let tuesdayActivity = try activity(id: "00000000-0000-0000-0000-000000000002", name: "Walk")
+    let fridayActivity = try activity(id: "00000000-0000-0000-0000-000000000003", name: "Journal")
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        step: .weeklySchedule,
+        schedule: [
+          ScheduledPlanDay(weekday: .monday, activities: [sourceActivity]),
+          ScheduledPlanDay(weekday: .tuesday, activities: [tuesdayActivity]),
+          ScheduledPlanDay(weekday: .wednesday),
+          ScheduledPlanDay(weekday: .thursday),
+          ScheduledPlanDay(weekday: .friday, activities: [fridayActivity])
+        ]
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.view(.applyToDaysTapped(.monday))) {
+      $0.applySourceDay = .monday
+    }
+    await store.send(.view(.applyTargetTapped(.tuesday))) {
+      $0.applyTargetDays = [.tuesday]
+    }
+    await store.send(.view(.applyTargetTapped(.wednesday))) {
+      $0.applyTargetDays = [.tuesday, .wednesday]
+    }
+    await store.send(.view(.applyTargetTapped(.thursday))) {
+      $0.applyTargetDays = [.tuesday, .wednesday, .thursday]
+    }
+    await store.send(.view(.applyConfirmed)) {
+      $0.replacementTargetDays = [.tuesday]
+    }
+    await store.send(.view(.replacementConfirmed)) {
+      $0.schedule[1].activities = [sourceActivity]
+      $0.schedule[2].activities = [sourceActivity]
+      $0.schedule[3].activities = [sourceActivity]
+      $0.applySourceDay = nil
+      $0.applyTargetDays = []
+      $0.replacementTargetDays = []
+    }
+
+    #expect(store.state.schedule[0].activities == [sourceActivity])
+    #expect(store.state.schedule[4].activities == [fridayActivity])
+  }
+
+  @Test
   func scheduleWithActivitiesCanContinueToReview() async throws {
     let activity = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
     let store = TestStore(
@@ -309,7 +579,83 @@ struct NewPlanFeatureTests {
       reducer: { NewPlanFeature() }
     )
 
-    await store.send(.view(.continueButtonTapped))
+    await store.send(.view(.continueButtonTapped)) {
+      $0.isScheduleValidationErrorPresented = true
+    }
+    #expect(store.state.step == .weeklySchedule)
+  }
+
+  @Test
+  func blankNameCannotStartFromReview() async throws {
+    let activity = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        step: .review,
+        name: "   ",
+        schedule: [ScheduledPlanDay(weekday: .monday, activities: [activity])]
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.view(.startPlanButtonTapped)) {
+      $0.isNameValidationErrorPresented = true
+      $0.step = .details
+    }
+  }
+
+  @Test
+  func emptyScheduleCannotStartFromReview() async {
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        step: .review,
+        name: "Morning routine",
+        schedule: [ScheduledPlanDay(weekday: .monday)]
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.view(.startPlanButtonTapped)) {
+      $0.isScheduleValidationErrorPresented = true
+      $0.step = .weeklySchedule
+    }
+  }
+
+  @Test
+  func addingAnActivityClearsScheduleValidationErrorWithoutLosingDraft() async throws {
+    let activity = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
+    let startDate = try date(year: 2026, month: 7, day: 21)
+    let schedule = [ScheduledPlanDay(weekday: .tuesday)]
+    let store = TestStore(
+      initialState: NewPlanFeature.State(
+        step: .weeklySchedule,
+        name: "Morning routine",
+        startDate: startDate,
+        schedule: schedule
+      ),
+      reducer: { NewPlanFeature() }
+    )
+
+    await store.send(.view(.continueButtonTapped)) {
+      $0.isScheduleValidationErrorPresented = true
+    }
+    await store.send(.view(.addActivityTapped(.tuesday))) {
+      $0.activityPickerDay = .tuesday
+      $0.activityPicker = ActivityListFeature.State(
+        selectedActivityIDs: [],
+        title: "Add to \(PlanWeekday.tuesday.title)"
+      )
+    }
+    await store.send(
+      .activityPicker(.presented(.delegate(.selectionConfirmed([activity]))))
+    ) {
+      $0.schedule = [ScheduledPlanDay(weekday: .tuesday, activities: [activity])]
+      $0.isScheduleValidationErrorPresented = false
+      $0.activityPickerDay = nil
+      $0.activityPicker = nil
+    }
+
+    #expect(store.state.name == "Morning routine")
+    #expect(store.state.startDate == startDate)
     #expect(store.state.step == .weeklySchedule)
   }
 
@@ -441,6 +787,32 @@ struct NewPlanFeatureTests {
   }
 
   @Test
+  func plansHistoryIsEmptyOnlyWithoutFinishedOrArchivedPlans() throws {
+    let plan = Plan(
+      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
+      name: "Reading week",
+      startDate: .now,
+      endDate: .now,
+      duration: .custom,
+      schedule: []
+    )
+    let item = PlanListItem(
+      plan: plan,
+      activities: [],
+      occurrences: [],
+      dayActivities: []
+    )
+
+    #expect(PlansFeature.State(selectedSection: .history).isHistoryEmpty)
+    #expect(
+      !PlansFeature.State(selectedSection: .history, finishedPlans: [item]).isHistoryEmpty
+    )
+    #expect(
+      !PlansFeature.State(selectedSection: .history, archivedPlans: [item]).isHistoryEmpty
+    )
+  }
+
+  @Test
   func activePlanOpensDetails() async throws {
     let calendar = testCalendar()
     let now = try date(year: 2026, month: 7, day: 15, calendar: calendar)
@@ -478,45 +850,10 @@ struct NewPlanFeatureTests {
     }
 
     await store.send(.view(.planTapped(plan.id))) {
-      $0.planDetails = PlanDetailsFeature.State(plan: plan, allowsManagement: true)
-    }
-  }
-
-  @Test
-  func activePlanContextMenuOpensInEditMode() async throws {
-    let calendar = testCalendar()
-    let now = try date(year: 2026, month: 7, day: 15, calendar: calendar)
-    let read = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
-    let plan = Plan(
-      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
-      name: "Reading week",
-      startDate: now,
-      endDate: now,
-      duration: .custom,
-      schedule: []
-    )
-    let item = PlanListItem(
-      plan: plan,
-      activities: [read],
-      occurrences: [],
-      dayActivities: []
-    )
-    let store = withDependencies {
-      $0.calendar = calendar
-      $0.date.now = now
-    } operation: {
-      TestStore(
-        initialState: PlansFeature.State(selectedSection: .active, activePlans: [item]),
-        reducer: { PlansFeature() }
-      )
-    }
-
-    await store.send(.view(.editPlanTapped(plan.id))) {
-      $0.newPlan = NewPlanFeature.State(
+      $0.planDetails = PlanDetailsFeature.State(
         plan: plan,
-        activities: [read],
-        now: now,
-        calendar: calendar
+        allowsManagement: true,
+        activities: [read]
       )
     }
   }

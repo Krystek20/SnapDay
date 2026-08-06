@@ -65,9 +65,13 @@ struct WeeklyScheduleView: View {
       )
 
       if !store.canReview {
-        Text("Add at least one activity to review this Plan.", bundle: .module)
+        Text("Add at least one activity to one available day.", bundle: .module)
           .font(.system(size: 13.0, weight: .regular))
-          .foregroundStyle(Color.sectionText)
+          .foregroundStyle(
+            store.isScheduleValidationErrorPresented
+              ? Color.alertText
+              : Color.sectionText
+          )
           .padding(.horizontal, 10.0)
           .padding(.top, 5.0)
       }

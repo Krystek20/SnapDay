@@ -33,6 +33,30 @@ import SwiftUI
   }
 }
 
+#Preview("Plans - empty active after history") {
+  NavigationStack {
+    PlansView(
+      store: Store(
+        initialState: PlansFeature.State(
+          selectedSection: .active,
+          archivedPlans: [
+            PlanListItem.preview(
+              seed: 6,
+              name: "Evening Yoga",
+              completed: 5,
+              total: 10,
+              isArchived: true
+            )
+          ]
+        ),
+        reducer: {
+          PlansFeature()
+        }
+      )
+    )
+  }
+}
+
 #Preview("Plans - history") {
   NavigationStack {
     PlansView(
@@ -42,6 +66,61 @@ import SwiftUI
           finishedPlans: [PlanListItem.preview(seed: 5, name: "June Strength", completed: 8, total: 10)],
           archivedPlans: [PlanListItem.preview(seed: 6, name: "Evening Yoga", completed: 5, total: 10, isArchived: true)]
         ),
+        reducer: {
+          PlansFeature()
+        }
+      )
+    )
+  }
+}
+
+#Preview("Plans - finished history") {
+  NavigationStack {
+    PlansView(
+      store: Store(
+        initialState: PlansFeature.State(
+          selectedSection: .history,
+          finishedPlans: [
+            PlanListItem.preview(seed: 5, name: "June Strength", completed: 8, total: 10)
+          ]
+        ),
+        reducer: {
+          PlansFeature()
+        }
+      )
+    )
+  }
+}
+
+#Preview("Plans - archived history") {
+  NavigationStack {
+    PlansView(
+      store: Store(
+        initialState: PlansFeature.State(
+          selectedSection: .history,
+          archivedPlans: [
+            PlanListItem.preview(
+              seed: 6,
+              name: "Evening Yoga",
+              completed: 5,
+              total: 10,
+              isArchived: true
+            )
+          ]
+        ),
+        reducer: {
+          PlansFeature()
+        }
+      )
+    )
+  }
+}
+
+#Preview("Plans - empty history") {
+  NavigationStack {
+    PlansView(
+      store: Store(
+        initialState: PlansFeature.State(selectedSection: .history),
         reducer: {
           PlansFeature()
         }

@@ -11,17 +11,19 @@ public struct PlanDetailsFeature {
   @Dependency(\.calendar) private var calendar
   @Dependency(\.date.now) private var now
   @Dependency(\.planRepository) private var planRepository
+  @Dependency(\.uuid) private var uuid
 
   @ObservableState
   public struct State: Equatable, Identifiable {
     var plan: Plan
-    let allowsManagement: Bool
+    var allowsManagement: Bool
     var activities: [Activity]
     var occurrences: [PlanOccurrence]
     var dayActivities: [DayActivity]
     var referenceDate: Date?
     var isLoading = false
     var isArchiveConfirmationPresented = false
+    var isRestoreUnavailableAlertPresented = false
     @Presents var newPlan: NewPlanFeature.State?
 
     public var id: Plan.ID { plan.id }
@@ -50,13 +52,18 @@ public struct PlanDetailsFeature {
       case archiveButtonTapped
       case archiveCancelled
       case archiveConfirmed
+      case createSimilarButtonTapped
+      case restoreButtonTapped
+      case restoreUnavailableDismissed
     }
 
     public enum InternalAction: Equatable {
       case detailsLoaded([Activity], PlanProgressSnapshot)
       case editActivitiesLoaded([Activity])
+      case lifecyclePlanSaved(Plan)
       case operationFailed
       case planSaved(Plan)
+      case similarActivitiesLoaded([Activity])
     }
 
     public enum DelegateAction: Equatable {
@@ -79,15 +86,34 @@ public struct PlanDetailsFeature {
         state.isLoading = true
         state.referenceDate = now
         let plan = state.plan
+        let knownActivities = state.activities
         let activityIDs = Set(plan.schedule.map(\.activityID))
         return .run { send in
           do {
-            async let loadedActivities = loadActivities()
+            async let activitiesRequest = loadActivities()
             async let snapshots = PlanProgressProvider().snapshots(for: [plan])
-            let activities = try await loadedActivities.filter { activityIDs.contains($0.id) }
+            let loadedActivities = try await activitiesRequest
             guard let snapshot = try await snapshots.first else {
               await send(.internal(.operationFailed))
               return
+            }
+            var activitiesByID = Dictionary(
+              knownActivities
+                .filter { activityIDs.contains($0.id) }
+                .map { ($0.id, $0) },
+              uniquingKeysWith: { _, latest in latest }
+            )
+            for activity in snapshot.dayActivities.compactMap(\.activity)
+              where activityIDs.contains(activity.id) {
+              activitiesByID[activity.id] = activity
+            }
+            for activity in loadedActivities where activityIDs.contains(activity.id) {
+              activitiesByID[activity.id] = activity
+            }
+            var includedActivityIDs = Set<Activity.ID>()
+            let activities = plan.schedule.compactMap { entry -> Activity? in
+              guard includedActivityIDs.insert(entry.activityID).inserted else { return nil }
+              return activitiesByID[entry.activityID]
             }
             await send(.internal(.detailsLoaded(activities, snapshot)))
           } catch {
@@ -117,6 +143,41 @@ public struct PlanDetailsFeature {
         guard state.allowsManagement else { return .none }
         state.isArchiveConfirmationPresented = false
         return .send(.delegate(.archivePlanTapped(state.id)))
+      case .view(.createSimilarButtonTapped):
+        let activityIDs = Set(state.plan.schedule.map(\.activityID))
+        let availableActivities = state.activities.filter { activityIDs.contains($0.id) }
+        if Set(availableActivities.map(\.id)) == activityIDs {
+          return .send(.internal(.similarActivitiesLoaded(availableActivities)))
+        }
+        return .run { send in
+          do {
+            let loadedActivities = try await loadActivities()
+            var activitiesByID = Dictionary(
+              uniqueKeysWithValues: availableActivities.map { ($0.id, $0) }
+            )
+            for activity in loadedActivities where activityIDs.contains(activity.id) {
+              activitiesByID[activity.id] = activity
+            }
+            await send(.internal(.similarActivitiesLoaded(Array(activitiesByID.values))))
+          } catch {
+            await send(.internal(.operationFailed))
+          }
+        }
+      case .view(.restoreButtonTapped):
+        guard state.plan.isArchived else { return .none }
+        let today = calendar.startOfDay(for: now)
+        guard !state.plan.schedule.isEmpty,
+              calendar.startOfDay(for: state.plan.endDate) >= today
+        else {
+          state.isRestoreUnavailableAlertPresented = true
+          return .none
+        }
+        var restoredPlan = state.plan
+        restoredPlan.isArchived = false
+        return saveLifecyclePlan(restoredPlan, synchronizingFrom: today)
+      case .view(.restoreUnavailableDismissed):
+        state.isRestoreUnavailableAlertPresented = false
+        return .none
       case .internal(.editActivitiesLoaded(let activities)):
         state.newPlan = NewPlanFeature.State(
           plan: state.plan,
@@ -131,18 +192,39 @@ public struct PlanDetailsFeature {
         state.dayActivities = snapshot.dayActivities
         state.isLoading = false
         return .none
+      case .internal(.lifecyclePlanSaved(let plan)):
+        state.plan = plan
+        state.allowsManagement = true
+        state.newPlan = nil
+        state.isRestoreUnavailableAlertPresented = false
+        return .merge(
+          .send(.view(.task)),
+          .send(.delegate(.planUpdated))
+        )
       case .internal(.planSaved(let plan)):
         state.plan = plan
         return .merge(
           .send(.view(.task)),
           .send(.delegate(.planUpdated))
         )
+      case .internal(.similarActivitiesLoaded(let activities)):
+        state.isRestoreUnavailableAlertPresented = false
+        state.newPlan = NewPlanFeature.State(
+          copying: state.plan,
+          activities: activities,
+          startDate: now,
+          calendar: calendar
+        )
+        return .none
       case .internal(.operationFailed):
         state.isLoading = false
         return .none
       case .newPlan(.presented(.delegate(.cancelTapped))):
         state.newPlan = nil
         return .none
+      case .newPlan(.presented(.delegate(.planCreated(let draft)))):
+        let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
+        return saveLifecyclePlan(plan, synchronizingFrom: plan.startDate)
       case .newPlan(.presented(.delegate(.planUpdated(let plan)))):
         state.newPlan = nil
         let firstAffectedOccurrenceDate = calendar.date(
@@ -167,6 +249,21 @@ public struct PlanDetailsFeature {
     }
     .ifLet(\.$newPlan, action: \.newPlan) {
       NewPlanFeature()
+    }
+  }
+
+  private func saveLifecyclePlan(
+    _ plan: Plan,
+    synchronizingFrom date: Date
+  ) -> EffectOf<Self> {
+    .run { send in
+      do {
+        try await planRepository.savePlan(plan)
+        _ = try await planRepository.synchronizeOccurrences(plan, date)
+        await send(.internal(.lifecyclePlanSaved(plan)))
+      } catch {
+        await send(.internal(.operationFailed))
+      }
     }
   }
 }

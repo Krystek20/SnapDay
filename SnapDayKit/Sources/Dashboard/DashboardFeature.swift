@@ -18,6 +18,10 @@ import enum UiComponents.ListItemAction
 @Reducer
 public struct DashboardFeature: TodayProvidable {
 
+  private enum CancelID {
+    case loadPlans
+  }
+
   // MARK: - Dependencies
 
   @Dependency(\.activityRepository) var activityRepository
@@ -346,6 +350,7 @@ public struct DashboardFeature: TodayProvidable {
         await send(.internal(.load))
       }
     case .calendarDayChanged:
+      state.date = today
       return .send(.internal(.load))
     case .setDate(let date):
       state.date = date
@@ -366,13 +371,14 @@ public struct DashboardFeature: TodayProvidable {
         }
       }
     case .loadPlans:
-      return .run { [date = state.date] send in
+      return .run { [date = today] send in
         do {
           await send(.internal(.plansLoaded(try await loadPlanSummaries(on: date))))
         } catch {
           print("error: \(error)")
         }
       }
+      .cancellable(id: CancelID.loadPlans, cancelInFlight: true)
     case .plansLoaded(let summaries):
       state.planSummaries = summaries
       return .none
@@ -428,9 +434,6 @@ public struct DashboardFeature: TodayProvidable {
 
   private func loadPlanSummaries(on date: Date) async throws -> [DashboardPlanSummary] {
     let plans = try await planRepository.loadActivePlans(date)
-    for plan in plans {
-      _ = try await planRepository.synchronizeOccurrences(plan, date)
-    }
     return try await PlanProgressProvider().snapshots(for: plans).map { snapshot in
       DashboardPlanSummary(
         plan: snapshot.plan,

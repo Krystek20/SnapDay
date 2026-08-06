@@ -7,6 +7,7 @@ public struct DashboardPlanSummary: Equatable, Identifiable {
   let title: String
   let progress: PlanProgress
   let nextSessionDate: Date?
+  let referenceDate: Date
 
   init(
     plan: Plan,
@@ -23,6 +24,7 @@ public struct DashboardPlanSummary: Equatable, Identifiable {
     self.plan = plan
     self.title = plan.name
     self.progress = progress
+    self.referenceDate = startOfDate
     self.nextSessionDate = occurrences.lazy
       .filter { occurrence in
         occurrence.date >= startOfDate

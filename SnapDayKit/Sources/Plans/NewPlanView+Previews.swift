@@ -26,10 +26,34 @@ private var newPlanPreviewSchedule: [ScheduledPlanDay] {
   ]
 }
 
+private let shortRangePreviewStartDate = Calendar(identifier: .gregorian).date(
+  from: DateComponents(year: 2026, month: 6, day: 19, hour: 12)
+) ?? Date(timeIntervalSinceReferenceDate: 803_736_000)
+
+private let shortRangePreviewEndDate = Calendar(identifier: .gregorian).date(
+  from: DateComponents(year: 2026, month: 6, day: 21, hour: 12)
+) ?? Date(timeIntervalSinceReferenceDate: 803_908_800)
+
+private var shortRangePreviewSchedule: [ScheduledPlanDay] {
+  [
+    ScheduledPlanDay(weekday: .friday, activities: [newPlanPreviewActivities[0]]),
+    ScheduledPlanDay(weekday: .saturday),
+    ScheduledPlanDay(weekday: .sunday, activities: [newPlanPreviewActivities[1]])
+  ]
+}
+
 #Preview("New Plan") {
   newPlanPreview(state: NewPlanFeature.State(
     name: "Learn Spanish",
     startDate: newPlanPreviewDate
+  ))
+}
+
+#Preview("New Plan - blank name error") {
+  newPlanPreview(state: NewPlanFeature.State(
+    name: "   ",
+    startDate: newPlanPreviewDate,
+    isNameValidationErrorPresented: true
   ))
 }
 
@@ -40,6 +64,41 @@ private var newPlanPreviewSchedule: [ScheduledPlanDay] {
     startDate: newPlanPreviewDate,
     schedule: newPlanPreviewSchedule
   ))
+}
+
+#Preview("Weekly Schedule - empty error") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Learn Spanish",
+    startDate: newPlanPreviewDate,
+    schedule: newPlanPreviewSchedule.map {
+      ScheduledPlanDay(weekday: $0.weekday)
+    },
+    isScheduleValidationErrorPresented: true
+  ))
+}
+
+#Preview("Weekly Schedule - short range") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Weekend reset",
+    selectedDuration: .custom,
+    startDate: shortRangePreviewStartDate,
+    endDate: shortRangePreviewEndDate,
+    schedule: shortRangePreviewSchedule
+  ))
+}
+
+#Preview("Weekly Schedule - short range dark") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Weekend reset",
+    selectedDuration: .custom,
+    startDate: shortRangePreviewStartDate,
+    endDate: shortRangePreviewEndDate,
+    schedule: shortRangePreviewSchedule
+  ))
+  .preferredColorScheme(.dark)
 }
 
 #Preview("Review Plan") {

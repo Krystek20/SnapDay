@@ -178,6 +178,72 @@ struct PlanRepositoryTests {
     }
   }
 
+  @Test
+  func extendingWeekdayPlanThroughWeekendAddsWeekendOccurrences() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      var calendar = Calendar(identifier: .gregorian)
+      calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+      let monday = try #require(
+        calendar.date(from: DateComponents(year: 2026, month: 7, day: 13))
+      )
+      let friday = try #require(calendar.date(byAdding: .day, value: 4, to: monday))
+      let saturday = try #require(calendar.date(byAdding: .day, value: 5, to: monday))
+      let sunday = try #require(calendar.date(byAdding: .day, value: 6, to: monday))
+      let activityID = UUID()
+      var plan = Plan(
+        id: UUID(),
+        name: "Daily plan",
+        startDate: monday,
+        endDate: friday,
+        duration: .custom,
+        schedule: PlanWeekday.allCases
+          .filter { $0 != .saturday && $0 != .sunday }
+          .map {
+            PlanScheduleEntry(
+              id: UUID(),
+              weekday: $0,
+              activityID: activityID,
+              position: 0
+            )
+          }
+      )
+
+      try await repository.savePlan(plan)
+      let weekdayOccurrences = try await repository.synchronizeOccurrences(plan, monday)
+      #expect(weekdayOccurrences.count == 5)
+
+      plan.endDate = sunday
+      plan.duration = .sevenDays
+      plan.schedule.append(
+        PlanScheduleEntry(
+          id: UUID(),
+          weekday: .saturday,
+          activityID: activityID,
+          position: 0
+        )
+      )
+      plan.schedule.append(
+        PlanScheduleEntry(
+          id: UUID(),
+          weekday: .sunday,
+          activityID: activityID,
+          position: 0
+        )
+      )
+
+      try await repository.savePlan(plan)
+      let extendedOccurrences = try await repository.synchronizeOccurrences(plan, saturday)
+
+      #expect(extendedOccurrences.count == 7)
+      #expect(extendedOccurrences.contains { $0.date == saturday })
+      #expect(extendedOccurrences.contains { $0.date == sunday })
+      #expect(try await repository.loadOccurrences(plan.id) == extendedOccurrences)
+    }
+  }
+
   private func makePlan(
     id: UUID = UUID(),
     startDate: Date = Date(timeIntervalSinceReferenceDate: 800_000_000),

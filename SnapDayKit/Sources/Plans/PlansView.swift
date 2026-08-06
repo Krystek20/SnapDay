@@ -143,18 +143,17 @@ public struct PlansView: View {
 
   private var activeSection: some View {
     VStack(alignment: .leading, spacing: 10.0) {
-      PlansSectionHeader(
-        title: String(localized: "ACTIVE PLANS", bundle: .module),
-        trailingTitle: "\(store.activePlans.count) active"
-      )
-
       if store.activePlans.isEmpty {
         emptyActiveContent
       } else {
+        PlansSectionHeader(
+          title: String(localized: "ACTIVE PLANS", bundle: .module),
+          trailingTitle: "\(store.activePlans.count) active"
+        )
+
         PlansGroup(
           plans: store.activePlans,
           action: { store.send(.view(.planTapped($0))) },
-          editAction: { store.send(.view(.editPlanTapped($0))) },
           archiveAction: { store.send(.view(.archivePlanTapped($0))) }
         )
       }
@@ -188,34 +187,63 @@ public struct PlansView: View {
           store.send(.view(.createPlanButtonTapped))
         },
         label: {
-          Text("Create your first Plan", bundle: .module)
+          if store.isHistoryEmpty {
+            Text("Create your first Plan", bundle: .module)
+          } else {
+            Text("Create a Plan", bundle: .module)
+          }
         }
       )
       .buttonStyle(PrimaryButtonStyle())
-
-      Text("Finished and archived Plans will appear in History.", bundle: .module)
-        .font(.system(size: 13.0, weight: .regular))
-        .foregroundStyle(Color.sectionText)
-        .multilineTextAlignment(.center)
-        .maxWidth(alignment: .center)
     }
   }
 
   private var historySection: some View {
-    VStack(alignment: .leading, spacing: 15.0) {
-      historyGroup(
-        title: String(localized: "FINISHED", bundle: .module),
-        trailingTitle: "\(store.finishedPlans.count) finished",
-        plans: store.finishedPlans
-      )
+    Group {
+      if store.isHistoryEmpty {
+        emptyHistoryContent
+      } else {
+        VStack(alignment: .leading, spacing: 15.0) {
+          if !store.finishedPlans.isEmpty {
+            historyGroup(
+              title: String(localized: "FINISHED", bundle: .module),
+              trailingTitle: "\(store.finishedPlans.count) finished",
+              plans: store.finishedPlans
+            )
+          }
 
-      historyGroup(
-        title: String(localized: "ARCHIVED", bundle: .module),
-        trailingTitle: "\(store.archivedPlans.count) archived",
-        plans: store.archivedPlans
-      )
-      .opacity(0.85)
+          if !store.archivedPlans.isEmpty {
+            historyGroup(
+              title: String(localized: "ARCHIVED", bundle: .module),
+              trailingTitle: "\(store.archivedPlans.count) archived",
+              plans: store.archivedPlans
+            )
+            .opacity(0.85)
+          }
+        }
+      }
     }
+  }
+
+  private var emptyHistoryContent: some View {
+    VStack(spacing: 5.0) {
+      Text("No plan history yet", bundle: .module)
+        .font(.system(size: 19.0, weight: .semibold))
+        .foregroundStyle(Color.primaryText)
+        .multilineTextAlignment(.center)
+
+      Text("Finished and archived Plans will appear here.", bundle: .module)
+        .font(.system(size: 14.0, weight: .regular))
+        .foregroundStyle(Color.secondaryText)
+        .multilineTextAlignment(.center)
+        .lineSpacing(2.0)
+    }
+    .padding(15.0)
+    .maxWidth()
+    .background(
+      Color.formBackground
+        .clipShape(RoundedRectangle(cornerRadius: 14.0))
+    )
   }
 
   private func historyGroup(
@@ -271,7 +299,6 @@ private struct PlansGroup: View {
 
   let plans: [PlanListItem]
   let action: (Plan.ID) -> Void
-  var editAction: ((Plan.ID) -> Void)? = nil
   var archiveAction: ((Plan.ID) -> Void)? = nil
 
   var body: some View {
@@ -280,9 +307,6 @@ private struct PlansGroup: View {
         PlanRow(
           item: item,
           action: { action(item.id) },
-          editAction: editAction.map { editAction in
-            { editAction(item.id) }
-          },
           archiveAction: archiveAction.map { archiveAction in
             { archiveAction(item.id) }
           }
@@ -305,7 +329,6 @@ private struct PlanRow: View {
 
   let item: PlanListItem
   let action: () -> Void
-  let editAction: (() -> Void)?
   let archiveAction: (() -> Void)?
 
   var body: some View {
@@ -342,14 +365,6 @@ private struct PlanRow: View {
     }
     .buttonStyle(.plain)
     .contextMenu {
-      if let editAction {
-        Button(
-          action: editAction,
-          label: {
-            Label(String(localized: "Edit", bundle: .module), systemImage: "pencil")
-          }
-        )
-      }
       if let archiveAction {
         Button(
           role: .destructive,

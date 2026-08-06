@@ -87,7 +87,9 @@ public extension Plan {
     dayActivities: [DayActivity]
   ) -> PlanProgress {
     PlanProgress(
-      occurrences: occurrences.filter { $0.planID == id },
+      occurrences: occurrences
+        .filter { $0.planID == id }
+        .deduplicatedByID(),
       dayActivities: dayActivities
     )
   }

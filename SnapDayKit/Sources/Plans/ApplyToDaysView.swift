@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import Models
 import Resources
 import SwiftUI
@@ -50,7 +51,7 @@ struct ApplyToDaysView: View {
         .background(Color.background)
       }
       .confirmationDialog(
-        String(localized: "Replace existing activities?", bundle: .module),
+        replacementConfirmationTitle,
         isPresented: replacementConfirmationBinding,
         titleVisibility: .visible
       ) {
@@ -65,7 +66,7 @@ struct ApplyToDaysView: View {
           action: { store.send(.view(.replacementCancelled)) }
         )
       } message: {
-        Text("At least one selected day already has activities. Applying will replace them.", bundle: .module)
+        Text(replacementConfirmationMessage)
       }
     }
   }
@@ -167,5 +168,35 @@ struct ApplyToDaysView: View {
         }
       }
     )
+  }
+
+  private var replacementConfirmationTitle: String {
+    if replacementDays.count == 1 {
+      return String(localized: "Replace activities on \(replacementDaysTitle)?", bundle: .module)
+    }
+    return String(localized: "Replace activities on selected days?", bundle: .module)
+  }
+
+  private var replacementConfirmationMessage: String {
+    if replacementDays.count == 1 {
+      return String(
+        localized: "\(replacementDaysTitle) already has activities. Applying will replace them, not merge them.",
+        bundle: .module
+      )
+    }
+    return String(
+      localized: "\(replacementDaysTitle) already have activities. Applying will replace them, not merge them.",
+      bundle: .module
+    )
+  }
+
+  private var replacementDays: [PlanWeekday] {
+    store.schedule
+      .filter { store.replacementTargetDays.contains($0.weekday) }
+      .map(\.weekday)
+  }
+
+  private var replacementDaysTitle: String {
+    ListFormatter.localizedString(byJoining: replacementDays.map(\.title))
   }
 }

@@ -153,9 +153,9 @@ final class RemoteChangeObserver {
     request.fetchRequest = NSPersistentHistoryTransaction.fetchRequest
     request.fetchRequest?.predicate = NSPredicate(format: "author != %@", TransactionAuthor.app())
 
-    if store.identifier == store.identifier {
+    if storeUUID == store.identifier {
       request.affectedStores = [store]
-    } else if store.identifier == sharedStore.identifier {
+    } else if storeUUID == sharedStore.identifier {
       request.affectedStores = [sharedStore]
     }
 

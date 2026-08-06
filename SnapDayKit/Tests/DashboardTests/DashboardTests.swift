@@ -112,13 +112,48 @@ struct DashboardTests {
     )
     let configuration = DashboardPlansSummaryView.Configuration(
       summary: summary,
-      relativeTo: saturday,
       calendar: calendar,
       locale: Locale(identifier: "en_US")
     )
 
     #expect(summary.nextSessionDate == sunday)
     #expect(configuration.metadata?.leadingText == "Next session: Tomorrow")
+  }
+
+  @Test
+  func planSummaryKeepsPendingSessionOnToday() throws {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+    let today = try #require(
+      calendar.date(from: DateComponents(year: 2026, month: 7, day: 21))
+    )
+    let tomorrow = try #require(calendar.date(byAdding: .day, value: 1, to: today))
+    let plan = Plan(
+      id: UUID(),
+      name: "Daily plan",
+      startDate: today,
+      endDate: tomorrow,
+      duration: .custom,
+      schedule: []
+    )
+    let summary = DashboardPlanSummary(
+      plan: plan,
+      occurrences: [
+        PlanOccurrence(planID: plan.id, activityID: UUID(), date: today),
+        PlanOccurrence(planID: plan.id, activityID: UUID(), date: tomorrow)
+      ],
+      dayActivities: [],
+      date: today,
+      calendar: calendar
+    )
+    let configuration = DashboardPlansSummaryView.Configuration(
+      summary: summary,
+      calendar: calendar,
+      locale: Locale(identifier: "en_US")
+    )
+
+    #expect(summary.nextSessionDate == today)
+    #expect(configuration.metadata?.leadingText == "Next session: Today")
   }
 
   @Test
@@ -197,7 +232,6 @@ struct DashboardTests {
 
     let configuration = DashboardPlansSummaryView.Configuration(
       summary: summary,
-      relativeTo: today,
       calendar: calendar,
       locale: Locale(identifier: "en_US")
     )

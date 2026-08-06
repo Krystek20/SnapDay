@@ -29,7 +29,9 @@ public struct PlanProgressProvider {
     var occurrencesByPlanID: [Plan.ID: [PlanOccurrence]] = [:]
 
     for plan in plans {
-      occurrencesByPlanID[plan.id] = try await planRepository.loadOccurrences(plan.id)
+      occurrencesByPlanID[plan.id] = try await planRepository
+        .loadOccurrences(plan.id)
+        .deduplicatedByID()
     }
 
     let dayActivityIDs = Set(

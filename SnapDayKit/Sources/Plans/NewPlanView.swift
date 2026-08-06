@@ -1,5 +1,6 @@
 import ActivityList
 import ComposableArchitecture
+import Foundation
 import Models
 import Resources
 import SwiftUI
@@ -36,6 +37,26 @@ public struct NewPlanView: View {
     .sheet(item: applySourceDayBinding) { weekday in
       ApplyToDaysView(store: store, sourceWeekday: weekday)
         .presentationDetents([.large])
+    }
+    .alert(
+      scheduleRemovalConfirmationTitle,
+      isPresented: scheduleRemovalConfirmationBinding
+    ) {
+      Button(
+        String(localized: "Keep editing", bundle: .module),
+        role: .cancel,
+        action: { store.send(.view(.scheduleRemovalCancelled)) }
+      )
+      Button(
+        String(localized: "Remove activities", bundle: .module),
+        role: .destructive,
+        action: { store.send(.view(.scheduleRemovalConfirmed)) }
+      )
+    } message: {
+      Text(
+        "The selected date range no longer includes these days. Their scheduled activities will be removed.",
+        bundle: .module
+      )
     }
   }
 
@@ -107,12 +128,12 @@ public struct NewPlanView: View {
       actionButton(title: String(localized: "Continue", bundle: .module)) {
         store.send(.view(.continueButtonTapped))
       }
-      .disabled(!store.canContinue)
+      .disabled(store.isNameValidationErrorPresented && !store.canContinue)
     case .weeklySchedule:
       actionButton(title: String(localized: "Review Plan", bundle: .module)) {
         store.send(.view(.continueButtonTapped))
       }
-      .disabled(!store.canReview)
+      .disabled(store.isScheduleValidationErrorPresented && !store.canReview)
     case .review:
       actionButton(
         title: store.isEditing
@@ -144,6 +165,27 @@ public struct NewPlanView: View {
       }
     )
   }
+
+  private var scheduleRemovalConfirmationBinding: Binding<Bool> {
+    Binding(
+      get: { store.needsScheduleRemovalConfirmation },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.view(.scheduleRemovalCancelled))
+        }
+      }
+    )
+  }
+
+  private var scheduleRemovalConfirmationTitle: String {
+    let weekdays = ListFormatter.localizedString(
+      byJoining: store.scheduleRemovalWeekdays.map(\.title)
+    )
+    return String(
+      localized: "Remove activities from \(weekdays)?",
+      bundle: .module
+    )
+  }
 }
 
 @MainActor
@@ -163,40 +205,67 @@ private struct NewPlanDetailsView: View {
     }
     .scrollDismissesKeyboard(.immediately)
     .scrollIndicators(.hidden)
+    .onAppear {
+      isNameFocused = store.isNameValidationErrorPresented
+    }
+    .onChange(of: store.isNameValidationErrorPresented) { _, isPresented in
+      if isPresented {
+        isNameFocused = true
+      }
+    }
   }
 
   private var nameSection: some View {
     NewPlanSection(title: String(localized: "PLAN NAME", bundle: .module)) {
-      HStack(spacing: 10.0) {
-        Text("Name", bundle: .module)
+      VStack(alignment: .leading, spacing: 5.0) {
+        HStack(spacing: 10.0) {
+          Text("Name", bundle: .module)
+            .foregroundStyle(Color.primaryText)
+
+          Spacer(minLength: 10.0)
+
+          TextField(
+            String(localized: "Learn Spanish", bundle: .module),
+            text: $store.name
+          )
           .foregroundStyle(Color.primaryText)
-
-        Spacer(minLength: 10.0)
-
-        TextField(
-          String(localized: "Learn Spanish", bundle: .module),
-          text: $store.name
+          .multilineTextAlignment(.trailing)
+          .textInputAutocapitalization(.words)
+          .submitLabel(.done)
+          .focused($isNameFocused)
+          .onSubmit {
+            if store.canContinue {
+              isNameFocused = false
+            } else {
+              store.send(.view(.continueButtonTapped))
+            }
+          }
+        }
+        .font(.system(size: 15.0, weight: .regular))
+        .padding(.horizontal, 15.0)
+        .frame(minHeight: 55.0)
+        .contentShape(Rectangle())
+        .onTapGesture {
+          isNameFocused = true
+        }
+        .background(
+          Color.formBackground
+            .clipShape(RoundedRectangle(cornerRadius: 14.0))
         )
-        .foregroundStyle(Color.primaryText)
-        .multilineTextAlignment(.trailing)
-        .textInputAutocapitalization(.words)
-        .submitLabel(.done)
-        .focused($isNameFocused)
-        .onSubmit {
-          isNameFocused = false
+        .overlay {
+          if store.isNameValidationErrorPresented {
+            RoundedRectangle(cornerRadius: 14.0)
+              .stroke(Color.alertText, lineWidth: 1.0)
+          }
+        }
+
+        if store.isNameValidationErrorPresented {
+          Text("Enter a name for this Plan.", bundle: .module)
+            .font(.system(size: 13.0, weight: .regular))
+            .foregroundStyle(Color.alertText)
+            .padding(.horizontal, 10.0)
         }
       }
-      .font(.system(size: 15.0, weight: .regular))
-      .padding(.horizontal, 15.0)
-      .frame(minHeight: 55.0)
-      .contentShape(Rectangle())
-      .onTapGesture {
-        isNameFocused = true
-      }
-      .background(
-        Color.formBackground
-          .clipShape(RoundedRectangle(cornerRadius: 14.0))
-      )
     }
   }
 

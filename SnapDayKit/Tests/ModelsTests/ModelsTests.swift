@@ -151,6 +151,46 @@ struct PlanModelTests {
   }
 
   @Test
+  func progressDeduplicatesOccurrencesRegeneratedFromWednesday() throws {
+    let calendar = testCalendar()
+    let monday = try date(year: 2026, month: 7, day: 20, calendar: calendar)
+    let activityID = UUID()
+    let plan = plan(
+      startDate: monday,
+      endDate: try #require(calendar.date(byAdding: .day, value: 6, to: monday)),
+      schedule: PlanWeekday.ordered(using: calendar).map {
+        scheduleEntry(weekday: $0, activityID: activityID, position: 0)
+      }
+    )
+    var originalOccurrences = plan.scheduledOccurrences(calendar: calendar)
+    let completedDayActivityIDs = [UUID(), UUID(), UUID()]
+    for index in completedDayActivityIDs.indices {
+      originalOccurrences[index].dayActivityID = completedDayActivityIDs[index]
+    }
+    let wednesday = originalOccurrences[2].date
+    let regeneratedOccurrences = originalOccurrences
+      .filter { $0.date >= wednesday }
+    let dayActivities = zip(completedDayActivityIDs, originalOccurrences.prefix(3)).map {
+      dayActivity(id: $0.0, date: $0.1.date, doneDate: $0.1.date)
+    }
+
+    let duplicatedProgress = PlanProgress(
+      occurrences: originalOccurrences + regeneratedOccurrences,
+      dayActivities: dayActivities
+    )
+    #expect(duplicatedProgress.completedPlannedActivityCount == 4)
+    #expect(duplicatedProgress.totalPlannedActivityCount == 12)
+
+    let progress = plan.progress(
+      from: originalOccurrences + regeneratedOccurrences,
+      dayActivities: dayActivities
+    )
+
+    #expect(progress.completedPlannedActivityCount == 3)
+    #expect(progress.totalPlannedActivityCount == 7)
+  }
+
+  @Test
   func progressIgnoresOccurrencesFromOtherPlans() throws {
     let calendar = testCalendar()
     let monday = try date(year: 2026, month: 6, day: 8, calendar: calendar)

@@ -249,7 +249,6 @@ public struct DashboardView: View {
     return store.planSummaries.map {
       DashboardPlansSummaryView.Configuration(
         summary: $0,
-        relativeTo: store.date,
         calendar: calendar,
         locale: locale
       )

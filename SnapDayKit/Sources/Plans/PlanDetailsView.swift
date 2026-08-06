@@ -3,6 +3,7 @@ import Models
 import Resources
 import SwiftUI
 import UiComponents
+import Utilities
 
 @MainActor
 public struct PlanDetailsView: View {
@@ -51,6 +52,19 @@ public struct PlanDetailsView: View {
       )
     } message: {
       Text("The Plan will move to History. Completed activities and progress will be kept.", bundle: .module)
+    }
+    .alert(
+      String(localized: "This Plan can't be restored", bundle: .module),
+      isPresented: restoreUnavailableBinding
+    ) {
+      Button(String(localized: "Create similar", bundle: .module)) {
+        store.send(.view(.createSimilarButtonTapped))
+      }
+      Button(String(localized: "Cancel", bundle: .module), role: .cancel) {
+        store.send(.view(.restoreUnavailableDismissed))
+      }
+    } message: {
+      Text("Its date range has ended or its schedule is empty. Create a similar Plan with a new schedule instead.", bundle: .module)
     }
     .sheet(item: $store.scope(state: \.newPlan, action: \.newPlan)) { store in
       NewPlanView(store: store)
@@ -170,23 +184,12 @@ public struct PlanDetailsView: View {
 
   @ViewBuilder
   private var finishedContent: some View {
-    sectionTitle("RESULT")
+    activityBreakdownContent
 
-    VStack(alignment: .leading, spacing: 15.0) {
-      Text(progressSummary)
-        .font(.system(size: 17.0, weight: .semibold))
-        .foregroundStyle(Color.primaryText)
-
-      Text("This Plan has reached its end date. Its schedule and progress are now read-only.", bundle: .module)
-        .font(.system(size: 13.0))
-        .foregroundStyle(Color.secondaryText)
-
-      DetailsProgressBar(value: content.progress.fractionComplete)
-    }
-    .detailsCard()
-
-    sectionTitle("SCHEDULE")
+    sectionTitle("ORIGINAL SCHEDULE")
     scheduleCard(days: content.scheduledDays, showsState: false)
+
+    lifecycleButtons(for: .finished)
   }
 
   @ViewBuilder
@@ -204,8 +207,71 @@ public struct PlanDetailsView: View {
     }
     .detailsCard()
 
+    activityBreakdownContent
+
     sectionTitle("PREVIOUS SCHEDULE")
     scheduleCard(days: content.scheduledDays, showsState: false)
+
+    lifecycleButtons(for: .archived)
+  }
+
+  @ViewBuilder
+  private var activityBreakdownContent: some View {
+    sectionTitle("ACTIVITIES")
+
+    if content.activityBreakdown.isEmpty {
+      noActivitiesCard
+    } else {
+      activityBreakdownCard
+    }
+  }
+
+  private var activityBreakdownCard: some View {
+    VStack(alignment: .leading, spacing: 0.0) {
+      ForEach(Array(content.activityBreakdown.enumerated()), id: \.element.id) { index, item in
+        if index > 0 { Divider().padding(.vertical, 15.0) }
+        HStack(spacing: 10.0) {
+          Text(item.activity.name)
+            .font(.system(size: 15.0, weight: .medium))
+            .foregroundStyle(Color.primaryText)
+          Spacer(minLength: 10.0)
+          Text(verbatim: "\(item.completedCount) / \(item.plannedCount)")
+            .font(.system(size: 13.0, weight: .semibold))
+            .foregroundStyle(Color.secondaryText)
+        }
+      }
+    }
+    .detailsCard()
+  }
+
+  private var noActivitiesCard: some View {
+    Text("No activities were scheduled for this Plan.", bundle: .module)
+      .font(.system(size: 13.0))
+      .foregroundStyle(Color.secondaryText)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .detailsCard()
+  }
+
+  private func lifecycleButtons(for status: PlanStatus) -> some View {
+    VStack(spacing: 5.0) {
+      if status == .finished {
+        Button(String(localized: "Create similar", bundle: .module)) {
+          store.send(.view(.createSimilarButtonTapped))
+        }
+        .buttonStyle(PrimaryButtonStyle())
+      } else if status == .archived {
+        Button(String(localized: "Restore Plan", bundle: .module)) {
+          store.send(.view(.restoreButtonTapped))
+        }
+        .buttonStyle(PrimaryButtonStyle())
+
+        Button(String(localized: "Create similar", bundle: .module)) {
+          store.send(.view(.createSimilarButtonTapped))
+        }
+        .buttonStyle(CancelButtonStyle())
+      }
+    }
+    .padding(.top, 5.0)
   }
 
   private func scheduleCard(
@@ -357,7 +423,12 @@ public struct PlanDetailsView: View {
   }
 
   private var progressSummary: String {
-    "\(content.progress.completedPlannedActivityCount) of \(content.progress.totalPlannedActivityCount) planned activities complete"
+    let completed = content.progress.completedPlannedActivityCount
+    let total = content.progress.totalPlannedActivityCount
+    return String(
+      localized: "\(completed) of \(total) planned activities complete",
+      bundle: .module
+    )
   }
 
   private var archiveConfirmationBinding: Binding<Bool> {
@@ -365,6 +436,15 @@ public struct PlanDetailsView: View {
       get: { store.isArchiveConfirmationPresented },
       set: { isPresented in
         if !isPresented { store.send(.view(.archiveCancelled)) }
+      }
+    )
+  }
+
+  private var restoreUnavailableBinding: Binding<Bool> {
+    Binding(
+      get: { store.isRestoreUnavailableAlertPresented },
+      set: { isPresented in
+        if !isPresented { store.send(.view(.restoreUnavailableDismissed)) }
       }
     )
   }

@@ -3,7 +3,6 @@ import Foundation
 extension DashboardPlansSummaryView.Configuration {
   init(
     summary: DashboardPlanSummary,
-    relativeTo date: Date,
     calendar: Calendar,
     locale: Locale
   ) {
@@ -22,7 +21,7 @@ extension DashboardPlansSummaryView.Configuration {
         DashboardPlansSummaryView.Metadata(
           leadingText: Self.nextSessionText(
             for: $0,
-            relativeTo: date,
+            relativeTo: summary.referenceDate,
             calendar: calendar,
             locale: locale
           )

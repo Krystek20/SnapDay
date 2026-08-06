@@ -92,6 +92,7 @@ extension PlanRepository: DependencyKey {
           predicates: { NSPredicate(format: "planIdentifier == %@", plan.id as CVarArg) },
           sorts: { NSSortDescriptor(key: "date", ascending: true) }
         )
+        .deduplicatedByID()
         let generated = plan.scheduledOccurrences(from: lowerBound, calendar: calendar)
         let generatedIDs = Set(generated.map(\.id))
         let obsolete = existing.filter {
@@ -108,7 +109,9 @@ extension PlanRepository: DependencyKey {
         if !occurrences.isEmpty {
           try await entityHandler.save(occurrences)
         }
-        return occurrences.sorted { $0.date < $1.date }
+        return occurrences
+          .deduplicatedByID()
+          .sorted { $0.date < $1.date }
       }
     )
   }
