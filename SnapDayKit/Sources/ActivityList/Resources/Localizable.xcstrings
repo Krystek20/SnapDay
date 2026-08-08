@@ -4,11 +4,197 @@
     "" : {
       "shouldTranslate" : false
     },
+    "Activity is used by a Plan" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النشاط مستخدم في خطة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität wird in einem Plan verwendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activity is used by a Plan"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La actividad se usa en un plan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’activité est utilisée dans un plan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’attività è usata in un piano"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクティビティはプランで使用されています"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "활동이 플랜에서 사용 중입니다"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktywność jest używana w planie"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A atividade é usada em um plano"
+          }
+        }
+      }
+    },
     "Add %lld activities" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة %lld أنشطة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Aktivitäten hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add %lld activities"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir %lld actividades"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter %lld activités"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi %lld attività"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件のアクティビティを追加"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "활동 %lld개 추가"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj %lld aktywności"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar %lld atividades"
+          }
+        }
+      }
     },
     "Add 1 activity" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة نشاط واحد"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Aktivität hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add 1 activity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir 1 actividad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter 1 activité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi 1 attività"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1件のアクティビティを追加"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "활동 1개 추가"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj 1 aktywność"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar 1 atividade"
+          }
+        }
+      }
     },
     "Add to day" : {
       "localizations" : {
@@ -75,7 +261,18 @@
       }
     },
     "Cancel" : {
-
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Annulla" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "キャンセル" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "취소" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Anuluj" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } }
+      }
     },
     "Disable Repeat" : {
       "localizations" : {
@@ -397,6 +594,20 @@
         }
       }
     },
+    "OK" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "موافق" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aceptar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "확인" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "OK" } }
+      }
+    },
     "Remove" : {
       "localizations" : {
         "ar" : {
@@ -459,6 +670,20 @@
             "value" : "Remover"
           }
         }
+      }
+    },
+    "Plan activities must be kept to preserve their schedules and progress." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يجب الاحتفاظ بأنشطة الخطة للحفاظ على جداولها وتقدمها." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Planaktivitäten müssen beibehalten werden, damit Zeitpläne und Fortschritt erhalten bleiben." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Plan activities must be kept to preserve their schedules and progress." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Las actividades del plan deben conservarse para mantener sus horarios y progreso." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les activités du plan doivent être conservées afin de préserver leur programmation et leur progression." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Le attività del piano devono essere mantenute per conservarne la programmazione e i progressi." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "スケジュールと進捗を保持するため、プランのアクティビティは削除できません。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "플랜의 일정과 진행 상황을 유지하려면 플랜 활동을 보존해야 합니다." } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Aktywności planu muszą zostać zachowane, aby utrzymać harmonogram i postęp." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "As atividades do plano precisam ser mantidas para preservar os agendamentos e o progresso." } }
       }
     },
     "Saved Activities" : {

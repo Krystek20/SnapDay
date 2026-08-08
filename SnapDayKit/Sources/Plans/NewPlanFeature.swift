@@ -2,6 +2,7 @@ import ActivityList
 import ComposableArchitecture
 import Foundation
 import Models
+import Utilities
 
 @Reducer
 public struct NewPlanFeature {
@@ -86,7 +87,7 @@ public struct NewPlanFeature {
       now: Date,
       calendar: Calendar
     ) {
-      let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+      let activitiesByID = PlanActivityResolver.activitiesByID(activities)
       let scheduledDays = Dictionary(grouping: plan.schedule, by: \.weekday).mapValues { entries in
         entries.sorted { $0.position < $1.position }.compactMap { activitiesByID[$0.activityID] }
       }
@@ -112,7 +113,7 @@ public struct NewPlanFeature {
       startDate: Date,
       calendar: Calendar
     ) {
-      let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+      let activitiesByID = PlanActivityResolver.activitiesByID(activities)
       let scheduledDays = Dictionary(grouping: plan.schedule, by: \.weekday).mapValues { entries in
         entries.sorted { $0.position < $1.position }.compactMap { activitiesByID[$0.activityID] }
       }
@@ -326,10 +327,7 @@ public struct NewPlanFeature {
         )
         state.activityPicker = ActivityListFeature.State(
           selectedActivityIDs: selectedActivityIDs,
-          title: String(
-            localized: "Add to \(weekday.title)",
-            bundle: .module
-          )
+          title: Self.activityPickerTitle(for: weekday)
         )
         return .none
 
@@ -463,6 +461,10 @@ public struct NewPlanFeature {
       }
       return day.weekday
     }
+  }
+
+  static func activityPickerTitle(for weekday: PlanWeekday) -> String {
+    String(localized: "Add to \(weekday.title)", bundle: .module)
   }
 
   private static func applySchedule(

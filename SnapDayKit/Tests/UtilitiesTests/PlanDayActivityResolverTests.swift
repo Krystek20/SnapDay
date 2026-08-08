@@ -100,6 +100,28 @@ struct PlanDayActivityResolverTests {
     #expect(matches.first?.occurrences.count == 2)
   }
 
+  @Test
+  func duplicateActivityIdentifiersUseLatestValueWithoutCrashing() throws {
+    let date = try testDate()
+    let activityID = UUID()
+    let occurrence = PlanOccurrence(planID: UUID(), activityID: activityID, date: date)
+
+    let match = try #require(
+      PlanDayActivityResolver.matches(
+        on: date,
+        occurrences: [occurrence],
+        activities: [
+          Activity(id: activityID, name: "Old name"),
+          Activity(id: activityID, name: "Current name")
+        ],
+        dayActivities: [],
+        calendar: calendar
+      ).first
+    )
+
+    #expect(match.activity.name == "Current name")
+  }
+
   private func testDate() throws -> Date {
     try #require(calendar.date(from: DateComponents(year: 2026, month: 7, day: 13)))
   }

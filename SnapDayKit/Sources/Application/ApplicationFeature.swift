@@ -1,6 +1,7 @@
 import Dashboard
 import Reports
 import Plans
+import Models
 import Onboarding
 import ActivityDetails
 import ComposableArchitecture
@@ -57,6 +58,9 @@ public struct ApplicationFeature: TodayProvidable {
     case setupCloud
     case deviceShaked
     case handleUrl(URL)
+    case openPlans
+    case openPlan(Plan.ID)
+    case planDeepLinkLoaded(Plan?)
     case setTab(Tab)
     case dashboard(DashboardFeature.Action)
     case dashboardPath(StackAction<Path.State, Path.Action>)
@@ -137,6 +141,12 @@ public struct ApplicationFeature: TodayProvidable {
               switch deeplink {
               case .dashboard:
                 await send(.setTab(.dashboard))
+              case .plans(let planID):
+                if let planID {
+                  await send(.openPlan(planID))
+                } else {
+                  await send(.openPlans)
+                }
               case .none:
                 break
               }
@@ -168,6 +178,26 @@ public struct ApplicationFeature: TodayProvidable {
         return .none
       case .handleUrl(let url):
         deeplinkService.handleUrl(url)
+        return .none
+      case .openPlans:
+        deeplinkService.consume()
+        state.selectedTab = .dashboard
+        state.dashboardPath.append(.plans(PlansFeature.State()))
+        return .none
+      case .openPlan(let planID):
+        deeplinkService.consume()
+        state.selectedTab = .dashboard
+        return .run { send in
+          await send(.planDeepLinkLoaded(try? await planRepository.plan(planID)))
+        }
+      case .planDeepLinkLoaded(let plan):
+        if let plan {
+          state.dashboardPath.append(
+            .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
+          )
+        } else {
+          state.dashboardPath.append(.plans(PlansFeature.State()))
+        }
         return .none
       case .setTab(let tab):
         guard state.selectedTab != tab else { return .none }

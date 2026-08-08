@@ -24,7 +24,7 @@ enum PlanDayActivityResolver {
     calendar: Calendar
   ) -> [PlanDayActivityMatch] {
     let date = calendar.startOfDay(for: date)
-    let activitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+    let activitiesByID = PlanActivityResolver.activitiesByID(activities)
     let occurrencesByActivityID = Dictionary(
       grouping: occurrences.filter { calendar.isDate($0.date, inSameDayAs: date) },
       by: \.activityID

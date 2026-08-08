@@ -3,6 +3,7 @@ import Models
 import Resources
 import SwiftUI
 import UiComponents
+import Utilities
 
 @MainActor
 struct WeeklyScheduleView: View {
@@ -21,7 +22,7 @@ struct WeeklyScheduleView: View {
   }
 
   private var planSection: some View {
-    NewPlanSection(title: String(localized: "PLAN", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Plan", bundle: .module)) {
       HStack(alignment: .top, spacing: 10.0) {
         VStack(alignment: .leading, spacing: 5.0) {
           Text(store.name)
@@ -48,7 +49,7 @@ struct WeeklyScheduleView: View {
   }
 
   private var scheduleSection: some View {
-    NewPlanSection(title: String(localized: "WEEKLY SCHEDULE", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Weekly schedule", bundle: .module)) {
       VStack(spacing: .zero) {
         ForEach(Array(store.schedule.enumerated()), id: \.element.id) { index, day in
           ScheduleDayRow(store: store, day: day)
@@ -65,7 +66,7 @@ struct WeeklyScheduleView: View {
       )
 
       if !store.canReview {
-        Text("Add at least one activity to one available day.", bundle: .module)
+        Text("Add an activity to at least one available day.", bundle: .module)
           .font(.system(size: 13.0, weight: .regular))
           .foregroundStyle(
             store.isScheduleValidationErrorPresented
@@ -79,9 +80,10 @@ struct WeeklyScheduleView: View {
   }
 
   private var dateRangeTitle: String {
-    let start = store.startDate.formatted(.dateTime.day().month(.abbreviated))
-    let end = store.endDate.formatted(.dateTime.day().month(.abbreviated))
-    return "\(start) - \(end) · \(String(localized: "Repeats weekly", bundle: .module))"
+    let calendar = Calendar.autoupdatingCurrent.utcCalendar
+    let start = store.startDate.formatted(template: "dMMM", calendar: calendar)
+    let end = store.endDate.formatted(template: "dMMM", calendar: calendar)
+    return "\(start) – \(end) · \(String(localized: "Repeats weekly", bundle: .module))"
   }
 }
 

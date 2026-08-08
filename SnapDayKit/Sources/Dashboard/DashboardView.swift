@@ -9,6 +9,7 @@ import CalendarPicker
 import Models
 import Friends
 import ManageActivity
+import Utilities
 
 public struct DashboardView: View {
 
@@ -240,8 +241,8 @@ public struct DashboardView: View {
     guard !store.planSummaries.isEmpty else {
       return [
         DashboardPlansSummaryView.Configuration(
-          title: String(localized: "No active Plan", bundle: .module),
-          subtitle: String(localized: "Recurring routines will appear here when scheduled.", bundle: .module)
+          title: String(localized: "No active plans", bundle: .module),
+          subtitle: String(localized: "Scheduled plans will appear here.", bundle: .module)
         )
       ]
     }
@@ -249,7 +250,7 @@ public struct DashboardView: View {
     return store.planSummaries.map {
       DashboardPlansSummaryView.Configuration(
         summary: $0,
-        calendar: calendar,
+        calendar: calendar.utcCalendar,
         locale: locale
       )
     }

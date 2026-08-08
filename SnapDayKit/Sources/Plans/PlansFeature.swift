@@ -24,6 +24,7 @@ public struct PlansFeature {
     var finishedPlans: [PlanListItem] = []
     var archivedPlans: [PlanListItem] = []
     var archiveConfirmationPlanID: Plan.ID?
+    var isSaveErrorPresented = false
     @Presents var planDetails: PlanDetailsFeature.State?
     @Presents var newPlan: NewPlanFeature.State?
 
@@ -63,6 +64,7 @@ public struct PlansFeature {
       case archivePlanTapped(Plan.ID)
       case archivePlanCancelled
       case archivePlanConfirmed
+      case saveErrorDismissed
       case retryButtonTapped
     }
 
@@ -71,6 +73,8 @@ public struct PlansFeature {
       case loadPlans
       case plansLoaded(PlansSnapshot)
       case plansLoadFailed(String)
+      case planSaveFailed
+      case planSaved
     }
 
     public enum DelegateAction: Equatable {
@@ -128,6 +132,9 @@ public struct PlansFeature {
         guard let id = state.archiveConfirmationPlanID else { return .none }
         state.archiveConfirmationPlanID = nil
         return .send(.internal(.archivePlan(id)))
+      case .view(.saveErrorDismissed):
+        state.isSaveErrorPresented = false
+        return .none
       case .internal(.archivePlan(let id)):
         state.loadState = .loading
         return .run { send in
@@ -155,18 +162,10 @@ public struct PlansFeature {
         state.finishedPlans = snapshot.finishedPlans
         state.archivedPlans = snapshot.archivedPlans
         if let selectedPlanID, let item = state.planItem(id: selectedPlanID) {
-          var activitiesByID = Dictionary(
-            selectedPlanActivities.map { ($0.id, $0) },
-            uniquingKeysWith: { _, latest in latest }
+          let activities = PlanActivityResolver.orderedActivities(
+            for: item.plan.schedule,
+            merging: [selectedPlanActivities, item.activities]
           )
-          for activity in item.activities {
-            activitiesByID[activity.id] = activity
-          }
-          var includedActivityIDs = Set<Activity.ID>()
-          let activities = item.plan.schedule.compactMap { entry -> Activity? in
-            guard includedActivityIDs.insert(entry.activityID).inserted else { return nil }
-            return activitiesByID[entry.activityID]
-          }
           state.planDetails = PlanDetailsFeature.State(
             plan: item.plan,
             allowsManagement: true,
@@ -180,26 +179,31 @@ public struct PlansFeature {
       case .internal(.plansLoadFailed(let message)):
         state.loadState = .failed(message)
         return .none
+      case .internal(.planSaveFailed):
+        state.isSaveErrorPresented = true
+        return .none
+      case .internal(.planSaved):
+        state.newPlan = nil
+        state.isSaveErrorPresented = false
+        return .merge(
+          .send(.internal(.loadPlans)),
+          .send(.delegate(.plansChanged))
+        )
       case .newPlan(.presented(.delegate(.cancelTapped))):
         state.newPlan = nil
         return .none
       case .newPlan(.presented(.delegate(.planCreated(let draft)))):
         let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
-        state.newPlan = nil
-        state.loadState = .loading
         return .run { send in
           do {
             try await planRepository.savePlan(plan)
             _ = try await planRepository.synchronizeOccurrences(plan, plan.startDate)
-            await send(.internal(.loadPlans))
-            await send(.delegate(.plansChanged))
+            await send(.internal(.planSaved))
           } catch {
-            await send(.internal(.plansLoadFailed(error.localizedDescription)))
+            await send(.internal(.planSaveFailed))
           }
         }
       case .newPlan(.presented(.delegate(.planUpdated(let plan)))):
-        state.newPlan = nil
-        state.loadState = .loading
         let firstAffectedOccurrenceDate = calendar.date(
           byAdding: .day,
           value: 1,
@@ -209,10 +213,9 @@ public struct PlansFeature {
           do {
             try await planRepository.savePlan(plan)
             _ = try await planRepository.synchronizeOccurrences(plan, firstAffectedOccurrenceDate)
-            await send(.internal(.loadPlans))
-            await send(.delegate(.plansChanged))
+            await send(.internal(.planSaved))
           } catch {
-            await send(.internal(.plansLoadFailed(error.localizedDescription)))
+            await send(.internal(.planSaveFailed))
           }
         }
       case .newPlan:
@@ -247,21 +250,12 @@ public struct PlansFeature {
 
     for snapshot in progressSnapshots {
       let plan = snapshot.plan
-      let activityIDs = Set(plan.schedule.map(\.activityID))
-      var activitiesByID = Dictionary(
-        snapshot.dayActivities.compactMap(\.activity).map { ($0.id, $0) },
-        uniquingKeysWith: { _, latest in latest }
-      )
-      for activity in activities where activityIDs.contains(activity.id) {
-        activitiesByID[activity.id] = activity
-      }
-      var includedActivityIDs = Set<Activity.ID>()
       let item = PlanListItem(
         plan: plan,
-        activities: plan.schedule.compactMap { entry -> Activity? in
-          guard includedActivityIDs.insert(entry.activityID).inserted else { return nil }
-          return activitiesByID[entry.activityID]
-        },
+        activities: PlanActivityResolver.orderedActivities(
+          for: plan.schedule,
+          merging: [snapshot.dayActivities.compactMap(\.activity), activities]
+        ),
         occurrences: snapshot.occurrences,
         dayActivities: snapshot.dayActivities
       )

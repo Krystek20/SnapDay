@@ -96,14 +96,17 @@ extension PlanRepository: DependencyKey {
         let generated = plan.scheduledOccurrences(from: lowerBound, calendar: calendar)
         let generatedIDs = Set(generated.map(\.id))
         let obsolete = existing.filter {
-          $0.date >= lowerBound && $0.dayActivityID == nil && !generatedIDs.contains($0.id)
+          $0.date >= lowerBound && !generatedIDs.contains($0.id)
         }
         if !obsolete.isEmpty {
           try await entityHandler.delete(obsolete)
         }
 
         let retained = existing.filter { !obsolete.contains($0) }
-        let retainedByID = Dictionary(uniqueKeysWithValues: retained.map { ($0.id, $0) })
+        let retainedByID = Dictionary(
+          retained.map { ($0.id, $0) },
+          uniquingKeysWith: { existing, _ in existing }
+        )
         let occurrences = generated.map { retainedByID[$0.id] ?? $0 }
           + retained.filter { $0.date < lowerBound || !generatedIDs.contains($0.id) }
         if !occurrences.isEmpty {

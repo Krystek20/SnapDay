@@ -5,6 +5,7 @@ import Models
 import Resources
 import SwiftUI
 import UiComponents
+import Utilities
 
 @MainActor
 public struct NewPlanView: View {
@@ -112,12 +113,12 @@ public struct NewPlanView: View {
     switch step {
     case .details:
       store.isEditing
-        ? String(localized: "Edit Plan", bundle: .module)
-        : String(localized: "New Plan", bundle: .module)
+        ? String(localized: "Edit plan", bundle: .module)
+        : String(localized: "New plan", bundle: .module)
     case .weeklySchedule:
-      String(localized: "Weekly Schedule", bundle: .module)
+      String(localized: "Weekly schedule", bundle: .module)
     case .review:
-      String(localized: "Review Plan", bundle: .module)
+      String(localized: "Review plan", bundle: .module)
     }
   }
 
@@ -130,15 +131,15 @@ public struct NewPlanView: View {
       }
       .disabled(store.isNameValidationErrorPresented && !store.canContinue)
     case .weeklySchedule:
-      actionButton(title: String(localized: "Review Plan", bundle: .module)) {
+      actionButton(title: String(localized: "Review plan", bundle: .module)) {
         store.send(.view(.continueButtonTapped))
       }
       .disabled(store.isScheduleValidationErrorPresented && !store.canReview)
     case .review:
       actionButton(
         title: store.isEditing
-          ? String(localized: "Save Changes", bundle: .module)
-          : String(localized: "Start Plan", bundle: .module)
+          ? String(localized: "Save changes", bundle: .module)
+          : String(localized: "Start plan", bundle: .module)
       ) {
         store.send(.view(.startPlanButtonTapped))
       }
@@ -216,7 +217,7 @@ private struct NewPlanDetailsView: View {
   }
 
   private var nameSection: some View {
-    NewPlanSection(title: String(localized: "PLAN NAME", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Plan name", bundle: .module)) {
       VStack(alignment: .leading, spacing: 5.0) {
         HStack(spacing: 10.0) {
           Text("Name", bundle: .module)
@@ -260,7 +261,7 @@ private struct NewPlanDetailsView: View {
         }
 
         if store.isNameValidationErrorPresented {
-          Text("Enter a name for this Plan.", bundle: .module)
+          Text("Enter a plan name.", bundle: .module)
             .font(.system(size: 13.0, weight: .regular))
             .foregroundStyle(Color.alertText)
             .padding(.horizontal, 10.0)
@@ -270,7 +271,7 @@ private struct NewPlanDetailsView: View {
   }
 
   private var durationSection: some View {
-    NewPlanSection(title: String(localized: "HOW LONG", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Duration", bundle: .module)) {
       DurationFlowLayout(spacing: 10.0) {
         ForEach(PlanDuration.allCases) { duration in
           DurationChip(
@@ -289,14 +290,14 @@ private struct NewPlanDetailsView: View {
   }
 
   private var dateRangeSection: some View {
-    NewPlanSection(title: String(localized: "DATE RANGE", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Date range", bundle: .module)) {
       VStack(spacing: .zero) {
         datePicker(
           title: String(localized: "Starts", bundle: .module),
           selection: $store.startDate,
           range: min(
             store.startDate,
-            Calendar.autoupdatingCurrent.startOfDay(for: .now)
+            Calendar.autoupdatingCurrent.utcCalendar.startOfDay(for: .now)
           )...Date.distantFuture
         )
         .disabled(!store.isStartDateEditable)
@@ -315,7 +316,7 @@ private struct NewPlanDetailsView: View {
           .clipShape(RoundedRectangle(cornerRadius: 14.0))
       )
 
-      Text("Preset duration keeps the same length when start date changes. Changing the end date switches to Custom.", bundle: .module)
+      Text("Changing the start date keeps the selected duration. Changing the end date sets a custom duration.", bundle: .module)
         .font(.system(size: 13.0, weight: .regular))
         .foregroundStyle(Color.sectionText)
         .lineSpacing(2.0)
@@ -340,6 +341,7 @@ private struct NewPlanDetailsView: View {
       }
     )
     .datePickerStyle(.compact)
+    .environment(\.calendar, Calendar.autoupdatingCurrent.utcCalendar)
     .tint(Color.actionBlue)
     .padding(.horizontal, 15.0)
     .frame(minHeight: 55.0)

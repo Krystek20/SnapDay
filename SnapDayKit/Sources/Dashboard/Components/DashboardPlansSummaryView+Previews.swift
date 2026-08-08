@@ -38,8 +38,8 @@ private extension DashboardPlansSummaryView.Configuration {
   )
 
   static let noActivePlanPreview = DashboardPlansSummaryView.Configuration(
-    title: "No active Plan",
-    subtitle: "Recurring routines will appear here when scheduled."
+    title: "No active plans",
+    subtitle: "Scheduled plans will appear here."
   )
 
   static let activePlanCarouselPreviews = [

@@ -6,7 +6,7 @@ import Utilities
 
 struct ListUp: AppIntent {
   static var title: LocalizedStringResource = "Move list up"
-  static var description = IntentDescription("Moving list up")
+  static var description = IntentDescription("Scroll the activity list up.")
 
   func perform() async throws -> some IntentResult {
     if ListConfiguration.currentPage > .zero {
@@ -18,7 +18,7 @@ struct ListUp: AppIntent {
 
 struct ListDown: AppIntent {
   static var title: LocalizedStringResource = "Move list down"
-  static var description = IntentDescription("Moving list down")
+  static var description = IntentDescription("Scroll the activity list down.")
 
   func perform() async throws -> some IntentResult {
     ListConfiguration.currentPage += 1
@@ -28,10 +28,10 @@ struct ListDown: AppIntent {
 
 struct ToggleItemIntent: AppIntent {
 
-  static var title: LocalizedStringResource = "Switch item"
-  static var description = IntentDescription("Switching item state on the list")
+  static var title: LocalizedStringResource = "Toggle activity"
+  static var description = IntentDescription("Mark an activity as complete or incomplete.")
 
-  @Parameter(title: "Identifier")
+  @Parameter(title: "Activity ID")
   private var identifier: String?
 
   init(identifier: String) {
@@ -62,4 +62,3 @@ struct ToggleItemIntent: AppIntent {
     return .result()
   }
 }
-

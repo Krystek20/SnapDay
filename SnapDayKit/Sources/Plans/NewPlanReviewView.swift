@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Resources
 import SwiftUI
+import Utilities
 
 @MainActor
 struct NewPlanReviewView: View {
@@ -19,7 +20,7 @@ struct NewPlanReviewView: View {
   }
 
   private var summarySection: some View {
-    NewPlanSection(title: String(localized: "PLAN", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Plan", bundle: .module)) {
       VStack(alignment: .leading, spacing: 10.0) {
         Text(store.name)
           .font(.system(size: 19.0, weight: .semibold))
@@ -52,7 +53,7 @@ struct NewPlanReviewView: View {
   }
 
   private var scheduleSection: some View {
-    NewPlanSection(title: String(localized: "WEEKLY SCHEDULE", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Weekly schedule", bundle: .module)) {
       VStack(spacing: .zero) {
         ForEach(Array(store.schedule.enumerated()), id: \.element.id) { index, day in
           HStack(alignment: .top, spacing: 10.0) {
@@ -93,9 +94,10 @@ struct NewPlanReviewView: View {
   }
 
   private var dateRangeTitle: String {
-    let start = store.startDate.formatted(date: .abbreviated, time: .omitted)
-    let end = store.endDate.formatted(date: .abbreviated, time: .omitted)
-    return "\(start) - \(end)"
+    let calendar = Calendar.autoupdatingCurrent.utcCalendar
+    let start = store.startDate.formatted(template: "yMMMd", calendar: calendar)
+    let end = store.endDate.formatted(template: "yMMMd", calendar: calendar)
+    return "\(start) – \(end)"
   }
 
   private var plannedActivityCount: Int {

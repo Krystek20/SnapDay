@@ -62,7 +62,9 @@ public struct NewPlanDraft: Equatable {
   }
 
   func plannedActivityCount(calendar: Calendar = .autoupdatingCurrent) -> Int {
-    let activitiesByWeekday = Dictionary(uniqueKeysWithValues: schedule.map { ($0.weekday, $0.activities.count) })
+    let activitiesByWeekday = schedule.reduce(into: [PlanWeekday: Int]()) { result, day in
+      result[day.weekday, default: 0] += day.activities.count
+    }
     let end = calendar.startOfDay(for: endDate)
     var date = calendar.startOfDay(for: startDate)
     var count = 0

@@ -18,6 +18,7 @@ public struct ActivityListFeature: TodayProvidable {
   @Dependency(\.dayUpdater) private var dayUpdater
   @Dependency(\.dismiss) private var dismiss
   @Dependency(\.calendar) private var calendar
+  @Dependency(\.planRepository) private var planRepository
   @Dependency(\.uuid) private var uuid
 
   // MARK: - State & Action
@@ -35,9 +36,9 @@ public struct ActivityListFeature: TodayProvidable {
     var items: [ListItem] = []
     var information: InformationViewConfiguration?
     var selectedActivityIDs: Set<Activity.ID>
+    var isPlanActivityDeletionAlertPresented = false
 
     @Presents var templateForm: DayActivityFormFeature.State?
-    @Presents var dayActivityForm: DayActivityFormFeature.State?
 
     var newField: DayNewField?
 
@@ -88,10 +89,12 @@ public struct ActivityListFeature: TodayProvidable {
       case activitySelectionTapped(Activity.ID)
       case selectionConfirmed
       case cancelButtonTapped
+      case planActivityDeletionAlertDismissed
     }
     public enum InternalAction: Equatable {
       case loadActivities
       case removeDayActivities(Activity)
+      case activityDeletionBlocked
       case activitiesLoaded(_ activities: [Activity])
       case addToDay(_ activity: Activity)
       case setIsFrequent(_ isFrequentEnabled: Bool, _ activity: Activity)
@@ -140,6 +143,9 @@ public struct ActivityListFeature: TodayProvidable {
         return .run { _ in
           await dismiss()
         }
+      case .view(.planActivityDeletionAlertDismissed):
+        state.isPlanActivityDeletionAlertPresented = false
+        return .none
       case .internal(.loadActivities):
         return .run { send in
           let activities = try await activityRepository.loadActivities()
@@ -148,6 +154,13 @@ public struct ActivityListFeature: TodayProvidable {
       case .internal(.removeDayActivities(let activity)):
         guard let day = state.day else { return .none }
         return .run { [day] send in
+          let isUsedByPlan = try await planRepository.loadPlans().contains { plan in
+            plan.schedule.contains { $0.activityID == activity.id }
+          }
+          guard !isUsedByPlan else {
+            await send(.internal(.activityDeletionBlocked))
+            return
+          }
           try await dayUpdater.updateDaysByRemovedActivity(activity, from: day.date)
           try await activityRepository.deleteActivity(activity)
           await send(.delegate(.daysUpdated))
@@ -156,6 +169,9 @@ public struct ActivityListFeature: TodayProvidable {
       case .internal(.activitiesLoaded(let activities)):
         state.activities = activities
         return .send(.internal(.setItems))
+      case .internal(.activityDeletionBlocked):
+        state.isPlanActivityDeletionAlertPresented = true
+        return .none
       case .internal(.addToDay(let activity)):
         guard let day = state.day else { return .none }
         let dayActivity = DayActivity.create(

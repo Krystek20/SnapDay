@@ -132,11 +132,11 @@ struct PlanRepositoryTests {
       let synchronized = try await repository.synchronizeOccurrences(plan, tuesday)
       let synchronizedAgain = try await repository.synchronizeOccurrences(plan, tuesday)
 
-      #expect(synchronized.count == 3)
+      #expect(synchronized.count == 2)
       #expect(synchronizedAgain == synchronized)
       #expect(synchronized.contains { $0.date == monday && $0.dayActivityID != nil })
-      #expect(synchronized.contains { calendar.component(.weekday, from: $0.date) == 4 && $0.dayActivityID != nil })
       #expect(synchronized.contains { calendar.component(.weekday, from: $0.date) == 6 && $0.dayActivityID == nil })
+      #expect(!synchronized.contains { calendar.component(.weekday, from: $0.date) == 4 })
       #expect(!synchronized.contains { calendar.component(.weekday, from: $0.date) == 5 })
       #expect(try await repository.loadOccurrences(plan.id) == synchronized)
     }

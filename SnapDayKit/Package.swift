@@ -8,7 +8,8 @@ let package = Package(
     name: "SnapDayKit",
     defaultLocalization: "en",
     platforms: [
-      .iOS(.v17)
+      .iOS(.v17),
+      .macOS(.v13)
     ],
     products: products,
     dependencies: packageDependencies,
@@ -23,6 +24,7 @@ private var products: [Product] {
   Module.widgetActivityList
   Module.widgetStreak
   Module.widgetWeeklyProgress
+  Module.widgetPlanProgress
   Module.plans
   Module.previews
 }
@@ -52,6 +54,7 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetActivityList, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
+  TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
   TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
@@ -96,6 +99,7 @@ private enum Module: String {
   case widgetActivityList
   case widgetStreak
   case widgetWeeklyProgress
+  case widgetPlanProgress
   case dayActivityReminder
   case onboarding
   case manageActivity

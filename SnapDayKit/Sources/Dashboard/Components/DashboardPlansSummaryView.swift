@@ -289,7 +289,7 @@ private struct DashboardPlansAllPlansRow: View {
 
   private var content: some View {
     HStack(spacing: 10.0) {
-      Text("All Plans", bundle: .module)
+      Text("All plans", bundle: .module)
         .font(.system(size: 12.0, weight: .medium))
         .foregroundStyle(Color.primaryText)
 

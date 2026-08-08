@@ -94,6 +94,8 @@ struct ActivityListWidget: Widget {
       ActivityListWidgetEntryView(entry: entry)
         .containerBackground(.fill.tertiary, for: .widget)
     }
+    .configurationDisplayName("Today's activities")
+    .description("View and complete today's activities.")
     .contentMarginsDisabled()
     .supportedFamilies([.systemLarge])
   }

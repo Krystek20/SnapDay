@@ -102,6 +102,8 @@ struct StreakWidget: Widget {
       StreakEntryView(entry: entry)
         .containerBackground(.fill.tertiary, for: .widget)
     }
+    .configurationDisplayName("Activity streak")
+    .description("Track the streak for a saved activity.")
     .contentMarginsDisabled()
     .supportedFamilies([.systemSmall])
   }

@@ -68,11 +68,11 @@ public struct PlansView: View {
       PlanDetailsView(store: store)
     }
     .alert(
-      String(localized: "Archive this Plan?", bundle: .module),
+      String(localized: "Archive this plan?", bundle: .module),
       isPresented: archiveConfirmationBinding
     ) {
       Button(
-        String(localized: "Archive Plan", bundle: .module),
+        String(localized: "Archive plan", bundle: .module),
         role: .destructive,
         action: { store.send(.view(.archivePlanConfirmed)) }
       )
@@ -82,7 +82,17 @@ public struct PlansView: View {
         action: { store.send(.view(.archivePlanCancelled)) }
       )
     } message: {
-      Text("The Plan will move to History. Completed activities and progress will be kept.", bundle: .module)
+      Text("This plan will move to History. Its completed activities and progress will be kept.", bundle: .module)
+    }
+    .alert(
+      String(localized: "Plan couldn't be saved", bundle: .module),
+      isPresented: saveErrorBinding
+    ) {
+      Button(String(localized: "OK", bundle: .module)) {
+        store.send(.view(.saveErrorDismissed))
+      }
+    } message: {
+      Text("Your changes are still open. Please try saving again.", bundle: .module)
     }
   }
 
@@ -118,7 +128,7 @@ public struct PlansView: View {
 
   private func errorContent(message: String) -> some View {
     VStack(spacing: 10.0) {
-      Text("Plans couldn't be loaded", bundle: .module)
+      Text("Couldn't load plans", bundle: .module)
         .font(.system(size: 16.0, weight: .semibold))
         .foregroundStyle(Color.primaryText)
 
@@ -147,8 +157,8 @@ public struct PlansView: View {
         emptyActiveContent
       } else {
         PlansSectionHeader(
-          title: String(localized: "ACTIVE PLANS", bundle: .module),
-          trailingTitle: "\(store.activePlans.count) active"
+          title: String(localized: "Active plans", bundle: .module),
+          trailingTitle: "\(store.activePlans.count)"
         )
 
         PlansGroup(
@@ -163,12 +173,12 @@ public struct PlansView: View {
   private var emptyActiveContent: some View {
     VStack(spacing: 15.0) {
       VStack(spacing: 5.0) {
-        Text("No active Plans", bundle: .module)
+        Text("No active plans", bundle: .module)
           .font(.system(size: 19.0, weight: .semibold))
           .foregroundStyle(Color.primaryText)
           .multilineTextAlignment(.center)
 
-        Text("Create a Plan from your existing activities and SnapDay will add them to the right days.", bundle: .module)
+        Text("Build a weekly plan from your saved activities. SnapDay will add them on the days you choose.", bundle: .module)
           .font(.system(size: 14.0, weight: .regular))
           .foregroundStyle(Color.secondaryText)
           .multilineTextAlignment(.center)
@@ -188,9 +198,9 @@ public struct PlansView: View {
         },
         label: {
           if store.isHistoryEmpty {
-            Text("Create your first Plan", bundle: .module)
+            Text("Create your first plan", bundle: .module)
           } else {
-            Text("Create a Plan", bundle: .module)
+            Text("Create a plan", bundle: .module)
           }
         }
       )
@@ -206,16 +216,16 @@ public struct PlansView: View {
         VStack(alignment: .leading, spacing: 15.0) {
           if !store.finishedPlans.isEmpty {
             historyGroup(
-              title: String(localized: "FINISHED", bundle: .module),
-              trailingTitle: "\(store.finishedPlans.count) finished",
+              title: String(localized: "Finished plans", bundle: .module),
+              trailingTitle: "\(store.finishedPlans.count)",
               plans: store.finishedPlans
             )
           }
 
           if !store.archivedPlans.isEmpty {
             historyGroup(
-              title: String(localized: "ARCHIVED", bundle: .module),
-              trailingTitle: "\(store.archivedPlans.count) archived",
+              title: String(localized: "Archived plans", bundle: .module),
+              trailingTitle: "\(store.archivedPlans.count)",
               plans: store.archivedPlans
             )
             .opacity(0.85)
@@ -227,12 +237,12 @@ public struct PlansView: View {
 
   private var emptyHistoryContent: some View {
     VStack(spacing: 5.0) {
-      Text("No plan history yet", bundle: .module)
+      Text("No plan history", bundle: .module)
         .font(.system(size: 19.0, weight: .semibold))
         .foregroundStyle(Color.primaryText)
         .multilineTextAlignment(.center)
 
-      Text("Finished and archived Plans will appear here.", bundle: .module)
+      Text("Finished and archived plans will appear here.", bundle: .module)
         .font(.system(size: 14.0, weight: .regular))
         .foregroundStyle(Color.secondaryText)
         .multilineTextAlignment(.center)
@@ -266,6 +276,17 @@ public struct PlansView: View {
       set: { isPresented in
         if !isPresented {
           store.send(.view(.archivePlanCancelled))
+        }
+      }
+    )
+  }
+
+  private var saveErrorBinding: Binding<Bool> {
+    Binding(
+      get: { store.isSaveErrorPresented },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.view(.saveErrorDismissed))
         }
       }
     )
@@ -370,7 +391,7 @@ private struct PlanRow: View {
           role: .destructive,
           action: archiveAction,
           label: {
-            Label(String(localized: "Archive Plan", bundle: .module), systemImage: "archivebox")
+            Label(String(localized: "Archive plan", bundle: .module), systemImage: "archivebox")
           }
         )
       }

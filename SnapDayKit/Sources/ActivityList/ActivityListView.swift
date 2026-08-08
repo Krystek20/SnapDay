@@ -77,6 +77,16 @@ public struct ActivityListView: View {
         }
         .presentationDetents([.large])
       }
+      .alert(
+        String(localized: "Activity is used by a Plan", bundle: .module),
+        isPresented: planActivityDeletionAlertBinding
+      ) {
+        Button(String(localized: "OK", bundle: .module)) {
+          store.send(.view(.planActivityDeletionAlertDismissed))
+        }
+      } message: {
+        Text("Plan activities must be kept to preserve their schedules and progress.", bundle: .module)
+      }
   }
 
   private var content: some View {
@@ -142,6 +152,17 @@ public struct ActivityListView: View {
     return String(
       localized: "Add \(store.selectedActivityIDs.count) activities",
       bundle: .module
+    )
+  }
+
+  private var planActivityDeletionAlertBinding: Binding<Bool> {
+    Binding(
+      get: { store.isPlanActivityDeletionAlertPresented },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.view(.planActivityDeletionAlertDismissed))
+        }
+      }
     )
   }
 }

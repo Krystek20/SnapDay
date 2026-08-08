@@ -1,5 +1,6 @@
 import Foundation
 import Models
+import Utilities
 
 struct PlanDetailsContent: Equatable {
 
@@ -23,7 +24,7 @@ struct PlanDetailsContent: Equatable {
     case today
     case upcoming
 
-    var title: String {
+    var title: String.LocalizationValue {
       switch self {
       case .done: "Done"
       case .partial: "Partly done"
@@ -136,7 +137,7 @@ struct PlanDetailsContent: Equatable {
 
     return ScheduledDay(
       id: weekday,
-      title: date.formatted(.dateTime.weekday(.wide).month(.abbreviated).day()),
+      title: date.formatted(template: "EEEEMMMd", calendar: calendar),
       state: .upcoming,
       activities: activityItems(on: date, fallback: nextOccurrences)
     )

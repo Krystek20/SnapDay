@@ -9,7 +9,7 @@ import Utilities
 public struct PlanDetailsView: View {
 
   @Bindable private var store: StoreOf<PlanDetailsFeature>
-  @Environment(\.calendar) private var calendar
+  private let calendar = Calendar.autoupdatingCurrent.utcCalendar
 
   public init(store: StoreOf<PlanDetailsFeature>) {
     self.store = store
@@ -32,16 +32,16 @@ public struct PlanDetailsView: View {
       .padding(15.0)
     }
     .background(Color.background)
-    .navigationTitle(Text("Plan Detail", bundle: .module))
+    .navigationTitle(Text("Plan details", bundle: .module))
     .navigationBarTitleDisplayMode(.inline)
     .toolbar { managementToolbar }
     .task { await store.send(.view(.task)).finish() }
     .alert(
-      String(localized: "Archive this Plan?", bundle: .module),
+      String(localized: "Archive this plan?", bundle: .module),
       isPresented: archiveConfirmationBinding
     ) {
       Button(
-        String(localized: "Archive Plan", bundle: .module),
+        String(localized: "Archive plan", bundle: .module),
         role: .destructive,
         action: { store.send(.view(.archiveConfirmed)) }
       )
@@ -51,10 +51,10 @@ public struct PlanDetailsView: View {
         action: { store.send(.view(.archiveCancelled)) }
       )
     } message: {
-      Text("The Plan will move to History. Completed activities and progress will be kept.", bundle: .module)
+      Text("This plan will move to History. Its completed activities and progress will be kept.", bundle: .module)
     }
     .alert(
-      String(localized: "This Plan can't be restored", bundle: .module),
+      String(localized: "This plan can't be restored", bundle: .module),
       isPresented: restoreUnavailableBinding
     ) {
       Button(String(localized: "Create similar", bundle: .module)) {
@@ -64,7 +64,17 @@ public struct PlanDetailsView: View {
         store.send(.view(.restoreUnavailableDismissed))
       }
     } message: {
-      Text("Its date range has ended or its schedule is empty. Create a similar Plan with a new schedule instead.", bundle: .module)
+      Text("Its date range has ended or its schedule is empty. Create a similar plan with a new schedule.", bundle: .module)
+    }
+    .alert(
+      String(localized: "Plan couldn't be saved", bundle: .module),
+      isPresented: saveErrorBinding
+    ) {
+      Button(String(localized: "OK", bundle: .module)) {
+        store.send(.view(.saveErrorDismissed))
+      }
+    } message: {
+      Text("Your changes are still open. Please try saving again.", bundle: .module)
     }
     .sheet(item: $store.scope(state: \.newPlan, action: \.newPlan)) { store in
       NewPlanView(store: store)
@@ -117,8 +127,8 @@ public struct PlanDetailsView: View {
   @ViewBuilder
   private var activeContent: some View {
     sectionTitle(
-      "TODAY",
-      trailing: (store.referenceDate ?? .now).formatted(.dateTime.weekday(.wide))
+      String(localized: "Today", bundle: .module),
+      trailing: (store.referenceDate ?? .now).formatted(template: "EEEE", calendar: calendar)
     )
 
     if content.todayActivities.isEmpty {
@@ -127,14 +137,17 @@ public struct PlanDetailsView: View {
       todayCard
     }
 
-    sectionTitle("THIS WEEK")
+    sectionTitle(String(localized: "This week", bundle: .module))
     scheduleCard(days: content.scheduledDays, showsState: true)
   }
 
   private var todayCard: some View {
     VStack(alignment: .leading, spacing: 15.0) {
       VStack(alignment: .leading, spacing: 5.0) {
-        Text(verbatim: "\(content.completedTodayCount) of \(content.todayActivities.count) activities complete")
+        Text(
+          "\(content.completedTodayCount) of \(content.todayActivities.count) activities complete",
+          bundle: .module
+        )
           .font(.system(size: 17.0, weight: .semibold))
           .foregroundStyle(Color.primaryText)
 
@@ -158,7 +171,7 @@ public struct PlanDetailsView: View {
           .font(.system(size: 17.0, weight: .semibold))
           .foregroundStyle(Color.primaryText)
 
-        Text("This Plan does not generate anything today. Your daily list can still contain non-Plan activities.", bundle: .module)
+        Text("This plan has nothing scheduled today. Your daily list may still include other activities.", bundle: .module)
           .font(.system(size: 13.0))
           .foregroundStyle(Color.secondaryText)
       }
@@ -167,7 +180,7 @@ public struct PlanDetailsView: View {
         Divider()
 
         VStack(alignment: .leading, spacing: 10.0) {
-          Text("NEXT PLANNED DAY", bundle: .module)
+          Text("Next planned day", bundle: .module)
             .font(.system(size: 11.0, weight: .semibold))
             .foregroundStyle(Color.sectionText)
 
@@ -186,7 +199,7 @@ public struct PlanDetailsView: View {
   private var finishedContent: some View {
     activityBreakdownContent
 
-    sectionTitle("ORIGINAL SCHEDULE")
+    sectionTitle(String(localized: "Original schedule", bundle: .module))
     scheduleCard(days: content.scheduledDays, showsState: false)
 
     lifecycleButtons(for: .finished)
@@ -194,10 +207,10 @@ public struct PlanDetailsView: View {
 
   @ViewBuilder
   private var archivedContent: some View {
-    sectionTitle("STATUS")
+    sectionTitle(String(localized: "Status", bundle: .module))
 
     VStack(alignment: .leading, spacing: 5.0) {
-      Text("This Plan is not active", bundle: .module)
+      Text("This plan is not active", bundle: .module)
         .font(.system(size: 17.0, weight: .semibold))
         .foregroundStyle(Color.primaryText)
 
@@ -209,7 +222,7 @@ public struct PlanDetailsView: View {
 
     activityBreakdownContent
 
-    sectionTitle("PREVIOUS SCHEDULE")
+    sectionTitle(String(localized: "Previous schedule", bundle: .module))
     scheduleCard(days: content.scheduledDays, showsState: false)
 
     lifecycleButtons(for: .archived)
@@ -217,7 +230,7 @@ public struct PlanDetailsView: View {
 
   @ViewBuilder
   private var activityBreakdownContent: some View {
-    sectionTitle("ACTIVITIES")
+    sectionTitle(String(localized: "Activities", bundle: .module))
 
     if content.activityBreakdown.isEmpty {
       noActivitiesCard
@@ -245,7 +258,7 @@ public struct PlanDetailsView: View {
   }
 
   private var noActivitiesCard: some View {
-    Text("No activities were scheduled for this Plan.", bundle: .module)
+    Text("No activities were scheduled for this plan.", bundle: .module)
       .font(.system(size: 13.0))
       .foregroundStyle(Color.secondaryText)
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -260,7 +273,7 @@ public struct PlanDetailsView: View {
         }
         .buttonStyle(PrimaryButtonStyle())
       } else if status == .archived {
-        Button(String(localized: "Restore Plan", bundle: .module)) {
+        Button(String(localized: "Restore plan", bundle: .module)) {
           store.send(.view(.restoreButtonTapped))
         }
         .buttonStyle(PrimaryButtonStyle())
@@ -314,7 +327,11 @@ public struct PlanDetailsView: View {
 
       Spacer(minLength: 10.0)
 
-      Text(verbatim: activity.isDone ? "Done" : "Planned")
+      Text(
+        activity.isDone
+          ? String(localized: "Done", bundle: .module)
+          : String(localized: "Planned", bundle: .module)
+      )
         .font(.system(size: 12.0, weight: .semibold))
         .foregroundStyle(activity.isDone ? Color.greenSuccess : Color.secondaryText)
     }
@@ -366,7 +383,7 @@ public struct PlanDetailsView: View {
     case .upcoming: .secondaryText
     }
 
-    return Text(state.title)
+    return Text(String(localized: state.title, bundle: .module))
       .font(.system(size: 11.0, weight: .semibold))
       .foregroundStyle(color)
       .padding(.horizontal, 10.0)
@@ -389,7 +406,7 @@ public struct PlanDetailsView: View {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
           Button(role: .destructive, action: { store.send(.view(.archiveButtonTapped)) }) {
-            Label(String(localized: "Archive Plan", bundle: .module), systemImage: "archivebox")
+            Label(String(localized: "Archive plan", bundle: .module), systemImage: "archivebox")
           }
         } label: {
           Image(systemName: "ellipsis")
@@ -417,9 +434,20 @@ public struct PlanDetailsView: View {
   }
 
   private var dateRangeText: String {
-    let start = store.plan.startDate.formatted(.dateTime.day().month(.abbreviated).year())
-    let end = store.plan.endDate.formatted(.dateTime.day().month(.abbreviated).year())
-    return "\(start) - \(end)"
+    let start = store.plan.startDate.formatted(template: "dMMMy", calendar: calendar)
+    let end = store.plan.endDate.formatted(template: "dMMMy", calendar: calendar)
+    return "\(start) – \(end)"
+  }
+
+  private var saveErrorBinding: Binding<Bool> {
+    Binding(
+      get: { store.isSaveErrorPresented },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.view(.saveErrorDismissed))
+        }
+      }
+    )
   }
 
   private var progressSummary: String {

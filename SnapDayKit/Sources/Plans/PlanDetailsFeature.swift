@@ -24,6 +24,7 @@ public struct PlanDetailsFeature {
     var isLoading = false
     var isArchiveConfirmationPresented = false
     var isRestoreUnavailableAlertPresented = false
+    var isSaveErrorPresented = false
     @Presents var newPlan: NewPlanFeature.State?
 
     public var id: Plan.ID { plan.id }
@@ -55,6 +56,7 @@ public struct PlanDetailsFeature {
       case createSimilarButtonTapped
       case restoreButtonTapped
       case restoreUnavailableDismissed
+      case saveErrorDismissed
     }
 
     public enum InternalAction: Equatable {
@@ -62,6 +64,7 @@ public struct PlanDetailsFeature {
       case editActivitiesLoaded([Activity])
       case lifecyclePlanSaved(Plan)
       case operationFailed
+      case planSaveFailed
       case planSaved(Plan)
       case similarActivitiesLoaded([Activity])
     }
@@ -97,24 +100,14 @@ public struct PlanDetailsFeature {
               await send(.internal(.operationFailed))
               return
             }
-            var activitiesByID = Dictionary(
-              knownActivities
-                .filter { activityIDs.contains($0.id) }
-                .map { ($0.id, $0) },
-              uniquingKeysWith: { _, latest in latest }
+            let activities = PlanActivityResolver.orderedActivities(
+              for: plan.schedule,
+              merging: [
+                knownActivities.filter { activityIDs.contains($0.id) },
+                snapshot.dayActivities.compactMap(\.activity),
+                loadedActivities.filter { activityIDs.contains($0.id) }
+              ]
             )
-            for activity in snapshot.dayActivities.compactMap(\.activity)
-              where activityIDs.contains(activity.id) {
-              activitiesByID[activity.id] = activity
-            }
-            for activity in loadedActivities where activityIDs.contains(activity.id) {
-              activitiesByID[activity.id] = activity
-            }
-            var includedActivityIDs = Set<Activity.ID>()
-            let activities = plan.schedule.compactMap { entry -> Activity? in
-              guard includedActivityIDs.insert(entry.activityID).inserted else { return nil }
-              return activitiesByID[entry.activityID]
-            }
             await send(.internal(.detailsLoaded(activities, snapshot)))
           } catch {
             await send(.internal(.operationFailed))
@@ -145,6 +138,7 @@ public struct PlanDetailsFeature {
         return .send(.delegate(.archivePlanTapped(state.id)))
       case .view(.createSimilarButtonTapped):
         let activityIDs = Set(state.plan.schedule.map(\.activityID))
+        let schedule = state.plan.schedule
         let availableActivities = state.activities.filter { activityIDs.contains($0.id) }
         if Set(availableActivities.map(\.id)) == activityIDs {
           return .send(.internal(.similarActivitiesLoaded(availableActivities)))
@@ -152,13 +146,11 @@ public struct PlanDetailsFeature {
         return .run { send in
           do {
             let loadedActivities = try await loadActivities()
-            var activitiesByID = Dictionary(
-              uniqueKeysWithValues: availableActivities.map { ($0.id, $0) }
+            let activities = PlanActivityResolver.orderedActivities(
+              for: schedule,
+              merging: [availableActivities, loadedActivities]
             )
-            for activity in loadedActivities where activityIDs.contains(activity.id) {
-              activitiesByID[activity.id] = activity
-            }
-            await send(.internal(.similarActivitiesLoaded(Array(activitiesByID.values))))
+            await send(.internal(.similarActivitiesLoaded(activities)))
           } catch {
             await send(.internal(.operationFailed))
           }
@@ -177,6 +169,9 @@ public struct PlanDetailsFeature {
         return saveLifecyclePlan(restoredPlan, synchronizingFrom: today)
       case .view(.restoreUnavailableDismissed):
         state.isRestoreUnavailableAlertPresented = false
+        return .none
+      case .view(.saveErrorDismissed):
+        state.isSaveErrorPresented = false
         return .none
       case .internal(.editActivitiesLoaded(let activities)):
         state.newPlan = NewPlanFeature.State(
@@ -203,6 +198,8 @@ public struct PlanDetailsFeature {
         )
       case .internal(.planSaved(let plan)):
         state.plan = plan
+        state.newPlan = nil
+        state.isSaveErrorPresented = false
         return .merge(
           .send(.view(.task)),
           .send(.delegate(.planUpdated))
@@ -219,6 +216,9 @@ public struct PlanDetailsFeature {
       case .internal(.operationFailed):
         state.isLoading = false
         return .none
+      case .internal(.planSaveFailed):
+        state.isSaveErrorPresented = true
+        return .none
       case .newPlan(.presented(.delegate(.cancelTapped))):
         state.newPlan = nil
         return .none
@@ -226,7 +226,6 @@ public struct PlanDetailsFeature {
         let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
         return saveLifecyclePlan(plan, synchronizingFrom: plan.startDate)
       case .newPlan(.presented(.delegate(.planUpdated(let plan)))):
-        state.newPlan = nil
         let firstAffectedOccurrenceDate = calendar.date(
           byAdding: .day,
           value: 1,
@@ -238,7 +237,7 @@ public struct PlanDetailsFeature {
             _ = try await planRepository.synchronizeOccurrences(plan, firstAffectedOccurrenceDate)
             await send(.internal(.planSaved(plan)))
           } catch {
-            await send(.internal(.operationFailed))
+            await send(.internal(.planSaveFailed))
           }
         }
       case .newPlan:

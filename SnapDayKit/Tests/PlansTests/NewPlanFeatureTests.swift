@@ -371,7 +371,7 @@ struct NewPlanFeatureTests {
       $0.activityPickerDay = .monday
       $0.activityPicker = ActivityListFeature.State(
         selectedActivityIDs: [],
-        title: "Add to \(PlanWeekday.monday.title)"
+        title: NewPlanFeature.activityPickerTitle(for: .monday)
       )
     }
     await store.send(
@@ -403,7 +403,7 @@ struct NewPlanFeatureTests {
       $0.activityPickerDay = .monday
       $0.activityPicker = ActivityListFeature.State(
         selectedActivityIDs: [],
-        title: "Add to \(PlanWeekday.monday.title)"
+        title: NewPlanFeature.activityPickerTitle(for: .monday)
       )
     }
     #expect(store.state.name == initialState.name)
@@ -642,7 +642,7 @@ struct NewPlanFeatureTests {
       $0.activityPickerDay = .tuesday
       $0.activityPicker = ActivityListFeature.State(
         selectedActivityIDs: [],
-        title: "Add to \(PlanWeekday.tuesday.title)"
+        title: NewPlanFeature.activityPickerTitle(for: .tuesday)
       )
     }
     await store.send(
@@ -784,6 +784,52 @@ struct NewPlanFeatureTests {
     await store.send(.newPlan(.presented(.delegate(.cancelTapped)))) {
       $0.newPlan = nil
     }
+  }
+
+  @Test
+  func plansFeatureKeepsEditorOpenWhenSavingFails() async throws {
+    struct SaveError: Error { }
+
+    let calendar = testCalendar()
+    let now = try date(year: 2026, month: 6, day: 8, calendar: calendar)
+    let plan = Plan(
+      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
+      name: "Reading week",
+      startDate: now,
+      endDate: now,
+      duration: .custom,
+      schedule: []
+    )
+    var state = PlansFeature.State()
+    state.newPlan = NewPlanFeature.State(
+      plan: plan,
+      activities: [],
+      now: now,
+      calendar: calendar
+    )
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = now
+      $0.planRepository = PlanRepository(
+        loadPlans: { [] },
+        loadActivePlans: { _ in [] },
+        loadHistoricalPlans: { _ in [] },
+        plan: { _ in nil },
+        savePlan: { _ in throw SaveError() },
+        archivePlan: { _ in },
+        loadOccurrences: { _ in [] },
+        saveOccurrences: { _ in },
+        synchronizeOccurrences: { _, _ in [] }
+      )
+    } operation: {
+      TestStore(initialState: state, reducer: { PlansFeature() })
+    }
+
+    await store.send(.newPlan(.presented(.delegate(.planUpdated(plan)))))
+    await store.receive(.internal(.planSaveFailed)) {
+      $0.isSaveErrorPresented = true
+    }
+    #expect(store.state.newPlan != nil)
   }
 
   @Test

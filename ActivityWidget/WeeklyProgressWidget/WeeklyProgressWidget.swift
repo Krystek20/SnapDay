@@ -12,19 +12,16 @@ struct WeeklyProgressWidgetProvider: AppIntentTimelineProvider, TodayProvidable 
   private let streakProvider = StreakProvider()
 
   func placeholder(in context: Context) -> WeeklyProgressEntry {
-    WeeklyProgressEntry(
-      days: [],
-      date: Date(),
-      configuration: WeeklyProgressAppIntent()
-    )
+    .preview()
   }
 
   func snapshot(for configuration: WeeklyProgressAppIntent, in context: Context) async -> WeeklyProgressEntry {
-    WeeklyProgressEntry(
-      days: [],
-      date: Date(),
-      configuration: configuration
-    )
+    guard !context.isPreview else {
+      return .preview(configuration: configuration)
+    }
+
+    let timeline = await timeline(for: configuration, in: context)
+    return timeline.entries.first ?? .preview(configuration: configuration)
   }
 
   func timeline(for configuration: WeeklyProgressAppIntent, in context: Context) async -> Timeline<WeeklyProgressEntry> {
@@ -91,6 +88,49 @@ struct WeeklyProgressEntry: TimelineEntry {
   let configuration: WeeklyProgressAppIntent
 }
 
+extension WeeklyProgressEntry {
+  static func preview(
+    configuration: WeeklyProgressAppIntent = WeeklyProgressAppIntent(),
+    referenceDate: Date = .now
+  ) -> Self {
+    var calendar = Calendar.autoupdatingCurrent
+    calendar.timeZone = .autoupdatingCurrent
+    let weekStart = calendar.dateInterval(of: .weekOfYear, for: referenceDate)?.start ?? referenceDate
+    let completionByDay = [
+      (completed: 2, planned: 2),
+      (completed: 1, planned: 2),
+      (completed: 3, planned: 3),
+      (completed: 0, planned: 2),
+      (completed: 1, planned: 1),
+      (completed: 0, planned: 0),
+      (completed: 1, planned: 2)
+    ]
+
+    let days = completionByDay.enumerated().compactMap { offset, progress -> Day? in
+      guard let date = calendar.date(byAdding: .day, value: offset, to: weekStart) else {
+        return nil
+      }
+      let activities = (0..<progress.planned).map { index in
+        DayActivity(
+          id: UUID(),
+          date: date,
+          name: "Activity \(index + 1)",
+          doneDate: index < progress.completed ? date : nil,
+          duration: 20,
+          isGeneratedAutomatically: false
+        )
+      }
+      return Day(id: UUID(), date: date, activities: activities)
+    }
+
+    return Self(
+      days: days,
+      date: referenceDate,
+      configuration: configuration
+    )
+  }
+}
+
 struct WeeklyProgressEntryView : View {
   var entry: WeeklyProgressWidgetProvider.Entry
 
@@ -120,7 +160,15 @@ struct WeeklyProgressWidget: Widget {
       WeeklyProgressEntryView(entry: entry)
         .containerBackground(.fill.tertiary, for: .widget)
     }
+    .configurationDisplayName("Weekly progress")
+    .description("See your activity progress for the week.")
     .contentMarginsDisabled()
     .supportedFamilies([.systemMedium])
   }
+}
+
+#Preview("Weekly progress", as: .systemMedium) {
+  WeeklyProgressWidget()
+} timeline: {
+  WeeklyProgressEntry.preview()
 }

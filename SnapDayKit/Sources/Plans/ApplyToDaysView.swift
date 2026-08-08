@@ -18,7 +18,7 @@ struct ApplyToDaysView: View {
           sourceSection
           targetSection
 
-          Text("Selected days will use the source day's activities. Days with existing activities ask for confirmation.", bundle: .module)
+          Text("Selected days will copy the source day's activities. You'll confirm before replacing existing activities.", bundle: .module)
             .font(.system(size: 13.0, weight: .regular))
             .foregroundStyle(Color.sectionText)
             .lineSpacing(2.0)
@@ -72,7 +72,7 @@ struct ApplyToDaysView: View {
   }
 
   private var sourceSection: some View {
-    NewPlanSection(title: String(localized: "SOURCE DAY", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Source day", bundle: .module)) {
       VStack(alignment: .leading, spacing: 10.0) {
         Text(sourceWeekday.title)
           .font(.system(size: 16.0, weight: .semibold))
@@ -96,7 +96,7 @@ struct ApplyToDaysView: View {
   }
 
   private var targetSection: some View {
-    NewPlanSection(title: String(localized: "TARGET DAYS", bundle: .module)) {
+    NewPlanSection(title: String(localized: "Target days", bundle: .module)) {
       VStack(spacing: .zero) {
         ForEach(Array(targetDays.enumerated()), id: \.element.id) { index, day in
           Button {
@@ -178,16 +178,7 @@ struct ApplyToDaysView: View {
   }
 
   private var replacementConfirmationMessage: String {
-    if replacementDays.count == 1 {
-      return String(
-        localized: "\(replacementDaysTitle) already has activities. Applying will replace them, not merge them.",
-        bundle: .module
-      )
-    }
-    return String(
-      localized: "\(replacementDaysTitle) already have activities. Applying will replace them, not merge them.",
-      bundle: .module
-    )
+    String(localized: "Existing activities will be replaced, not merged.", bundle: .module)
   }
 
   private var replacementDays: [PlanWeekday] {

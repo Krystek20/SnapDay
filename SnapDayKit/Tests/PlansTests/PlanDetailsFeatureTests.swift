@@ -233,6 +233,45 @@ struct PlanDetailsFeatureTests {
     #expect(copiedPlan.schedule.first(where: { $0.weekday == .wednesday })?.activities == [activity])
   }
 
+  @Test
+  func failedEditKeepsEditorOpenAndShowsError() async throws {
+    let calendar = testCalendar()
+    let now = try testDate(day: 15, calendar: calendar)
+    let originalPlan = try plan()
+    var updatedPlan = originalPlan
+    updatedPlan.name = "Updated plan"
+    var state = PlanDetailsFeature.State(plan: originalPlan, allowsManagement: true)
+    state.newPlan = NewPlanFeature.State(
+      plan: originalPlan,
+      activities: [],
+      now: now,
+      calendar: calendar
+    )
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = now
+      $0.planRepository = PlanRepository(
+        loadPlans: { [] },
+        loadActivePlans: { _ in [] },
+        loadHistoricalPlans: { _ in [] },
+        plan: { _ in nil },
+        savePlan: { _ in throw TestError() },
+        archivePlan: { _ in },
+        loadOccurrences: { _ in [] },
+        saveOccurrences: { _ in },
+        synchronizeOccurrences: { _, _ in [] }
+      )
+    } operation: {
+      TestStore(initialState: state, reducer: { PlanDetailsFeature() })
+    }
+
+    await store.send(.newPlan(.presented(.delegate(.planUpdated(updatedPlan)))))
+    await store.receive(.internal(.planSaveFailed)) {
+      $0.isSaveErrorPresented = true
+    }
+    #expect(store.state.newPlan != nil)
+  }
+
   private func plan(
     startDate: Date? = nil,
     endDate: Date? = nil,
