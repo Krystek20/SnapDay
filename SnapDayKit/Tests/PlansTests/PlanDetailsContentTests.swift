@@ -186,68 +186,40 @@ struct PlanDetailsContentTests {
   }
 
   @Test
-  func historySeparatesDonePartialMissedAndRemainingDays() throws {
+  func activePlanDoesNotShowScheduledDaysAfterItsEndDate() throws {
     let calendar = try calendar()
-    let activity = Activity(id: UUID(), name: "Read")
-    let secondActivity = Activity(id: UUID(), name: "Walk")
+    let monday = try date(day: 13, calendar: calendar)
+    let activity = Activity(id: UUID(), name: "Walk")
     let plan = Plan(
       id: UUID(),
-      name: "History",
-      startDate: try date(day: 13, calendar: calendar),
-      endDate: try date(day: 16, calendar: calendar),
+      name: "Ending today",
+      startDate: try date(day: 6, calendar: calendar),
+      endDate: monday,
       duration: .custom,
-      schedule: []
+      schedule: [
+        PlanScheduleEntry(
+          id: UUID(),
+          weekday: .tuesday,
+          activityID: activity.id,
+          position: 0
+        )
+      ]
     )
-    let dates = try (13...16).map { try date(day: $0, calendar: calendar) }
-    let doneID = UUID()
-    let partialID = UUID()
-    let occurrences = [
-      PlanOccurrence(planID: plan.id, activityID: activity.id, date: dates[0], dayActivityID: doneID),
-      PlanOccurrence(planID: plan.id, activityID: activity.id, date: dates[1], dayActivityID: partialID),
-      PlanOccurrence(planID: plan.id, activityID: secondActivity.id, date: dates[1]),
-      PlanOccurrence(planID: plan.id, activityID: activity.id, date: dates[2]),
-      PlanOccurrence(planID: plan.id, activityID: activity.id, date: dates[3])
-    ]
-    let dayActivities = [
-      DayActivity(
-        id: doneID,
-        date: dates[0],
-        activity: activity,
-        name: activity.name,
-        doneDate: dates[0],
-        duration: 600,
-        isGeneratedAutomatically: true
-      ),
-      DayActivity(
-        id: partialID,
-        date: dates[1],
-        activity: activity,
-        name: activity.name,
-        doneDate: dates[1],
-        duration: 300,
-        isGeneratedAutomatically: true
-      )
-    ]
     let content = PlanDetailsContent(
       plan: plan,
-      activities: [activity, secondActivity],
-      occurrences: occurrences,
-      dayActivities: dayActivities,
-      referenceDate: dates[3],
+      activities: [activity],
+      occurrences: [],
+      dayActivities: [],
+      referenceDate: monday,
       calendar: calendar
     )
 
-    #expect(content.historySummary.completedDays == 1)
-    #expect(content.historySummary.partialDays == 1)
-    #expect(content.historySummary.missedDays == 1)
-    #expect(content.historySummary.remainingDays == 1)
-    #expect(content.historySummary.completedTime == 900)
-    #expect(content.historyMonths.count == 1)
-    #expect(content.historyMonths[0].days.map(\.state) == [.done, .partial, .missed, .future])
+    #expect(content.status == .active)
+    #expect(content.scheduledDays.isEmpty)
   }
 
   @Test
-  func resultProgressUsesPlannedActivitiesRatherThanCompletedDays() throws {
+  func progressUsesPlannedActivitiesRatherThanCompletedDays() throws {
     let calendar = try calendar()
     let firstDate = try date(day: 13, calendar: calendar)
     let secondDate = try date(day: 14, calendar: calendar)
@@ -297,12 +269,10 @@ struct PlanDetailsContentTests {
     #expect(content.progress.completedPlannedActivityCount == 3)
     #expect(content.progress.totalPlannedActivityCount == 4)
     #expect(content.progress.percentComplete == 75)
-    #expect(content.historySummary.completedDays == 1)
-    #expect(content.historySummary.missedDays == 1)
   }
 
   @Test
-  func resultDeduplicatesOccurrencesAndUsesCurrentActivityDetails() throws {
+  func detailsDeduplicateOccurrencesAndUseCurrentActivityDetails() throws {
     let calendar = try calendar()
     let plannedDate = try date(day: 13, calendar: calendar)
     let readID = UUID()
@@ -352,67 +322,13 @@ struct PlanDetailsContentTests {
 
     #expect(content.progress.completedPlannedActivityCount == 1)
     #expect(content.progress.totalPlannedActivityCount == 2)
-    #expect(content.historySummary.partialDays == 1)
     #expect(content.activityBreakdown.map(\.activity.name) == ["Read Spanish", "Walk"])
     #expect(content.activityBreakdown.map(\.completedCount) == [1, 0])
     #expect(content.activityBreakdown.map(\.plannedCount) == [1, 1])
   }
 
   @Test
-  func completedTimeOnlyIncludesDayActivitiesLinkedToThePlan() throws {
-    let calendar = try calendar()
-    let plannedDate = try date(day: 13, calendar: calendar)
-    let activity = Activity(id: UUID(), name: "Read")
-    let linkedID = UUID()
-    let plan = Plan(
-      id: UUID(),
-      name: "Reading",
-      startDate: plannedDate,
-      endDate: plannedDate,
-      duration: .custom,
-      schedule: []
-    )
-    let dayActivities = [
-      DayActivity(
-        id: linkedID,
-        date: plannedDate,
-        activity: activity,
-        name: activity.name,
-        doneDate: plannedDate,
-        duration: 600,
-        isGeneratedAutomatically: true
-      ),
-      DayActivity(
-        id: UUID(),
-        date: plannedDate,
-        activity: activity,
-        name: activity.name,
-        doneDate: plannedDate,
-        duration: 1_800,
-        isGeneratedAutomatically: false
-      )
-    ]
-    let content = PlanDetailsContent(
-      plan: plan,
-      activities: [activity],
-      occurrences: [
-        PlanOccurrence(
-          planID: plan.id,
-          activityID: activity.id,
-          date: plannedDate,
-          dayActivityID: linkedID
-        )
-      ],
-      dayActivities: dayActivities,
-      referenceDate: try date(day: 14, calendar: calendar),
-      calendar: calendar
-    )
-
-    #expect(content.historySummary.completedTime == 600)
-  }
-
-  @Test
-  func finishedResultWithoutCompletionsKeepsPlannedActivityBreakdown() throws {
+  func finishedDetailsWithoutCompletionsKeepPlannedActivityBreakdown() throws {
     let calendar = try calendar()
     let plannedDate = try date(day: 13, calendar: calendar)
     let activity = Activity(id: UUID(), name: "Read")
@@ -445,8 +361,6 @@ struct PlanDetailsContentTests {
     #expect(content.status == .finished)
     #expect(content.progress.completedPlannedActivityCount == 0)
     #expect(content.progress.totalPlannedActivityCount == 1)
-    #expect(content.historySummary.missedDays == 1)
-    #expect(content.historySummary.remainingDays == 0)
     #expect(content.activityBreakdown.first?.completedCount == 0)
     #expect(content.activityBreakdown.first?.plannedCount == 1)
   }

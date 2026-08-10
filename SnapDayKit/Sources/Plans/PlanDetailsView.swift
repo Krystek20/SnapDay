@@ -35,7 +35,7 @@ public struct PlanDetailsView: View {
     .navigationTitle(Text("Plan details", bundle: .module))
     .navigationBarTitleDisplayMode(.inline)
     .toolbar { managementToolbar }
-    .task { await store.send(.view(.task)).finish() }
+    .task(id: store.plan.id) { await store.send(.view(.task)).finish() }
     .alert(
       String(localized: "Archive this plan?", bundle: .module),
       isPresented: archiveConfirmationBinding

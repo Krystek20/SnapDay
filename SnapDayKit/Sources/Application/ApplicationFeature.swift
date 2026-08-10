@@ -1,11 +1,6 @@
-import Dashboard
-import Reports
-import Plans
-import Models
 import Onboarding
-import ActivityDetails
 import ComposableArchitecture
-import Repositories
+import Foundation
 import Utilities
 import TipKit
 #if DEBUG
@@ -13,21 +8,17 @@ import DeveloperTools
 #endif
 
 @Reducer
-public struct ApplicationFeature: TodayProvidable {
+public struct ApplicationFeature {
 
   @Dependency(\.deeplinkService) private var deeplinkService
   @Dependency(\.cloudService) private var cloudService
   @Dependency(\.iconProvider) private var iconProvider
-  @Dependency(\.planRepository) private var planRepository
   private static let isOnboardingShownKey = "isOnboardingShown"
 
   // MARK: - State & Action
 
   @ObservableState
   public struct State: Equatable {
-    var dashboardPath = StackState<Path.State>()
-    var reportsPath = StackState<Path.State>()
-
     var showOnboarding: Bool {
       didSet {
         userDefaults.setValue(!showOnboarding, forKey: ApplicationFeature.isOnboardingShownKey)
@@ -36,8 +27,8 @@ public struct ApplicationFeature: TodayProvidable {
 
     var selectedTab = Tab.dashboard
 
-    var dashboard = DashboardFeature.State(date: Calendar.today)
-    var reports = ReportsFeature.State()
+    var dashboard = DashboardCoordinatorFeature.State()
+    var reports = ReportsCoordinatorFeature.State()
     var onboarding = OnboardingFeature.State()
 
     #if DEBUG
@@ -58,49 +49,15 @@ public struct ApplicationFeature: TodayProvidable {
     case setupCloud
     case deviceShaked
     case handleUrl(URL)
-    case openPlans
-    case openPlan(Plan.ID)
-    case planDeepLinkLoaded(Plan?)
+    case openDashboardRoute(DashboardCoordinatorFeature.ExternalRoute)
     case setTab(Tab)
-    case dashboard(DashboardFeature.Action)
-    case dashboardPath(StackAction<Path.State, Path.Action>)
-    case reportsPath(StackAction<Path.State, Path.Action>)
-    case reports(ReportsFeature.Action)
+    case dashboard(DashboardCoordinatorFeature.Action)
+    case reports(ReportsCoordinatorFeature.Action)
     case onboarding(OnboardingFeature.Action)
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
     case binding(BindingAction<State>)
-  }
-
-  @Reducer
-  public struct Path {
-    
-    @ObservableState
-    public enum State: Equatable {
-      case activityDetails(ActivityDetailsFeature.State)
-      case planDetails(PlanDetailsFeature.State)
-      case plans(PlansFeature.State)
-    }
-
-    public enum Action: Equatable {
-      case activityDetails(ActivityDetailsFeature.Action)
-      case planDetails(PlanDetailsFeature.Action)
-      case plans(PlansFeature.Action)
-    }
-
-    public var body: some ReducerOf<Self> {
-      EmptyReducer<State, Action>()
-        .ifCaseLet(\.activityDetails, action: \.activityDetails) {
-          ActivityDetailsFeature()
-        }
-        .ifCaseLet(\.planDetails, action: \.planDetails) {
-          PlanDetailsFeature()
-        }
-        .ifCaseLet(\.plans, action: \.plans) {
-          PlansFeature()
-        }
-    }
   }
 
   public enum Tab: String {
@@ -118,11 +75,11 @@ public struct ApplicationFeature: TodayProvidable {
     BindingReducer()
 
     Scope(state: \.dashboard, action: \.dashboard) {
-      DashboardFeature()
+      DashboardCoordinatorFeature()
     }
 
     Scope(state: \.reports, action: \.reports) {
-      ReportsFeature()
+      ReportsCoordinatorFeature()
     }
 
     Scope(state: \.onboarding, action: \.onboarding) {
@@ -143,9 +100,9 @@ public struct ApplicationFeature: TodayProvidable {
                 await send(.setTab(.dashboard))
               case .plans(let planID):
                 if let planID {
-                  await send(.openPlan(planID))
+                  await send(.openDashboardRoute(.plan(planID)))
                 } else {
-                  await send(.openPlans)
+                  await send(.openDashboardRoute(.plans))
                 }
               case .none:
                 break
@@ -179,44 +136,16 @@ public struct ApplicationFeature: TodayProvidable {
       case .handleUrl(let url):
         deeplinkService.handleUrl(url)
         return .none
-      case .openPlans:
+      case .openDashboardRoute(let route):
         deeplinkService.consume()
         state.selectedTab = .dashboard
-        state.dashboardPath.removeAll()
-        state.dashboardPath.append(.plans(PlansFeature.State()))
-        return .none
-      case .openPlan(let planID):
-        deeplinkService.consume()
-        state.selectedTab = .dashboard
-        return .run { send in
-          await send(.planDeepLinkLoaded(try? await planRepository.plan(planID)))
-        }
-      case .planDeepLinkLoaded(let plan):
-        state.dashboardPath.removeAll()
-        if let plan {
-          state.dashboardPath.append(
-            .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
-          )
-        } else {
-          state.dashboardPath.append(.plans(PlansFeature.State()))
-        }
-        return .none
+        return .send(.dashboard(.externalRoute(route)))
       case .setTab(let tab):
         guard state.selectedTab != tab else { return .none }
         state.selectedTab = tab
         return .none
-      case .dashboard(.delegate(.allPlansTapped)):
-        state.dashboardPath.append(.plans(PlansFeature.State()))
-        return .none
-      case .dashboard(.delegate(.planTapped(let plan))):
-        state.dashboardPath.append(
-          .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
-        )
-        return .none
       case .dashboard:
         return .none
-      case .reports(.delegate(let action)):
-        return handleReportsDelegate(action: action, state: &state)
       case .reports:
         return .none
       case .onboarding(.delegate(.finished)):
@@ -228,33 +157,6 @@ public struct ApplicationFeature: TodayProvidable {
       case .developerTools:
         return .none
       #endif
-      case .dashboardPath(.element(
-        id: let pathID,
-        action: .planDetails(.delegate(.archivePlanTapped(let planID)))
-      )):
-        return .run { send in
-          do {
-            try await planRepository.archivePlan(planID)
-            await send(.dashboardPath(.popFrom(id: pathID)))
-            await send(.dashboard(.internal(.load)))
-          } catch {
-            return
-          }
-        }
-      case .dashboardPath(.element(
-        id: _,
-        action: .planDetails(.delegate(.planUpdated))
-      )):
-        return .send(.dashboard(.internal(.load)))
-      case .dashboardPath(.element(
-        id: _,
-        action: .plans(.delegate(.plansChanged))
-      )):
-        return .send(.dashboard(.internal(.load)))
-      case .dashboardPath:
-        return .none
-      case .reportsPath:
-        return .none
       case .binding:
         return .none
       }
@@ -264,41 +166,5 @@ public struct ApplicationFeature: TodayProvidable {
       DeveloperToolsFeature()
     }
     #endif
-    .forEach(\.dashboardPath, action: \.dashboardPath) {
-      Path()
-    }
-    .forEach(\.reportsPath, action: \.reportsPath) {
-      Path()
-    }
-  }
-
-  // MARK: - Private
-
-  private func handleReportsDelegate(
-    action: ReportsFeature.Action.DelegateAction,
-    state: inout ApplicationFeature.State
-  ) -> EffectOf<Self> {
-    switch action {
-    case .activityTapped(let activity, let activities, let period):
-      state.reportsPath.append(
-        .activityDetails(
-          ActivityDetailsFeature.State(
-            reportType: .activity(activity, activities, nil),
-            period: period
-          )
-        )
-      )
-      return .none
-    case .tagTapped(let tag, let tags, let period):
-      state.reportsPath.append(
-        .activityDetails(
-          ActivityDetailsFeature.State(
-            reportType: .tag(tag, tags, nil),
-            period: period
-          )
-        )
-      )
-      return .none
-    }
   }
 }

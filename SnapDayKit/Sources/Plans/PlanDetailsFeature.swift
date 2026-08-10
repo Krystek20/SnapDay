@@ -44,6 +44,14 @@ public struct PlanDetailsFeature {
       self.dayActivities = dayActivities
       self.referenceDate = referenceDate
     }
+
+    public func hasSamePlanContent(as plan: Plan) -> Bool {
+      self.plan == plan
+    }
+
+    public mutating func updatePlan(_ plan: Plan) {
+      self.plan = plan
+    }
   }
 
   public enum Action: Equatable {

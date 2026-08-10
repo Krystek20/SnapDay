@@ -36,8 +36,6 @@ public struct DashboardView: View {
   public var body: some View {
     ZStack(alignment: .top) {
       ScrollView {
-        Spacer()
-          .frame(height: 50.0)
         dashboardContent
           .padding(.horizontal, 15.0)
           .padding(.top, 15.0)
@@ -45,16 +43,20 @@ public struct DashboardView: View {
       }
       .maxWidth()
       .scrollIndicators(.hidden)
-
-      Switcher(
-        title: store.title,
-        leftArrowAction: {
-          store.send(.view(.decreaseButtonTapped))
-        },
-        rightArrowAction: {
-          store.send(.view(.increaseButtonTapped))
-        }
-      )
+      .safeAreaInset(edge: .top, spacing: .zero) {
+        Switcher(
+          title: store.title,
+          titleAction: {
+            store.send(.view(.calendarButtonTapped))
+          },
+          leftArrowAction: {
+            store.send(.view(.decreaseButtonTapped))
+          },
+          rightArrowAction: {
+            store.send(.view(.increaseButtonTapped))
+          }
+        )
+      }
 
       aiAssistantButton
 
@@ -112,15 +114,6 @@ public struct DashboardView: View {
             },
             label: {
               Image(systemName: "smallcircle.filled.circle.fill")
-                .foregroundStyle(Color.actionBlue)
-            }
-          )
-          Button(
-            action: {
-              store.send(.view(.calendarButtonTapped))
-            },
-            label: {
-              Image(systemName: "calendar.circle.fill")
                 .foregroundStyle(Color.actionBlue)
             }
           )

@@ -1,10 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
-import Dashboard
-import Reports
-import Plans
 import Onboarding
-import ActivityDetails
 import Resources
 import UIKit.UIDevice
 #if DEBUG
@@ -68,16 +64,9 @@ public struct ApplicationView: View {
     TabView(
       selection: $store.selectedTab,
       content: {
-        NavigationStack(path: $store.scope(state: \.dashboardPath, action: \.dashboardPath)) {
-          DashboardView(
-            store: store.scope(
-              state: \.dashboard,
-              action: \.dashboard
-            )
-          )
-        } destination: { store in
-          destinationView(store: store)
-        }
+        DashboardCoordinatorView(
+          store: store.scope(state: \.dashboard, action: \.dashboard)
+        )
         .tabItem {
           Text("Dashboard", bundle: .module)
           Image(systemName: "rectangle.grid.2x2")
@@ -85,16 +74,9 @@ public struct ApplicationView: View {
         .tag(ApplicationFeature.Tab.dashboard)
         .toolbarBackground(.visible, for: .tabBar)
 
-        NavigationStack(path: $store.scope(state: \.reportsPath, action: \.reportsPath)) {
-          ReportsView(
-            store: store.scope(
-              state: \.reports,
-              action: \.reports
-            )
-          )
-        } destination: { store in
-          destinationView(store: store)
-        }
+        ReportsCoordinatorView(
+          store: store.scope(state: \.reports, action: \.reports)
+        )
         .tabItem {
           Text("Reports", bundle: .module)
           Image(systemName: "doc.text")
@@ -105,21 +87,4 @@ public struct ApplicationView: View {
     )
   }
 
-  @ViewBuilder
-  private func destinationView(store: StoreOf<ApplicationFeature.Path>) -> some View {
-    switch store.state {
-    case .activityDetails:
-      if let store = store.scope(state: \.activityDetails, action: \.activityDetails) {
-        ActivityDetailsView(store: store)
-      }
-    case .planDetails:
-      if let store = store.scope(state: \.planDetails, action: \.planDetails) {
-        PlanDetailsView(store: store)
-      }
-    case .plans:
-      if let store = store.scope(state: \.plans, action: \.plans) {
-        PlansView(store: store)
-      }
-    }
-  }
 }

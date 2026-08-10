@@ -35,40 +35,6 @@ struct PlanDetailsContent: Equatable {
     }
   }
 
-  struct HistoryDay: Equatable, Identifiable {
-    enum State: Equatable {
-      case done
-      case partial
-      case missed
-      case rest
-      case future
-    }
-
-    let date: Date
-    let state: State
-
-    var id: Date { date }
-    var opensDashboard: Bool {
-      state == .done || state == .partial || state == .missed
-    }
-  }
-
-  struct HistoryMonth: Equatable, Identifiable {
-    let month: Date
-    let leadingBlankCount: Int
-    let days: [HistoryDay]
-
-    var id: Date { month }
-  }
-
-  struct HistorySummary: Equatable {
-    let completedDays: Int
-    let partialDays: Int
-    let missedDays: Int
-    let remainingDays: Int
-    let completedTime: Int
-  }
-
   struct ActivityBreakdown: Equatable, Identifiable {
     let activity: ActivityItem
     let completedCount: Int
@@ -109,6 +75,11 @@ struct PlanDetailsContent: Equatable {
       guard !entries.isEmpty else { return nil }
 
       let date = datesByWeekday[weekday]
+      if status == .active,
+         let date,
+         calendar.startOfDay(for: date) > calendar.startOfDay(for: plan.endDate) {
+        return nil
+      }
       let items = date.map { activityItems(on: $0) } ?? entries.compactMap(activityItem(for:))
       return ScheduledDay(
         id: weekday,
@@ -141,41 +112,6 @@ struct PlanDetailsContent: Equatable {
       state: .upcoming,
       activities: activityItems(on: date, fallback: nextOccurrences)
     )
-  }
-
-  var historySummary: HistorySummary {
-    let linkedDayActivityIDs = Set(planOccurrences.compactMap(\.dayActivityID))
-    return HistorySummary(
-      completedDays: historyDays.filter { $0.state == .done }.count,
-      partialDays: historyDays.filter { $0.state == .partial }.count,
-      missedDays: historyDays.filter { $0.state == .missed }.count,
-      remainingDays: historyDays.filter { $0.state == .future }.count,
-      completedTime: dayActivitiesByID.values
-        .filter { linkedDayActivityIDs.contains($0.id) && $0.isDone }
-        .reduce(0) { $0 + $1.totalDuration }
-    )
-  }
-
-  var hasRecordedHistory: Bool {
-    historyDays.contains { $0.state == .done || $0.state == .partial || $0.state == .missed }
-  }
-
-  var historyMonths: [HistoryMonth] {
-    let groupedDays = Dictionary(grouping: historyDays) { day in
-      calendar.dateInterval(of: .month, for: day.date)?.start ?? day.date
-    }
-    return groupedDays.keys.sorted().compactMap { month in
-      guard let days = groupedDays[month]?.sorted(by: { $0.date < $1.date }),
-            let firstDay = days.first
-      else { return nil }
-      let weekday = calendar.component(.weekday, from: firstDay.date)
-      let leadingBlankCount = (weekday - calendar.firstWeekday + 7) % 7
-      return HistoryMonth(
-        month: month,
-        leadingBlankCount: leadingBlankCount,
-        days: days
-      )
-    }
   }
 
   var activityBreakdown: [ActivityBreakdown] {
@@ -239,40 +175,6 @@ struct PlanDetailsContent: Equatable {
       else { return }
       dates[weekday] = date
     }
-  }
-
-  private var historyDays: [HistoryDay] {
-    let startDate = calendar.startOfDay(for: plan.startDate)
-    let endDate = calendar.startOfDay(for: plan.endDate)
-    let referenceDay = calendar.startOfDay(for: referenceDate)
-    guard startDate <= endDate else { return [] }
-
-    var result: [HistoryDay] = []
-    var date = startDate
-    while date <= endDate {
-      let matchingOccurrences = planOccurrences.filter { calendar.isDate($0.date, inSameDayAs: date) }
-      let state: HistoryDay.State
-      if matchingOccurrences.isEmpty {
-        state = .rest
-      } else {
-        let completedCount = matchingOccurrences.filter { occurrence in
-          occurrence.dayActivityID.flatMap { dayActivitiesByID[$0]?.isDone } ?? false
-        }.count
-        if completedCount == matchingOccurrences.count {
-          state = .done
-        } else if completedCount > 0 {
-          state = .partial
-        } else if date < referenceDay {
-          state = .missed
-        } else {
-          state = .future
-        }
-      }
-      result.append(HistoryDay(date: date, state: state))
-      guard let nextDate = calendar.date(byAdding: .day, value: 1, to: date) else { break }
-      date = nextDate
-    }
-    return result
   }
 
   private func activityItems(
