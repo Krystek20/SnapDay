@@ -99,11 +99,9 @@ public struct WeeklyProgressView: View {
         }
       }
       Spacer()
-      Text("\(store.days.percent)%")
-        .font(.system(size: 52.0, weight: .bold))
+      Text("\(store.doneDaysCount) / \(store.days.count)")
+        .font(.system(size: 34.0, weight: .semibold))
         .foregroundStyle(Color.primaryText)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
     }
     .frame(maxWidth: width ?? .infinity)
   }

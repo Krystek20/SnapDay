@@ -308,7 +308,7 @@ public struct PlanDetailsView: View {
             }
           }
 
-          chipRow(day.activities)
+          chipRow(day.activities, showsCompletion: showsState)
         }
       }
     }
@@ -337,15 +337,37 @@ public struct PlanDetailsView: View {
     }
   }
 
-  private func chipRow(_ activities: [PlanDetailsContent.ActivityItem]) -> some View {
+  private func chipRow(
+    _ activities: [PlanDetailsContent.ActivityItem],
+    showsCompletion: Bool = false
+  ) -> some View {
     ScrollView(.horizontal) {
       HStack(spacing: 5.0) {
         ForEach(activities) { activity in
-          Chip(title: activity.name)
+          if showsCompletion {
+            Chip(
+              title: activity.name,
+              systemImage: activity.isDone ? "checkmark.circle.fill" : "circle",
+              systemImageColor: activity.isDone ? Color.greenSuccess : Color.secondaryText
+            )
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: activityAccessibilityLabel(activity)))
+          } else {
+            Chip(title: activity.name)
+          }
         }
       }
     }
     .scrollIndicators(.hidden)
+  }
+
+  private func activityAccessibilityLabel(
+    _ activity: PlanDetailsContent.ActivityItem
+  ) -> String {
+    let status = activity.isDone
+      ? String(localized: "Done", bundle: .module)
+      : String(localized: "Planned", bundle: .module)
+    return "\(activity.name), \(status)"
   }
 
   private func sectionTitle(_ title: String, trailing: String? = nil) -> some View {

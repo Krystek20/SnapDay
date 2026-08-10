@@ -59,6 +59,15 @@ public struct WeeklyProgressFeature: TodayProvidable {
       }
     }
 
+    var doneDaysCount: Int {
+      days.reduce(into: 0) { result, day in
+        guard day.date <= today, day.plannedCount > 0 else { return }
+        if day.completedCount == day.plannedCount {
+          result += 1
+        }
+      }
+    }
+
     private let formatter: DateFormatter = {
       let formatter = DateFormatter()
       formatter.locale = .preferred

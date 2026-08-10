@@ -182,6 +182,7 @@ public struct ApplicationFeature: TodayProvidable {
       case .openPlans:
         deeplinkService.consume()
         state.selectedTab = .dashboard
+        state.dashboardPath.removeAll()
         state.dashboardPath.append(.plans(PlansFeature.State()))
         return .none
       case .openPlan(let planID):
@@ -191,6 +192,7 @@ public struct ApplicationFeature: TodayProvidable {
           await send(.planDeepLinkLoaded(try? await planRepository.plan(planID)))
         }
       case .planDeepLinkLoaded(let plan):
+        state.dashboardPath.removeAll()
         if let plan {
           state.dashboardPath.append(
             .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
