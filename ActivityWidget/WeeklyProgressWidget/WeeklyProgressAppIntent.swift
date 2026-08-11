@@ -2,11 +2,11 @@ import WidgetKit
 import AppIntents
 
 struct WeeklyProgressAppIntent: WidgetConfigurationIntent {
-  static var title: LocalizedStringResource = "Weekly Progress"
-  static var description = IntentDescription("Collect all your activities!")
+  static var title: LocalizedStringResource = "Weekly progress"
+  static var description = IntentDescription("See your activity progress for the week.")
 
   @Parameter(
-    title: "Filter by activities",
+    title: "Activities",
     optionsProvider: ActivityProvider()
   )
   var selectedActivities: [String]?

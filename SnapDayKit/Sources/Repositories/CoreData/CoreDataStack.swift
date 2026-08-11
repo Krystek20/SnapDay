@@ -43,14 +43,14 @@ final class CoreDataStack {
 
   // MARK: - Private
 
-  private init(
+  init(
     name: String,
     managedObjectModelType: ManagedObjectModelType.Type = NSManagedObjectModel.self,
     persistentContainerType: PersistentContainer.Type = NSPersistentCloudKitContainer.self,
     coreDataBackupService: CoreDataBackupService = CoreDataBackupService(),
-    remoteChangeObserver: RemoteChangeObserver = RemoteChangeObserver(),
+    remoteChangeObserver: RemoteChangeObserver? = nil,
     fileManager: FileManager = .default,
-    inMemoryStore: Bool = false
+    persistentStoreDescriptions: [NSPersistentStoreDescription]? = nil
   ) {
     guard let modelURL = Bundle.module.coreDataModelUrl(name: name),
           let managedObjectModel = managedObjectModelType.init(contentsOf: modelURL),
@@ -66,18 +66,17 @@ final class CoreDataStack {
       managedObjectModel: managedObjectModel
     )
 
-    let description: NSPersistentStoreDescription
-    let sharedDescription: NSPersistentStoreDescription
-    if inMemoryStore {
-      description = .inMemoryPersistentStoreDescription
-      sharedDescription = .inMemoryPersistentStoreDescription
+    let descriptions: [NSPersistentStoreDescription]
+    if let persistentStoreDescriptions {
+      descriptions = persistentStoreDescriptions
     } else {
-      (description, sharedDescription) = NSPersistentStoreDescription.persistentStoreDescriptions(
+      let (description, sharedDescription) = NSPersistentStoreDescription.persistentStoreDescriptions(
         storeUrl: storeUrl,
         sharedStoreUrl: sharedStoreUrl
       )
+      descriptions = [description, sharedDescription]
     }
-    persistentContainer.persistentStoreDescriptions = [description, sharedDescription]
+    persistentContainer.persistentStoreDescriptions = descriptions
 
     persistentContainer.loadPersistentStores { description, error in
       guard let loadPersistentStoresError = error as NSError? else { return }
@@ -114,34 +113,41 @@ final class CoreDataStack {
       fatalError("Failed to pin viewContext to the current generation:\(error)")
     }
 
-    guard Bundle.main.isMainApp else { return }
+    guard persistentStoreDescriptions == nil, Bundle.main.isMainApp else { return }
+    let remoteChangeObserver = remoteChangeObserver ?? RemoteChangeObserver()
 
-    do {
-      try coreDataBackupService.scheduleBackups(
-        persistentContainer: persistentContainer,
-        storeURL: storeUrl,
-        description: description
-      )
-    } catch {
-      print("Backup schedule failed: \(error)")
+    guard let description = descriptions.first else { return }
+
+    coreDataBackupService.scheduleBackups(
+      persistentContainer: persistentContainer,
+      storeURL: storeUrl,
+      description: description
+    )
+
+    Task {
+      do {
+        await remoteChangeObserver.startObservingRemoteChanges(
+          persistentContainer: persistentContainer,
+          store: try privatePersistentStore,
+          sharedStore: try sharedPersistentStore,
+          backgroundContextProvider: { [weak self] in self?.backgroundContext }
+        )
+      } catch {
+        print("Remote change observation failed: \(error)")
+      }
     }
 
     Task {
-      await remoteChangeObserver.startObservingRemoteChanges(
-        persistentContainer: persistentContainer,
-        store: try privatePersistentStore,
-        sharedStore: try sharedPersistentStore,
-        backgroundContextProvider: { [weak self] in self?.backgroundContext }
-      )
-    }
-
-    Task {
-      await remoteChangeObserver.startObservingCloudKitChanges(
-        persistentContainer: persistentContainer,
-        store: try privatePersistentStore,
-        shareStore: try sharedPersistentStore,
-        backgroundContextProvider: { [weak self] in self?.backgroundContext }
-      )
+      do {
+        await remoteChangeObserver.startObservingCloudKitChanges(
+          persistentContainer: persistentContainer,
+          store: try privatePersistentStore,
+          shareStore: try sharedPersistentStore,
+          backgroundContextProvider: { [weak self] in self?.backgroundContext }
+        )
+      } catch {
+        print("CloudKit change observation failed: \(error)")
+      }
     }
   }
 
@@ -216,10 +222,6 @@ extension CoreDataStack: DependencyKey {
   static var liveValue: CoreDataStack {
     CoreDataStack(name: "SnapDay")
   }
-
-  static var previewValue: CoreDataStack {
-    CoreDataStack(name: "SnapDay", inMemoryStore: true)
-  }
 }
 
 private extension CoreDataStack {
@@ -245,14 +247,6 @@ private extension NSPersistentStoreDescription {
 
   static let containerIdentifier = "iCloud.com.mobilove.snapday"
 
-  static let inMemoryPersistentStoreDescription: NSPersistentStoreDescription = {
-    let description = NSPersistentStoreDescription()
-    description.type = NSInMemoryStoreType
-    description.shouldAddStoreAsynchronously = false
-    description.url = URL(filePath: "/dev/null")
-    return description
-  }()
-
   static func persistentStoreDescriptions(
     storeUrl: URL,
     sharedStoreUrl: URL
@@ -265,7 +259,7 @@ private extension NSPersistentStoreDescription {
     privateDescription.setOption(true as NSObject, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
     privateDescription.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
     privateDescription.shouldMigrateStoreAutomatically = true
-    privateDescription.shouldInferMappingModelAutomatically = false
+    privateDescription.shouldInferMappingModelAutomatically = true
 
     guard let copiedDescription = privateDescription.copy() as? NSPersistentStoreDescription else {
       fatalError("copy description failed")

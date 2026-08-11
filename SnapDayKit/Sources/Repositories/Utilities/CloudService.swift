@@ -100,6 +100,12 @@ public actor CloudService {
     }
   }
 
+  private var hasShareEntity: Bool {
+    get async throws {
+      try await shareEntity != nil
+    }
+  }
+
   private let container = CKContainer(identifier: "iCloud.com.mobilove.snapday")
   private var initializing = false
 
@@ -111,13 +117,12 @@ public actor CloudService {
           !iCloudStore.bool(forKey: isShareEntityGeneratedKey),
           let userRecordName = await userRecordName else { return }
     initializing = true
-    defer { initializing = false }
 
     try await asyncWaiter.waitUntil(
       deadline: 5.0,
       interval: 1.0,
       action: { [weak self] in
-        try await self?.shareEntity != nil
+        try await self?.hasShareEntity ?? false
       }
     )
 
@@ -132,6 +137,7 @@ public actor CloudService {
     try await coreDataStack.share(managedObject: shareEntity)
     iCloudStore.set(true, forKey: isShareEntityGeneratedKey)
     iCloudStore.synchronize()
+    initializing = false
   }
 
   public func allShares() async throws -> [Share] {

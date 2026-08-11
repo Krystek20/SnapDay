@@ -385,48 +385,48 @@ extension DecisionType {
     return formatter.string(from: date)
   }
 
-  var title: String {
+  var title: String.LocalizationValue {
     switch self {
     case .createDayActivity(let dayActivity):
       if let date = dayActivity.date {
-        String(localized: "Create a new activity for \(formattedDay(date))", bundle: .module)
+        "Create a new activity for \(formattedDay(date))"
       } else {
-        String(localized: "Create a new day activity", bundle: .module)
+        "Create a new day activity"
       }
     case .updateDayActivity(let dayActivity):
       if let date = dayActivity.date {
-        String(localized: "Update the activity for \(formattedDay(date))", bundle: .module)
+        "Update the activity for \(formattedDay(date))"
       } else {
-        String(localized: "Update this day activity", bundle: .module)
+        "Update this day activity"
       }
     case .deleteDayActivity(let dayActivity):
       if let date = dayActivity.date {
-        String(localized: "Delete the activity for \(formattedDay(date))", bundle: .module)
+        "Delete the activity for \(formattedDay(date))"
       } else {
-        String(localized: "Delete this day activity", bundle: .module)
+        "Delete this day activity"
       }
-    case .createDayActivityTask(let dayActivity, let dayActivityTask):
+    case .createDayActivityTask(let dayActivity, _):
       if let date = dayActivity.date {
-        String(localized: "Add a new task to \(dayActivity.name) for \(formattedDay(date))", bundle: .module)
+        "Add a new task to \(dayActivity.name) for \(formattedDay(date))"
       } else {
-        String(localized: "Add a new task to \(dayActivity.name)", bundle: .module)
+        "Add a new task to \(dayActivity.name)"
       }
-    case .updateDayActivityTask(let dayActivityTask):
-      String(localized: "Update this task in the day activity", bundle: .module )
-    case .deleteDayActivityTask(let dayActivityTask):
-      String(localized: "Remove this task from the day activity", bundle: .module)
-    case .createActivity(let activity):
-      String(localized: "Create a new saved activity", bundle: .module)
-    case .updateActivity(let activity):
-      String(localized: "Update this saved activity", bundle: .module)
-    case .deleteActivity(let activity):
-      String(localized: "Delete this saved activity", bundle: .module)
-    case .createActivityTask(let activity, let activityTask):
-      String(localized: "Add a new task to saved \(activity.name)", bundle: .module)
-    case .updateActivityTask(let activity, let activityTask):
-      String(localized: "Update this task in saved \(activity)", bundle: .module)
-    case .deleteActivityTask(let activity, let activityTask):
-      String(localized: "Remove this task from saved \(activity.name)", bundle: .module)
+    case .updateDayActivityTask:
+      "Update this task in the day activity"
+    case .deleteDayActivityTask:
+      "Remove this task from the day activity"
+    case .createActivity:
+      "Create a new saved activity"
+    case .updateActivity:
+      "Update this saved activity"
+    case .deleteActivity:
+      "Delete this saved activity"
+    case .createActivityTask(let activity, _):
+      "Add a new task to saved \(activity.name)"
+    case .updateActivityTask(let activity, _):
+      "Update this task in saved \(activity.name)"
+    case .deleteActivityTask(let activity, _):
+      "Remove this task from saved \(activity.name)"
     }
   }
 }

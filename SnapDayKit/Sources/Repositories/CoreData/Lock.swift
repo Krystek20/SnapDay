@@ -53,7 +53,7 @@ public actor Lock {
     record["timestamp"] = Date() as CKRecordValue
 
     do {
-      try await database.save(record)
+      _ = try await database.save(record)
       print("[LOCK] Lock created")
     } catch {
       print("[LOCK] Cannot create lock record: \(error)")

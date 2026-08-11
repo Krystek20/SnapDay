@@ -15,7 +15,7 @@ extension DayActivity: Entity {
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> DayActivityEntity {
     let dayActivityEntity = try DayActivityEntity.object(
-      identifier: id.uuidString,
+      identifier: id as CVarArg,
       fetchRequest: DayActivity.fetchRequest,
       context: context
     )

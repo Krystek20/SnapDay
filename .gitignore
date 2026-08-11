@@ -19,6 +19,7 @@ xcuserdata
 /Carthage
 
 .swiftpm
+**/.build/
 /node_modules
 /tmp
 

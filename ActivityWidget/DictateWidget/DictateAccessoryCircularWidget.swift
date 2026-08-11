@@ -46,7 +46,7 @@ struct DictateAccessoryCircularWidget: Widget {
     StaticConfiguration(kind: kind, provider: DictateWidgetProvider()) { entry in
       DictateAccessoryCircularView(entry: entry)
     }
-    .configurationDisplayName("Dictate Goal")
+    .configurationDisplayName("Dictate goal")
     .description("Quickly dictate your daily goal.")
     .supportedFamilies([.accessoryCircular])
   }

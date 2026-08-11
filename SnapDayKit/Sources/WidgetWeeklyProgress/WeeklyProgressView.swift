@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 import ComposableArchitecture
 import UiComponents
 import Common
@@ -77,7 +78,7 @@ public struct WeeklyProgressView: View {
       VStack(alignment: .leading, spacing: 2.0) {
         if store.showTotalActivities {
           HStack(alignment: .bottom, spacing: 4.0) {
-            Text("\(store.daysStats.doneActivitiesCount)")
+            Text("\(store.doneActivitiesCount)")
               .font(.system(size: 14.0, weight: .bold))
               .foregroundStyle(Color.primaryText)
             Text("activities")
@@ -98,7 +99,7 @@ public struct WeeklyProgressView: View {
         }
       }
       Spacer()
-      Text("\(store.daysStats.doneDaysCount) / \(store.days.count)")
+      Text("\(store.doneDaysCount) / \(store.days.count)")
         .font(.system(size: 34.0, weight: .semibold))
         .foregroundStyle(Color.primaryText)
     }

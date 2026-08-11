@@ -12,8 +12,7 @@
             "value" : "%1$lld / %2$lld"
           }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "activities" : {
       "localizations" : {

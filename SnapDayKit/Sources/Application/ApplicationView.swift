@@ -1,9 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
-import Dashboard
-import Reports
 import Onboarding
-import ActivityDetails
 import Resources
 import UIKit.UIDevice
 #if DEBUG
@@ -21,25 +18,6 @@ public struct ApplicationView: View {
 
   public init(store: StoreOf<ApplicationFeature>) {
     self.store = store
-
-#warning("Move it")
-    let appearance = UINavigationBarAppearance()
-    appearance.backgroundColor = UIColor.background
-    appearance.shadowImage = nil
-    appearance.shadowColor = nil
-
-    appearance.titleTextAttributes = [
-      .font: UIFont.systemFont(ofSize: 16.0, weight: .medium),
-      .foregroundColor: UIColor.primaryText
-    ]
-
-    let scrollEdgeAppearance = appearance.copy()
-    scrollEdgeAppearance.shadowImage = nil
-    scrollEdgeAppearance.shadowColor = nil
-
-    UINavigationBar.appearance().standardAppearance = appearance
-    UINavigationBar.appearance().compactAppearance = appearance
-    UINavigationBar.appearance().scrollEdgeAppearance = scrollEdgeAppearance
   }
 
   // MARK: - Views
@@ -86,14 +64,9 @@ public struct ApplicationView: View {
     TabView(
       selection: $store.selectedTab,
       content: {
-        NavigationStack {
-          DashboardView(
-            store: store.scope(
-              state: \.dashboard,
-              action: \.dashboard
-            )
-          )
-        }
+        DashboardCoordinatorView(
+          store: store.scope(state: \.dashboard, action: \.dashboard)
+        )
         .tabItem {
           Text("Dashboard", bundle: .module)
           Image(systemName: "rectangle.grid.2x2")
@@ -101,21 +74,9 @@ public struct ApplicationView: View {
         .tag(ApplicationFeature.Tab.dashboard)
         .toolbarBackground(.visible, for: .tabBar)
 
-        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-          ReportsView(
-            store: store.scope(
-              state: \.reports,
-              action: \.reports
-            )
-          )
-        } destination: { store in
-          switch store.state {
-          case .activityDetails:
-            if let store = store.scope(state: \.activityDetails, action: \.activityDetails) {
-              ActivityDetailsView(store: store)
-            }
-          }
-        }
+        ReportsCoordinatorView(
+          store: store.scope(state: \.reports, action: \.reports)
+        )
         .tabItem {
           Text("Reports", bundle: .module)
           Image(systemName: "doc.text")
@@ -125,4 +86,5 @@ public struct ApplicationView: View {
       }
     )
   }
+
 }

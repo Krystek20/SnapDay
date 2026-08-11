@@ -9,7 +9,7 @@ extension DayActivityTask {
       throw EntityError.attributeNil()
     }
 
-    let activityTask = try? ActivityTask(identifier: entity.templateIdentifier?.uuidString, context: context)
+    let activityTask = try? ActivityTask(identifier: entity.templateIdentifier, context: context)
     let name = entity.name ?? activityTask?.name ?? ""
 
     self.init(

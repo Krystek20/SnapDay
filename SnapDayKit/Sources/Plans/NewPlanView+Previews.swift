@@ -1,0 +1,150 @@
+#if DEBUG
+import ComposableArchitecture
+import Foundation
+import Models
+import SwiftUI
+
+private let newPlanPreviewDate = Calendar(identifier: .gregorian).date(
+  from: DateComponents(year: 2026, month: 6, day: 15, hour: 12)
+) ?? Date(timeIntervalSinceReferenceDate: 803_390_400)
+
+private let newPlanPreviewActivities = [
+  Activity(id: UUID(), name: "Read Spanish book"),
+  Activity(id: UUID(), name: "Spanish lesson"),
+  Activity(id: UUID(), name: "Spanish exercise")
+]
+
+private var newPlanPreviewSchedule: [ScheduledPlanDay] {
+  [
+    ScheduledPlanDay(weekday: .monday, activities: [newPlanPreviewActivities[0]]),
+    ScheduledPlanDay(weekday: .tuesday),
+    ScheduledPlanDay(weekday: .wednesday, activities: [newPlanPreviewActivities[1]]),
+    ScheduledPlanDay(weekday: .thursday),
+    ScheduledPlanDay(weekday: .friday, activities: [newPlanPreviewActivities[2], newPlanPreviewActivities[0]]),
+    ScheduledPlanDay(weekday: .saturday),
+    ScheduledPlanDay(weekday: .sunday, activities: [newPlanPreviewActivities[1], newPlanPreviewActivities[2]])
+  ]
+}
+
+private let shortRangePreviewStartDate = Calendar(identifier: .gregorian).date(
+  from: DateComponents(year: 2026, month: 6, day: 19, hour: 12)
+) ?? Date(timeIntervalSinceReferenceDate: 803_736_000)
+
+private let shortRangePreviewEndDate = Calendar(identifier: .gregorian).date(
+  from: DateComponents(year: 2026, month: 6, day: 21, hour: 12)
+) ?? Date(timeIntervalSinceReferenceDate: 803_908_800)
+
+private var shortRangePreviewSchedule: [ScheduledPlanDay] {
+  [
+    ScheduledPlanDay(weekday: .friday, activities: [newPlanPreviewActivities[0]]),
+    ScheduledPlanDay(weekday: .saturday),
+    ScheduledPlanDay(weekday: .sunday, activities: [newPlanPreviewActivities[1]])
+  ]
+}
+
+#Preview("New Plan") {
+  newPlanPreview(state: NewPlanFeature.State(
+    name: "Learn Spanish",
+    startDate: newPlanPreviewDate
+  ))
+}
+
+#Preview("New Plan - blank name error") {
+  newPlanPreview(state: NewPlanFeature.State(
+    name: "   ",
+    startDate: newPlanPreviewDate,
+    isNameValidationErrorPresented: true
+  ))
+}
+
+#Preview("Weekly Schedule") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Learn Spanish",
+    startDate: newPlanPreviewDate,
+    schedule: newPlanPreviewSchedule
+  ))
+}
+
+#Preview("Weekly Schedule - empty error") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Learn Spanish",
+    startDate: newPlanPreviewDate,
+    schedule: newPlanPreviewSchedule.map {
+      ScheduledPlanDay(weekday: $0.weekday)
+    },
+    isScheduleValidationErrorPresented: true
+  ))
+}
+
+#Preview("Weekly Schedule - short range") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Weekend reset",
+    selectedDuration: .custom,
+    startDate: shortRangePreviewStartDate,
+    endDate: shortRangePreviewEndDate,
+    schedule: shortRangePreviewSchedule
+  ))
+}
+
+#Preview("Weekly Schedule - short range dark") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Weekend reset",
+    selectedDuration: .custom,
+    startDate: shortRangePreviewStartDate,
+    endDate: shortRangePreviewEndDate,
+    schedule: shortRangePreviewSchedule
+  ))
+  .preferredColorScheme(.dark)
+}
+
+#Preview("Review Plan") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .review,
+    name: "Learn Spanish",
+    startDate: newPlanPreviewDate,
+    schedule: newPlanPreviewSchedule
+  ))
+}
+
+#Preview("Edit Plan") {
+  let plan = NewPlanDraft(
+    name: "Learn Spanish",
+    duration: .oneMonth,
+    startDate: newPlanPreviewDate,
+    endDate: PlanDuration.oneMonth.endDate(from: newPlanPreviewDate),
+    schedule: newPlanPreviewSchedule
+  )
+  .plan(id: UUID(), scheduleEntryID: UUID.init)
+  newPlanPreview(state: NewPlanFeature.State(
+    plan: plan,
+    activities: newPlanPreviewActivities,
+    now: newPlanPreviewDate,
+    calendar: .autoupdatingCurrent
+  ))
+}
+
+#Preview("Weekly Schedule - dark") {
+  newPlanPreview(state: NewPlanFeature.State(
+    step: .weeklySchedule,
+    name: "Learn Spanish",
+    startDate: newPlanPreviewDate,
+    schedule: newPlanPreviewSchedule
+  ))
+  .preferredColorScheme(.dark)
+}
+
+@MainActor
+private func newPlanPreview(state: NewPlanFeature.State) -> some View {
+  NavigationStack {
+    NewPlanView(
+      store: Store(initialState: state) {
+        NewPlanFeature()
+      }
+    )
+  }
+}
+#endif

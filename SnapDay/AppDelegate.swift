@@ -35,9 +35,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
     Task {
-      let tokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
-      DeveloperToolsLogger.shared.append(.token(tokenString))
-      try await userNotificationCenterProvider.registerRemoteNotifications(deviceToken: tokenString)
+      do {
+        let tokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
+        DeveloperToolsLogger.shared.append(.token(tokenString))
+        try await userNotificationCenterProvider.registerRemoteNotifications(deviceToken: tokenString)
+      } catch {
+        print("Remote notification registration failed: \(error)")
+      }
     }
   }
 

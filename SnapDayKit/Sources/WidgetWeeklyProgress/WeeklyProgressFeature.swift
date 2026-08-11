@@ -52,13 +52,19 @@ public struct WeeklyProgressFeature: TodayProvidable {
       }
     }
 
-    var daysStats: (doneDaysCount: Int, doneActivitiesCount: Int) {
-      days.reduce(into: (0, 0)) { result, day in
+    var doneActivitiesCount: Int {
+      days.reduce(into: 0) { result, day in
+        guard day.date <= today, day.plannedCount > 0 else { return }
+        result += day.completedCount
+      }
+    }
+
+    var doneDaysCount: Int {
+      days.reduce(into: 0) { result, day in
         guard day.date <= today, day.plannedCount > 0 else { return }
         if day.completedCount == day.plannedCount {
-          result.0 += 1
+          result += 1
         }
-        result.1 += day.completedCount
       }
     }
 

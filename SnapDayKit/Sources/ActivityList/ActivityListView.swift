@@ -28,7 +28,7 @@ public struct ActivityListView: View {
     content
       .maxWidth()
       .backgroundSoft
-      .navigationTitle(String(localized: "Saved Activities", bundle: .module))
+      .navigationTitle(store.navigationTitle)
       .navigationBarTitleDisplayMode(.inline)
       .searchable(
         text: $store.searchText,
@@ -59,11 +59,33 @@ public struct ActivityListView: View {
         }
       }
       .toolbarBackground(Color.backgroundSoft, for: .navigationBar)
+      .safeAreaInset(edge: .bottom) {
+        if store.isSelectionMode {
+          Button(
+            action: { store.send(.view(.selectionConfirmed)) },
+            label: { Text(selectionButtonTitle) }
+          )
+          .buttonStyle(PrimaryButtonStyle())
+          .padding(.horizontal, 15.0)
+          .padding(.vertical, 10.0)
+          .background(Color.background)
+        }
+      }
       .sheet(item: $store.scope(state: \.templateForm, action: \.templateForm)) { store in
         NavigationStack {
           DayActivityFormView(store: store)
         }
         .presentationDetents([.large])
+      }
+      .alert(
+        String(localized: "Activity is used by a Plan", bundle: .module),
+        isPresented: planActivityDeletionAlertBinding
+      ) {
+        Button(String(localized: "OK", bundle: .module)) {
+          store.send(.view(.planActivityDeletionAlertDismissed))
+        }
+      } message: {
+        Text("Plan activities must be kept to preserve their schedules and progress.", bundle: .module)
       }
   }
 
@@ -80,12 +102,16 @@ public struct ActivityListView: View {
     VStack(spacing: .zero) {
       informationViewIfNeeded
       ForEach($store.items) { item in
-        ListItemView(item: item) { action in
-          store.send(.view(.listItemActionPerfomed(action)))
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-          store.send(.view(.listItemActionPerfomed(.itemTapped(itemId: item.id, parentId: nil))))
+        if store.isSelectionMode, !item.wrappedValue.isForm {
+          selectionItem(item.wrappedValue)
+        } else {
+          ListItemView(item: item) { action in
+            store.send(.view(.listItemActionPerfomed(action)))
+          }
+          .contentShape(Rectangle())
+          .onTapGesture {
+            store.send(.view(.listItemActionPerfomed(.itemTapped(itemId: item.id, parentId: nil))))
+          }
         }
       }
     }
@@ -97,5 +123,46 @@ public struct ActivityListView: View {
     if let informationConfiguration = store.information {
       InformationView(configuration: informationConfiguration)
     }
+  }
+
+  @ViewBuilder
+  private func selectionItem(_ item: ListItem) -> some View {
+    if let activityID = UUID(uuidString: item.id) {
+      Button {
+        store.send(.view(.activitySelectionTapped(activityID)))
+      } label: {
+        ListItemView(item: item) {
+          Image(systemName: store.selectedActivityIDs.contains(activityID) ? "checkmark.circle.fill" : "circle")
+            .font(.system(size: 20.0))
+            .foregroundStyle(
+              store.selectedActivityIDs.contains(activityID)
+                ? Color.actionBlue
+                : Color.sectionText
+            )
+        }
+      }
+      .buttonStyle(.plain)
+    }
+  }
+
+  private var selectionButtonTitle: String {
+    if store.selectedActivityIDs.count == 1 {
+      return String(localized: "Add 1 activity", bundle: .module)
+    }
+    return String(
+      localized: "Add \(store.selectedActivityIDs.count) activities",
+      bundle: .module
+    )
+  }
+
+  private var planActivityDeletionAlertBinding: Binding<Bool> {
+    Binding(
+      get: { store.isPlanActivityDeletionAlertPresented },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.view(.planActivityDeletionAlertDismissed))
+        }
+      }
+    )
   }
 }

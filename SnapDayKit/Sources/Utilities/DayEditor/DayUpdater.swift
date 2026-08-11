@@ -28,6 +28,7 @@ public actor DayUpdater: TodayProvidable {
   @Dependency(\.uuid) private var uuid
   @Dependency(\.cloudService) private var cloudService
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
+  @Dependency(\.planRepository) private var planRepository
   @Dependency(\.date.now) private var now
   @Dependency(\.iconProvider) private var iconProvider
 
@@ -75,6 +76,11 @@ public actor DayUpdater: TodayProvidable {
         setDateActivitiesGenerated(date: date)
       }
       dayActivities = try await removeDeduplicatedDayActivitiesByDate(dayActivities)
+      dayActivities = try await addPlanScheduledActivities(
+        on: date,
+        activities: activities,
+        dayActivities: dayActivities
+      )
 
       try await updateDayActivitiesWithShared(&dayActivities, participants: invited)
       try await updateDayActivitiesWithInvitations(&dayActivities, date: date)
@@ -278,17 +284,19 @@ public actor DayUpdater: TodayProvidable {
     let dayActivities = try await dayActivityRepository.dayActivities(
       configuration: ActivitiesFetchConfiguration(range: dateRange)
     )
-    try await removeDayActivities(with: activity, dayActivities: dayActivities, date: date)
+    try await removeDayActivities(with: activity, dayActivities: dayActivities)
     return dateRange
   }
 
-  private func removeDayActivities(with activity: Activity, dayActivities: [DayActivity], date: Date) async throws {
-    for dayActivity in dayActivities {
-      guard let dayActivityDate = dayActivity.date else { continue }
-      let isTodayOrLess = dayActivityDate <= date
-      guard dayActivity.activity?.id == activity.id &&
-            dayActivity.isGeneratedAutomatically &&
-            (!isTodayOrLess || !dayActivity.isDone) else { continue }
+  private func removeDayActivities(with activity: Activity, dayActivities: [DayActivity]) async throws {
+    for var dayActivity in dayActivities {
+      guard dayActivity.activity?.id == activity.id,
+            dayActivity.isGeneratedAutomatically else { continue }
+      if dayActivity.isDone {
+        dayActivity.refreshTemplatePresentation(from: activity)
+        try await saveDayActivity(dayActivity, syncSharable: false)
+        continue
+      }
       try await removeDayActivity(dayActivity)
     }
   }
@@ -344,6 +352,42 @@ public actor DayUpdater: TodayProvidable {
       let dayActivity = try await createAndSaveDayActivity(activity: activity, date: date)
       dayActivities.append(dayActivity)
     }
+    return dayActivities
+  }
+
+  private func addPlanScheduledActivities(
+    on date: Date,
+    activities: [Activity],
+    dayActivities: [DayActivity]
+  ) async throws -> [DayActivity] {
+    guard date >= today else { return dayActivities }
+    let plans = try await planRepository.loadActivePlans(date)
+    var occurrences: [PlanOccurrence] = []
+    for plan in plans {
+      occurrences.append(contentsOf: try await planRepository.loadOccurrences(plan.id))
+    }
+    let matches = PlanDayActivityResolver.matches(
+      on: date,
+      occurrences: occurrences,
+      activities: activities,
+      dayActivities: dayActivities,
+      calendar: calendar
+    )
+    var dayActivities = dayActivities
+
+    for match in matches {
+      let dayActivity: DayActivity
+      if let dayActivityID = match.dayActivityID,
+         let existing = dayActivities.first(where: { $0.id == dayActivityID }) {
+        dayActivity = existing
+      } else {
+        dayActivity = try await createAndSaveDayActivity(activity: match.activity, date: date)
+        dayActivities.append(dayActivity)
+      }
+
+      try await planRepository.saveOccurrences(match.linkedOccurrences(to: dayActivity.id))
+    }
+
     return dayActivities
   }
 

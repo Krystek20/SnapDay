@@ -5,8 +5,6 @@ import Models
 protocol Deduplicable: NSManagedObject {
   var version: Int32 { get }
   var deduplicatedDate: Date? { get set }
-
-  func deduplicate(to object: Deduplicable)
 }
 
 extension Deduplicable {
@@ -16,11 +14,6 @@ extension Deduplicable {
 }
 
 extension [Deduplicable] {
-
-  func deduplicate(to object: Deduplicable) {
-    forEach { $0.deduplicate(to: object) }
-  }
-
   func markAsDeduplicated() {
     forEach {
       guard $0.deduplicatedDate == nil else { return }
@@ -29,9 +22,25 @@ extension [Deduplicable] {
   }
 
   var indexToReserve: Int? {
-      firstIndex(where: { $0.deduplicatedDate == nil })
+    firstIndex(where: { $0.deduplicatedDate == nil })
   }
 }
+
+extension ActivityEntity: Deduplicable {}
+extension ActivityLabelEntity: Deduplicable {}
+extension ActivityTaskEntity: Deduplicable {}
+extension DayActivityEntity: Deduplicable {}
+extension DayActivityTaskEntity: Deduplicable {}
+extension IconEntity: Deduplicable {}
+extension PlanEntity: Deduplicable {}
+extension PlanOccurrenceEntity: Deduplicable {}
+extension PlanScheduleEntryEntity: Deduplicable {}
+extension RGBColorEntity: Deduplicable {}
+extension ShareEntity: Deduplicable {}
+extension SharedByEntity: Deduplicable {}
+extension SharedDayActivityEntity: Deduplicable {}
+extension SharedDayActivityTaskEntity: Deduplicable {}
+extension TagEntity: Deduplicable {}
 
 enum SupportedDeduplicable {
   static var entities: [any Deduplicable.Type] {
@@ -42,6 +51,9 @@ enum SupportedDeduplicable {
       DayActivityEntity.self,
       DayActivityTaskEntity.self,
       IconEntity.self,
+      PlanEntity.self,
+      PlanOccurrenceEntity.self,
+      PlanScheduleEntryEntity.self,
       RGBColorEntity.self,
       TagEntity.self
     ]

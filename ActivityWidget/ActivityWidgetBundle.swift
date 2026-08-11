@@ -7,6 +7,7 @@ struct ActivityWidgetBundle: WidgetBundle {
     ActivityListWidget()
     StreakWidget()
     WeeklyProgressWidget()
+    PlanProgressWidget()
     #if DEBUG
     DictateAccessoryCircularWidget()
     #endif

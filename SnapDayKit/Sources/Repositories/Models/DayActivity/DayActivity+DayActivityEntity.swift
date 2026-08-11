@@ -15,7 +15,7 @@ extension DayActivity {
     }
 
     let activity = try? Activity(
-      identifier: entity.templateIdentifier?.uuidString,
+      identifier: entity.templateIdentifier,
       context: context
     )
     let tags: [Tag] = (try? entity.mapIdentifierArray(for: "tagsIdentifiers", context: context)) ?? []

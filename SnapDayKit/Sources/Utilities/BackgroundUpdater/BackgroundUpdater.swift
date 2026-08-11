@@ -30,15 +30,17 @@ public final class BackgroundUpdater {
     let isRegistered = taskScheduler.register(
       forTaskWithIdentifier: BackgroundUpdaterIdentifier.createDay.rawValue,
       using: nil,
-      launchHandler: { bgTask in
+      launchHandler: { [weak self] bgTask in
         guard let bgTask = bgTask as? BGAppRefreshTask else {
           return bgTask.setTaskCompleted(success: false)
         }
+        guard let self else {
+          return bgTask.setTaskCompleted(success: false)
+        }
 
-        let task = Task { [weak self] in
-          guard let self else { throw CancellationError() }
+        let task = Task {
           do {
-            try await scheduleCreatingDayBackgroundTask()
+            try await self.scheduleCreatingDayBackgroundTask()
             try await launchHandler()
             bgTask.setTaskCompleted(success: !Task.isCancelled)
           } catch {
@@ -53,7 +55,11 @@ public final class BackgroundUpdater {
     )
     guard isRegistered else { throw BackgroundUpdaterError.notRegistered }
     Task {
-      try await scheduleCreatingDayBackgroundTask()
+      do {
+        try await scheduleCreatingDayBackgroundTask()
+      } catch {
+        print("Background refresh scheduling failed: \(error)")
+      }
     }
   }
 

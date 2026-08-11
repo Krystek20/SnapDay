@@ -8,7 +8,8 @@ let package = Package(
     name: "SnapDayKit",
     defaultLocalization: "en",
     platforms: [
-      .iOS(.v17)
+      .iOS(.v17),
+      .macOS(.v13)
     ],
     products: products,
     dependencies: packageDependencies,
@@ -23,6 +24,8 @@ private var products: [Product] {
   Module.widgetActivityList
   Module.widgetStreak
   Module.widgetWeeklyProgress
+  Module.widgetPlanProgress
+  Module.plans
   Module.previews
 }
 
@@ -35,13 +38,14 @@ private var packageDependencies: [Package.Dependency] {
 @TargetsBuilder
 private var targets: [Target] {
   TargetParamenters(module: .application, dependencies: sceneDependecies + [
-    .onboarding, .dashboard, .reports, .activityDetails, .developerTools
+    .onboarding, .dashboard, .reports, .plans, .activityDetails, .developerTools
   ])
   TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends, .manageActivity])
   TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
   TargetParamenters(module: .markerForm, dependencies: sceneDependecies)
   TargetParamenters(module: .dayActivityForm, dependencies: sceneDependecies + [.markerForm, .emojiPicker])
   TargetParamenters(module: .reports, dependencies: sceneDependecies)
+  TargetParamenters(module: .plans, dependencies: sceneDependecies + [.activityList])
   TargetParamenters(module: .friends, dependencies: sceneDependecies)
   TargetParamenters(module: .activityDetails, dependencies: sceneDependecies + [.selectableList])
   TargetParamenters(module: .selectableList, dependencies: sceneDependecies)
@@ -50,6 +54,7 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetActivityList, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
+  TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
   TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
@@ -86,6 +91,7 @@ private enum Module: String {
   case emojiPicker
   case calendarPicker
   case reports
+  case plans
   case friends
   case activityDetails
   case selectableList
@@ -93,6 +99,7 @@ private enum Module: String {
   case widgetActivityList
   case widgetStreak
   case widgetWeeklyProgress
+  case widgetPlanProgress
   case dayActivityReminder
   case onboarding
   case manageActivity

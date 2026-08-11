@@ -9,12 +9,15 @@ import CalendarPicker
 import Models
 import Friends
 import ManageActivity
+import Utilities
 
 public struct DashboardView: View {
 
   // MARK: - Properties
 
   @Bindable private var store: StoreOf<DashboardFeature>
+  @Environment(\.calendar) private var calendar
+  @Environment(\.locale) private var locale
   @State private var alertSize = CGSize.zero
 
   private var additionalButtomPadding: Double {
@@ -33,25 +36,27 @@ public struct DashboardView: View {
   public var body: some View {
     ZStack(alignment: .top) {
       ScrollView {
-        Spacer()
-          .frame(height: 50.0)
-        dayList
+        dashboardContent
           .padding(.horizontal, 15.0)
           .padding(.top, 15.0)
           .padding(.bottom, 15.0 + additionalButtomPadding)
       }
       .maxWidth()
       .scrollIndicators(.hidden)
-
-      Switcher(
-        title: store.title,
-        leftArrowAction: {
-          store.send(.view(.decreaseButtonTapped))
-        },
-        rightArrowAction: {
-          store.send(.view(.increaseButtonTapped))
-        }
-      )
+      .safeAreaInset(edge: .top, spacing: .zero) {
+        Switcher(
+          title: store.title,
+          titleAction: {
+            store.send(.view(.calendarButtonTapped))
+          },
+          leftArrowAction: {
+            store.send(.view(.decreaseButtonTapped))
+          },
+          rightArrowAction: {
+            store.send(.view(.increaseButtonTapped))
+          }
+        )
+      }
 
       aiAssistantButton
 
@@ -109,15 +114,6 @@ public struct DashboardView: View {
             },
             label: {
               Image(systemName: "smallcircle.filled.circle.fill")
-                .foregroundStyle(Color.actionBlue)
-            }
-          )
-          Button(
-            action: {
-              store.send(.view(.calendarButtonTapped))
-            },
-            label: {
-              Image(systemName: "calendar.circle.fill")
                 .foregroundStyle(Color.actionBlue)
             }
           )
@@ -205,6 +201,51 @@ public struct DashboardView: View {
         .extractSize(in: $alertSize)
         .padding(.all, 15.0)
       }
+    }
+  }
+
+  private var dashboardContent: some View {
+    VStack(spacing: 15.0) {
+      plansSummary
+      dayList
+    }
+  }
+
+  private var plansSummary: some View {
+    DashboardPlansSectionView(
+      configurations: planSummaryConfigurations,
+      planAction: planSummaryAction,
+      allPlansAction: {
+        store.send(.view(.allPlansButtonTapped))
+      }
+    )
+  }
+
+  private var planSummaryAction: ((Int) -> Void)? {
+    guard !store.planSummaries.isEmpty else { return nil }
+
+    return { index in
+      guard store.planSummaries.indices.contains(index) else { return }
+      store.send(.view(.planSummaryTapped(store.planSummaries[index].plan)))
+    }
+  }
+
+  private var planSummaryConfigurations: [DashboardPlansSummaryView.Configuration] {
+    guard !store.planSummaries.isEmpty else {
+      return [
+        DashboardPlansSummaryView.Configuration(
+          title: String(localized: "No active plans", bundle: .module),
+          subtitle: String(localized: "Scheduled plans will appear here.", bundle: .module)
+        )
+      ]
+    }
+
+    return store.planSummaries.map {
+      DashboardPlansSummaryView.Configuration(
+        summary: $0,
+        calendar: calendar.utcCalendar,
+        locale: locale
+      )
     }
   }
 

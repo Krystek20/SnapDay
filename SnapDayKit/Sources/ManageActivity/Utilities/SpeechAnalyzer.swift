@@ -88,11 +88,7 @@ final class SpeechAnalyzer {
       }
     }
 
-    let micAuthorized = await withCheckedContinuation { cont in
-      AVAudioSession.sharedInstance().requestRecordPermission { granted in
-        cont.resume(returning: granted)
-      }
-    }
+    let micAuthorized = await AVAudioApplication.requestRecordPermission()
 
     return speechAuthorized && micAuthorized
   }
