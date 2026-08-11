@@ -1,0 +1,23 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "15 minutes today" : {},
+    "Add a healthy habit" : {},
+    "Continue" : {},
+    "Create my own" : {},
+    "Drink a glass of water in the morning" : {},
+    "Learn something" : {},
+    "More options" : {},
+    "Move more" : {},
+    "Name any goal and choose a rhythm" : {},
+    "Organize my day" : {},
+    "Pick a starting point and build a plan around it with SnapDay" : {},
+    "Read more" : {},
+    "Skip" : {},
+    "Start with one focused session" : {},
+    "Start with today's tasks" : {},
+    "Take a 20-minute walk" : {},
+    "What is your goal?" : {}
+  },
+  "version" : "1.0"
+}

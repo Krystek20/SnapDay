@@ -26,6 +26,7 @@ private var products: [Product] {
   Module.widgetWeeklyProgress
   Module.widgetPlanProgress
   Module.plans
+  Module.onboarding
 }
 
 @PackageDependenciesBuilder
@@ -54,6 +55,7 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies)
+  TargetParamenters(module: .onboarding, dependencies: [.composableArchitecture, .uiComponents, .resources])
   TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
@@ -98,6 +100,7 @@ private enum Module: String {
   case widgetWeeklyProgress
   case widgetPlanProgress
   case dayActivityReminder
+  case onboarding
   case manageActivity
   case developerTools
   case utilities
