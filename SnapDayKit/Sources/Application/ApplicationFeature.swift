@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import Onboarding
 import Utilities
 import TipKit
 #if DEBUG
@@ -12,21 +13,27 @@ public struct ApplicationFeature {
   @Dependency(\.deeplinkService) private var deeplinkService
   @Dependency(\.cloudService) private var cloudService
   @Dependency(\.iconProvider) private var iconProvider
+  private static let isOnboardingShownKey = "isOnboardingShown"
+  private let userDefaults: UserDefaults
 
   // MARK: - State & Action
 
   @ObservableState
   public struct State: Equatable {
+    var showOnboarding: Bool
     var selectedTab = Tab.dashboard
 
     var dashboard = DashboardCoordinatorFeature.State()
     var reports = ReportsCoordinatorFeature.State()
+    var onboarding = OnboardingFeature.State()
 
     #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
     #endif
 
-    public init() { }
+    public init(userDefaults: UserDefaults = .standard) {
+      showOnboarding = !userDefaults.bool(forKey: ApplicationFeature.isOnboardingShownKey)
+    }
   }
 
   public enum Action: BindableAction, Equatable {
@@ -39,6 +46,7 @@ public struct ApplicationFeature {
     case setTab(Tab)
     case dashboard(DashboardCoordinatorFeature.Action)
     case reports(ReportsCoordinatorFeature.Action)
+    case onboarding(OnboardingFeature.Action)
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
@@ -52,7 +60,9 @@ public struct ApplicationFeature {
 
   // MARK: - Initialization
 
-  public init() { }
+  public init(userDefaults: UserDefaults = .standard) {
+    self.userDefaults = userDefaults
+  }
 
   // MARK: - Body
 
@@ -65,6 +75,10 @@ public struct ApplicationFeature {
 
     Scope(state: \.reports, action: \.reports) {
       ReportsCoordinatorFeature()
+    }
+
+    Scope(state: \.onboarding, action: \.onboarding) {
+      OnboardingFeature()
     }
 
     Reduce { state, action in
@@ -129,7 +143,24 @@ public struct ApplicationFeature {
         return .none
       case .reports:
         return .none
+      case .onboarding(.delegate(.completed)),
+           .onboarding(.delegate(.skipped)):
+        state.showOnboarding = false
+        userDefaults.set(true, forKey: Self.isOnboardingShownKey)
+        return .none
+      case .onboarding(.delegate(.createPlanRequested(let name))):
+        state.showOnboarding = false
+        userDefaults.set(true, forKey: Self.isOnboardingShownKey)
+        return .send(.openDashboardRoute(.createPlan(name: name)))
+      case .onboarding:
+        return .none
       #if DEBUG
+      case .developerTools(.presented(.delegate(.showOnboardingAgain))):
+        userDefaults.removeObject(forKey: Self.isOnboardingShownKey)
+        state.onboarding = OnboardingFeature.State()
+        state.showOnboarding = true
+        state.developerTools = nil
+        return .none
       case .developerTools:
         return .none
       #endif

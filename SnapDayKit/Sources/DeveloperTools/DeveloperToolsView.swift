@@ -57,6 +57,9 @@ public struct DeveloperToolsView: View {
         Button("Clean NSUbiquitousKeyValueStore") {
           store.send(.view(.cleanKeyValueStore))
         }
+        Button("Show onboarding again") {
+          store.send(.view(.showOnboardingAgainButtonTapped))
+        }
         Text("Send notifications")
           .font(.title2)
         Button("Day Activity") {

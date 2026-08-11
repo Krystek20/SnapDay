@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Onboarding
 import SwiftUI
 import UIKit.UIDevice
 #if DEBUG
@@ -21,7 +22,7 @@ public struct ApplicationView: View {
   // MARK: - Views
 
   public var body: some View {
-    tabView
+    content
       .onAppear {
         store.send(.appeared)
       }
@@ -36,6 +37,17 @@ public struct ApplicationView: View {
       .onReceive(NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification)) { _ in
         store.send(.deviceShaked)
       }
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    if store.showOnboarding {
+      OnboardingView(
+        store: store.scope(state: \.onboarding, action: \.onboarding)
+      )
+    } else {
+      tabView
+    }
   }
 
   private var tabView: some View {
