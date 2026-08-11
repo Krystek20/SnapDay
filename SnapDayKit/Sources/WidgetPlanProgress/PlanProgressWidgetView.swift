@@ -116,7 +116,6 @@ public struct PlanProgressWidgetView: View {
     }
     return String(localized: "Next session: \(session)", bundle: .module, locale: locale)
   }
-
 }
 
 private struct PlanProgressLevelsView: View {

@@ -1,4 +1,3 @@
-import Onboarding
 import ComposableArchitecture
 import Foundation
 import Utilities
@@ -13,34 +12,21 @@ public struct ApplicationFeature {
   @Dependency(\.deeplinkService) private var deeplinkService
   @Dependency(\.cloudService) private var cloudService
   @Dependency(\.iconProvider) private var iconProvider
-  private static let isOnboardingShownKey = "isOnboardingShown"
 
   // MARK: - State & Action
 
   @ObservableState
   public struct State: Equatable {
-    var showOnboarding: Bool {
-      didSet {
-        userDefaults.setValue(!showOnboarding, forKey: ApplicationFeature.isOnboardingShownKey)
-      }
-    }
-
     var selectedTab = Tab.dashboard
 
     var dashboard = DashboardCoordinatorFeature.State()
     var reports = ReportsCoordinatorFeature.State()
-    var onboarding = OnboardingFeature.State()
 
     #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
     #endif
 
-    private let userDefaults: UserDefaults
-
-    public init(userDefaults: UserDefaults = .standard) {
-      self.userDefaults = userDefaults
-      self.showOnboarding = !userDefaults.bool(forKey: ApplicationFeature.isOnboardingShownKey)
-    }
+    public init() { }
   }
 
   public enum Action: BindableAction, Equatable {
@@ -53,7 +39,6 @@ public struct ApplicationFeature {
     case setTab(Tab)
     case dashboard(DashboardCoordinatorFeature.Action)
     case reports(ReportsCoordinatorFeature.Action)
-    case onboarding(OnboardingFeature.Action)
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
@@ -80,10 +65,6 @@ public struct ApplicationFeature {
 
     Scope(state: \.reports, action: \.reports) {
       ReportsCoordinatorFeature()
-    }
-
-    Scope(state: \.onboarding, action: \.onboarding) {
-      OnboardingFeature()
     }
 
     Reduce { state, action in
@@ -147,11 +128,6 @@ public struct ApplicationFeature {
       case .dashboard:
         return .none
       case .reports:
-        return .none
-      case .onboarding(.delegate(.finished)):
-        state.showOnboarding = false
-        return .none
-      case .onboarding:
         return .none
       #if DEBUG
       case .developerTools:

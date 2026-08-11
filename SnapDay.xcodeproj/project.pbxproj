@@ -43,7 +43,6 @@
 		D4CCE63D2BCACB8E00C198C5 /* EveningSummary in Frameworks */ = {isa = PBXBuildFile; productRef = D4CCE63C2BCACB8E00C198C5 /* EveningSummary */; };
 		D4D658782C56D122007E61EB /* ActivityListIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D658772C56D122007E61EB /* ActivityListIntents.swift */; };
 		D4D8809E2D33B30B00280B02 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D8809D2D33B30A00280B02 /* AppDelegate.swift */; };
-		D4E090EB2C90ACF000E605B2 /* Previews in Frameworks */ = {isa = PBXBuildFile; productRef = D4E090EA2C90ACF000E605B2 /* Previews */; };
 		D4EE7DB52C54FF32007A0B4F /* WidgetActivityList in Frameworks */ = {isa = PBXBuildFile; productRef = D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */; };
 		D4FE9FC32BF5342B003305A9 /* DayActivityReminder in Frameworks */ = {isa = PBXBuildFile; productRef = D4FE9FC22BF5342B003305A9 /* DayActivityReminder */; };
 /* End PBXBuildFile section */
@@ -153,7 +152,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D432465C2AD0820100D3E8F9 /* Application in Frameworks */,
-				D4E090EB2C90ACF000E605B2 /* Previews in Frameworks */,
 				D464184A2C50D59E005920E1 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -371,7 +369,6 @@
 			name = SnapDay;
 			packageProductDependencies = (
 				D432465B2AD0820100D3E8F9 /* Application */,
-				D4E090EA2C90ACF000E605B2 /* Previews */,
 			);
 			productName = SnapToday;
 			productReference = D443ECEE2AD0771C002225CF /* SnapDay.app */;
@@ -763,7 +760,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Krystian Solarz (592BXD7V67)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -806,7 +803,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Krystian Solarz (62J877TJR3)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -886,7 +883,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -919,7 +916,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -950,7 +947,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -981,7 +978,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1076,10 +1073,6 @@
 		D4CCE63C2BCACB8E00C198C5 /* EveningSummary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EveningSummary;
-		};
-		D4E090EA2C90ACF000E605B2 /* Previews */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Previews;
 		};
 		D4EE7DB42C54FF32007A0B4F /* WidgetActivityList */ = {
 			isa = XCSwiftPackageProductDependency;

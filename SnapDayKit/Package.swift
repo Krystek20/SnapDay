@@ -26,7 +26,6 @@ private var products: [Product] {
   Module.widgetWeeklyProgress
   Module.widgetPlanProgress
   Module.plans
-  Module.previews
 }
 
 @PackageDependenciesBuilder
@@ -38,7 +37,7 @@ private var packageDependencies: [Package.Dependency] {
 @TargetsBuilder
 private var targets: [Target] {
   TargetParamenters(module: .application, dependencies: sceneDependecies + [
-    .onboarding, .dashboard, .reports, .plans, .activityDetails, .developerTools
+    .dashboard, .reports, .plans, .activityDetails, .developerTools
   ])
   TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends, .manageActivity])
   TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
@@ -55,7 +54,6 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies)
-  TargetParamenters(module: .onboarding, dependencies: sceneDependecies)
   TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
@@ -64,7 +62,6 @@ private var targets: [Target] {
   TargetParamenters(module: .repositories, dependencies: [.common, .models, .composableArchitecture])
   TargetParamenters(module: .common, dependencies: [.composableArchitecture])
   TargetParamenters(module: .models, dependencies: [.common])
-  TargetParamenters(module: .previews, dependencies: [.application])
   TargetParamenters(module: .uiComponents, dependencies: [.resources, .composableArchitecture, .utilities])
   TargetParamenters(module: .resources)
 }
@@ -101,14 +98,12 @@ private enum Module: String {
   case widgetWeeklyProgress
   case widgetPlanProgress
   case dayActivityReminder
-  case onboarding
   case manageActivity
   case developerTools
   case utilities
   case repositories
   case common
   case models
-  case previews
   case uiComponents
   case resources
   case composableArchitecture
@@ -152,7 +147,7 @@ private enum Module: String {
     switch self {
     case .composableArchitecture, .snapDayCore:
       []
-    case .previews, .uiComponents, .resources, .developerTools:
+    case .uiComponents, .resources, .developerTools:
       [.source]
     default:
       [.source, .tests]
