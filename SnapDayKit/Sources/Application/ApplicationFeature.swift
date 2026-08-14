@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import Models
 import Onboarding
+import Payment
 import Plans
 import Repositories
 import Utilities
@@ -15,6 +16,7 @@ public struct ApplicationFeature {
 
   private enum CancelID {
     case onboardingPlanCreation
+    case premiumEntitlementUpdates
   }
 
   @Dependency(\.deeplinkService) private var deeplinkService
@@ -24,6 +26,7 @@ public struct ApplicationFeature {
   @Dependency(\.calendar) private var calendar
   @Dependency(\.date.now) private var now
   @Dependency(\.uuid) private var uuid
+  @Dependency(\.paymentClient) private var paymentClient
   private static let isOnboardingShownKey = "isOnboardingShown"
   private let userDefaults: UserDefaults
 
@@ -39,6 +42,7 @@ public struct ApplicationFeature {
     var onboarding = OnboardingFeature.State()
     var onboardingGeneratedActivityIDs: Set<Activity.ID> = []
     var isOnboardingPlanSaveErrorPresented = false
+    var premiumEntitlement = PremiumEntitlement.unknown
 
     #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
@@ -63,6 +67,7 @@ public struct ApplicationFeature {
     case onboardingPlanSaved
     case onboardingPlanSaveFailed
     case onboardingPlanSaveErrorDismissed
+    case premiumEntitlementUpdated(PremiumEntitlement)
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
@@ -125,7 +130,13 @@ public struct ApplicationFeature {
               await send(.setupCloud)
               await send(.cleanIcons)
             }
+          },
+          .run { send in
+            for await entitlement in paymentClient.entitlementUpdates() {
+              await send(.premiumEntitlementUpdated(entitlement))
+            }
           }
+          .cancellable(id: CancelID.premiumEntitlementUpdates, cancelInFlight: true)
         )
       case .cleanIcons:
         return .run { _ in
@@ -237,6 +248,9 @@ public struct ApplicationFeature {
         return .send(.onboarding(.newPlan(.submissionFailed)))
       case .onboardingPlanSaveErrorDismissed:
         state.isOnboardingPlanSaveErrorPresented = false
+        return .none
+      case .premiumEntitlementUpdated(let entitlement):
+        state.premiumEntitlement = entitlement
         return .none
       #if DEBUG
       case .developerTools(.presented(.delegate(.showOnboardingAgain))):
