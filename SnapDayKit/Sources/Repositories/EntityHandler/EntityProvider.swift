@@ -1,6 +1,5 @@
 import Foundation
 import Dependencies
-@preconcurrency import Models
 @preconcurrency import CoreData
 
 public struct EntityHandler {
@@ -112,29 +111,6 @@ public struct EntityHandler {
       try entities.forEach {
         try $0.managedObject(context)
         try context.save()
-      }
-    }
-  }
-
-  public func savePlanCreation(
-    plan: Plan,
-    activities: [Activity],
-    occurrences: [PlanOccurrence]
-  ) async throws {
-    let context = coreDataStack.backgroundContext
-    try await context.perform {
-      do {
-        for activity in activities {
-          _ = try activity.managedObject(context)
-        }
-        _ = try plan.managedObject(context)
-        for occurrence in occurrences {
-          _ = try occurrence.managedObject(context)
-        }
-        try context.save()
-      } catch {
-        context.rollback()
-        throw error
       }
     }
   }

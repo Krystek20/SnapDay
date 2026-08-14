@@ -27,14 +27,14 @@ public struct ApplicationView: View {
         store.send(.appeared)
       }
       .alert(
-        "Plan couldn't be saved",
+        String(localized: "Plan couldn't be saved", bundle: .module),
         isPresented: onboardingPlanSaveErrorBinding
       ) {
-        Button("OK") {
+        Button(String(localized: "OK", bundle: .module)) {
           store.send(.onboardingPlanSaveErrorDismissed)
         }
       } message: {
-        Text("Your plan is still open. Please try saving again.")
+        Text("Your plan is still open. Please try saving again.", bundle: .module)
       }
       #if DEBUG
       .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in

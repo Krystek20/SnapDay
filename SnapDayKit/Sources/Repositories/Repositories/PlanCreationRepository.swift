@@ -1,3 +1,4 @@
+import CoreData
 import Dependencies
 import Models
 
@@ -27,11 +28,38 @@ extension DependencyValues {
 extension PlanCreationRepository: DependencyKey {
   public static var liveValue: PlanCreationRepository {
     PlanCreationRepository { plan, activities, occurrences in
-      try await EntityHandler().savePlanCreation(
+      try await PlanCreationPersistence().create(
         plan: plan,
         activities: activities,
         occurrences: occurrences
       )
+    }
+  }
+}
+
+private struct PlanCreationPersistence {
+  @Dependency(\.coreDataStack) private var coreDataStack
+
+  func create(
+    plan: Plan,
+    activities: [Activity],
+    occurrences: [PlanOccurrence]
+  ) async throws {
+    let context = coreDataStack.backgroundContext
+    try await context.perform {
+      do {
+        for activity in activities {
+          _ = try activity.managedObject(context)
+        }
+        _ = try plan.managedObject(context)
+        for occurrence in occurrences {
+          _ = try occurrence.managedObject(context)
+        }
+        try context.save()
+      } catch {
+        context.rollback()
+        throw error
+      }
     }
   }
 }
