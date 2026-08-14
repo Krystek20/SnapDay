@@ -10,7 +10,6 @@ import Utilities
 public struct DashboardCoordinatorFeature {
 
   @Dependency(\.planRepository) private var planRepository
-  @Dependency(\.date.now) private var now
 
   @ObservableState
   public struct State: Equatable {
@@ -28,7 +27,6 @@ public struct DashboardCoordinatorFeature {
   }
 
   public enum ExternalRoute: Equatable {
-    case createPlan(name: String?)
     case plan(Plan.ID)
     case plans
   }
@@ -84,12 +82,6 @@ public struct DashboardCoordinatorFeature {
       case .externalRoute(.plans):
         state.path.removeAll()
         state.path.append(.plans(PlansFeature.State()))
-        return .cancel(id: CancelID.externalPlan)
-      case .externalRoute(.createPlan(let name)):
-        state.path.removeAll()
-        state.path.append(
-          .plans(PlansFeature.State(openingNewPlanAt: now, name: name))
-        )
         return .cancel(id: CancelID.externalPlan)
       case .externalRoute(.plan(let planID)):
         return .run { send in

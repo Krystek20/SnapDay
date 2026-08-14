@@ -26,6 +26,16 @@ public struct ApplicationView: View {
       .onAppear {
         store.send(.appeared)
       }
+      .alert(
+        "Plan couldn't be saved",
+        isPresented: onboardingPlanSaveErrorBinding
+      ) {
+        Button("OK") {
+          store.send(.onboardingPlanSaveErrorDismissed)
+        }
+      } message: {
+        Text("Your plan is still open. Please try saving again.")
+      }
       #if DEBUG
       .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
         NavigationStack {
@@ -73,6 +83,17 @@ public struct ApplicationView: View {
         }
         .tag(ApplicationFeature.Tab.reports)
         .toolbarBackground(.visible, for: .tabBar)
+      }
+    )
+  }
+
+  private var onboardingPlanSaveErrorBinding: Binding<Bool> {
+    Binding(
+      get: { store.isOnboardingPlanSaveErrorPresented },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.onboardingPlanSaveErrorDismissed)
+        }
       }
     )
   }

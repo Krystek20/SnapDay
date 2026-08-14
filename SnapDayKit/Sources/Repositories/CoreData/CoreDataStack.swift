@@ -103,15 +103,6 @@ final class CoreDataStack {
     }
 
     self.persistentContainer = persistentContainer
-    self.persistentContainer.viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
-    self.persistentContainer.viewContext.transactionAuthor = TransactionAuthor.app()
-    self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
-
-    do {
-      try persistentContainer.viewContext.setQueryGenerationFrom(.current)
-    } catch {
-      fatalError("Failed to pin viewContext to the current generation:\(error)")
-    }
 
     guard persistentStoreDescriptions == nil, Bundle.main.isMainApp else { return }
     let remoteChangeObserver = remoteChangeObserver ?? RemoteChangeObserver()

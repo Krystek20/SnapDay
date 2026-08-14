@@ -185,6 +185,84 @@ struct DashboardTests {
   }
 
   @Test
+  func notificationPromptRequiresContent() {
+    let date = Date(timeIntervalSince1970: 1_752_364_800)
+    var state = DashboardFeature.State(date: date)
+
+    state.canRequestNotificationAuthorization = true
+    #expect(!state.shouldShowNotificationPrompt)
+
+    state.selectedDay = Day(
+      id: UUID(),
+      date: date,
+      activities: [
+        DayActivity(
+          id: UUID(),
+          date: date,
+          isGeneratedAutomatically: false
+        )
+      ]
+    )
+
+    #expect(state.shouldShowNotificationPrompt)
+  }
+
+  @Test
+  func notificationPromptDismissalIsRemembered() async throws {
+    let suiteName = "DashboardTests.notificationPrompt.\(UUID().uuidString)"
+    let userDefaults = try #require(UserDefaults(suiteName: suiteName))
+    defer { userDefaults.removePersistentDomain(forName: suiteName) }
+    var state = DashboardFeature.State(date: Date())
+    state.canRequestNotificationAuthorization = true
+    let store = TestStore(
+      initialState: state,
+      reducer: { DashboardFeature(userDefaults: userDefaults) }
+    )
+
+    await store.send(.view(.notificationPromptDismissed)) {
+      $0.canRequestNotificationAuthorization = false
+    }
+
+    #expect(userDefaults.bool(forKey: "notificationPromptDismissed"))
+  }
+
+  @Test
+  func failedNotificationAuthorizationCanBeRetried() async throws {
+    let suiteName = "DashboardTests.notificationFailure.\(UUID().uuidString)"
+    let userDefaults = try #require(UserDefaults(suiteName: suiteName))
+    defer { userDefaults.removePersistentDomain(forName: suiteName) }
+    let store = TestStore(
+      initialState: DashboardFeature.State(date: Date()),
+      reducer: { DashboardFeature(userDefaults: userDefaults) }
+    )
+
+    await store.send(.internal(.notificationAuthorizationRequestFailed)) {
+      $0.canRequestNotificationAuthorization = true
+    }
+
+    #expect(!userDefaults.bool(forKey: "notificationPromptDismissed"))
+  }
+
+  @Test
+  func completedNotificationAuthorizationIsRemembered() async throws {
+    let suiteName = "DashboardTests.notificationSuccess.\(UUID().uuidString)"
+    let userDefaults = try #require(UserDefaults(suiteName: suiteName))
+    defer { userDefaults.removePersistentDomain(forName: suiteName) }
+    var state = DashboardFeature.State(date: Date())
+    state.canRequestNotificationAuthorization = true
+    let store = TestStore(
+      initialState: state,
+      reducer: { DashboardFeature(userDefaults: userDefaults) }
+    )
+
+    await store.send(.internal(.notificationAuthorizationRequestCompleted)) {
+      $0.canRequestNotificationAuthorization = false
+    }
+
+    #expect(userDefaults.bool(forKey: "notificationPromptDismissed"))
+  }
+
+  @Test
   func planSummaryTapDelegatesSelectedPlan() async {
     let date = Date(timeIntervalSince1970: 1_752_364_800)
     let plan = Plan(

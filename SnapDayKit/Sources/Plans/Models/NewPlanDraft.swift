@@ -8,12 +8,12 @@ public struct NewPlanDraft: Equatable {
   let endDate: Date
   let schedule: [ScheduledPlanDay]
 
-  var uniqueActivities: [Activity] {
+  public var uniqueActivities: [Activity] {
     var seen = Set<Activity.ID>()
     return schedule.flatMap(\.activities).filter { seen.insert($0.id).inserted }
   }
 
-  func plan(
+  public func plan(
     id: Plan.ID,
     scheduleEntryID: () -> PlanScheduleEntry.ID
   ) -> Plan {

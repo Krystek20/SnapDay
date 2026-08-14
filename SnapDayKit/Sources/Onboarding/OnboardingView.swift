@@ -1,18 +1,19 @@
 import ComposableArchitecture
+import Plans
 import Resources
 import SwiftUI
 import UiComponents
 
 public struct OnboardingView: View {
 
-  private let store: StoreOf<OnboardingFeature>
+  @Bindable private var store: StoreOf<OnboardingFeature>
 
   public init(store: StoreOf<OnboardingFeature>) {
     self.store = store
   }
 
   public var body: some View {
-    NavigationStack {
+    NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
       ScrollView {
         VStack(alignment: .leading, spacing: 5.0) {
           header
@@ -51,6 +52,26 @@ public struct OnboardingView: View {
         .padding(.horizontal, 15.0)
         .padding(.vertical, 10.0)
         .background(Color.background)
+      }
+    } destination: { pathStore in
+      switch pathStore.state {
+      case .newPlanStep(let step):
+        if let newPlanStore = store.scope(
+          state: \.newPlan,
+          action: \.newPlan
+        ) {
+          NewPlanView(
+            store: newPlanStore,
+            presentationContext: .onboarding(step)
+          )
+        }
+      case .templateSelection:
+        if let templateStore = pathStore.scope(
+          state: \.templateSelection,
+          action: \.templateSelection
+        ) {
+          OnboardingTemplateSelectionView(store: templateStore)
+        }
       }
     }
   }

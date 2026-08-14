@@ -32,8 +32,21 @@ public actor CloudService {
     }
   }
 
-  public enum CloudError: Error {
+  public enum CloudError: LocalizedError {
     case serviceNotAvailable
+    case shareEntityNotAvailable
+    case shareNotAvailable
+
+    public var errorDescription: String? {
+      switch self {
+      case .serviceNotAvailable:
+        "iCloud is not available. Check that you are signed in and try again."
+      case .shareEntityNotAvailable:
+        "The local sharing record is not available. Please try again."
+      case .shareNotAvailable:
+        "The iCloud share is not available. Please try again."
+      }
+    }
   }
 
   // MARK: - Dependecies
@@ -107,16 +120,21 @@ public actor CloudService {
   }
 
   private let container = CKContainer(identifier: "iCloud.com.mobilove.snapday")
-  private var initializing = false
+  private let initializationIdentifier = UUID()
 
   // MARK: - Public
 
   public func initializeIfNeeded() async throws {
-    guard !initializing,
-          try await cloudState == .active,
-          !iCloudStore.bool(forKey: isShareEntityGeneratedKey),
-          let userRecordName = await userRecordName else { return }
-    initializing = true
+    try await asyncWaiter.executeOrWait(for: initializationIdentifier) { [self] in
+      try await initializeShareIfNeeded()
+    }
+  }
+
+  private func initializeShareIfNeeded() async throws {
+    guard try await cloudState == .active,
+          let userRecordName = await userRecordName else {
+      throw CloudError.serviceNotAvailable
+    }
 
     try await asyncWaiter.waitUntil(
       deadline: 5.0,
@@ -126,18 +144,20 @@ public actor CloudService {
       }
     )
 
-    guard try await shareEntity == nil else {
-      iCloudStore.set(true, forKey: isShareEntityGeneratedKey)
-      iCloudStore.synchronize()
-      return
+    let shareEntity: ShareEntity
+    if let existingShareEntity = try await self.shareEntity {
+      shareEntity = existingShareEntity
+      if try coreDataStack.fetchShare(matching: shareEntity).share != nil {
+        setShareEntityGenerated()
+        return
+      }
+    } else {
+      let share = try await createShare(userRecordName: userRecordName)
+      shareEntity = try share.managedObject(coreDataStack.backgroundContext)
     }
 
-    let share = try await createShare(userRecordName: userRecordName)
-    let shareEntity = try share.managedObject(coreDataStack.backgroundContext)
     try await coreDataStack.share(managedObject: shareEntity)
-    iCloudStore.set(true, forKey: isShareEntityGeneratedKey)
-    iCloudStore.synchronize()
-    initializing = false
+    setShareEntityGenerated()
   }
 
   public func allShares() async throws -> [Share] {
@@ -244,27 +264,50 @@ public actor CloudService {
   // MARK: - Private
 
   private func addParticipant(lookupInfo: CKUserIdentity.LookupInfo) async throws -> ShareResult? {
+    try await initializeIfNeeded()
+
     guard let shareEntity = try await shareEntity else {
-      print("There is no share entity")
-      return nil
+      throw CloudError.shareEntityNotAvailable
     }
 
     let (share, container) = try coreDataStack.fetchShare(matching: shareEntity)
     guard let share else {
-      print("There is no ckShare")
-      return nil
+      throw CloudError.shareNotAvailable
     }
 
-    guard let participant = try await coreDataStack.fetchParticipants(matching: [lookupInfo]).first else {
-      print("There is no such participant")
-      return nil
+    let existingShareResult = ShareResult(ckShare: share, container: container)
+
+    let participant: CKShare.Participant
+    do {
+      guard let fetchedParticipant = try await coreDataStack.fetchParticipants(matching: [lookupInfo]).first else {
+        NSLog("[CloudService] CloudKit returned no participant; presenting the system share sheet instead")
+        return existingShareResult
+      }
+      participant = fetchedParticipant
+    } catch {
+      NSLog("[CloudService] Participant lookup failed; presenting the system share sheet instead: \(error)")
+      return existingShareResult
     }
 
     participant.permission = .readWrite
     participant.role = .privateUser
+    if share.participants.contains(where: { $0.participantID == participant.participantID }) {
+      return existingShareResult
+    }
     share.addParticipant(participant)
-    let updatedShare = try await coreDataStack.persistUpdatedShare(share: share)
-    return ShareResult(ckShare: updatedShare, container: container)
+    do {
+      let updatedShare = try await coreDataStack.persistUpdatedShare(share: share)
+      return ShareResult(ckShare: updatedShare, container: container)
+    } catch {
+      share.removeParticipant(participant)
+      NSLog("[CloudService] Participant persistence failed; presenting the system share sheet instead: \(error)")
+      return existingShareResult
+    }
+  }
+
+  private func setShareEntityGenerated() {
+    iCloudStore.set(true, forKey: isShareEntityGeneratedKey)
+    iCloudStore.synchronize()
   }
 
   private func createShare(userRecordName: String) async throws -> Share {

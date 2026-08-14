@@ -17,6 +17,10 @@ final class CoreDataBackupService {
   // MARK: - Properties
 
   private let fileManager: FileManager
+  private let backupStoreOptions: [AnyHashable: Any] = [
+    NSMigratePersistentStoresAutomaticallyOption: true,
+    NSInferMappingModelAutomaticallyOption: true
+  ]
 
   // MARK: - Initialization
 
@@ -60,19 +64,31 @@ final class CoreDataBackupService {
     persistentContainer: PersistentContainerType,
     description: NSPersistentStoreDescription
   ) async throws {
-    let temporaryStore = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
-    let newStore = try temporaryStore.addPersistentStore(
+    let coordinator = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
+    let storeType = NSPersistentStore.StoreType(rawValue: description.type)
+    let backupURL = try fileManager.nextBackupURL()
+
+    if fileManager.fileExists(atPath: backupURL.path()) {
+      try coordinator.destroyPersistentStore(
+        at: backupURL,
+        type: storeType,
+        options: backupStoreOptions
+      )
+    }
+
+    let sourceStore = try coordinator.addPersistentStore(
       ofType: description.type,
       configurationName: description.configuration,
       at: description.url,
       options: description.options
     )
-    _ = try temporaryStore.migratePersistentStore(
-      newStore,
-      to: fileManager.prepareURLForBackup(),
-      options: description.options,
-      type: NSPersistentStore.StoreType(rawValue: description.type)
+    let backupStore = try coordinator.migratePersistentStore(
+      sourceStore,
+      to: backupURL,
+      options: backupStoreOptions,
+      type: storeType
     )
+    try coordinator.remove(backupStore)
   }
 
   func recoverStore(
@@ -111,7 +127,7 @@ final class CoreDataBackupService {
       ofType: description.type,
       configurationName: description.configuration,
       at: backupURL,
-      options: description.options
+      options: backupStoreOptions
     )
     _ = try persistentContainer.persistentStoreCoordinator.migratePersistentStore(
       backupStore,
@@ -160,7 +176,7 @@ extension FileManager {
     }
   }
 
-  fileprivate func prepareURLForBackup() throws -> URL {
+  fileprivate func nextBackupURL() throws -> URL {
     guard let documentDirectory = urls(for: .documentDirectory, in: .userDomainMask).first else {
       throw CoreDataStackError.documentDirectoryNotExist
     }
@@ -182,17 +198,13 @@ extension FileManager {
     case (true, true):
       let attributes1 = try attributesOfItem(atPath: firstSqlite.path())
       let attributes2 = try attributesOfItem(atPath: secondSqlite.path())
-      let urlToDeleteAndReturn: URL
       guard let creationDate1 = attributes1[.creationDate] as? Date,
             let creationDate2 = attributes2[.creationDate] as? Date else {
-        try removeItem(at: firstSqlite)
         return firstSqlite
       }
-      urlToDeleteAndReturn = creationDate1 < creationDate2
+      return creationDate1 < creationDate2
       ? firstSqlite
       : secondSqlite
-      try removeItem(at: urlToDeleteAndReturn)
-      return urlToDeleteAndReturn
     }
   }
 

@@ -10,6 +10,7 @@ import CalendarPicker
 import Combine
 import Friends
 import ManageActivity
+import UIKit.UIApplication
 
 import protocol UiComponents.InformationViewConfigurable
 import struct UiComponents.ListItem
@@ -22,6 +23,8 @@ public struct DashboardFeature: TodayProvidable {
     case loadPlans
   }
 
+  private static let notificationPromptDismissedKey = "notificationPromptDismissed"
+
   // MARK: - Dependencies
 
   @Dependency(\.activityRepository) var activityRepository
@@ -33,6 +36,7 @@ public struct DashboardFeature: TodayProvidable {
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
   @Dependency(\.deeplinkService) private var deeplinkService
   @Dependency(\.widgetReloader) private var widgetReloader
+  @Dependency(\.openURL) private var openURL
   private let userDefaults: UserDefaults
 
   // MARK: - State & Action
@@ -60,6 +64,12 @@ public struct DashboardFeature: TodayProvidable {
     var newField: DayNewField?
     var items: [ListItem] = []
     var planSummaries: [DashboardPlanSummary] = []
+    var canRequestNotificationAuthorization = false
+
+    var shouldShowNotificationPrompt: Bool {
+      canRequestNotificationAuthorization
+      && (!(selectedDay?.activities.isEmpty ?? true) || !planSummaries.isEmpty)
+    }
 
     var dayInformation: InformationViewConfiguration? {
       guard !hideDayInformation, let selectedDay, newField == nil else { return nil }
@@ -117,6 +127,9 @@ public struct DashboardFeature: TodayProvidable {
       case assistantButtonTapped
       case allPlansButtonTapped
       case planSummaryTapped(Plan)
+      case notificationPromptDismissed
+      case notificationTurnOnTapped
+      case notificationsSettingsTapped
     }
 
     public enum InternalAction: Equatable {
@@ -125,6 +138,10 @@ public struct DashboardFeature: TodayProvidable {
       case loadDay
       case loadPlans
       case plansLoaded([DashboardPlanSummary])
+      case notificationAuthorizationAvailabilityLoaded(Bool)
+      case notificationAuthorizationRequestCompleted
+      case notificationAuthorizationRequestFailed
+      case refreshNotificationAuthorization
       case setDate(_ date: Date)
       case setDay(_ day: Day)
       case setItems
@@ -264,11 +281,7 @@ public struct DashboardFeature: TodayProvidable {
             await send(.internal(.load))
           }
         },
-        .run { _ in
-          try await userNotificationCenterProvider.schedule(
-            userNotification: EveningSummary(calendar: calendar)
-          )
-        },
+        .send(.internal(.refreshNotificationAuthorization)),
         .run { send in
           for await _ in NotificationCenter.default.publisher(for: .NSCalendarDayChanged).values {
             await send(.internal(.calendarDayChanged))
@@ -278,6 +291,13 @@ public struct DashboardFeature: TodayProvidable {
           for await deeplink in deeplinkService.deeplinkPublisher.values {
             guard let deeplink, case .dashboard(let action) = deeplink else { continue }
             await send(.internal(.handleDeepLink(action)))
+          }
+        },
+        .run { send in
+          for await _ in NotificationCenter.default.publisher(
+            for: UIApplication.didBecomeActiveNotification
+          ).values {
+            await send(.internal(.refreshNotificationAuthorization))
           }
         }
       )
@@ -336,6 +356,42 @@ public struct DashboardFeature: TodayProvidable {
       return .send(.delegate(.allPlansTapped))
     case .planSummaryTapped(let plan):
       return .send(.delegate(.planTapped(plan)))
+    case .notificationPromptDismissed:
+      state.canRequestNotificationAuthorization = false
+      userDefaults.set(true, forKey: Self.notificationPromptDismissedKey)
+      return .none
+    case .notificationTurnOnTapped:
+      state.canRequestNotificationAuthorization = false
+      return .run { send in
+        do {
+          let isAuthorized = try await userNotificationCenterProvider.requestAuthorization()
+          await send(.internal(.notificationAuthorizationRequestCompleted))
+          guard isAuthorized else { return }
+          await refreshScheduledNotifications()
+        } catch {
+          print("Cannot enable notifications: \(error)")
+          await send(.internal(.notificationAuthorizationRequestFailed))
+        }
+      }
+    case .notificationsSettingsTapped:
+      return .run { send in
+        switch await userNotificationCenterProvider.status {
+        case .notDetermined:
+          await send(.internal(.notificationAuthorizationAvailabilityLoaded(false)))
+          do {
+            let isAuthorized = try await userNotificationCenterProvider.requestAuthorization()
+            await send(.internal(.notificationAuthorizationRequestCompleted))
+            guard isAuthorized else { return }
+            await refreshScheduledNotifications()
+          } catch {
+            print("Cannot enable notifications: \(error)")
+            await send(.internal(.notificationAuthorizationRequestFailed))
+          }
+        case .authorized, .denied:
+          guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+          await openURL(settingsURL)
+        }
+      }
     }
   }
 
@@ -382,12 +438,37 @@ public struct DashboardFeature: TodayProvidable {
     case .plansLoaded(let summaries):
       state.planSummaries = summaries
       return .none
+    case .notificationAuthorizationAvailabilityLoaded(let isAvailable):
+      state.canRequestNotificationAuthorization = isAvailable
+      return .none
+    case .notificationAuthorizationRequestCompleted:
+      state.canRequestNotificationAuthorization = false
+      userDefaults.set(true, forKey: Self.notificationPromptDismissedKey)
+      return .none
+    case .notificationAuthorizationRequestFailed:
+      state.canRequestNotificationAuthorization = true
+      return .none
+    case .refreshNotificationAuthorization:
+      return .run { send in
+        switch await userNotificationCenterProvider.status {
+        case .notDetermined:
+          let isAvailable = !userDefaults.bool(
+            forKey: Self.notificationPromptDismissedKey
+          )
+          await send(.internal(.notificationAuthorizationAvailabilityLoaded(isAvailable)))
+        case .denied:
+          await send(.internal(.notificationAuthorizationAvailabilityLoaded(false)))
+        case .authorized:
+          await send(.internal(.notificationAuthorizationAvailabilityLoaded(false)))
+          await refreshScheduledNotifications()
+        }
+      }
     case .setDay(let day):
       state.selectedDay = day
       state.hideDayInformation = false
       return .run { send in
         await send(.internal(.setItems))
-        try await userNotificationCenterProvider.reloadReminders()
+        await reloadRemindersIfAuthorized()
       }
     case .setItems:
       state.items = ListItemsBuilder(
@@ -443,6 +524,31 @@ public struct DashboardFeature: TodayProvidable {
         calendar: calendar
       )
     }
+  }
+
+  private func scheduleEveningSummaryIfAuthorized() async {
+    guard case .authorized = await userNotificationCenterProvider.status else { return }
+    do {
+      try await userNotificationCenterProvider.schedule(
+        userNotification: EveningSummary(calendar: calendar)
+      )
+    } catch {
+      print("Cannot schedule evening summary: \(error)")
+    }
+  }
+
+  private func reloadRemindersIfAuthorized() async {
+    guard case .authorized = await userNotificationCenterProvider.status else { return }
+    do {
+      try await userNotificationCenterProvider.reloadReminders()
+    } catch {
+      print("Cannot reload reminders: \(error)")
+    }
+  }
+
+  private func refreshScheduledNotifications() async {
+    await scheduleEveningSummaryIfAuthorized()
+    await reloadRemindersIfAuthorized()
   }
 
   private func performListItemAction(_ actionType: ListItemAction, state: inout State) -> Effect<Action> {
@@ -557,7 +663,7 @@ public struct DashboardFeature: TodayProvidable {
       return .run { [dayActivity] send in
         try await dayUpdater.saveDayActivity(dayActivity, syncSharable: true)
         await send(.internal(.load))
-        try await userNotificationCenterProvider.reloadReminders()
+        await reloadRemindersIfAuthorized()
         guard dayActivity.hasIncompletedSubtasksAndDone else { return }
         await send(.internal(.dayActivityAction(.showAlertSelectAll(dayActivity))))
       }
@@ -706,7 +812,7 @@ public struct DashboardFeature: TodayProvidable {
       return .run { [dayActivityTask] send in
         try await dayUpdater.saveDayActivityTask(dayActivityTask, syncSharable: true)
         await send(.internal(.load))
-        try await userNotificationCenterProvider.reloadReminders()
+        await reloadRemindersIfAuthorized()
         guard let dayActivity = try await dayUpdater.dayActivity(identifier: dayActivityTask.dayActivityId.uuidString),
               dayActivity.hasCompletedSubtasksAndNotDone else { return }
         await send(.internal(.dayActivityAction(.showAlertSelectActivity(dayActivity))))

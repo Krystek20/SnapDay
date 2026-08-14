@@ -17,12 +17,14 @@ struct DashboardCoordinatorFeatureTests {
       allowsManagement: true,
       activities: [activity]
     )
-    var state = DashboardCoordinatorFeature.State()
-    state.path.append(.planDetails(loadedDetails))
-    let store = TestStore(
-      initialState: state,
-      reducer: { DashboardCoordinatorFeature() }
-    )
+    let store = withTestDependencies {
+      var state = DashboardCoordinatorFeature.State()
+      state.path.append(.planDetails(loadedDetails))
+      return TestStore(
+        initialState: state,
+        reducer: { DashboardCoordinatorFeature() }
+      )
+    }
 
     await store.send(.externalPlanLoaded(plan))
 
@@ -35,12 +37,14 @@ struct DashboardCoordinatorFeatureTests {
   @Test
   func planDeepLinkReplacesExistingDashboardDestination() async {
     let plan = makePlan()
-    var state = DashboardCoordinatorFeature.State()
-    state.path.append(.plans(PlansFeature.State()))
-    let store = TestStore(
-      initialState: state,
-      reducer: { DashboardCoordinatorFeature() }
-    )
+    let store = withTestDependencies {
+      var state = DashboardCoordinatorFeature.State()
+      state.path.append(.plans(PlansFeature.State()))
+      return TestStore(
+        initialState: state,
+        reducer: { DashboardCoordinatorFeature() }
+      )
+    }
 
     await store.send(.externalPlanLoaded(plan)) {
       $0.path.removeAll()
@@ -62,5 +66,14 @@ struct DashboardCoordinatorFeatureTests {
       duration: .custom,
       schedule: []
     )
+  }
+
+  private func withTestDependencies<T>(_ operation: () -> T) -> T {
+    withDependencies {
+      $0.utcCalendar = Calendar(identifier: .gregorian)
+      $0.date.now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+    } operation: {
+      operation()
+    }
   }
 }
