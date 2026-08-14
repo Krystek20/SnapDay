@@ -26,6 +26,8 @@ public struct NewPlanFeature {
     var isStartDateEditable: Bool
     var isNameValidationErrorPresented: Bool
     var isScheduleValidationErrorPresented: Bool
+    var delegatesStepChanges: Bool
+    var isSubmitting: Bool
 
     var activityPickerDay: PlanWeekday?
     @Presents var activityPicker: ActivityListFeature.State?
@@ -61,7 +63,9 @@ public struct NewPlanFeature {
       isStartDateEditable: Bool = true,
       isNameValidationErrorPresented: Bool = false,
       isScheduleValidationErrorPresented: Bool = false,
-      scheduleRemovalWeekdays: [PlanWeekday] = []
+      scheduleRemovalWeekdays: [PlanWeekday] = [],
+      delegatesStepChanges: Bool = false,
+      isSubmitting: Bool = false
     ) {
       self.step = step
       self.name = name
@@ -73,12 +77,47 @@ public struct NewPlanFeature {
       self.isStartDateEditable = isStartDateEditable
       self.isNameValidationErrorPresented = isNameValidationErrorPresented
       self.isScheduleValidationErrorPresented = isScheduleValidationErrorPresented
+      self.delegatesStepChanges = delegatesStepChanges
+      self.isSubmitting = isSubmitting
       self.activityPickerDay = nil
       self.activityPicker = nil
       self.applySourceDay = nil
       self.applyTargetDays = []
       self.replacementTargetDays = []
       self.scheduleRemovalWeekdays = scheduleRemovalWeekdays
+    }
+
+    public init(
+      onboardingName name: String,
+      startDate: Date,
+      suggestedActivity: Activity?,
+      scheduledWeekdays: Set<PlanWeekday>,
+      calendar: Calendar
+    ) {
+      let duration = PlanDuration.oneMonth
+      let endDate = duration.endDate(from: startDate, calendar: calendar)
+      let schedule = NewPlanFeature.makeSchedule(
+        from: startDate,
+        through: endDate,
+        preserving: [],
+        calendar: calendar
+      ).map { day in
+        guard let suggestedActivity, scheduledWeekdays.contains(day.weekday) else {
+          return day
+        }
+        return ScheduledPlanDay(
+          weekday: day.weekday,
+          activities: [suggestedActivity]
+        )
+      }
+      self.init(
+        name: name,
+        selectedDuration: duration,
+        startDate: startDate,
+        endDate: endDate,
+        schedule: schedule,
+        delegatesStepChanges: true
+      )
     }
 
     init(
@@ -160,7 +199,6 @@ public struct NewPlanFeature {
 
     public enum ViewAction: Equatable {
       case cancelButtonTapped
-      case backButtonTapped
       case continueButtonTapped
       case navigationPathChanged([NewPlanStep])
       case durationTapped(PlanDuration)
@@ -180,11 +218,13 @@ public struct NewPlanFeature {
       case cancelTapped
       case planCreated(NewPlanDraft)
       case planUpdated(Plan)
+      case stepChanged(NewPlanStep)
     }
 
     case binding(BindingAction<State>)
     case activityPicker(PresentationAction<ActivityListFeature.Action>)
     case delegate(DelegateAction)
+    case submissionFailed
     case view(ViewAction)
   }
 
@@ -253,17 +293,6 @@ public struct NewPlanFeature {
       case .view(.cancelButtonTapped):
         return .send(.delegate(.cancelTapped))
 
-      case .view(.backButtonTapped):
-        switch state.step {
-        case .details:
-          return .send(.delegate(.cancelTapped))
-        case .weeklySchedule:
-          state.step = .details
-        case .review:
-          state.step = .weeklySchedule
-        }
-        return .none
-
       case .view(.continueButtonTapped):
         switch state.step {
         case .details:
@@ -292,7 +321,7 @@ public struct NewPlanFeature {
         case .review:
           break
         }
-        return .none
+        return stepChangeEffect(for: state)
 
       case .view(.navigationPathChanged(let path)):
         switch path {
@@ -388,19 +417,20 @@ public struct NewPlanFeature {
           calendar: calendar
         )
         Self.applySchedule(updatedSchedule, to: &state)
-        return .none
+        return stepChangeEffect(for: state)
 
       case .view(.startPlanButtonTapped):
+        guard !state.isSubmitting else { return .none }
         guard state.step == .review else { return .none }
         guard state.canContinue else {
           state.isNameValidationErrorPresented = true
           state.step = .details
-          return .none
+          return stepChangeEffect(for: state)
         }
         guard state.canReview else {
           state.isScheduleValidationErrorPresented = true
           state.step = .weeklySchedule
-          return .none
+          return stepChangeEffect(for: state)
         }
         let draft = NewPlanDraft(
           name: state.name.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -412,7 +442,14 @@ public struct NewPlanFeature {
         if let editingPlan = state.editingPlan {
           return .send(.delegate(.planUpdated(draft.updating(editingPlan, scheduleEntryID: { uuid() }))))
         }
+        if state.delegatesStepChanges {
+          state.isSubmitting = true
+        }
         return .send(.delegate(.planCreated(draft)))
+
+      case .submissionFailed:
+        state.isSubmitting = false
+        return .none
 
       }
     }
@@ -422,6 +459,11 @@ public struct NewPlanFeature {
   }
 
   // MARK: - Private
+
+  private func stepChangeEffect(for state: State) -> Effect<Action> {
+    guard state.delegatesStepChanges else { return .none }
+    return .send(.delegate(.stepChanged(state.step)))
+  }
 
   private static func makeSchedule(
     from startDate: Date,

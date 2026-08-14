@@ -621,6 +621,47 @@ struct NewPlanFeatureTests {
   }
 
   @Test
+  func onboardingPlanCanOnlyBeSubmittedOnceUntilSavingFails() async throws {
+    let calendar = testCalendar()
+    let startDate = try date(year: 2026, month: 7, day: 20, calendar: calendar)
+    let activity = try activity(
+      id: "00000000-0000-0000-0000-000000000001",
+      name: "Read"
+    )
+    var state = NewPlanFeature.State(
+      onboardingName: "Reading plan",
+      startDate: startDate,
+      suggestedActivity: activity,
+      scheduledWeekdays: [.monday],
+      calendar: calendar
+    )
+    state.step = .review
+    let draft = NewPlanDraft(
+      name: state.name,
+      duration: state.selectedDuration,
+      startDate: state.startDate,
+      endDate: state.endDate,
+      schedule: state.schedule
+    )
+    let store = TestStore(initialState: state) {
+      NewPlanFeature()
+    }
+
+    await store.send(.view(.startPlanButtonTapped)) {
+      $0.isSubmitting = true
+    }
+    await store.receive(.delegate(.planCreated(draft)))
+    await store.send(.view(.startPlanButtonTapped))
+    await store.send(.submissionFailed) {
+      $0.isSubmitting = false
+    }
+    await store.send(.view(.startPlanButtonTapped)) {
+      $0.isSubmitting = true
+    }
+    await store.receive(.delegate(.planCreated(draft)))
+  }
+
+  @Test
   func addingAnActivityClearsScheduleValidationErrorWithoutLosingDraft() async throws {
     let activity = try activity(id: "00000000-0000-0000-0000-000000000001", name: "Read")
     let startDate = try date(year: 2026, month: 7, day: 21)

@@ -1,7 +1,6 @@
 import ComposableArchitecture
-import SwiftUI
 import Onboarding
-import Resources
+import SwiftUI
 import UIKit.UIDevice
 #if DEBUG
 import DeveloperTools
@@ -27,6 +26,16 @@ public struct ApplicationView: View {
       .onAppear {
         store.send(.appeared)
       }
+      .alert(
+        String(localized: "Plan couldn't be saved", bundle: .module),
+        isPresented: onboardingPlanSaveErrorBinding
+      ) {
+        Button(String(localized: "OK", bundle: .module)) {
+          store.send(.onboardingPlanSaveErrorDismissed)
+        }
+      } message: {
+        Text("Your plan is still open. Please try saving again.", bundle: .module)
+      }
       #if DEBUG
       .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
         NavigationStack {
@@ -43,20 +52,11 @@ public struct ApplicationView: View {
   @ViewBuilder
   private var content: some View {
     if store.showOnboarding {
-      onboardingView
+      OnboardingView(
+        store: store.scope(state: \.onboarding, action: \.onboarding)
+      )
     } else {
       tabView
-    }
-  }
-
-  private var onboardingView: some View {
-    NavigationStack {
-      OnboardingView(
-        store: store.scope(
-          state: \.onboarding,
-          action: \.onboarding
-        )
-      )
     }
   }
 
@@ -87,4 +87,14 @@ public struct ApplicationView: View {
     )
   }
 
+  private var onboardingPlanSaveErrorBinding: Binding<Bool> {
+    Binding(
+      get: { store.isOnboardingPlanSaveErrorPresented },
+      set: { isPresented in
+        if !isPresented {
+          store.send(.onboardingPlanSaveErrorDismissed)
+        }
+      }
+    )
+  }
 }

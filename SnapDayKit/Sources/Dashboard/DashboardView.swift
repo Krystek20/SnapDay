@@ -141,6 +141,15 @@ public struct DashboardView: View {
                   }
                 }
               )
+              Button(
+                action: {
+                  store.send(.view(.notificationsSettingsTapped))
+                },
+                label: {
+                  Text("Notifications", bundle: .module)
+                  Image(systemName: "bell")
+                }
+              )
             }, label: {
               Image(systemName: "gearshape.circle.fill")
                 .foregroundStyle(Color.actionBlue)
@@ -207,7 +216,22 @@ public struct DashboardView: View {
   private var dashboardContent: some View {
     VStack(spacing: 15.0) {
       plansSummary
+      notificationPrompt
       dayList
+    }
+  }
+
+  @ViewBuilder
+  private var notificationPrompt: some View {
+    if store.shouldShowNotificationPrompt {
+      DashboardNotificationPromptView(
+        dismissAction: {
+          store.send(.view(.notificationPromptDismissed))
+        },
+        turnOnAction: {
+          store.send(.view(.notificationTurnOnTapped))
+        }
+      )
     }
   }
 

@@ -1,6 +1,9 @@
-import Onboarding
 import ComposableArchitecture
 import Foundation
+import Models
+import Onboarding
+import Plans
+import Repositories
 import Utilities
 import TipKit
 #if DEBUG
@@ -10,36 +13,39 @@ import DeveloperTools
 @Reducer
 public struct ApplicationFeature {
 
+  private enum CancelID {
+    case onboardingPlanCreation
+  }
+
   @Dependency(\.deeplinkService) private var deeplinkService
   @Dependency(\.cloudService) private var cloudService
   @Dependency(\.iconProvider) private var iconProvider
+  @Dependency(\.planCreationRepository) private var planCreationRepository
+  @Dependency(\.calendar) private var calendar
+  @Dependency(\.date.now) private var now
+  @Dependency(\.uuid) private var uuid
   private static let isOnboardingShownKey = "isOnboardingShown"
+  private let userDefaults: UserDefaults
 
   // MARK: - State & Action
 
   @ObservableState
   public struct State: Equatable {
-    var showOnboarding: Bool {
-      didSet {
-        userDefaults.setValue(!showOnboarding, forKey: ApplicationFeature.isOnboardingShownKey)
-      }
-    }
-
+    var showOnboarding: Bool
     var selectedTab = Tab.dashboard
 
     var dashboard = DashboardCoordinatorFeature.State()
     var reports = ReportsCoordinatorFeature.State()
     var onboarding = OnboardingFeature.State()
+    var onboardingGeneratedActivityIDs: Set<Activity.ID> = []
+    var isOnboardingPlanSaveErrorPresented = false
 
     #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
     #endif
 
-    private let userDefaults: UserDefaults
-
     public init(userDefaults: UserDefaults = .standard) {
-      self.userDefaults = userDefaults
-      self.showOnboarding = !userDefaults.bool(forKey: ApplicationFeature.isOnboardingShownKey)
+      showOnboarding = !userDefaults.bool(forKey: ApplicationFeature.isOnboardingShownKey)
     }
   }
 
@@ -54,6 +60,9 @@ public struct ApplicationFeature {
     case dashboard(DashboardCoordinatorFeature.Action)
     case reports(ReportsCoordinatorFeature.Action)
     case onboarding(OnboardingFeature.Action)
+    case onboardingPlanSaved
+    case onboardingPlanSaveFailed
+    case onboardingPlanSaveErrorDismissed
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
@@ -67,7 +76,9 @@ public struct ApplicationFeature {
 
   // MARK: - Initialization
 
-  public init() { }
+  public init(userDefaults: UserDefaults = .standard) {
+    self.userDefaults = userDefaults
+  }
 
   // MARK: - Body
 
@@ -148,12 +159,92 @@ public struct ApplicationFeature {
         return .none
       case .reports:
         return .none
-      case .onboarding(.delegate(.finished)):
+      case .onboarding(.delegate(.completed)):
+        state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
+        state.selectedTab = .dashboard
+        userDefaults.set(true, forKey: Self.isOnboardingShownKey)
         return .none
+      case .onboarding(.delegate(.skipped)):
+        state.onboarding = OnboardingFeature.State()
+        state.showOnboarding = false
+        state.selectedTab = .dashboard
+        userDefaults.set(true, forKey: Self.isOnboardingShownKey)
+        return .none
+      case .onboarding(.delegate(.createPlanRequested(let request))):
+        let startDate = calendar.startOfDay(for: now)
+        let activity = request.activityTitle.map {
+          Activity(
+            id: uuid(),
+            name: $0,
+            startDate: startDate
+          )
+        }
+        state.onboardingGeneratedActivityIDs = Set(activity.map { [$0.id] } ?? [])
+        return .send(
+          .onboarding(
+            .presentPlan(
+              NewPlanFeature.State(
+                onboardingName: request.name,
+                startDate: startDate,
+                suggestedActivity: activity,
+                scheduledWeekdays: scheduledWeekdays(
+                  for: request.cadence,
+                  startDate: startDate
+                ),
+                calendar: calendar
+              )
+            )
+          )
+        )
+      case .onboarding(.delegate(.planCreationCancelled)):
+        state.onboardingGeneratedActivityIDs = []
+        return .cancel(id: CancelID.onboardingPlanCreation)
+      case .onboarding(.delegate(.planCreated(let draft))):
+        let generatedActivityIDs = state.onboardingGeneratedActivityIDs
+        let generatedActivities = draft.uniqueActivities.filter {
+          generatedActivityIDs.contains($0.id)
+        }
+        let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
+        let occurrences = plan.scheduledOccurrences(
+          from: plan.startDate,
+          calendar: calendar
+        )
+        return .run { send in
+          do {
+            try await planCreationRepository.create(
+              plan,
+              generatedActivities,
+              occurrences
+            )
+            await send(.onboardingPlanSaved)
+          } catch {
+            await send(.onboardingPlanSaveFailed)
+          }
+        }
+        .cancellable(id: CancelID.onboardingPlanCreation, cancelInFlight: true)
       case .onboarding:
         return .none
+      case .onboardingPlanSaved:
+        state.onboardingGeneratedActivityIDs = []
+        state.onboarding = OnboardingFeature.State()
+        state.showOnboarding = false
+        state.selectedTab = .dashboard
+        userDefaults.set(true, forKey: Self.isOnboardingShownKey)
+        return .send(.dashboard(.dashboard(.internal(.load))))
+      case .onboardingPlanSaveFailed:
+        state.isOnboardingPlanSaveErrorPresented = true
+        return .send(.onboarding(.newPlan(.submissionFailed)))
+      case .onboardingPlanSaveErrorDismissed:
+        state.isOnboardingPlanSaveErrorPresented = false
+        return .none
       #if DEBUG
+      case .developerTools(.presented(.delegate(.showOnboardingAgain))):
+        userDefaults.removeObject(forKey: Self.isOnboardingShownKey)
+        state.onboarding = OnboardingFeature.State()
+        state.showOnboarding = true
+        state.developerTools = nil
+        return .none
       case .developerTools:
         return .none
       #endif
@@ -166,5 +257,23 @@ public struct ApplicationFeature {
       DeveloperToolsFeature()
     }
     #endif
+  }
+
+  private func scheduledWeekdays(
+    for cadence: OnboardingPlanRequest.Cadence?,
+    startDate: Date
+  ) -> Set<PlanWeekday> {
+    switch cadence {
+    case .daily:
+      Set(PlanWeekday.allCases)
+    case .weekdays:
+      [.monday, .tuesday, .wednesday, .thursday, .friday]
+    case .weekends:
+      [.saturday, .sunday]
+    case .onceWeekly:
+      PlanWeekday(rawValue: calendar.component(.weekday, from: startDate)).map { [$0] } ?? []
+    case nil:
+      []
+    }
   }
 }

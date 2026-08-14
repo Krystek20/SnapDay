@@ -10,24 +10,36 @@ import Utilities
 @MainActor
 public struct NewPlanView: View {
 
+  public enum PresentationContext {
+    case modal
+    case onboarding(NewPlanStep)
+  }
+
   // MARK: - Properties
 
   @Bindable private var store: StoreOf<NewPlanFeature>
+  private let presentationContext: PresentationContext
 
   // MARK: - Initialization
 
-  public init(store: StoreOf<NewPlanFeature>) {
+  public init(
+    store: StoreOf<NewPlanFeature>,
+    presentationContext: PresentationContext = .modal
+  ) {
     self.store = store
+    self.presentationContext = presentationContext
   }
 
   // MARK: - Views
 
   public var body: some View {
-    NavigationStack(path: navigationPath) {
-      stepView(for: .details)
-        .navigationDestination(for: NewPlanStep.self) { step in
-          stepView(for: step)
-        }
+    Group {
+      switch presentationContext {
+      case .modal:
+        modalFlow
+      case .onboarding(let step):
+        onboardingFlow(step: step)
+      }
     }
     .sheet(item: $store.scope(state: \.activityPicker, action: \.activityPicker)) { store in
       NavigationStack {
@@ -61,7 +73,40 @@ public struct NewPlanView: View {
     }
   }
 
-  private func stepView(for step: NewPlanStep) -> some View {
+  private var modalFlow: some View {
+    NavigationStack(path: navigationPath) {
+      modalStepView(for: .details)
+        .navigationDestination(for: NewPlanStep.self) { step in
+          modalStepView(for: step)
+        }
+    }
+  }
+
+  private func onboardingFlow(step: NewPlanStep) -> some View {
+    stepContent(for: step)
+      .navigationTitle(navigationTitle(for: step))
+      .navigationBarTitleDisplayMode(.inline)
+      .navigationBarBackButtonHidden(store.isSubmitting)
+  }
+
+  private func modalStepView(for step: NewPlanStep) -> some View {
+    stepContent(for: step)
+      .navigationTitle(navigationTitle(for: step))
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          if step == .details {
+            Button(
+              action: { store.send(.view(.cancelButtonTapped)) },
+              label: { Text("Cancel", bundle: .module) }
+            )
+            .foregroundStyle(Color.actionBlue)
+          }
+        }
+      }
+  }
+
+  private func stepContent(for step: NewPlanStep) -> some View {
     Group {
       switch step {
       case .details:
@@ -73,19 +118,6 @@ public struct NewPlanView: View {
       }
     }
     .background
-    .navigationTitle(navigationTitle(for: step))
-    .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .cancellationAction) {
-        if step == .details {
-          Button(
-            action: { store.send(.view(.cancelButtonTapped)) },
-            label: { Text("Cancel", bundle: .module) }
-          )
-          .foregroundStyle(Color.actionBlue)
-        }
-      }
-    }
     .safeAreaInset(edge: .bottom) {
       bottomAction(for: step)
     }
@@ -139,18 +171,31 @@ public struct NewPlanView: View {
       actionButton(
         title: store.isEditing
           ? String(localized: "Save changes", bundle: .module)
-          : String(localized: "Start plan", bundle: .module)
+          : String(localized: "Start plan", bundle: .module),
+        isLoading: store.isSubmitting
       ) {
         store.send(.view(.startPlanButtonTapped))
       }
     }
   }
 
-  private func actionButton(title: String, action: @escaping () -> Void) -> some View {
+  private func actionButton(
+    title: String,
+    isLoading: Bool = false,
+    action: @escaping () -> Void
+  ) -> some View {
     Button(action: action) {
-      Text(title)
+      ZStack {
+        Text(title)
+          .opacity(isLoading ? 0.0 : 1.0)
+        if isLoading {
+          ProgressView()
+            .tint(Color.pureWhite)
+        }
+      }
     }
     .buttonStyle(PrimaryButtonStyle())
+    .disabled(isLoading)
     .padding(.horizontal, 15.0)
     .padding(.vertical, 10.0)
     .background(Color.background)

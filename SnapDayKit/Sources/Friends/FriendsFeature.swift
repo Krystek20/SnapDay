@@ -68,6 +68,7 @@ public struct FriendsFeature: TodayProvidable {
       case updateParticipantsWithContants(contacts: [Contact])
       case invite(String, String)
       case shareUrl(ShareResult)
+      case invitationFailed
       case closeForm
       case setViewContent(ViewContent)
       case setRemoving(Collaboration, Bool)
@@ -193,6 +194,10 @@ public struct FriendsFeature: TodayProvidable {
       state.shareResult = shareResult
       state.isSharing = true
       return .none
+    case .invitationFailed:
+      state.isGeneratingInvitiation = false
+      state.content = state.collaborations.isEmpty ? .noCollaboration : .list
+      return .none
     case .setViewContent(let value):
       state.content = value
       return .none
@@ -274,22 +279,27 @@ public struct FriendsFeature: TodayProvidable {
     return .run { send in
       await send(.internal(.closeForm))
 
-      var shareResult: ShareResult?
-      for contact in contacts {
-        let byEmail = !contact.email.isEmpty
-        let byPhone = !contact.phoneNumber.isEmpty
-        if byEmail {
-          shareResult = try await cloudService.addParticipant(toEmailAddress: contact.email)
-        } else if byPhone {
-          shareResult = try await cloudService.addParticipant(toPhoneNumber: contact.phoneNumber)
+      do {
+        var shareResult: ShareResult?
+        for contact in contacts {
+          let byEmail = !contact.email.isEmpty
+          let byPhone = !contact.phoneNumber.isEmpty
+          if byEmail {
+            shareResult = try await cloudService.addParticipant(toEmailAddress: contact.email)
+          } else if byPhone {
+            shareResult = try await cloudService.addParticipant(toPhoneNumber: contact.phoneNumber)
+          }
         }
-      }
 
-      guard let shareResult else {
-        return await send(.internal(.loadParticipants))
+        guard let shareResult else {
+          return await send(.internal(.invitationFailed))
+        }
+        await send(.internal(.shareUrl(shareResult)))
+        await send(.internal(.loadParticipants))
+      } catch {
+        NSLog("[FriendsFeature] Invitation creation failed: \(error)")
+        await send(.internal(.invitationFailed))
       }
-      await send(.internal(.shareUrl(shareResult)))
-      await send(.internal(.loadParticipants))
     }
   }
 

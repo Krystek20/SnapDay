@@ -1,125 +1,139 @@
-import Foundation
 import ComposableArchitecture
-import Repositories
-import Utilities
-import Models
-import Common
+import Plans
 
 @Reducer
 public struct OnboardingFeature {
 
-  public enum Tab: String {
-    case welcome
-    case featureHighlight
-    case icloud
-    case notification
-  }
-
-  public enum VisibileHighlight: Int, CaseIterable, Identifiable {
-    public var id: Int { rawValue }
-    case habitTracking = 0
-    case takeControl
-    case achieveGoals
-  }
-
-  // MARK: - Dependencies
-
-  @Dependency(\.dismiss) private var dismiss
-  @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
-
-  // MARK: - State & Action
-
   @ObservableState
   public struct State: Equatable {
+    var path = StackState<Path.State>()
+    var newPlan: NewPlanFeature.State?
+    var selectedGoal: OnboardingGoal?
 
-    // MARK: - Properties
-
-    var selectedTab = Tab.welcome
-    var visibileHighlight: [VisibileHighlight] = [.habitTracking]
-
-    var isButtonVisible: Bool = true
-
-    var buttonTitle: String {
-      switch selectedTab {
-      case .welcome:
-        String(localized: "Get Started", bundle: .module)
-      case .featureHighlight, .icloud:
-        String(localized: "Continue", bundle: .module)
-      case .notification:
-        String(localized: "Turn on", bundle: .module)
-      }
+    public init(selectedGoal: OnboardingGoal? = nil) {
+      self.selectedGoal = selectedGoal
     }
-
-    var isSkipButtonShown: Bool {
-      guard case .notification = selectedTab else { return false }
-      return true
-    }
-
-    public init() { }
   }
 
-  public enum Action: BindableAction, FeatureAction, Equatable {
-
+  public enum Action: Equatable {
     public enum ViewAction: Equatable {
-      case nextButtonPressed
-      case skipButtonPressed
-    }
-    public enum InternalAction: Equatable { 
-      case showNextHighlight(highlight: VisibileHighlight)
-    }
-    public enum DelegateAction: Equatable { 
-      case finished
+      case continueButtonTapped
+      case goalTapped(OnboardingGoal)
+      case skipButtonTapped
     }
 
-    case binding(BindingAction<State>)
+    public enum DelegateAction: Equatable {
+      case completed
+      case createPlanRequested(OnboardingPlanRequest)
+      case planCreationCancelled
+      case planCreated(NewPlanDraft)
+      case skipped
+    }
+
     case view(ViewAction)
-    case `internal`(InternalAction)
     case delegate(DelegateAction)
+    case newPlan(NewPlanFeature.Action)
+    case path(StackAction<Path.State, Path.Action>)
+    case presentPlan(NewPlanFeature.State)
   }
 
-  // MARK: - Initialization
+  @Reducer
+  public struct Path {
+    @ObservableState
+    public enum State: Equatable {
+      case newPlanStep(NewPlanStep)
+      case templateSelection(OnboardingTemplateSelectionFeature.State)
+    }
+
+    public enum Action: Equatable {
+      case newPlanStep
+      case templateSelection(OnboardingTemplateSelectionFeature.Action)
+    }
+
+    public var body: some ReducerOf<Self> {
+      EmptyReducer<State, Action>()
+        .ifCaseLet(\.templateSelection, action: \.templateSelection) {
+          OnboardingTemplateSelectionFeature()
+        }
+    }
+  }
 
   public init() { }
 
-  // MARK: - Body
-
   public var body: some ReducerOf<Self> {
-    BindingReducer()
     Reduce { state, action in
       switch action {
-      case .binding:
+      case .view(.goalTapped(let goal)):
+        state.selectedGoal = goal
         return .none
-      case .view(.nextButtonPressed):
-        switch state.selectedTab {
-        case .welcome:
-          state.selectedTab = .featureHighlight
-          return .run { send in
-            for highlight in VisibileHighlight.allCases.dropFirst(1) {
-              try await Task.sleep(for: .seconds(1.0))
-              await send(.internal(.showNextHighlight(highlight: highlight)))
-            }
-          }
-        case .featureHighlight:
-          state.selectedTab = .icloud
+      case .view(.continueButtonTapped):
+        guard let selectedGoal = state.selectedGoal else { return .none }
+        switch selectedGoal {
+        case .readMore:
+          state.path.append(.templateSelection(.init(category: .reading)))
           return .none
-        case .icloud:
-          state.selectedTab = .notification
+        case .moveMore:
+          state.path.append(.templateSelection(.init(category: .movement)))
           return .none
-        case .notification:
-          return .run { send in
-            let result = try await userNotificationCenterProvider.requestAuthorization()
-            print("RequestAuthorization - \(result ? "authorized" : "unauthorized")")
-            await send(.delegate(.finished))
-          }
+        case .healthyHabit:
+          state.path.append(.templateSelection(.init(category: .healthyHabit)))
+          return .none
+        case .learnSomething:
+          state.path.append(.templateSelection(.init(category: .learning)))
+          return .none
+        case .organizeMyDay:
+          return .send(.delegate(.completed))
+        case .createMyOwn:
+          return .send(.delegate(.createPlanRequested(.empty)))
         }
-      case .view(.skipButtonPressed):
-        return .send(.delegate(.finished))
-      case .internal(.showNextHighlight(let highlight)):
-        state.visibileHighlight.append(highlight)
+      case .view(.skipButtonTapped):
+        return .send(.delegate(.skipped))
+      case .presentPlan(let planState):
+        state.newPlan = planState
+        state.path.append(.newPlanStep(.details))
+        return .none
+      case .path(.element(
+        id: _,
+        action: .templateSelection(.delegate(.createPlanRequested(let request)))
+      )):
+        return .send(.delegate(.createPlanRequested(request)))
+      case .newPlan(.delegate(.cancelTapped)):
+        guard let id = state.path.ids.last else { return .none }
+        return .send(.path(.popFrom(id: id)))
+      case .newPlan(.delegate(.planCreated(let draft))):
+        return .send(.delegate(.planCreated(draft)))
+      case .newPlan(.delegate(.stepChanged(let step))):
+        guard state.path.last != .newPlanStep(step) else { return .none }
+        state.path.append(.newPlanStep(step))
+        return .none
+      case .newPlan:
+        return .none
+      case .path(.popFrom(let id)):
+        guard case .newPlanStep(let removedStep)? = state.path[id: id] else {
+          return .none
+        }
+        switch removedStep {
+        case .details:
+          state.newPlan = nil
+          return .send(.delegate(.planCreationCancelled))
+        case .weeklySchedule:
+          return .send(.newPlan(.view(.navigationPathChanged([]))))
+        case .review:
+          return .send(
+            .newPlan(.view(.navigationPathChanged([.weeklySchedule])))
+          )
+        }
+      case .path:
         return .none
       case .delegate:
         return .none
       }
+    }
+    .ifLet(\.newPlan, action: \.newPlan) {
+      NewPlanFeature()
+    }
+    .forEach(\.path, action: \.path) {
+      Path()
     }
   }
 }

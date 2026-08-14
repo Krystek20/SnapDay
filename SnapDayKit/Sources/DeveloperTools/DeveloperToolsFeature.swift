@@ -64,6 +64,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
       case invite1
       case invite2
       case cleanImages
+      case showOnboardingAgainButtonTapped
       case sendDayActivityReminderNotificationButtonTapped
       case sendDayActivityTaskReminderNotificationButtonTapped
       case sendEveningSummaryReminderNotificationButtonTapped
@@ -77,7 +78,9 @@ public struct DeveloperToolsFeature: TodayProvidable {
       case setBackgroundPendingIdentifiers([String])
       case schedule(notification: DeveloperNotificiation)
     }
-    public enum DelegateAction: Equatable { }
+    public enum DelegateAction: Equatable {
+      case showOnboardingAgain
+    }
 
     case binding(BindingAction<State>)
 
@@ -157,6 +160,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
         @Dependency(\.iconProvider) var iconProvider
         await iconProvider.cleanIcons(force: true)
       }
+    case .showOnboardingAgainButtonTapped:
+      return .send(.delegate(.showOnboardingAgain))
     case .cleanZones:
       return .run { send in
         @Dependency(\.cloudService) var cloudService
