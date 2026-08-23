@@ -70,11 +70,13 @@ public struct PlansFeature {
 
     public enum InternalAction: Equatable {
       case archivePlan(Plan.ID)
+      case deletePlan(Plan.ID)
       case loadPlans
       case plansLoaded(PlansSnapshot)
       case plansLoadFailed(String)
       case planSaveFailed
       case planSaved
+      case planDeleted
     }
 
     public enum DelegateAction: Equatable {
@@ -139,9 +141,19 @@ public struct PlansFeature {
         state.loadState = .loading
         return .run { send in
           do {
-            try await planRepository.archivePlan(id)
+            try await planRepository.archivePlan(id, now)
             await send(.internal(.loadPlans))
             await send(.delegate(.plansChanged))
+          } catch {
+            await send(.internal(.plansLoadFailed(error.localizedDescription)))
+          }
+        }
+      case .internal(.deletePlan(let id)):
+        state.loadState = .loading
+        return .run { send in
+          do {
+            try await planRepository.deletePlan(id, now)
+            await send(.internal(.planDeleted))
           } catch {
             await send(.internal(.plansLoadFailed(error.localizedDescription)))
           }
@@ -189,6 +201,12 @@ public struct PlansFeature {
           .send(.internal(.loadPlans)),
           .send(.delegate(.plansChanged))
         )
+      case .internal(.planDeleted):
+        state.planDetails = nil
+        return .merge(
+          .send(.internal(.loadPlans)),
+          .send(.delegate(.plansChanged))
+        )
       case .newPlan(.presented(.delegate(.cancelTapped))):
         state.newPlan = nil
         return .none
@@ -223,6 +241,8 @@ public struct PlansFeature {
       case .planDetails(.presented(.delegate(.archivePlanTapped(let id)))):
         state.planDetails = nil
         return .send(.internal(.archivePlan(id)))
+      case .planDetails(.presented(.delegate(.deletePlanTapped(let id)))):
+        return .send(.internal(.deletePlan(id)))
       case .planDetails(.presented(.delegate(.planUpdated))):
         return .merge(
           .send(.internal(.loadPlans)),

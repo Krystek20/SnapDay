@@ -21,13 +21,15 @@ extension ActivityLabelRepository: DependencyKey {
   public static var liveValue: ActivityLabelRepository {
     ActivityLabelRepository(
       saveLabel: { label in
-        try await EntityHandler().save(label.rgbColor)
-        try await EntityHandler().save(label)
+        try await EntityHandler().transaction { transaction in
+          try transaction.save(label.rgbColor)
+          try transaction.save(label)
+        }
       },
       saveLabels: { labels in
-        for label in labels {
-          try await EntityHandler().save(label.rgbColor)
-          try await EntityHandler().save(label)
+        try await EntityHandler().transaction { transaction in
+          try transaction.save(labels.map(\.rgbColor))
+          try transaction.save(labels)
         }
       },
       deleteLabel: { label in

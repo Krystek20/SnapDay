@@ -54,6 +54,23 @@ public struct PlanDetailsView: View {
       Text("This plan will move to History. Its completed activities and progress will be kept.", bundle: .module)
     }
     .alert(
+      String(localized: "Delete this plan?", bundle: .module),
+      isPresented: deleteConfirmationBinding
+    ) {
+      Button(
+        String(localized: "Delete plan", bundle: .module),
+        role: .destructive,
+        action: { store.send(.view(.deleteConfirmed)) }
+      )
+      Button(
+        String(localized: "Cancel", bundle: .module),
+        role: .cancel,
+        action: { store.send(.view(.deleteCancelled)) }
+      )
+    } message: {
+      Text("The plan and its progress will be deleted. Completed activities will remain in your history.", bundle: .module)
+    }
+    .alert(
       String(localized: "This plan can't be restored", bundle: .module),
       isPresented: restoreUnavailableBinding
     ) {
@@ -416,19 +433,27 @@ public struct PlanDetailsView: View {
 
   @ToolbarContentBuilder
   private var managementToolbar: some ToolbarContent {
-    if store.allowsManagement, content.status == .active {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button(action: { store.send(.view(.editButtonTapped)) }) {
-          Image(systemName: "pencil.circle.fill")
-            .accessibilityLabel(Text("Edit", bundle: .module))
+    if store.allowsManagement {
+      if content.status == .active {
+        ToolbarItem(placement: .topBarTrailing) {
+          Button(action: { store.send(.view(.editButtonTapped)) }) {
+            Image(systemName: "pencil.circle.fill")
+              .accessibilityLabel(Text("Edit", bundle: .module))
+          }
+          .foregroundStyle(Color.actionBlue)
         }
-        .foregroundStyle(Color.actionBlue)
       }
 
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
-          Button(role: .destructive, action: { store.send(.view(.archiveButtonTapped)) }) {
-            Label(String(localized: "Archive plan", bundle: .module), systemImage: "archivebox")
+          if content.status == .active {
+            Button(role: .destructive, action: { store.send(.view(.archiveButtonTapped)) }) {
+              Label(String(localized: "Archive plan", bundle: .module), systemImage: "archivebox")
+            }
+          } else {
+            Button(role: .destructive, action: { store.send(.view(.deleteButtonTapped)) }) {
+              Label(String(localized: "Delete plan", bundle: .module), systemImage: "trash")
+            }
           }
         } label: {
           Image(systemName: "ellipsis")
@@ -486,6 +511,15 @@ public struct PlanDetailsView: View {
       get: { store.isArchiveConfirmationPresented },
       set: { isPresented in
         if !isPresented { store.send(.view(.archiveCancelled)) }
+      }
+    )
+  }
+
+  private var deleteConfirmationBinding: Binding<Bool> {
+    Binding(
+      get: { store.isDeleteConfirmationPresented },
+      set: { isPresented in
+        if !isPresented { store.send(.view(.deleteCancelled)) }
       }
     )
   }

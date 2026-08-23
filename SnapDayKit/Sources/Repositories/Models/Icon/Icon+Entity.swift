@@ -15,7 +15,7 @@ extension Icon: Entity {
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> IconEntity {
     let iconEntity = try IconEntity.object(
-      identifier: id.uuidString,
+      identifier: id as CVarArg,
       fetchRequest: Icon.fetchRequest,
       context: context
     )

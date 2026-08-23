@@ -2250,6 +2250,34 @@
         }
       }
     },
+    "Delete plan" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حذف الخطة" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Plan löschen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete plan" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar plan" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le plan" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Elimina piano" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プランを削除" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "플랜 삭제" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Usuń plan" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Excluir plano" } }
+      }
+    },
+    "Delete this plan?" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل تريد حذف هذه الخطة؟" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Diesen Plan löschen?" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete this plan?" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "¿Eliminar este plan?" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer ce plan ?" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Eliminare questo piano?" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このプランを削除しますか？" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이 플랜을 삭제할까요?" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Usunąć ten plan?" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Excluir este plano?" } }
+      }
+    },
     "Done" : {
       "localizations" : {
         "ar" : {
@@ -5540,6 +5568,20 @@
             "value" : "Dias de destino"
           }
         }
+      }
+    },
+    "The plan and its progress will be deleted. Completed activities will remain in your history." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سيتم حذف الخطة وتقدمها. ستبقى الأنشطة المكتملة في سجلك." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Der Plan und sein Fortschritt werden gelöscht. Abgeschlossene Aktivitäten bleiben in deinem Verlauf erhalten." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The plan and its progress will be deleted. Completed activities will remain in your history." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "El plan y su progreso se eliminarán. Las actividades completadas permanecerán en tu historial." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le plan et sa progression seront supprimés. Les activités terminées resteront dans votre historique." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Il piano e i suoi progressi verranno eliminati. Le attività completate resteranno nella cronologia." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プランと進捗は削除されます。完了したアクティビティは履歴に残ります。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "플랜과 진행 상황이 삭제됩니다. 완료한 활동은 기록에 남습니다." } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Plan i jego postęp zostaną usunięte. Ukończone aktywności pozostaną w historii." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O plano e seu progresso serão excluídos. As atividades concluídas permanecerão no seu histórico." } }
       }
     },
     "The selected date range no longer includes these days. Their scheduled activities will be removed." : {

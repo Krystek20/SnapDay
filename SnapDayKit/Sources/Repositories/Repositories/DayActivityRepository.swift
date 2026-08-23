@@ -53,7 +53,9 @@ public struct DayActivityRepository {
   }
 
   private func activities<T: Entity>(configuration: ActivitiesFetchConfiguration) async throws -> [T] {
-    var predicates: [NSPredicate] = []
+    var predicates: [NSPredicate] = [
+      NSPredicate(format: "identifier != nil")
+    ]
     if let range = configuration.range {
       predicates.append(
         NSPredicate(format: "date >= %@ AND date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)
@@ -88,9 +90,9 @@ public struct DayActivityRepository {
   }
 
   public func removeDayActivity(_ dayActivity: DayActivity) async throws {
-    try await entityHandler.delete(dayActivity)
-    for dayActivityTask in dayActivity.dayActivityTasks {
-      try await removeDayActivityTask(dayActivityTask)
+    try await entityHandler.transaction { transaction in
+      try transaction.delete(dayActivity)
+      try transaction.delete(dayActivity.dayActivityTasks)
     }
   }
 

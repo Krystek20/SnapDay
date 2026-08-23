@@ -1,4 +1,3 @@
-import CoreData
 import Dependencies
 import Models
 
@@ -38,28 +37,15 @@ extension PlanCreationRepository: DependencyKey {
 }
 
 private struct PlanCreationPersistence {
-  @Dependency(\.coreDataStack) private var coreDataStack
-
   func create(
     plan: Plan,
     activities: [Activity],
     occurrences: [PlanOccurrence]
   ) async throws {
-    let context = coreDataStack.backgroundContext
-    try await context.perform {
-      do {
-        for activity in activities {
-          _ = try activity.managedObject(context)
-        }
-        _ = try plan.managedObject(context)
-        for occurrence in occurrences {
-          _ = try occurrence.managedObject(context)
-        }
-        try context.save()
-      } catch {
-        context.rollback()
-        throw error
-      }
+    try await EntityHandler().transaction { transaction in
+      try transaction.save(activities)
+      try transaction.save(plan)
+      try transaction.save(occurrences)
     }
   }
 }

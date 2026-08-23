@@ -20,13 +20,15 @@ extension TagRepository: DependencyKey {
   public static var liveValue: TagRepository {
     TagRepository(
       saveTag: { tag in
-        try await EntityHandler().save(tag.rgbColor)
-        try await EntityHandler().save(tag)
+        try await EntityHandler().transaction { transaction in
+          try transaction.save(tag.rgbColor)
+          try transaction.save(tag)
+        }
       },
       saveTags: { tags in
-        for tag in tags {
-          try await EntityHandler().save(tag.rgbColor)
-          try await EntityHandler().save(tag)
+        try await EntityHandler().transaction { transaction in
+          try transaction.save(tags.map(\.rgbColor))
+          try transaction.save(tags)
         }
       },
       deleteTag: { tag in

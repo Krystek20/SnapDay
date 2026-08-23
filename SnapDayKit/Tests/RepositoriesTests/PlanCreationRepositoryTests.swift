@@ -83,7 +83,7 @@ struct PlanCreationRepositoryTests {
     let startDate = try #require(
       calendar.date(from: DateComponents(year: 2026, month: 8, day: 10))
     )
-    let activity = Activity(id: UUID(), name: "Read", startDate: startDate)
+    let activity = Activity(id: UUID(), name: "Read", dueDaysCount: 0, startDate: startDate)
     let plan = Plan(
       id: UUID(),
       name: "Reading plan",

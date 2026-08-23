@@ -10,6 +10,7 @@ import Utilities
 public struct DashboardCoordinatorFeature {
 
   @Dependency(\.planRepository) private var planRepository
+  @Dependency(\.date.now) private var now
 
   @ObservableState
   public struct State: Equatable {
@@ -120,7 +121,20 @@ public struct DashboardCoordinatorFeature {
       )):
         return .run { send in
           do {
-            try await planRepository.archivePlan(planID)
+            try await planRepository.archivePlan(planID, now)
+            await send(.path(.popFrom(id: pathID)))
+            await send(.dashboard(.internal(.load)))
+          } catch {
+            return
+          }
+        }
+      case .path(.element(
+        id: let pathID,
+        action: .planDetails(.delegate(.deletePlanTapped(let planID)))
+      )):
+        return .run { send in
+          do {
+            try await planRepository.deletePlan(planID, now)
             await send(.path(.popFrom(id: pathID)))
             await send(.dashboard(.internal(.load)))
           } catch {

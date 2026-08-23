@@ -857,7 +857,8 @@ struct NewPlanFeatureTests {
         loadHistoricalPlans: { _ in [] },
         plan: { _ in nil },
         savePlan: { _ in throw SaveError() },
-        archivePlan: { _ in },
+        archivePlan: { _, _ in },
+        deletePlan: { _, _ in },
         loadOccurrences: { _ in [] },
         saveOccurrences: { _ in },
         synchronizeOccurrences: { _, _ in [] }

@@ -18,6 +18,7 @@ public struct ActivityListFeature: TodayProvidable {
   @Dependency(\.dayUpdater) private var dayUpdater
   @Dependency(\.dismiss) private var dismiss
   @Dependency(\.calendar) private var calendar
+  @Dependency(\.date.now) private var now
   @Dependency(\.planRepository) private var planRepository
   @Dependency(\.uuid) private var uuid
 
@@ -155,7 +156,7 @@ public struct ActivityListFeature: TodayProvidable {
         guard let day = state.day else { return .none }
         return .run { [day] send in
           let isUsedByPlan = try await planRepository.loadPlans().contains { plan in
-            plan.schedule.contains { $0.activityID == activity.id }
+            plan.blocksDeletingActivity(activity.id, on: now, calendar: calendar)
           }
           guard !isUsedByPlan else {
             await send(.internal(.activityDeletionBlocked))
@@ -319,4 +320,15 @@ public struct ActivityListFeature: TodayProvidable {
   // MARK: - Initialization
 
   public init() { }
+}
+
+extension Plan {
+  func blocksDeletingActivity(
+    _ activityID: Activity.ID,
+    on date: Date,
+    calendar: Calendar
+  ) -> Bool {
+    status(on: date, calendar: calendar) == .active
+      && schedule.contains { $0.activityID == activityID }
+  }
 }
