@@ -111,6 +111,45 @@ struct PlanRepositoryTests {
   }
 
   @Test
+  func archivingLastPlanSharingActivityWithArchivedPlanRemovesUpcomingActivity() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      let dayActivityRepository = DayActivityRepository.liveValue
+      let today = Date(timeIntervalSinceReferenceDate: 800_000_000)
+      let firstPlan = makePlan(startDate: today, endDate: today)
+      let secondPlan = makePlan(id: UUID(), startDate: today, endDate: today)
+      let sharedActivity = makeDayActivity(date: today)
+      let activityID = UUID()
+
+      try await repository.savePlan(firstPlan)
+      try await repository.savePlan(secondPlan)
+      try await dayActivityRepository.saveDayActivity(sharedActivity)
+      try await repository.saveOccurrences([
+        PlanOccurrence(
+          planID: firstPlan.id,
+          activityID: activityID,
+          date: today,
+          dayActivityID: sharedActivity.id
+        ),
+        PlanOccurrence(
+          planID: secondPlan.id,
+          activityID: activityID,
+          date: today,
+          dayActivityID: sharedActivity.id
+        )
+      ])
+
+      try await repository.archivePlan(firstPlan.id, today)
+      #expect(try await containsDayActivity(sharedActivity.id, in: dayActivityRepository))
+
+      try await repository.archivePlan(secondPlan.id, today)
+      #expect(try await !containsDayActivity(sharedActivity.id, in: dayActivityRepository))
+    }
+  }
+
+  @Test
   func deletingPlanAlsoDeletesItsOccurrences() async throws {
     try await withDependencies {
       $0.coreDataStack = .testValue
@@ -212,6 +251,17 @@ struct PlanRepositoryTests {
       #expect(persistedDayActivityIDs.contains(manuallyAdded.id))
       #expect(persistedDayActivityIDs.contains(shared.id))
     }
+  }
+
+  private func containsDayActivity(
+    _ identifier: UUID,
+    in repository: DayActivityRepository
+  ) async throws -> Bool {
+    try await !repository.dayActivities(
+      configuration: ActivitiesFetchConfiguration(
+        predicates: [NSPredicate(format: "identifier == %@", identifier as CVarArg)]
+      )
+    ).isEmpty
   }
 
   @Test

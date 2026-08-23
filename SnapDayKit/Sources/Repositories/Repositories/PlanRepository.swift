@@ -1,3 +1,4 @@
+import CoreData
 import Dependencies
 import Foundation
 import Models
@@ -67,14 +68,10 @@ extension PlanRepository: DependencyKey {
         try await EntityHandler().save(plan)
       },
       archivePlan: { identifier, from in
-        guard var plan = try await EntityHandler().fetch(Plan.self, identifier: identifier as CVarArg) else { return }
-        try await removeUpcomingGeneratedDayActivities(for: identifier, from: from)
-        plan.isArchived = true
-        try await EntityHandler().save(plan)
+        try await PlanLifecyclePersistence().archivePlan(identifier, from: from)
       },
       deletePlan: { identifier, from in
-        try await removeUpcomingGeneratedDayActivities(for: identifier, from: from)
-        try await EntityHandler().delete(identifier: identifier as CVarArg, Plan.self)
+        try await PlanLifecyclePersistence().deletePlan(identifier, from: from)
       },
       loadOccurrences: { planID in
         try await EntityHandler().fetch(
@@ -126,48 +123,109 @@ extension PlanRepository: DependencyKey {
   }
 }
 
-private func removeUpcomingGeneratedDayActivities(
-  for planID: Plan.ID,
-  from date: Date
-) async throws {
-  let entityHandler = EntityHandler()
-  let startOfDay = Calendar.planRepositoryCalendar.startOfDay(for: date)
-  let occurrences: [PlanOccurrence] = try await entityHandler.fetch(
-    PlanOccurrence.self,
-    predicates: { NSPredicate(format: "planIdentifier == %@", planID as CVarArg) }
-  )
-  let linkedDayActivityIDs = Set(
-    occurrences.lazy
-      .filter { $0.date >= startOfDay }
-      .compactMap(\.dayActivityID)
-  )
-  guard !linkedDayActivityIDs.isEmpty else { return }
+private struct PlanLifecyclePersistence {
+  @Dependency(\.coreDataStack) private var coreDataStack
 
-  let occurrencesFromOtherPlans: [PlanOccurrence] = try await entityHandler.fetch(
-    PlanOccurrence.self,
-    predicates: {
-      NSPredicate(format: "planIdentifier != %@", planID as CVarArg)
-      NSPredicate(format: "dayActivityIdentifier IN %@", Array(linkedDayActivityIDs))
-    }
-  )
-  let dayActivityIDsUsedByOtherPlans = Set(
-    occurrencesFromOtherPlans.compactMap(\.dayActivityID)
-  )
-  let removableDayActivityIDs = linkedDayActivityIDs
-    .subtracting(dayActivityIDsUsedByOtherPlans)
-  guard !removableDayActivityIDs.isEmpty else { return }
+  func archivePlan(_ identifier: Plan.ID, from date: Date) async throws {
+    try await mutatePlan(identifier, from: date, mutation: .archive)
+  }
 
-  let dayActivities: [DayActivity] = try await entityHandler.fetch(
-    DayActivity.self,
-    predicates: {
-      NSPredicate(format: "identifier IN %@", Array(removableDayActivityIDs))
-      NSPredicate(format: "date >= %@", startOfDay as NSDate)
-      NSPredicate(format: "doneDate == nil")
-      NSPredicate(format: "isGeneratedAutomatically == YES")
+  func deletePlan(_ identifier: Plan.ID, from date: Date) async throws {
+    try await mutatePlan(identifier, from: date, mutation: .delete)
+  }
+
+  private func mutatePlan(
+    _ identifier: Plan.ID,
+    from date: Date,
+    mutation: Mutation
+  ) async throws {
+    let context = coreDataStack.backgroundContext
+    try await context.perform {
+      do {
+        let request = PlanEntity.fetchRequest()
+        request.predicate = NSCompoundPredicate(
+          andPredicateWithSubpredicates: [
+            NSPredicate(format: "identifier == %@", identifier as CVarArg),
+            .deduplicatedDateNilPredicate
+          ]
+        )
+        request.fetchLimit = 1
+        guard let plan = try context.fetch(request).first else { return }
+
+        let dayActivities = try upcomingGeneratedDayActivities(
+          for: identifier,
+          from: date,
+          context: context
+        )
+        dayActivities.forEach(context.delete)
+
+        switch mutation {
+        case .archive:
+          plan.isArchived = true
+        case .delete:
+          context.delete(plan)
+        }
+        try context.save()
+      } catch {
+        context.rollback()
+        throw error
+      }
     }
-  )
-  guard !dayActivities.isEmpty else { return }
-  try await entityHandler.delete(dayActivities)
+  }
+
+  private func upcomingGeneratedDayActivities(
+    for planID: Plan.ID,
+    from date: Date,
+    context: NSManagedObjectContext
+  ) throws -> [DayActivityEntity] {
+    let startOfDay = Calendar.planRepositoryCalendar.startOfDay(for: date)
+    let occurrenceRequest = PlanOccurrenceEntity.fetchRequest()
+    occurrenceRequest.predicate = NSCompoundPredicate(
+      andPredicateWithSubpredicates: [
+        NSPredicate(format: "planIdentifier == %@", planID as CVarArg),
+        NSPredicate(format: "date >= %@", startOfDay as NSDate),
+        NSPredicate(format: "dayActivityIdentifier != nil"),
+        .deduplicatedDateNilPredicate
+      ]
+    )
+    let linkedDayActivityIDs = Set(
+      try context.fetch(occurrenceRequest).compactMap(\.dayActivityIdentifier)
+    )
+    guard !linkedDayActivityIDs.isEmpty else { return [] }
+
+    let otherOccurrenceRequest = PlanOccurrenceEntity.fetchRequest()
+    otherOccurrenceRequest.predicate = NSCompoundPredicate(
+      andPredicateWithSubpredicates: [
+        NSPredicate(format: "planIdentifier != %@", planID as CVarArg),
+        NSPredicate(format: "dayActivityIdentifier IN %@", Array(linkedDayActivityIDs)),
+        NSPredicate(format: "plan.isArchived == NO"),
+        .deduplicatedDateNilPredicate
+      ]
+    )
+    let dayActivityIDsUsedByOtherActivePlans = Set(
+      try context.fetch(otherOccurrenceRequest).compactMap(\.dayActivityIdentifier)
+    )
+    let removableDayActivityIDs = linkedDayActivityIDs
+      .subtracting(dayActivityIDsUsedByOtherActivePlans)
+    guard !removableDayActivityIDs.isEmpty else { return [] }
+
+    let dayActivityRequest = DayActivityEntity.fetchRequest()
+    dayActivityRequest.predicate = NSCompoundPredicate(
+      andPredicateWithSubpredicates: [
+        NSPredicate(format: "identifier IN %@", Array(removableDayActivityIDs)),
+        NSPredicate(format: "date >= %@", startOfDay as NSDate),
+        NSPredicate(format: "doneDate == nil"),
+        NSPredicate(format: "isGeneratedAutomatically == YES"),
+        .deduplicatedDateNilPredicate
+      ]
+    )
+    return try context.fetch(dayActivityRequest)
+  }
+
+  private enum Mutation {
+    case archive
+    case delete
+  }
 }
 
 private extension Calendar {
