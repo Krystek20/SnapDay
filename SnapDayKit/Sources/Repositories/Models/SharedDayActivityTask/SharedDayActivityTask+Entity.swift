@@ -15,7 +15,7 @@ extension SharedDayActivityTask: Entity {
 
   public func managedObject(_ context: NSManagedObjectContext) throws -> SharedDayActivityTaskEntity {
     let sharedDayActivityTaskEntity = try SharedDayActivityTaskEntity.object(
-      identifier: id.uuidString,
+      identifier: id as CVarArg,
       fetchRequest: SharedDayActivityTask.fetchRequest,
       context: context
     )

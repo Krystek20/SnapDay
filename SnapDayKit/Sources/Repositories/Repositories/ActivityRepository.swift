@@ -50,9 +50,9 @@ extension ActivityRepository: DependencyKey {
         try await EntityHandler().save(activity)
       },
       deleteActivity: { activity in
-        try await EntityHandler().delete(activity)
-        for task in activity.tasks {
-          try await EntityHandler().delete(task)
+        try await EntityHandler().transaction { transaction in
+          try transaction.delete(activity)
+          try transaction.delete(activity.tasks)
         }
       },
       activityTask: { identifier in

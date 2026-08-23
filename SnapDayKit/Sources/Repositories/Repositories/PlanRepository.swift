@@ -1,4 +1,3 @@
-import CoreData
 import Dependencies
 import Foundation
 import Models
@@ -84,151 +83,43 @@ extension PlanRepository: DependencyKey {
         try await EntityHandler().save(occurrences)
       },
       synchronizeOccurrences: { plan, from in
-        let entityHandler = EntityHandler()
-        let calendar = Calendar.planRepositoryCalendar
-        let lowerBound = max(
-          calendar.startOfDay(for: plan.startDate),
-          calendar.startOfDay(for: from)
-        )
-        let existing = try await entityHandler.fetch(
-          PlanOccurrence.self,
-          predicates: { NSPredicate(format: "planIdentifier == %@", plan.id as CVarArg) },
-          sorts: { NSSortDescriptor(key: "date", ascending: true) }
-        )
-        .deduplicatedByID()
-        let generated = plan.scheduledOccurrences(from: lowerBound, calendar: calendar)
-        let generatedIDs = Set(generated.map(\.id))
-        let obsolete = existing.filter {
-          $0.date >= lowerBound && !generatedIDs.contains($0.id)
-        }
-        if !obsolete.isEmpty {
-          try await entityHandler.delete(obsolete)
-        }
-
-        let retained = existing.filter { !obsolete.contains($0) }
-        let retainedByID = Dictionary(
-          retained.map { ($0.id, $0) },
-          uniquingKeysWith: { existing, _ in existing }
-        )
-        let occurrences = generated.map { retainedByID[$0.id] ?? $0 }
-          + retained.filter { $0.date < lowerBound || !generatedIDs.contains($0.id) }
-        if !occurrences.isEmpty {
-          try await entityHandler.save(occurrences)
-        }
-        return occurrences
+        try await EntityHandler().transaction { transaction in
+          let calendar = Calendar.planRepositoryCalendar
+          let lowerBound = max(
+            calendar.startOfDay(for: plan.startDate),
+            calendar.startOfDay(for: from)
+          )
+          let existing = try transaction.fetch(
+            PlanOccurrence.self,
+            predicates: { NSPredicate(format: "planIdentifier == %@", plan.id as CVarArg) },
+            sorts: { NSSortDescriptor(key: "date", ascending: true) }
+          )
           .deduplicatedByID()
-          .sorted { $0.date < $1.date }
-      }
-    )
-  }
-}
+          let generated = plan.scheduledOccurrences(from: lowerBound, calendar: calendar)
+          let generatedIDs = Set(generated.map(\.id))
+          let obsolete = existing.filter {
+            $0.date >= lowerBound && !generatedIDs.contains($0.id)
+          }
+          try transaction.delete(obsolete)
 
-private struct PlanLifecyclePersistence {
-  @Dependency(\.coreDataStack) private var coreDataStack
-
-  func archivePlan(_ identifier: Plan.ID, from date: Date) async throws {
-    try await mutatePlan(identifier, from: date, mutation: .archive)
-  }
-
-  func deletePlan(_ identifier: Plan.ID, from date: Date) async throws {
-    try await mutatePlan(identifier, from: date, mutation: .delete)
-  }
-
-  private func mutatePlan(
-    _ identifier: Plan.ID,
-    from date: Date,
-    mutation: Mutation
-  ) async throws {
-    let context = coreDataStack.backgroundContext
-    try await context.perform {
-      do {
-        let request = PlanEntity.fetchRequest()
-        request.predicate = NSCompoundPredicate(
-          andPredicateWithSubpredicates: [
-            NSPredicate(format: "identifier == %@", identifier as CVarArg),
-            .deduplicatedDateNilPredicate
-          ]
-        )
-        request.fetchLimit = 1
-        guard let plan = try context.fetch(request).first else { return }
-
-        let dayActivities = try upcomingGeneratedDayActivities(
-          for: identifier,
-          from: date,
-          context: context
-        )
-        dayActivities.forEach(context.delete)
-
-        switch mutation {
-        case .archive:
-          plan.isArchived = true
-        case .delete:
-          context.delete(plan)
+          let retained = existing.filter { !obsolete.contains($0) }
+          let retainedByID = Dictionary(
+            retained.map { ($0.id, $0) },
+            uniquingKeysWith: { existing, _ in existing }
+          )
+          let occurrences = generated.map { retainedByID[$0.id] ?? $0 }
+            + retained.filter { $0.date < lowerBound || !generatedIDs.contains($0.id) }
+          try transaction.save(occurrences)
+          return occurrences
+            .deduplicatedByID()
+            .sorted { $0.date < $1.date }
         }
-        try context.save()
-      } catch {
-        context.rollback()
-        throw error
       }
-    }
-  }
-
-  private func upcomingGeneratedDayActivities(
-    for planID: Plan.ID,
-    from date: Date,
-    context: NSManagedObjectContext
-  ) throws -> [DayActivityEntity] {
-    let startOfDay = Calendar.planRepositoryCalendar.startOfDay(for: date)
-    let occurrenceRequest = PlanOccurrenceEntity.fetchRequest()
-    occurrenceRequest.predicate = NSCompoundPredicate(
-      andPredicateWithSubpredicates: [
-        NSPredicate(format: "planIdentifier == %@", planID as CVarArg),
-        NSPredicate(format: "date >= %@", startOfDay as NSDate),
-        NSPredicate(format: "dayActivityIdentifier != nil"),
-        .deduplicatedDateNilPredicate
-      ]
     )
-    let linkedDayActivityIDs = Set(
-      try context.fetch(occurrenceRequest).compactMap(\.dayActivityIdentifier)
-    )
-    guard !linkedDayActivityIDs.isEmpty else { return [] }
-
-    let otherOccurrenceRequest = PlanOccurrenceEntity.fetchRequest()
-    otherOccurrenceRequest.predicate = NSCompoundPredicate(
-      andPredicateWithSubpredicates: [
-        NSPredicate(format: "planIdentifier != %@", planID as CVarArg),
-        NSPredicate(format: "dayActivityIdentifier IN %@", Array(linkedDayActivityIDs)),
-        NSPredicate(format: "plan.isArchived == NO"),
-        .deduplicatedDateNilPredicate
-      ]
-    )
-    let dayActivityIDsUsedByOtherActivePlans = Set(
-      try context.fetch(otherOccurrenceRequest).compactMap(\.dayActivityIdentifier)
-    )
-    let removableDayActivityIDs = linkedDayActivityIDs
-      .subtracting(dayActivityIDsUsedByOtherActivePlans)
-    guard !removableDayActivityIDs.isEmpty else { return [] }
-
-    let dayActivityRequest = DayActivityEntity.fetchRequest()
-    dayActivityRequest.predicate = NSCompoundPredicate(
-      andPredicateWithSubpredicates: [
-        NSPredicate(format: "identifier IN %@", Array(removableDayActivityIDs)),
-        NSPredicate(format: "date >= %@", startOfDay as NSDate),
-        NSPredicate(format: "doneDate == nil"),
-        NSPredicate(format: "isGeneratedAutomatically == YES"),
-        .deduplicatedDateNilPredicate
-      ]
-    )
-    return try context.fetch(dayActivityRequest)
-  }
-
-  private enum Mutation {
-    case archive
-    case delete
   }
 }
 
-private extension Calendar {
+extension Calendar {
   static var planRepositoryCalendar: Calendar {
     var calendar = Calendar.autoupdatingCurrent
     calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .current

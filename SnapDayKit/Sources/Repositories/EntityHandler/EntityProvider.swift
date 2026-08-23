@@ -106,12 +106,8 @@ public struct EntityHandler {
   }
 
   public func save<T: Entity>(_ entities: [T]) async throws {
-    let context = coreDataStack.backgroundContext
-    return try await context.perform {
-      try entities.forEach {
-        try $0.managedObject(context)
-        try context.save()
-      }
+    try await transaction { transaction in
+      try transaction.save(entities)
     }
   }
 
@@ -126,13 +122,26 @@ public struct EntityHandler {
   }
 
   public func delete<T: Entity>(_ entities: [T]) async throws {
+    try await transaction { transaction in
+      try transaction.delete(entities)
+    }
+  }
+
+  func transaction<Result>(
+    _ operation: @escaping @Sendable (EntityTransaction) throws -> Result
+  ) async throws -> Result {
     let context = coreDataStack.backgroundContext
     return try await context.perform {
-      try entities.forEach {
-        let managedObject = try $0.managedObject(context)
-        context.delete(managedObject)
+      do {
+        let result = try operation(EntityTransaction(context: context))
+        if context.hasChanges {
+          try context.save()
+        }
+        return result
+      } catch {
+        context.rollback()
+        throw error
       }
-      try context.save()
     }
   }
 }

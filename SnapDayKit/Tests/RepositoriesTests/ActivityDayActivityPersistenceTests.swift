@@ -79,4 +79,33 @@ struct ActivityDayActivityPersistenceTests {
       #expect(persistedDayActivity.doneDate == completionDate)
     }
   }
+
+  @Test
+  func removingDayActivityAlsoRemovesItsTasks() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = DayActivityRepository.liveValue
+      let dayActivityID = UUID()
+      let task = DayActivityTask(
+        id: UUID(),
+        dayActivityId: dayActivityID,
+        name: "Chapter one"
+      )
+      let dayActivity = DayActivity(
+        id: dayActivityID,
+        date: Date(timeIntervalSinceReferenceDate: 800_000_000),
+        name: "Read",
+        isGeneratedAutomatically: false,
+        dayActivityTasks: [task]
+      )
+
+      try await repository.saveDayActivity(dayActivity)
+      try await repository.removeDayActivity(dayActivity)
+
+      let handler = EntityHandler()
+      #expect(try await handler.fetch(DayActivity.self, identifier: dayActivity.id as CVarArg) == nil)
+      #expect(try await handler.fetch(DayActivityTask.self, identifier: task.id as CVarArg) == nil)
+    }
+  }
 }

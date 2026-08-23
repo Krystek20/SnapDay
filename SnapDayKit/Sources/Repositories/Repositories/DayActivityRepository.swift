@@ -90,9 +90,9 @@ public struct DayActivityRepository {
   }
 
   public func removeDayActivity(_ dayActivity: DayActivity) async throws {
-    try await entityHandler.delete(dayActivity)
-    for dayActivityTask in dayActivity.dayActivityTasks {
-      try await removeDayActivityTask(dayActivityTask)
+    try await entityHandler.transaction { transaction in
+      try transaction.delete(dayActivity)
+      try transaction.delete(dayActivity.dayActivityTasks)
     }
   }
 
