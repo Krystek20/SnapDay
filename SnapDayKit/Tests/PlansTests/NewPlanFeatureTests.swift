@@ -812,6 +812,7 @@ struct NewPlanFeatureTests {
     let now = try date(year: 2026, month: 6, day: 8)
     let store = withDependencies {
       $0.date.now = now
+      $0.planRepository.loadActivePlans = { _ in [] }
     } operation: {
       TestStore(
         initialState: PlansFeature.State(),
@@ -820,11 +821,55 @@ struct NewPlanFeatureTests {
     }
 
     await store.send(.view(.createPlanButtonTapped)) {
+      $0.pendingPremiumAction = .presentCreatePlan
+    }
+    await store.receive(.internal(.activePlanLimitResolved(false)))
+    await store.receive(.premiumAccessGranted) {
+      $0.pendingPremiumAction = nil
       $0.newPlan = NewPlanFeature.State(startDate: now)
     }
     await store.send(.newPlan(.presented(.delegate(.cancelTapped)))) {
       $0.newPlan = nil
     }
+  }
+
+  @Test
+  func secondActivePlanWaitsForPremiumAccessAndResumesOnlyOnce() async throws {
+    let now = try date(year: 2026, month: 6, day: 8)
+    let existingPlan = Plan(
+      id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000010")),
+      name: "Existing plan",
+      startDate: now,
+      endDate: now,
+      duration: .custom,
+      schedule: []
+    )
+    let item = PlanListItem(
+      plan: existingPlan,
+      activities: [],
+      occurrences: [],
+      dayActivities: []
+    )
+    let store = withDependencies {
+      $0.date.now = now
+      $0.planRepository.loadActivePlans = { _ in [existingPlan] }
+    } operation: {
+      TestStore(
+        initialState: PlansFeature.State(selectedSection: .active, activePlans: [item]),
+        reducer: { PlansFeature() }
+      )
+    }
+
+    await store.send(.view(.createPlanButtonTapped)) {
+      $0.pendingPremiumAction = .presentCreatePlan
+    }
+    await store.receive(.internal(.activePlanLimitResolved(true)))
+    await store.receive(.delegate(.premiumAccessRequested))
+    await store.send(.premiumAccessGranted) {
+      $0.pendingPremiumAction = nil
+      $0.newPlan = NewPlanFeature.State(startDate: now)
+    }
+    await store.send(.premiumAccessGranted)
   }
 
   @Test

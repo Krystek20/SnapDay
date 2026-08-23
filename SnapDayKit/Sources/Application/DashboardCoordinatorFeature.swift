@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Dashboard
 import Foundation
 import Models
+import Payment
 import Plans
 import Repositories
 import Utilities
@@ -24,7 +25,14 @@ public struct DashboardCoordinatorFeature {
     case dashboard(DashboardFeature.Action)
     case externalRoute(ExternalRoute)
     case externalPlanLoaded(Plan?)
+    case planLimitResolved(StackElementID, Bool)
+    case premiumAccessGranted(PaywallEntryContext)
+    case delegate(DelegateAction)
     case path(StackAction<Path.State, Path.Action>)
+  }
+
+  public enum DelegateAction: Equatable {
+    case premiumAccessRequested(PaywallEntryContext)
   }
 
   public enum ExternalRoute: Equatable {
@@ -114,6 +122,47 @@ public struct DashboardCoordinatorFeature {
           state.path.removeAll()
           state.path.append(.plans(PlansFeature.State()))
         }
+        return .none
+      case .path(.element(
+        id: _,
+        action: .plans(.delegate(.premiumAccessRequested))
+      )):
+        return .send(.delegate(.premiumAccessRequested(.secondActivePlan)))
+      case .path(.element(
+        id: let pathID,
+        action: .planDetails(.delegate(.premiumAccessRequested))
+      )):
+        return .run { [now] send in
+          let hasActivePlan: Bool
+          do {
+            let activePlans = try await planRepository.loadActivePlans(now)
+            hasActivePlan = !activePlans.isEmpty
+          } catch {
+            hasActivePlan = true
+          }
+          await send(.planLimitResolved(pathID, hasActivePlan))
+        }
+      case .planLimitResolved(_, true):
+        return .send(.delegate(.premiumAccessRequested(.secondActivePlan)))
+      case .planLimitResolved(let pathID, false):
+        return .send(
+          .path(.element(id: pathID, action: .planDetails(.premiumAccessGranted)))
+        )
+      case .premiumAccessGranted(.secondActivePlan):
+        guard let pathID = state.path.ids.last,
+              let destination = state.path[id: pathID]
+        else { return .none }
+        switch destination {
+        case .planDetails:
+          return .send(
+            .path(.element(id: pathID, action: .planDetails(.premiumAccessGranted)))
+          )
+        case .plans:
+          return .send(
+            .path(.element(id: pathID, action: .plans(.premiumAccessGranted)))
+          )
+        }
+      case .premiumAccessGranted, .delegate:
         return .none
       case .path(.element(
         id: let pathID,

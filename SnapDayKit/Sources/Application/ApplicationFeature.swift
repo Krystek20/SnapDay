@@ -27,6 +27,7 @@ public struct ApplicationFeature {
   @Dependency(\.date.now) private var now
   @Dependency(\.uuid) private var uuid
   @Dependency(\.paymentClient) private var paymentClient
+  @Dependency(\.openURL) private var openURL
   private static let isOnboardingShownKey = "isOnboardingShown"
   private let userDefaults: UserDefaults
 
@@ -43,6 +44,8 @@ public struct ApplicationFeature {
     var onboardingGeneratedActivityIDs: Set<Activity.ID> = []
     var isOnboardingPlanSaveErrorPresented = false
     var premiumEntitlement = PremiumEntitlement.unknown
+    var pendingPremiumAction: PaywallEntryContext?
+    @Presents var paywall: PaywallFeature.State?
 
     #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
@@ -68,6 +71,9 @@ public struct ApplicationFeature {
     case onboardingPlanSaveFailed
     case onboardingPlanSaveErrorDismissed
     case premiumEntitlementUpdated(PremiumEntitlement)
+    case requestPremiumAccess(PaywallEntryContext)
+    case premiumAccessGranted(PaywallEntryContext)
+    case paywall(PresentationAction<PaywallFeature.Action>)
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
@@ -166,6 +172,8 @@ public struct ApplicationFeature {
         guard state.selectedTab != tab else { return .none }
         state.selectedTab = tab
         return .none
+      case .dashboard(.delegate(.premiumAccessRequested(let context))):
+        return .send(.requestPremiumAccess(context))
       case .dashboard:
         return .none
       case .reports:
@@ -251,6 +259,35 @@ public struct ApplicationFeature {
         return .none
       case .premiumEntitlementUpdated(let entitlement):
         state.premiumEntitlement = entitlement
+        guard state.paywall != nil else { return .none }
+        return .send(.paywall(.presented(.internal(.entitlementUpdated(entitlement)))))
+      case .requestPremiumAccess(let context):
+        guard !state.premiumEntitlement.hasAccess else {
+          return .send(.premiumAccessGranted(context))
+        }
+        state.pendingPremiumAction = context
+        state.paywall = PaywallFeature.State(context: context)
+        return .none
+      case .premiumAccessGranted(let context):
+        return .send(.dashboard(.premiumAccessGranted(context)))
+      case .paywall(.presented(.delegate(.closeRequested))):
+        state.pendingPremiumAction = nil
+        state.paywall = nil
+        return .none
+      case .paywall(.presented(.delegate(.purchaseCompleted(let entitlement)))):
+        let pendingAction = state.pendingPremiumAction
+        state.premiumEntitlement = entitlement
+        state.pendingPremiumAction = nil
+        state.paywall = nil
+        return pendingAction.map { .send(.premiumAccessGranted($0)) } ?? .none
+      case .paywall(.presented(.delegate(.legalLinkRequested(let link)))):
+        return .run { _ in
+          await openURL(link.url)
+        }
+      case .paywall(.dismiss):
+        state.pendingPremiumAction = nil
+        return .none
+      case .paywall:
         return .none
       #if DEBUG
       case .developerTools(.presented(.delegate(.showOnboardingAgain))):
@@ -259,12 +296,18 @@ public struct ApplicationFeature {
         state.showOnboarding = true
         state.developerTools = nil
         return .none
+      case .developerTools(.presented(.delegate(.showPaywall))):
+        state.developerTools = nil
+        return .send(.requestPremiumAccess(.settings))
       case .developerTools:
         return .none
       #endif
       case .binding:
         return .none
       }
+    }
+    .ifLet(\.$paywall, action: \.paywall) {
+      PaywallFeature()
     }
     #if DEBUG
     .ifLet(\.$developerTools, action: \.developerTools) {

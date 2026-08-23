@@ -1,0 +1,171 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%@ %@. Renews automatically until canceled." : {
+
+    },
+    "%lld days" : {
+
+    },
+    "%lld months" : {
+
+    },
+    "%lld weeks" : {
+
+    },
+    "%lld years" : {
+
+    },
+    "1 day" : {
+
+    },
+    "1 month" : {
+
+    },
+    "1 week" : {
+
+    },
+    "1 year" : {
+
+    },
+    "14-day free trial" : {
+
+    },
+    "Annual" : {
+
+    },
+    "Best value" : {
+
+    },
+    "Build every routine" : {
+
+    },
+    "Build more Plans and see what helps you keep going." : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Check your connection and try again." : {
+
+    },
+    "Choose what your Weekly Progress widget shows on your Home Screen." : {
+
+    },
+    "Continue for %@" : {
+
+    },
+    "Continue using AI assistance after your free allowance has been used." : {
+
+    },
+    "Create more active Plans without giving up the routines already working for you." : {
+
+    },
+    "Explore more of your history and understand how your routines change over time." : {
+
+    },
+    "Follow a specific Plan from your Home Screen and see progress at a glance." : {
+
+    },
+    "In progress" : {
+
+    },
+    "Invite others and manage the people sharing your routines." : {
+
+    },
+    "Keep planning with SnapDay AI" : {
+
+    },
+    "Keep progress visible on your Home Screen" : {
+
+    },
+    "Keep your Plan in sight" : {
+
+    },
+    "Loading offers" : {
+
+    },
+    "Loading offers…" : {
+
+    },
+    "Make progress together" : {
+
+    },
+    "Make Weekly Progress yours" : {
+
+    },
+    "Make your schedule fit real life" : {
+
+    },
+    "Monthly" : {
+
+    },
+    "No active purchases were found for this Apple Account." : {
+
+    },
+    "No payment today. After 14 days, %@ per year. Renews automatically until canceled." : {
+
+    },
+    "Offers could not be loaded" : {
+
+    },
+    "per day" : {
+
+    },
+    "per month" : {
+
+    },
+    "per week" : {
+
+    },
+    "per year" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Purchase canceled. You can continue whenever you are ready." : {
+
+    },
+    "Restore Purchases" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Run multiple Plans at the same time" : {
+
+    },
+    "See the patterns behind your progress" : {
+
+    },
+    "Start 14-day free trial" : {
+
+    },
+    "Stay consistent across every routine" : {
+
+    },
+    "Terms" : {
+
+    },
+    "Understand long-term progress patterns" : {
+
+    },
+    "Use flexible recurrence rules for routines that do not fit a simple weekly schedule." : {
+
+    },
+    "We could not complete your purchase. Please try again." : {
+
+    },
+    "We could not restore purchases. Please try again." : {
+
+    },
+    "Your purchase is pending approval. Plus will unlock automatically when it completes." : {
+
+    }
+  },
+  "version" : "1.0"
+}

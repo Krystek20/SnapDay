@@ -57,7 +57,7 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies)
   TargetParamenters(module: .onboarding, dependencies: [.composableArchitecture, .uiComponents, .resources, .plans])
-  TargetParamenters(module: .payment, dependencies: [.composableArchitecture])
+  TargetParamenters(module: .payment, dependencies: [.composableArchitecture, .uiComponents, .resources])
   TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
@@ -161,7 +161,21 @@ private enum Module: String {
   }
 
   var resources: [Resource] {
-    []
+    switch self {
+    case .payment:
+      [.process("Resources")]
+    default:
+      []
+    }
+  }
+
+  var testResources: [Resource] {
+    switch self {
+    case .payment:
+      [.copy("Resources/SnapDayPlus.storekit")]
+    default:
+      []
+    }
   }
 }
 
@@ -226,7 +240,8 @@ private extension Target {
   static func testTarget(_ name: Module, dependencies: [Module]) -> Target {
     .testTarget(
       name: name.name + "Tests",
-      dependencies: (dependencies + [name]).compactMap(\.dependency)
+      dependencies: (dependencies + [name]).compactMap(\.dependency),
+      resources: name.testResources
     )
   }
 }
