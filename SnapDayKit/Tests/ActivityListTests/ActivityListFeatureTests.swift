@@ -51,13 +51,16 @@ struct ActivityListFeatureTests {
       ]
     )
     let store = withDependencies {
+      $0.calendar = Calendar(identifier: .gregorian)
+      $0.date.now = date
       $0.planRepository = PlanRepository(
         loadPlans: { [plan] },
         loadActivePlans: { _ in [] },
         loadHistoricalPlans: { _ in [] },
         plan: { _ in nil },
         savePlan: { _ in },
-        archivePlan: { _ in },
+        archivePlan: { _, _ in },
+        deletePlan: { _, _ in },
         loadOccurrences: { _ in [] },
         saveOccurrences: { _ in },
         synchronizeOccurrences: { _, _ in [] }
@@ -75,5 +78,32 @@ struct ActivityListFeatureTests {
     await store.receive(.internal(.activityDeletionBlocked)) {
       $0.isPlanActivityDeletionAlertPresented = true
     }
+  }
+
+  @Test(arguments: [PlanStatus.finished, .archived])
+  func activityUsedOnlyByHistoricalPlanCanBeDeleted(status: PlanStatus) throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+    let activityID = UUID()
+    let plan = Plan(
+      id: UUID(),
+      name: "Reading",
+      startDate: try #require(calendar.date(byAdding: .day, value: -10, to: now)),
+      endDate: try #require(
+        calendar.date(byAdding: .day, value: status == .finished ? -1 : 10, to: now)
+      ),
+      duration: .custom,
+      isArchived: status == .archived,
+      schedule: [
+        PlanScheduleEntry(
+          id: UUID(),
+          weekday: .monday,
+          activityID: activityID,
+          position: 0
+        )
+      ]
+    )
+
+    #expect(!plan.blocksDeletingActivity(activityID, on: now, calendar: calendar))
   }
 }

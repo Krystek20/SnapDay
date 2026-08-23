@@ -8,7 +8,8 @@ public struct PlanRepository {
   public var loadHistoricalPlans: @Sendable (_ date: Date) async throws -> [Plan]
   public var plan: @Sendable (_ identifier: Plan.ID) async throws -> Plan?
   public var savePlan: @Sendable (_ plan: Plan) async throws -> Void
-  public var archivePlan: @Sendable (_ identifier: Plan.ID) async throws -> Void
+  public var archivePlan: @Sendable (_ identifier: Plan.ID, _ from: Date) async throws -> Void
+  public var deletePlan: @Sendable (_ identifier: Plan.ID, _ from: Date) async throws -> Void
   public var loadOccurrences: @Sendable (_ planID: Plan.ID) async throws -> [PlanOccurrence]
   public var saveOccurrences: @Sendable (_ occurrences: [PlanOccurrence]) async throws -> Void
   public var synchronizeOccurrences: @Sendable (_ plan: Plan, _ from: Date) async throws -> [PlanOccurrence]
@@ -65,10 +66,15 @@ extension PlanRepository: DependencyKey {
       savePlan: { plan in
         try await EntityHandler().save(plan)
       },
-      archivePlan: { identifier in
+      archivePlan: { identifier, from in
         guard var plan = try await EntityHandler().fetch(Plan.self, identifier: identifier as CVarArg) else { return }
+        try await removeUpcomingGeneratedDayActivities(for: identifier, from: from)
         plan.isArchived = true
         try await EntityHandler().save(plan)
+      },
+      deletePlan: { identifier, from in
+        try await removeUpcomingGeneratedDayActivities(for: identifier, from: from)
+        try await EntityHandler().delete(identifier: identifier as CVarArg, Plan.self)
       },
       loadOccurrences: { planID in
         try await EntityHandler().fetch(
@@ -118,6 +124,50 @@ extension PlanRepository: DependencyKey {
       }
     )
   }
+}
+
+private func removeUpcomingGeneratedDayActivities(
+  for planID: Plan.ID,
+  from date: Date
+) async throws {
+  let entityHandler = EntityHandler()
+  let startOfDay = Calendar.planRepositoryCalendar.startOfDay(for: date)
+  let occurrences: [PlanOccurrence] = try await entityHandler.fetch(
+    PlanOccurrence.self,
+    predicates: { NSPredicate(format: "planIdentifier == %@", planID as CVarArg) }
+  )
+  let linkedDayActivityIDs = Set(
+    occurrences.lazy
+      .filter { $0.date >= startOfDay }
+      .compactMap(\.dayActivityID)
+  )
+  guard !linkedDayActivityIDs.isEmpty else { return }
+
+  let occurrencesFromOtherPlans: [PlanOccurrence] = try await entityHandler.fetch(
+    PlanOccurrence.self,
+    predicates: {
+      NSPredicate(format: "planIdentifier != %@", planID as CVarArg)
+      NSPredicate(format: "dayActivityIdentifier IN %@", Array(linkedDayActivityIDs))
+    }
+  )
+  let dayActivityIDsUsedByOtherPlans = Set(
+    occurrencesFromOtherPlans.compactMap(\.dayActivityID)
+  )
+  let removableDayActivityIDs = linkedDayActivityIDs
+    .subtracting(dayActivityIDsUsedByOtherPlans)
+  guard !removableDayActivityIDs.isEmpty else { return }
+
+  let dayActivities: [DayActivity] = try await entityHandler.fetch(
+    DayActivity.self,
+    predicates: {
+      NSPredicate(format: "identifier IN %@", Array(removableDayActivityIDs))
+      NSPredicate(format: "date >= %@", startOfDay as NSDate)
+      NSPredicate(format: "doneDate == nil")
+      NSPredicate(format: "isGeneratedAutomatically == YES")
+    }
+  )
+  guard !dayActivities.isEmpty else { return }
+  try await entityHandler.delete(dayActivities)
 }
 
 private extension Calendar {

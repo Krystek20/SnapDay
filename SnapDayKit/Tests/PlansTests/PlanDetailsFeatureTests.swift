@@ -9,6 +9,55 @@ import Utilities
 @MainActor
 struct PlanDetailsFeatureTests {
 
+  @Test(arguments: [PlanStatus.finished, .archived])
+  func historicalPlanCanBeDeleted(status: PlanStatus) async throws {
+    let calendar = testCalendar()
+    let now = try testDate(day: 15, calendar: calendar)
+    var historicalPlan = try plan(
+      startDate: try testDate(day: 1, calendar: calendar),
+      endDate: try testDate(day: status == .finished ? 10 : 31, calendar: calendar)
+    )
+    historicalPlan.isArchived = status == .archived
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = now
+    } operation: {
+      TestStore(
+        initialState: PlanDetailsFeature.State(plan: historicalPlan, allowsManagement: true),
+        reducer: { PlanDetailsFeature() }
+      )
+    }
+
+    await store.send(.view(.deleteButtonTapped)) {
+      $0.isDeleteConfirmationPresented = true
+    }
+    await store.send(.view(.deleteConfirmed)) {
+      $0.isDeleteConfirmationPresented = false
+    }
+    await store.receive(.delegate(.deletePlanTapped(historicalPlan.id)))
+  }
+
+  @Test
+  func activePlanCannotBeDeleted() async throws {
+    let calendar = testCalendar()
+    let now = try testDate(day: 15, calendar: calendar)
+    let activePlan = try plan(
+      startDate: try testDate(day: 1, calendar: calendar),
+      endDate: try testDate(day: 31, calendar: calendar)
+    )
+    let store = withDependencies {
+      $0.calendar = calendar
+      $0.date.now = now
+    } operation: {
+      TestStore(
+        initialState: PlanDetailsFeature.State(plan: activePlan, allowsManagement: true),
+        reducer: { PlanDetailsFeature() }
+      )
+    }
+
+    await store.send(.view(.deleteButtonTapped))
+  }
+
   @Test
   func expiredArchivedPlanGuidesUserToCreateSimilar() async throws {
     let calendar = testCalendar()
@@ -256,7 +305,8 @@ struct PlanDetailsFeatureTests {
         loadHistoricalPlans: { _ in [] },
         plan: { _ in nil },
         savePlan: { _ in throw TestError() },
-        archivePlan: { _ in },
+        archivePlan: { _, _ in },
+        deletePlan: { _, _ in },
         loadOccurrences: { _ in [] },
         saveOccurrences: { _ in },
         synchronizeOccurrences: { _, _ in [] }
@@ -313,7 +363,8 @@ struct PlanDetailsFeatureTests {
       loadHistoricalPlans: { _ in [] },
       plan: { _ in nil },
       savePlan: { plan in await recorder.save(plan) },
-      archivePlan: { _ in },
+      archivePlan: { _, _ in },
+      deletePlan: { _, _ in },
       loadOccurrences: { _ in [] },
       saveOccurrences: { _ in },
       synchronizeOccurrences: { plan, date in

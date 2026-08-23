@@ -23,6 +23,7 @@ public struct PlanDetailsFeature {
     var referenceDate: Date?
     var isLoading = false
     var isArchiveConfirmationPresented = false
+    var isDeleteConfirmationPresented = false
     var isRestoreUnavailableAlertPresented = false
     var isSaveErrorPresented = false
     @Presents var newPlan: NewPlanFeature.State?
@@ -61,6 +62,9 @@ public struct PlanDetailsFeature {
       case archiveButtonTapped
       case archiveCancelled
       case archiveConfirmed
+      case deleteButtonTapped
+      case deleteCancelled
+      case deleteConfirmed
       case createSimilarButtonTapped
       case restoreButtonTapped
       case restoreUnavailableDismissed
@@ -79,6 +83,7 @@ public struct PlanDetailsFeature {
 
     public enum DelegateAction: Equatable {
       case archivePlanTapped(Plan.ID)
+      case deletePlanTapped(Plan.ID)
       case planUpdated
     }
 
@@ -144,6 +149,21 @@ public struct PlanDetailsFeature {
         guard state.allowsManagement else { return .none }
         state.isArchiveConfirmationPresented = false
         return .send(.delegate(.archivePlanTapped(state.id)))
+      case .view(.deleteButtonTapped):
+        guard state.allowsManagement,
+              state.plan.status(on: now, calendar: calendar) != .active
+        else { return .none }
+        state.isDeleteConfirmationPresented = true
+        return .none
+      case .view(.deleteCancelled):
+        state.isDeleteConfirmationPresented = false
+        return .none
+      case .view(.deleteConfirmed):
+        guard state.allowsManagement,
+              state.plan.status(on: now, calendar: calendar) != .active
+        else { return .none }
+        state.isDeleteConfirmationPresented = false
+        return .send(.delegate(.deletePlanTapped(state.id)))
       case .view(.createSimilarButtonTapped):
         let activityIDs = Set(state.plan.schedule.map(\.activityID))
         let schedule = state.plan.schedule

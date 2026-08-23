@@ -52,10 +52,165 @@ struct PlanRepositoryTests {
       #expect(try await repository.loadActivePlans(today).map(\.id) == [activePlan.id])
       #expect(try await repository.loadHistoricalPlans(today).map(\.id) == [archivedPlan.id])
 
-      try await repository.archivePlan(activePlan.id)
+      try await repository.archivePlan(activePlan.id, today)
       let archivedActivePlan = try #require(try await repository.plan(activePlan.id))
       #expect(archivedActivePlan.isArchived)
       #expect(try await repository.loadActivePlans(today).isEmpty)
+    }
+  }
+
+  @Test
+  func archivingPlanRemovesUpcomingGeneratedActivitiesAndKeepsHistory() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      let dayActivityRepository = DayActivityRepository.liveValue
+      let today = Date(timeIntervalSinceReferenceDate: 800_000_000)
+      let yesterday = today.addingTimeInterval(-86_400)
+      let plan = makePlan(startDate: yesterday, endDate: today.addingTimeInterval(86_400))
+      let upcoming = makeDayActivity(date: today)
+      let historical = makeDayActivity(date: yesterday)
+      let occurrences = [
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: UUID(),
+          date: yesterday,
+          dayActivityID: historical.id
+        ),
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: UUID(),
+          date: today,
+          dayActivityID: upcoming.id
+        )
+      ]
+
+      try await repository.savePlan(plan)
+      try await dayActivityRepository.saveDayActivity(upcoming)
+      try await dayActivityRepository.saveDayActivity(historical)
+      try await repository.saveOccurrences(occurrences)
+
+      try await repository.archivePlan(plan.id, today)
+
+      let archivedPlan = try #require(try await repository.plan(plan.id))
+      let persistedDayActivities = try await dayActivityRepository.dayActivities(
+        configuration: ActivitiesFetchConfiguration(
+          predicates: [
+            NSPredicate(format: "identifier IN %@", [upcoming.id, historical.id])
+          ]
+        )
+      )
+      let persistedDayActivityIDs = Set(persistedDayActivities.map(\.id))
+
+      #expect(archivedPlan.isArchived)
+      #expect(try await repository.loadOccurrences(plan.id) == occurrences)
+      #expect(!persistedDayActivityIDs.contains(upcoming.id))
+      #expect(persistedDayActivityIDs.contains(historical.id))
+    }
+  }
+
+  @Test
+  func deletingPlanAlsoDeletesItsOccurrences() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      let plan = makePlan()
+
+      try await repository.savePlan(plan)
+      let occurrences = try await repository.synchronizeOccurrences(plan, plan.startDate)
+      #expect(!occurrences.isEmpty)
+
+      try await repository.deletePlan(plan.id, plan.startDate)
+
+      #expect(try await repository.plan(plan.id) == nil)
+      #expect(try await repository.loadOccurrences(plan.id).isEmpty)
+    }
+  }
+
+  @Test
+  func deletingPlanRemovesOnlyItsIncompleteGeneratedActivitiesFromToday() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      let dayActivityRepository = DayActivityRepository.liveValue
+      let today = Date(timeIntervalSinceReferenceDate: 800_000_000)
+      let yesterday = today.addingTimeInterval(-86_400)
+      let tomorrow = today.addingTimeInterval(86_400)
+      let plan = makePlan(startDate: yesterday, endDate: tomorrow)
+      let otherPlan = makePlan(id: UUID(), startDate: yesterday, endDate: tomorrow)
+      let sharedActivityID = UUID()
+      let removable = makeDayActivity(date: today)
+      let historical = makeDayActivity(date: yesterday)
+      let completed = makeDayActivity(date: tomorrow, doneDate: tomorrow)
+      let manuallyAdded = makeDayActivity(date: tomorrow, isGeneratedAutomatically: false)
+      let shared = makeDayActivity(date: tomorrow)
+
+      try await repository.savePlan(plan)
+      try await repository.savePlan(otherPlan)
+      for dayActivity in [removable, historical, completed, manuallyAdded, shared] {
+        try await dayActivityRepository.saveDayActivity(dayActivity)
+      }
+      try await repository.saveOccurrences([
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: UUID(),
+          date: today,
+          dayActivityID: removable.id
+        ),
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: UUID(),
+          date: yesterday,
+          dayActivityID: historical.id
+        ),
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: UUID(),
+          date: tomorrow,
+          dayActivityID: completed.id
+        ),
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: UUID(),
+          date: tomorrow,
+          dayActivityID: manuallyAdded.id
+        ),
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: sharedActivityID,
+          date: tomorrow,
+          dayActivityID: shared.id
+        ),
+        PlanOccurrence(
+          planID: otherPlan.id,
+          activityID: sharedActivityID,
+          date: tomorrow,
+          dayActivityID: shared.id
+        )
+      ])
+
+      try await repository.deletePlan(plan.id, today)
+
+      let persistedDayActivities = try await dayActivityRepository.dayActivities(
+        configuration: ActivitiesFetchConfiguration(
+          predicates: [
+            NSPredicate(
+              format: "identifier IN %@",
+              [removable.id, historical.id, completed.id, manuallyAdded.id, shared.id]
+            )
+          ]
+        )
+      )
+      let persistedDayActivityIDs = Set(persistedDayActivities.map(\.id))
+
+      #expect(!persistedDayActivityIDs.contains(removable.id))
+      #expect(persistedDayActivityIDs.contains(historical.id))
+      #expect(persistedDayActivityIDs.contains(completed.id))
+      #expect(persistedDayActivityIDs.contains(manuallyAdded.id))
+      #expect(persistedDayActivityIDs.contains(shared.id))
     }
   }
 
@@ -269,6 +424,20 @@ struct PlanRepositoryTests {
           position: 0
         )
       ]
+    )
+  }
+
+  private func makeDayActivity(
+    date: Date,
+    doneDate: Date? = nil,
+    isGeneratedAutomatically: Bool = true
+  ) -> DayActivity {
+    DayActivity(
+      id: UUID(),
+      date: date,
+      name: "Plan activity",
+      doneDate: doneDate,
+      isGeneratedAutomatically: isGeneratedAutomatically
     )
   }
 }

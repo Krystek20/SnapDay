@@ -53,7 +53,9 @@ public struct DayActivityRepository {
   }
 
   private func activities<T: Entity>(configuration: ActivitiesFetchConfiguration) async throws -> [T] {
-    var predicates: [NSPredicate] = []
+    var predicates: [NSPredicate] = [
+      NSPredicate(format: "identifier != nil")
+    ]
     if let range = configuration.range {
       predicates.append(
         NSPredicate(format: "date >= %@ AND date <= %@", range.lowerBound as NSDate, range.upperBound as NSDate)

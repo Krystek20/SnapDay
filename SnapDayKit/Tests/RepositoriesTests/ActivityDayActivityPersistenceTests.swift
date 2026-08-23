@@ -7,6 +7,36 @@ import Testing
 @Suite(.serialized)
 struct ActivityDayActivityPersistenceTests {
   @Test
+  func loadingDayActivitiesIgnoresIncompleteCloudKitRecords() async throws {
+    let coreDataStack = CoreDataStack.testValue
+
+    try await withDependencies {
+      $0.coreDataStack = coreDataStack
+    } operation: {
+      let repository = DayActivityRepository.liveValue
+      let validActivity = DayActivity(
+        id: UUID(),
+        date: Date(timeIntervalSinceReferenceDate: 800_000_000),
+        name: "Read",
+        isGeneratedAutomatically: false
+      )
+
+      try await repository.saveDayActivity(validActivity)
+      let context = coreDataStack.backgroundContext
+      try await context.perform {
+        _ = DayActivityEntity(context: context)
+        try context.save()
+      }
+
+      let activities = try await repository.dayActivities(
+        configuration: ActivitiesFetchConfiguration()
+      )
+
+      #expect(activities.map(\.id) == [validActivity.id])
+    }
+  }
+
+  @Test
   func updatingActivityKeepsLinkedCompletedDayActivity() async throws {
     try await withDependencies {
       $0.coreDataStack = .testValue
