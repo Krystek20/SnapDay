@@ -26,7 +26,9 @@ enum PlanDayActivityResolver {
     let date = calendar.startOfDay(for: date)
     let activitiesByID = PlanActivityResolver.activitiesByID(activities)
     let occurrencesByActivityID = Dictionary(
-      grouping: occurrences.filter { calendar.isDate($0.date, inSameDayAs: date) },
+      grouping: occurrences.filter {
+        !$0.isSkipped && calendar.isDate($0.date, inSameDayAs: date)
+      },
       by: \.activityID
     )
 

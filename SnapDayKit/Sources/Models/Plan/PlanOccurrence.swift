@@ -20,6 +20,7 @@ public struct PlanOccurrence: Equatable, Hashable, Identifiable {
   public let activityID: Activity.ID
   public let date: Date
   public var dayActivityID: DayActivity.ID?
+  public var isSkipped: Bool
 
   public var id: ID {
     ID(planID: planID, activityID: activityID, date: date)
@@ -31,12 +32,14 @@ public struct PlanOccurrence: Equatable, Hashable, Identifiable {
     planID: Plan.ID,
     activityID: Activity.ID,
     date: Date,
-    dayActivityID: DayActivity.ID? = nil
+    dayActivityID: DayActivity.ID? = nil,
+    isSkipped: Bool = false
   ) {
     self.planID = planID
     self.activityID = activityID
     self.date = date
     self.dayActivityID = dayActivityID
+    self.isSkipped = isSkipped
   }
 }
 
@@ -47,7 +50,9 @@ public extension Sequence where Element == PlanOccurrence {
 
     for occurrence in self {
       if let index = indicesByID[occurrence.id] {
-        if occurrences[index].dayActivityID == nil, occurrence.dayActivityID != nil {
+        if !occurrences[index].isSkipped,
+           occurrence.isSkipped ||
+           (occurrences[index].dayActivityID == nil && occurrence.dayActivityID != nil) {
           occurrences[index] = occurrence
         }
       } else {

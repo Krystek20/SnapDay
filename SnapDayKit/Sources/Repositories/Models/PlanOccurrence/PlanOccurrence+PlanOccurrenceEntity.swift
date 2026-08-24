@@ -12,7 +12,8 @@ extension PlanOccurrence {
       planID: planIdentifier,
       activityID: activityIdentifier,
       date: date,
-      dayActivityID: entity.dayActivityIdentifier
+      dayActivityID: entity.dayActivityIdentifier,
+      isSkipped: entity.isSkipped
     )
   }
 }

@@ -29,34 +29,10 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:SnapTodayKit/Tests/SnapToday.xctestplan"
+            reference = "container:SnapDayKit/Tests/SnapToday.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D443ECFD2AD0771D002225CF"
-               BuildableName = "SnapTodayTests.xctest"
-               BlueprintName = "SnapTodayTests"
-               ReferencedContainer = "container:SnapDay.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D443ED072AD0771D002225CF"
-               BuildableName = "SnapDayUITests.xctest"
-               BlueprintName = "SnapDayUITests"
-               ReferencedContainer = "container:SnapDay.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

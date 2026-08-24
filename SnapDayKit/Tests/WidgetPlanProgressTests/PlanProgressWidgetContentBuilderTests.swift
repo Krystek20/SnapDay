@@ -161,6 +161,37 @@ struct PlanProgressWidgetContentBuilderTests {
     #expect(content.nextSessionDate == saturday)
   }
 
+  @Test
+  func skippedOccurrenceStaysInTotalButIsNotDueToday() throws {
+    let calendar = testCalendar
+    let today = try date(year: 2026, month: 8, day: 6, calendar: calendar)
+    let tomorrow = try #require(calendar.date(byAdding: .day, value: 1, to: today))
+    let plan = makePlan(name: "Spanish", start: today, end: tomorrow)
+
+    let content = builder.content(
+      from: [PlanProgressSnapshot(
+        plan: plan,
+        occurrences: [
+          PlanOccurrence(
+            planID: plan.id,
+            activityID: UUID(),
+            date: today,
+            isSkipped: true
+          ),
+          PlanOccurrence(planID: plan.id, activityID: UUID(), date: tomorrow)
+        ],
+        dayActivities: []
+      )],
+      referenceDate: today,
+      calendar: calendar
+    )
+
+    #expect(content.state == .noActivitiesToday)
+    #expect(content.totalTodayCount == 0)
+    #expect(content.totalActivityCount == 2)
+    #expect(content.nextSessionDate == tomorrow)
+  }
+
   private var testCalendar: Calendar {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .current

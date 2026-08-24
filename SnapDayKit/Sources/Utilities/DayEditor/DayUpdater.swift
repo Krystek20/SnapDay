@@ -141,6 +141,8 @@ public actor DayUpdater: TodayProvidable {
         try await stopCollaboration(in: dayActivity)
       }
     }
+    let removedAsSkippedPlanOccurrence = try await planRepository.skipDayActivity(dayActivity)
+    guard !removedAsSkippedPlanOccurrence else { return }
     try await dayActivityRepository.removeDayActivity(dayActivity)
   }
 

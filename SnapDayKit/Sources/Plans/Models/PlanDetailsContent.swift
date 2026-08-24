@@ -8,6 +8,7 @@ struct PlanDetailsContent: Equatable {
     let id: Activity.ID
     let name: String
     let isDone: Bool
+    let isSkipped: Bool
   }
 
   struct ScheduledDay: Equatable, Identifiable {
@@ -20,6 +21,7 @@ struct PlanDetailsContent: Equatable {
   enum DayState: Equatable {
     case done
     case partial
+    case skipped
     case missed
     case today
     case upcoming
@@ -28,6 +30,7 @@ struct PlanDetailsContent: Equatable {
       switch self {
       case .done: "Done"
       case .partial: "Partly done"
+      case .skipped: "Skipped"
       case .missed: "Missed"
       case .today: "Today"
       case .upcoming: "Upcoming"
@@ -97,11 +100,17 @@ struct PlanDetailsContent: Equatable {
       to: calendar.startOfDay(for: referenceDate)
     ) else { return nil }
 
+    let skippedOccurrences = planOccurrences.filter(\.isSkipped)
     let nextOccurrences = plan.scheduledOccurrences(
       from: tomorrow,
       through: plan.endDate,
       calendar: calendar
-    )
+    ).filter { generatedOccurrence in
+      !skippedOccurrences.contains {
+        $0.activityID == generatedOccurrence.activityID
+          && calendar.isDate($0.date, inSameDayAs: generatedOccurrence.date)
+      }
+    }
     guard let date = nextOccurrences.first?.date,
           let weekday = PlanWeekday(rawValue: calendar.component(.weekday, from: date))
     else { return nil }
@@ -125,7 +134,12 @@ struct PlanDetailsContent: Equatable {
         occurrence.dayActivityID.flatMap { dayActivitiesByID[$0]?.isDone } ?? false
       }.count
       return ActivityBreakdown(
-        activity: ActivityItem(id: activity.id, name: activity.name, isDone: false),
+        activity: ActivityItem(
+          id: activity.id,
+          name: activity.name,
+          isDone: false,
+          isSkipped: false
+        ),
         completedCount: completedCount,
         plannedCount: occurrences.count
       )
@@ -190,7 +204,8 @@ struct PlanDetailsContent: Equatable {
         return ActivityItem(
           id: activity.id,
           name: activity.name,
-          isDone: occurrence.dayActivityID.flatMap { dayActivitiesByID[$0]?.isDone } ?? false
+          isDone: occurrence.dayActivityID.flatMap { dayActivitiesByID[$0]?.isDone } ?? false,
+          isSkipped: occurrence.isSkipped
         )
       }
     }
@@ -206,7 +221,7 @@ struct PlanDetailsContent: Equatable {
 
   private func activityItem(for entry: PlanScheduleEntry) -> ActivityItem? {
     guard let activity = activitiesByID[entry.activityID] else { return nil }
-    return ActivityItem(id: activity.id, name: activity.name, isDone: false)
+    return ActivityItem(id: activity.id, name: activity.name, isDone: false, isSkipped: false)
   }
 
   private func dayState(on date: Date?, activities: [ActivityItem]) -> DayState? {
@@ -214,6 +229,7 @@ struct PlanDetailsContent: Equatable {
     guard calendar.startOfDay(for: date) >= calendar.startOfDay(for: plan.startDate) else {
       return nil
     }
+    if !activities.isEmpty, activities.allSatisfy(\.isSkipped) { return .skipped }
     if !activities.isEmpty, activities.allSatisfy(\.isDone) { return .done }
     if activities.contains(where: \.isDone) { return .partial }
     if calendar.isDate(date, inSameDayAs: referenceDate) { return .today }

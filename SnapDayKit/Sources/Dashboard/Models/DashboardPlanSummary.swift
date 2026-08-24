@@ -27,7 +27,8 @@ public struct DashboardPlanSummary: Equatable, Identifiable {
     self.referenceDate = startOfDate
     self.nextSessionDate = occurrences.lazy
       .filter { occurrence in
-        occurrence.date >= startOfDate
+        !occurrence.isSkipped
+          && occurrence.date >= startOfDate
           && !(occurrence.dayActivityID.map(completedDayActivityIDs.contains) ?? false)
       }
       .map(\.date)

@@ -58,6 +58,55 @@ struct PlanDetailsContentTests {
   }
 
   @Test
+  func skippedOccurrenceHasSkippedActivityAndDayState() throws {
+    let calendar = try calendar()
+    let today = try date(day: 15, calendar: calendar)
+    let activity = Activity(id: UUID(), name: "Read")
+    let plan = Plan(
+      id: UUID(),
+      name: "Learn Spanish",
+      startDate: try date(day: 1, calendar: calendar),
+      endDate: try date(day: 31, calendar: calendar),
+      duration: .custom,
+      schedule: [
+        PlanScheduleEntry(
+          id: UUID(),
+          weekday: .wednesday,
+          activityID: activity.id,
+          position: 0
+        )
+      ]
+    )
+    let occurrence = PlanOccurrence(
+      planID: plan.id,
+      activityID: activity.id,
+      date: today,
+      isSkipped: true
+    )
+
+    let content = PlanDetailsContent(
+      plan: plan,
+      activities: [activity],
+      occurrences: [occurrence],
+      dayActivities: [],
+      referenceDate: today,
+      calendar: calendar
+    )
+
+    #expect(content.todayActivities == [
+      PlanDetailsContent.ActivityItem(
+        id: activity.id,
+        name: activity.name,
+        isDone: false,
+        isSkipped: true
+      )
+    ])
+    #expect(content.scheduledDays.first?.state == .skipped)
+    #expect(content.progress.completedPlannedActivityCount == 0)
+    #expect(content.progress.totalPlannedActivityCount == 1)
+  }
+
+  @Test
   func duplicateLinkedDayActivitiesDoNotCrashDetails() throws {
     let calendar = try calendar()
     let today = try date(day: 18, calendar: calendar)
@@ -112,7 +161,12 @@ struct PlanDetailsContentTests {
     )
 
     #expect(content.todayActivities == [
-      PlanDetailsContent.ActivityItem(id: activity.id, name: activity.name, isDone: true)
+      PlanDetailsContent.ActivityItem(
+        id: activity.id,
+        name: activity.name,
+        isDone: true,
+        isSkipped: false
+      )
     ])
   }
 
@@ -149,6 +203,50 @@ struct PlanDetailsContentTests {
     #expect(content.todayActivities.isEmpty)
     #expect(content.nextPlannedDay?.id == .friday)
     #expect(content.nextPlannedDay?.activities.map(\.name) == ["Walk"])
+  }
+
+  @Test
+  func skippedOccurrenceIsNotTheNextPlannedDay() throws {
+    let calendar = try calendar()
+    let wednesday = try date(day: 15, calendar: calendar)
+    let friday = try date(day: 17, calendar: calendar)
+    let nextFriday = try date(day: 24, calendar: calendar)
+    let activity = Activity(id: UUID(), name: "Walk")
+    let plan = Plan(
+      id: UUID(),
+      name: "Move more",
+      startDate: try date(day: 1, calendar: calendar),
+      endDate: try date(day: 31, calendar: calendar),
+      duration: .custom,
+      schedule: [
+        PlanScheduleEntry(
+          id: UUID(),
+          weekday: .friday,
+          activityID: activity.id,
+          position: 0
+        )
+      ]
+    )
+    let content = PlanDetailsContent(
+      plan: plan,
+      activities: [activity],
+      occurrences: [
+        PlanOccurrence(
+          planID: plan.id,
+          activityID: activity.id,
+          date: friday,
+          isSkipped: true
+        )
+      ],
+      dayActivities: [],
+      referenceDate: wednesday,
+      calendar: calendar
+    )
+
+    #expect(content.nextPlannedDay?.title == nextFriday.formatted(
+      template: "EEEEMMMd",
+      calendar: calendar
+    ))
   }
 
   @Test

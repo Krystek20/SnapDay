@@ -63,7 +63,8 @@ struct ActivityListFeatureTests {
         deletePlan: { _, _ in },
         loadOccurrences: { _ in [] },
         saveOccurrences: { _ in },
-        synchronizeOccurrences: { _, _ in [] }
+        synchronizeOccurrences: { _, _ in [] },
+        skipDayActivity: { _ in false }
       )
     } operation: {
       TestStore(
