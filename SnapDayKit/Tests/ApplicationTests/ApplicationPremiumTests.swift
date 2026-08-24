@@ -4,6 +4,7 @@ import Payment
 import Testing
 import Utilities
 @testable import Application
+@testable import Reports
 
 @MainActor
 struct ApplicationPremiumTests {
@@ -30,7 +31,9 @@ struct ApplicationPremiumTests {
 
     await store.send(.requestPremiumAccess(.extendedReports))
     await store.receive(.premiumAccessGranted(.extendedReports))
-    await store.receive(.dashboard(.premiumAccessGranted(.extendedReports)))
+    await store.receive(.reports(.reports(.premiumAccessGranted))) {
+      $0.reports.reports.hasPremiumAccess = true
+    }
   }
 
   @Test

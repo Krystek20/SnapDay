@@ -176,6 +176,8 @@ public struct ApplicationFeature {
         return .send(.requestPremiumAccess(context))
       case .dashboard:
         return .none
+      case .reports(.delegate(.premiumAccessRequested(let context))):
+        return .send(.requestPremiumAccess(context))
       case .reports:
         return .none
       case .onboarding(.delegate(.completed)):
@@ -259,8 +261,14 @@ public struct ApplicationFeature {
         return .none
       case .premiumEntitlementUpdated(let entitlement):
         state.premiumEntitlement = entitlement
-        guard state.paywall != nil else { return .none }
-        return .send(.paywall(.presented(.internal(.entitlementUpdated(entitlement)))))
+        let updateReports = Effect<Action>.send(
+          .reports(.reports(.premiumEntitlementUpdated(entitlement.hasAccess)))
+        )
+        guard state.paywall != nil else { return updateReports }
+        return .merge(
+          updateReports,
+          .send(.paywall(.presented(.internal(.entitlementUpdated(entitlement)))))
+        )
       case .requestPremiumAccess(let context):
         guard !state.premiumEntitlement.hasAccess else {
           return .send(.premiumAccessGranted(context))
@@ -269,7 +277,12 @@ public struct ApplicationFeature {
         state.paywall = PaywallFeature.State(context: context)
         return .none
       case .premiumAccessGranted(let context):
-        return .send(.dashboard(.premiumAccessGranted(context)))
+        switch context {
+        case .extendedReports:
+          return .send(.reports(.reports(.premiumAccessGranted)))
+        default:
+          return .send(.dashboard(.premiumAccessGranted(context)))
+        }
       case .paywall(.presented(.delegate(.closeRequested))):
         state.pendingPremiumAction = nil
         state.paywall = nil
