@@ -291,6 +291,83 @@ struct PlanRepositoryTests {
   }
 
   @Test
+  func skippingGeneratedActivityDeletesItAndPreservesSkippedOccurrence() async throws {
+    try await withDependencies {
+      $0.coreDataStack = .testValue
+    } operation: {
+      let repository = PlanRepository.liveValue
+      let dayActivityRepository = DayActivityRepository.liveValue
+      var calendar = Calendar(identifier: .gregorian)
+      calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+      let monday = try #require(
+        calendar.date(from: DateComponents(year: 2026, month: 7, day: 13))
+      )
+      let activityID = UUID()
+      let plan = Plan(
+        id: UUID(),
+        name: "Monday plan",
+        startDate: monday,
+        endDate: monday,
+        duration: .custom,
+        schedule: [
+          PlanScheduleEntry(
+            id: UUID(),
+            weekday: .monday,
+            activityID: activityID,
+            position: 0
+          )
+        ]
+      )
+      let dayActivity = makeDayActivity(date: monday)
+      let occurrence = PlanOccurrence(
+        planID: plan.id,
+        activityID: activityID,
+        date: monday,
+        dayActivityID: dayActivity.id
+      )
+
+      try await repository.savePlan(plan)
+      try await dayActivityRepository.saveDayActivity(dayActivity)
+      try await repository.saveOccurrences([occurrence])
+
+      #expect(try await repository.skipDayActivity(dayActivity))
+      #expect(try await !containsDayActivity(dayActivity.id, in: dayActivityRepository))
+
+      let skippedOccurrence = try #require(
+        try await repository.loadOccurrences(plan.id).first
+      )
+      #expect(skippedOccurrence.dayActivityID == nil)
+      #expect(skippedOccurrence.isSkipped)
+
+      let synchronized = try await repository.synchronizeOccurrences(plan, plan.startDate)
+      #expect(synchronized.first(where: { $0.id == skippedOccurrence.id }) == skippedOccurrence)
+      #expect(synchronized.filter { $0.id == skippedOccurrence.id }.count == 1)
+    }
+  }
+
+  @Test
+  func skippedOccurrenceWinsWhenDuplicatesAreMerged() {
+    let planID = UUID()
+    let activityID = UUID()
+    let date = Date(timeIntervalSinceReferenceDate: 800_000_000)
+    let skipped = PlanOccurrence(
+      planID: planID,
+      activityID: activityID,
+      date: date,
+      isSkipped: true
+    )
+    let linked = PlanOccurrence(
+      planID: planID,
+      activityID: activityID,
+      date: date,
+      dayActivityID: UUID()
+    )
+
+    #expect([skipped, linked].deduplicatedByID() == [skipped])
+    #expect([linked, skipped].deduplicatedByID() == [skipped])
+  }
+
+  @Test
   func synchronizesFutureOccurrencesWithoutChangingLinkedHistory() async throws {
     try await withDependencies {
       $0.coreDataStack = .testValue

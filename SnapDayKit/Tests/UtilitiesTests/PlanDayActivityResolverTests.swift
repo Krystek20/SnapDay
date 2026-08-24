@@ -54,6 +54,28 @@ struct PlanDayActivityResolverTests {
   }
 
   @Test
+  func skippedOccurrenceDoesNotRequestDailyActivity() throws {
+    let date = try testDate()
+    let activity = Activity(id: UUID(), name: "Read")
+    let occurrence = PlanOccurrence(
+      planID: UUID(),
+      activityID: activity.id,
+      date: date,
+      isSkipped: true
+    )
+
+    let matches = PlanDayActivityResolver.matches(
+      on: date,
+      occurrences: [occurrence],
+      activities: [activity],
+      dayActivities: [],
+      calendar: calendar
+    )
+
+    #expect(matches.isEmpty)
+  }
+
+  @Test
   func frequencyAndPlanOverlapReuseDailyActivity() throws {
     let date = try testDate()
     let activity = Activity(id: UUID(), name: "Read")

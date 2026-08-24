@@ -21,6 +21,7 @@ extension PlanOccurrenceEntity {
     activityIdentifier = occurrence.activityID
     date = occurrence.date
     dayActivityIdentifier = occurrence.dayActivityID
+    isSkipped = occurrence.isSkipped
     self.plan = plan
   }
 }

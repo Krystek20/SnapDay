@@ -168,9 +168,11 @@ public struct PlanDetailsView: View {
           .font(.system(size: 17.0, weight: .semibold))
           .foregroundStyle(Color.primaryText)
 
-        Text("Complete today's activities from your Dashboard.", bundle: .module)
-          .font(.system(size: 13.0))
-          .foregroundStyle(Color.secondaryText)
+        if content.todayActivities.contains(where: { !$0.isSkipped }) {
+          Text("Complete today's activities from your Dashboard.", bundle: .module)
+            .font(.system(size: 13.0))
+            .foregroundStyle(Color.secondaryText)
+        }
       }
 
       ForEach(Array(content.todayActivities.enumerated()), id: \.element.id) { index, activity in
@@ -333,24 +335,20 @@ public struct PlanDetailsView: View {
   }
 
   private func activityRow(_ activity: PlanDetailsContent.ActivityItem) -> some View {
-    HStack(spacing: 10.0) {
-      Image(systemName: activity.isDone ? "checkmark.circle.fill" : "circle")
+    HStack(spacing: 5.0) {
+      Image(systemName: activitySystemImage(activity))
         .font(.system(size: 20.0, weight: .semibold))
-        .foregroundStyle(activity.isDone ? Color.greenSuccess : Color.secondaryText)
+        .foregroundStyle(activityStatusColor(activity))
 
       Text(activity.name)
         .font(.system(size: 15.0, weight: .medium))
-        .foregroundStyle(Color.primaryText)
+        .foregroundStyle(activity.isSkipped ? Color.secondaryText : Color.primaryText)
 
       Spacer(minLength: 10.0)
 
-      Text(
-        activity.isDone
-          ? String(localized: "Done", bundle: .module)
-          : String(localized: "Planned", bundle: .module)
-      )
+      Text(activityStatusTitle(activity))
         .font(.system(size: 12.0, weight: .semibold))
-        .foregroundStyle(activity.isDone ? Color.greenSuccess : Color.secondaryText)
+        .foregroundStyle(activityStatusColor(activity))
     }
   }
 
@@ -364,8 +362,8 @@ public struct PlanDetailsView: View {
           if showsCompletion {
             Chip(
               title: activity.name,
-              systemImage: activity.isDone ? "checkmark.circle.fill" : "circle",
-              systemImageColor: activity.isDone ? Color.greenSuccess : Color.secondaryText
+              systemImage: activitySystemImage(activity),
+              systemImageColor: activityStatusColor(activity)
             )
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(verbatim: activityAccessibilityLabel(activity)))
@@ -381,10 +379,23 @@ public struct PlanDetailsView: View {
   private func activityAccessibilityLabel(
     _ activity: PlanDetailsContent.ActivityItem
   ) -> String {
-    let status = activity.isDone
+    "\(activity.name), \(activityStatusTitle(activity))"
+  }
+
+  private func activitySystemImage(_ activity: PlanDetailsContent.ActivityItem) -> String {
+    guard !activity.isSkipped else { return "minus.circle.fill" }
+    return activity.isDone ? "checkmark.circle.fill" : "circle"
+  }
+
+  private func activityStatusTitle(_ activity: PlanDetailsContent.ActivityItem) -> String {
+    guard !activity.isSkipped else { return String(localized: "Skipped", bundle: .module) }
+    return activity.isDone
       ? String(localized: "Done", bundle: .module)
       : String(localized: "Planned", bundle: .module)
-    return "\(activity.name), \(status)"
+  }
+
+  private func activityStatusColor(_ activity: PlanDetailsContent.ActivityItem) -> Color {
+    activity.isDone && !activity.isSkipped ? .greenSuccess : .secondaryText
   }
 
   private func sectionTitle(_ title: String, trailing: String? = nil) -> some View {
@@ -418,6 +429,7 @@ public struct PlanDetailsView: View {
     let color: Color = switch state {
     case .done: .greenSuccess
     case .partial, .today: .sunburstOrange
+    case .skipped: .secondaryText
     case .missed: .alertText
     case .upcoming: .secondaryText
     }

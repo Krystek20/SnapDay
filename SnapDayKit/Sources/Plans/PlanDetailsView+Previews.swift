@@ -94,11 +94,15 @@ private enum PlanDetailsPreview {
     case .archived, .archivedRestorable: 6
     }
     let linkedOccurrences = plannedOccurrences.enumerated().map { index, occurrence in
-      PlanOccurrence(
+      let isSkipped = self == .activeToday
+        && Self.calendar.isDate(occurrence.date, inSameDayAs: referenceDate)
+        && occurrence.activityID == walk.id
+      return PlanOccurrence(
         planID: occurrence.planID,
         activityID: occurrence.activityID,
         date: occurrence.date,
-        dayActivityID: index < completedCount ? UUID() : nil
+        dayActivityID: !isSkipped && index < completedCount ? UUID() : nil,
+        isSkipped: isSkipped
       )
     }
     let dayActivities = linkedOccurrences.compactMap { occurrence -> DayActivity? in

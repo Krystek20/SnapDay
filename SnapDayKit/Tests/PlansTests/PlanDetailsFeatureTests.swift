@@ -309,7 +309,8 @@ struct PlanDetailsFeatureTests {
         deletePlan: { _, _ in },
         loadOccurrences: { _ in [] },
         saveOccurrences: { _ in },
-        synchronizeOccurrences: { _, _ in [] }
+        synchronizeOccurrences: { _, _ in [] },
+        skipDayActivity: { _ in false }
       )
     } operation: {
       TestStore(initialState: state, reducer: { PlanDetailsFeature() })
@@ -370,7 +371,8 @@ struct PlanDetailsFeatureTests {
       synchronizeOccurrences: { plan, date in
         await recorder.synchronize(plan, from: date)
         return []
-      }
+      },
+      skipDayActivity: { _ in false }
     )
   }
 

@@ -96,7 +96,7 @@ public struct PlanProgressWidgetContentBuilder {
       snapshot.dayActivities.lazy.filter(\.isDone).map(\.id)
     )
     let todayOccurrences = occurrences.filter {
-      calendar.isDate($0.date, inSameDayAs: referenceDate)
+      !$0.isSkipped && calendar.isDate($0.date, inSameDayAs: referenceDate)
     }
     let completedTodayCount = todayOccurrences.lazy.filter {
       $0.dayActivityID.map(completedDayActivityIDs.contains) ?? false
@@ -108,7 +108,8 @@ public struct PlanProgressWidgetContentBuilder {
     )
     let nextSessionDate = occurrences.lazy
       .filter {
-        $0.date >= referenceDate
+        !$0.isSkipped
+          && $0.date >= referenceDate
           && !($0.dayActivityID.map(completedDayActivityIDs.contains) ?? false)
       }
       .map(\.date)

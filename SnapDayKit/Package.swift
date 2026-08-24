@@ -140,7 +140,7 @@ private enum Module: String {
     case .composableArchitecture:
       [.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.9.2")]
     case .snapDayCore:
-      [.package(path: "/Users/krystian/snapday-core")]
+      [.package(path: "../../snapday-core")]
     default:
       nil
     }

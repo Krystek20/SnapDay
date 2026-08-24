@@ -13,6 +13,7 @@ public struct PlanRepository {
   public var loadOccurrences: @Sendable (_ planID: Plan.ID) async throws -> [PlanOccurrence]
   public var saveOccurrences: @Sendable (_ occurrences: [PlanOccurrence]) async throws -> Void
   public var synchronizeOccurrences: @Sendable (_ plan: Plan, _ from: Date) async throws -> [PlanOccurrence]
+  public var skipDayActivity: @Sendable (_ dayActivity: DayActivity) async throws -> Bool
 }
 
 extension DependencyValues {
@@ -114,6 +115,9 @@ extension PlanRepository: DependencyKey {
             .deduplicatedByID()
             .sorted { $0.date < $1.date }
         }
+      },
+      skipDayActivity: { dayActivity in
+        try await PlanDayActivityPersistence().skipAndRemove(dayActivity)
       }
     )
   }
