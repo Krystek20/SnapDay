@@ -9,6 +9,27 @@ import Testing
 struct ActivityListFeatureTests {
 
   @Test
+  func enablingPremiumRecurrenceRequestsAccessBeforeSaving() async {
+    let activity = Activity(
+      id: UUID(),
+      name: "Read",
+      frequency: .monthly(monthlySchedule: .firstDay),
+      isFrequentEnabled: false
+    )
+    let store = TestStore(
+      initialState: ActivityListFeature.State(
+        day: Day(id: UUID(), date: .now, activities: [])
+      ),
+      reducer: { ActivityListFeature() }
+    )
+
+    await store.send(.internal(.setIsFrequent(true, activity))) {
+      $0.pendingPremiumAction = .enableRecurrence(activity)
+    }
+    await store.receive(.delegate(.premiumAccessRequested))
+  }
+
+  @Test
   func selectionModeTogglesAndConfirmsActivities() async throws {
     let firstID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
     let secondID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000002"))

@@ -28,6 +28,7 @@ public struct ApplicationFeature {
   @Dependency(\.uuid) private var uuid
   @Dependency(\.paymentClient) private var paymentClient
   @Dependency(\.openURL) private var openURL
+  @Dependency(\.widgetReloader) private var widgetReloader
   private static let isOnboardingShownKey = "isOnboardingShown"
   private let userDefaults: UserDefaults
 
@@ -125,6 +126,11 @@ public struct ApplicationFeature {
                   await send(.openDashboardRoute(.plan(planID)))
                 } else {
                   await send(.openDashboardRoute(.plans))
+                }
+              case .premium(let rawContext):
+                deeplinkService.consume()
+                if let context = PaywallEntryContext(rawValue: rawContext) {
+                  await send(.requestPremiumAccess(context))
                 }
               case .none:
                 break
@@ -260,19 +266,31 @@ public struct ApplicationFeature {
         state.isOnboardingPlanSaveErrorPresented = false
         return .none
       case .premiumEntitlementUpdated(let entitlement):
+        let accessChanged = state.premiumEntitlement.hasAccess != entitlement.hasAccess
         state.premiumEntitlement = entitlement
         let updateReports = Effect<Action>.send(
           .reports(.reports(.premiumEntitlementUpdated(entitlement.hasAccess)))
         )
-        guard state.paywall != nil else { return updateReports }
+        let updateDashboard = Effect<Action>.send(
+          .dashboard(.premiumEntitlementUpdated(entitlement.hasAccess))
+        )
+        let reloadWidgets: Effect<Action> = accessChanged
+          ? .run { _ in await widgetReloader.requestReload(delay: .zero) }
+          : .none
+        guard state.paywall != nil else {
+          return .merge(updateReports, updateDashboard, reloadWidgets)
+        }
         return .merge(
           updateReports,
+          updateDashboard,
+          reloadWidgets,
           .send(.paywall(.presented(.internal(.entitlementUpdated(entitlement)))))
         )
       case .requestPremiumAccess(let context):
         guard !state.premiumEntitlement.hasAccess else {
           return .send(.premiumAccessGranted(context))
         }
+        guard state.paywall?.context != context else { return .none }
         state.pendingPremiumAction = context
         state.paywall = PaywallFeature.State(context: context)
         return .none
@@ -280,6 +298,10 @@ public struct ApplicationFeature {
         switch context {
         case .extendedReports:
           return .send(.reports(.reports(.premiumAccessGranted)))
+        case .planProgressWidget:
+          return .send(.openDashboardRoute(.plans))
+        case .weeklyProgressWidget:
+          return .send(.setTab(.dashboard))
         default:
           return .send(.dashboard(.premiumAccessGranted(context)))
         }
@@ -292,7 +314,13 @@ public struct ApplicationFeature {
         state.premiumEntitlement = entitlement
         state.pendingPremiumAction = nil
         state.paywall = nil
-        return pendingAction.map { .send(.premiumAccessGranted($0)) } ?? .none
+        let continuePendingAction = pendingAction.map {
+          Effect<Action>.send(.premiumAccessGranted($0))
+        } ?? .none
+        return .merge(
+          continuePendingAction,
+          .run { _ in await widgetReloader.requestReload(delay: .zero) }
+        )
       case .paywall(.presented(.delegate(.legalLinkRequested(let link)))):
         return .run { _ in
           await openURL(link.url)

@@ -274,7 +274,10 @@ public struct DayActivityFormView: View {
     if store.showFrequencyOptions {
       OptionsView(
         options: ActivityFrequency.allCases,
-        selected: $store.form.frequency,
+        selected: Binding(
+          get: { store.form.frequency },
+          set: { store.send(.view(.frequencySelected($0))) }
+        ),
         axis: .horizontal(.center)
       )
       .scrollOnAppear("RecurrencyView", anchor: .bottom, reader: reader)

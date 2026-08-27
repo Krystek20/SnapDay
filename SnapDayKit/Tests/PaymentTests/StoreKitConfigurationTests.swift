@@ -8,9 +8,12 @@ struct StoreKitConfigurationTests {
   @Test
   @MainActor
   func snapDayPlusCatalogMatchesProductContract() throws {
-    let configurationURL = try #require(
-      Bundle.module.url(forResource: "SnapDayPlus", withExtension: "storekit")
-    )
+    let configurationURL = URL(fileURLWithPath: #filePath)
+      .deletingLastPathComponent()
+      .deletingLastPathComponent()
+      .deletingLastPathComponent()
+      .deletingLastPathComponent()
+      .appendingPathComponent("SnapDayPlus.storekit")
     _ = try SKTestSession(contentsOf: configurationURL)
     let configuration = try JSONDecoder().decode(
       StoreKitConfiguration.self,

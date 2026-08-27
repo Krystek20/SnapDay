@@ -58,15 +58,28 @@ public struct EntitlementSnapshotStore: @unchecked Sendable {
 
   public func entitlementForOfflineUse(at date: Date) -> PremiumEntitlement {
     guard let snapshot = load() else { return .unknown }
-    guard snapshot.entitlement.hasAccess else { return snapshot.entitlement }
+    let entitlement = snapshot.entitlement.validated(at: date)
+    guard entitlement.hasAccess else { return entitlement }
 
     let age = max(0, date.timeIntervalSince(snapshot.updatedAt))
-    return age <= Self.offlineAccessInterval ? snapshot.entitlement : .unknown
+    return age <= Self.offlineAccessInterval ? entitlement : .unknown
   }
 
   public func save(_ snapshot: EntitlementSnapshot) throws {
     let data = try encoder(snapshot)
     userDefaults.set(data, forKey: Self.snapshotKey)
+  }
+}
+
+private extension PremiumEntitlement {
+  func validated(at date: Date) -> PremiumEntitlement {
+    switch self {
+    case .trial(let expirationDate), .subscribed(let expirationDate):
+      guard let expirationDate, expirationDate <= date else { return self }
+      return .expired(expirationDate: expirationDate)
+    case .unknown, .free, .gracePeriod, .expired, .revoked:
+      return self
+    }
   }
 }
 

@@ -21,7 +21,7 @@ public struct DashboardView: View {
   @State private var alertSize = CGSize.zero
 
   private var additionalButtomPadding: Double {
-    guard store.alert != nil else { return .zero }
+    guard store.day.alert != nil else { return .zero }
     return alertSize.height + 15.0
   }
 
@@ -34,6 +34,8 @@ public struct DashboardView: View {
   // MARK: - Views
 
   public var body: some View {
+    @Bindable var dayStore = store.scope(state: \.day, action: \.day)
+
     ZStack(alignment: .top) {
       ScrollView {
         dashboardContent
@@ -63,19 +65,19 @@ public struct DashboardView: View {
       alertViewIfVisible
     }
     .background
-    .sheet(item: $store.scope(state: \.activityList, action: \.activityList)) { store in
+    .sheet(item: $dayStore.scope(state: \.activityList, action: \.activityList)) { store in
       NavigationStack {
         ActivityListView(store: store)
       }
       .presentationDetents([.large])
     }
-    .sheet(item: $store.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
+    .sheet(item: $dayStore.scope(state: \.editDayActivity, action: \.editDayActivity)) { store in
       NavigationStack {
         DayActivityFormView(store: store)
       }
       .presentationDetents([.large])
     }
-    .sheet(item: $store.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
+    .sheet(item: $dayStore.scope(state: \.dayActivityTaskForm, action: \.dayActivityTaskForm)) { store in
       NavigationStack {
         DayActivityFormView(store: store)
       }
@@ -121,29 +123,29 @@ public struct DashboardView: View {
             content: {
               Button(
                 action: {
-                  store.send(.view(.toggleShowCompletedActivities))
+                  store.send(.day(.view(.toggleShowCompletedActivities)))
                 },
                 label: {
                   Text("Show completed", bundle: .module)
-                  if !store.hideCompleted {
+                  if !store.day.hideCompleted {
                     Image(systemName: "checkmark.circle.fill")
                   }
                 }
               )
               Button(
                 action: {
-                  store.send(.view(.toggleShowTasks))
+                  store.send(.day(.view(.toggleShowTasks)))
                 },
                 label: {
                   Text("Show tasks", bundle: .module)
-                  if !store.hideTasks {
+                  if !store.day.hideTasks {
                     Image(systemName: "checkmark.circle.fill")
                   }
                 }
               )
               Button(
                 action: {
-                  store.send(.view(.notificationsSettingsTapped))
+                  store.send(.notifications(.view(.settingsTapped)))
                 },
                 label: {
                   Text("Notifications", bundle: .module)
@@ -171,7 +173,7 @@ public struct DashboardView: View {
 
           Button(
             action: {
-              store.send(.view(.activityListButtonTapped))
+              store.send(.day(.view(.activityListButtonTapped)))
             },
             label: {
               Image(systemName: "list.bullet.circle.fill")
@@ -181,7 +183,7 @@ public struct DashboardView: View {
           .modifier(SaveActivityTipModifier())
           Button(
             action: {
-              store.send(.view(.newButtonTapped))
+              store.send(.day(.view(.newButtonTapped)))
             },
             label: {
               Image(systemName: "plus.circle.fill")
@@ -195,16 +197,16 @@ public struct DashboardView: View {
 
   @ViewBuilder
   private var alertViewIfVisible: some View {
-    if let alertConfiguration = store.alert?.configuration {
+    if let alertConfiguration = store.day.alert?.configuration {
       VStack {
         Spacer()
         ComplateAlertView(
           configuration: alertConfiguration,
           confirmButtonTapped: {
-            store.send(.view(.confirmAlertButtonTapped))
+            store.send(.day(.view(.confirmAlertButtonTapped)))
           },
           cancelButtonTapped: {
-            store.send(.view(.cancelAlertButtonTapped))
+            store.send(.day(.view(.cancelAlertButtonTapped)))
           }
         )
         .extractSize(in: $alertSize)
@@ -226,10 +228,10 @@ public struct DashboardView: View {
     if store.shouldShowNotificationPrompt {
       DashboardNotificationPromptView(
         dismissAction: {
-          store.send(.view(.notificationPromptDismissed))
+        store.send(.notifications(.view(.promptDismissed)))
         },
         turnOnAction: {
-          store.send(.view(.notificationTurnOnTapped))
+        store.send(.notifications(.view(.turnOnTapped)))
         }
       )
     }
@@ -240,22 +242,22 @@ public struct DashboardView: View {
       configurations: planSummaryConfigurations,
       planAction: planSummaryAction,
       allPlansAction: {
-        store.send(.view(.allPlansButtonTapped))
+        store.send(.plans(.view(.allPlansTapped)))
       }
     )
   }
 
   private var planSummaryAction: ((Int) -> Void)? {
-    guard !store.planSummaries.isEmpty else { return nil }
+    guard !store.plans.summaries.isEmpty else { return nil }
 
     return { index in
-      guard store.planSummaries.indices.contains(index) else { return }
-      store.send(.view(.planSummaryTapped(store.planSummaries[index].plan)))
+      guard store.plans.summaries.indices.contains(index) else { return }
+      store.send(.plans(.view(.planTapped(store.plans.summaries[index].plan))))
     }
   }
 
   private var planSummaryConfigurations: [DashboardPlansSummaryView.Configuration] {
-    guard !store.planSummaries.isEmpty else {
+    guard !store.plans.summaries.isEmpty else {
       return [
         DashboardPlansSummaryView.Configuration(
           title: String(localized: "No active plans", bundle: .module),
@@ -264,7 +266,7 @@ public struct DashboardView: View {
       ]
     }
 
-    return store.planSummaries.map {
+    return store.plans.summaries.map {
       DashboardPlansSummaryView.Configuration(
         summary: $0,
         calendar: calendar.utcCalendar,
@@ -274,13 +276,15 @@ public struct DashboardView: View {
   }
 
   private var dayList: some View {
-    DaysSelectorView(
-      selectedDay: $store.selectedDay,
-      items: $store.items,
-      daySummary: store.daySummary,
-      informationConfiguration: store.dayInformation,
+    @Bindable var dayStore = store.scope(state: \.day, action: \.day)
+
+    return DaysSelectorView(
+      selectedDay: $dayStore.selectedDay,
+      items: $dayStore.items,
+      daySummary: dayStore.daySummary,
+      informationConfiguration: dayStore.dayInformation,
       dayActivityAction: { action in
-        store.send(.view(.listItemActionPerfomed(action)))
+        dayStore.send(.view(.listItemActionPerformed(action)))
       }
     )
     .formBackgroundModifier(padding: EdgeInsets(.zero))

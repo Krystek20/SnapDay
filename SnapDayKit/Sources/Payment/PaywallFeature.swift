@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import OSLog
 
 @Reducer
 public struct PaywallFeature {
@@ -164,6 +165,7 @@ public struct PaywallFeature {
 
       case .internal(.productsLoaded(let products)):
         guard !products.isEmpty else {
+          Logger.payment.error("StoreKit returned no SnapDay Plus subscription products")
           state.loadState = .failed
           return .none
         }
@@ -236,10 +238,20 @@ public struct PaywallFeature {
       do {
         await send(.internal(.productsLoaded(try await paymentClient.products())))
       } catch {
+        Logger.payment.error(
+          "Unable to load subscription products: \(error.localizedDescription, privacy: .public)"
+        )
         await send(.internal(.productsFailed))
       }
     }
   }
+}
+
+private extension Logger {
+  static let payment = Logger(
+    subsystem: Bundle.main.bundleIdentifier ?? "com.mobilove.snapday",
+    category: "Payment"
+  )
 }
 
 extension SubscriptionProduct {

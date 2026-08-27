@@ -27,6 +27,10 @@ public struct ActivityListFeature: TodayProvidable {
   @ObservableState
   public struct State: Equatable {
 
+    enum PendingPremiumAction: Equatable {
+      case enableRecurrence(Activity)
+    }
+
     enum Mode: Equatable {
       case management
       case selection(title: String)
@@ -38,6 +42,8 @@ public struct ActivityListFeature: TodayProvidable {
     var information: InformationViewConfiguration?
     var selectedActivityIDs: Set<Activity.ID>
     var isPlanActivityDeletionAlertPresented = false
+    var hasPremiumAccess: Bool
+    var pendingPremiumAction: PendingPremiumAction?
 
     @Presents var templateForm: DayActivityFormFeature.State?
 
@@ -66,10 +72,11 @@ public struct ActivityListFeature: TodayProvidable {
       activities.filter { selectedActivityIDs.contains($0.id) }
     }
 
-    public init(day: Day) {
+    public init(day: Day, hasPremiumAccess: Bool = false) {
       self.day = day
       self.mode = .management
       self.selectedActivityIDs = []
+      self.hasPremiumAccess = hasPremiumAccess
     }
 
     public init(
@@ -79,6 +86,7 @@ public struct ActivityListFeature: TodayProvidable {
       self.day = nil
       self.mode = .selection(title: title)
       self.selectedActivityIDs = selectedActivityIDs
+      self.hasPremiumAccess = false
     }
   }
 
@@ -105,6 +113,7 @@ public struct ActivityListFeature: TodayProvidable {
     public enum DelegateAction: Equatable {
       case daysUpdated
       case selectionConfirmed([Activity])
+      case premiumAccessRequested
     }
 
     case binding(BindingAction<State>)
@@ -114,6 +123,8 @@ public struct ActivityListFeature: TodayProvidable {
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
+    case premiumAccessGranted
+    case premiumEntitlementUpdated(Bool)
   }
 
   // MARK: - Body
@@ -187,6 +198,14 @@ public struct ActivityListFeature: TodayProvidable {
           await send(.delegate(.daysUpdated))
         }
       case .internal(.setIsFrequent(let isFrequentEnabled, var activity)):
+        guard
+          state.hasPremiumAccess
+            || !isFrequentEnabled
+            || !activity.frequency.requiresPremiumAccess
+        else {
+          state.pendingPremiumAction = .enableRecurrence(activity)
+          return .send(.delegate(.premiumAccessRequested))
+        }
         activity.isFrequentEnabled = isFrequentEnabled
         return .run { [activity] send in
           try await activityRepository.saveActivity(activity)
@@ -201,7 +220,8 @@ public struct ActivityListFeature: TodayProvidable {
             activity: activity
           ),
           type: .edit,
-          editDate: day.date
+          editDate: day.date,
+          hasPremiumAccess: state.hasPremiumAccess
         )
         return .none
       case .internal(.setItems):
@@ -216,6 +236,14 @@ public struct ActivityListFeature: TodayProvidable {
         return handleTemplateForm(action, state: &state)
       case .delegate:
         return .none
+      case .premiumAccessGranted:
+        state.hasPremiumAccess = true
+        return resumePremiumAction(state: &state)
+      case .premiumEntitlementUpdated(let hasAccess):
+        state.hasPremiumAccess = hasAccess
+        return state.templateForm == nil
+          ? .none
+          : .send(.templateForm(.presented(.premiumEntitlementUpdated(hasAccess))))
       case .binding(\.searchText):
         return .send(.internal(.setItems))
       case .binding:
@@ -225,6 +253,18 @@ public struct ActivityListFeature: TodayProvidable {
     .ifLet(\.$templateForm, action: \.templateForm) {
       DayActivityFormFeature()
     }
+  }
+
+  private func resumePremiumAction(state: inout State) -> Effect<Action> {
+    var effects: [Effect<Action>] = []
+    if case .enableRecurrence(let activity) = state.pendingPremiumAction {
+      state.pendingPremiumAction = nil
+      effects.append(.send(.internal(.setIsFrequent(true, activity))))
+    }
+    if state.templateForm != nil {
+      effects.append(.send(.templateForm(.presented(.premiumAccessGranted))))
+    }
+    return .merge(effects)
   }
 
   private func performListItemAction(_ actionType: ListItemAction, state: inout State) -> Effect<Action> {
@@ -283,6 +323,8 @@ public struct ActivityListFeature: TodayProvidable {
     case .presented(.delegate(.activityDeleted(let activityForm))):
       guard let toDelete = state.activities.first(where: { $0.id == activityForm.id }) else { return .none }
       return .send(.internal(.removeDayActivities(toDelete)))
+    case .presented(.delegate(.premiumAccessRequested)):
+      return .send(.delegate(.premiumAccessRequested))
     default:
       return .none
     }

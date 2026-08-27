@@ -1,9 +1,11 @@
 import ComposableArchitecture
 import Foundation
 import Payment
+import Plans
 import Testing
 import Utilities
 @testable import Application
+@testable import Dashboard
 @testable import Reports
 
 @MainActor
@@ -41,8 +43,8 @@ struct ApplicationPremiumTests {
     let userDefaults = try makeUserDefaults()
     var state = makeState(userDefaults: userDefaults)
     state.premiumEntitlement = .free
-    state.pendingPremiumAction = .planProgressWidget
-    state.paywall = PaywallFeature.State(context: .planProgressWidget)
+    state.pendingPremiumAction = .collaborationInvitation
+    state.paywall = PaywallFeature.State(context: .collaborationInvitation)
     let store = makeStore(initialState: state, userDefaults: userDefaults)
     let entitlement = PremiumEntitlement.trial(expirationDate: nil)
 
@@ -53,8 +55,53 @@ struct ApplicationPremiumTests {
       $0.pendingPremiumAction = nil
       $0.paywall = nil
     }
-    await store.receive(.premiumAccessGranted(.planProgressWidget))
-    await store.receive(.dashboard(.premiumAccessGranted(.planProgressWidget)))
+    await store.receive(.premiumAccessGranted(.collaborationInvitation))
+    await store.receive(.dashboard(.premiumAccessGranted(.collaborationInvitation)))
+    await store.receive(.dashboard(.dashboard(.premiumAccessGranted(.collaborationInvitation)))) {
+      $0.dashboard.dashboard.hasPremiumAccess = true
+    }
+  }
+
+  @Test
+  func planWidgetPurchaseContinuesToPlans() async throws {
+    let userDefaults = try makeUserDefaults()
+    let state = makeState(userDefaults: userDefaults)
+    let store = makeStore(initialState: state, userDefaults: userDefaults)
+
+    await store.send(.premiumAccessGranted(.planProgressWidget))
+    await store.receive(.openDashboardRoute(.plans))
+    store.exhaustivity = .off(showSkippedAssertions: false)
+    await store.receive(.dashboard(.externalRoute(.plans)))
+
+    let pathID = try #require(store.state.dashboard.path.ids.last)
+    #expect(store.state.dashboard.path[id: pathID, case: \.plans] != nil)
+  }
+
+  @Test
+  func successfulPurchaseReloadsWidgets() async throws {
+    let userDefaults = try makeUserDefaults()
+    var state = makeState(userDefaults: userDefaults)
+    state.premiumEntitlement = .free
+    state.paywall = PaywallFeature.State(context: .settings)
+    let reloadRecorder = ReloadRecorder()
+    let store = makeStore(
+      initialState: state,
+      userDefaults: userDefaults,
+      widgetReloader: WidgetReloader {
+        reloadRecorder.record()
+      }
+    )
+    let entitlement = PremiumEntitlement.subscribed(expirationDate: nil)
+
+    await store.send(
+      .paywall(.presented(.delegate(.purchaseCompleted(entitlement))))
+    ) {
+      $0.premiumEntitlement = entitlement
+      $0.paywall = nil
+    }
+    await store.finish()
+
+    #expect(reloadRecorder.count == 1)
   }
 
   @Test
@@ -121,11 +168,13 @@ struct ApplicationPremiumTests {
   private func makeStore(
     initialState: ApplicationFeature.State,
     userDefaults: UserDefaults,
-    openURL: @escaping @Sendable (URL) async -> Bool = { _ in false }
+    openURL: @escaping @Sendable (URL) async -> Bool = { _ in false },
+    widgetReloader: WidgetReloader = WidgetReloader(reloadAction: { })
   ) -> TestStoreOf<ApplicationFeature> {
     withDependencies {
       $0.deeplinkService = DeeplinkService()
       $0.openURL = OpenURLEffect(handler: openURL)
+      $0.widgetReloader = widgetReloader
     } operation: {
       TestStore(
         initialState: initialState,
@@ -140,5 +189,18 @@ private actor URLRecorder {
 
   func record(_ url: URL) {
     urls.append(url)
+  }
+}
+
+private final class ReloadRecorder: @unchecked Sendable {
+  private let lock = NSLock()
+  private var value = 0
+
+  var count: Int {
+    lock.withLock { value }
+  }
+
+  func record() {
+    lock.withLock { value += 1 }
   }
 }

@@ -1,6 +1,7 @@
 import WidgetKit
 import SwiftUI
 import Models
+import Payment
 import Utilities
 import Repositories
 import WidgetWeeklyProgress
@@ -26,6 +27,19 @@ struct WeeklyProgressWidgetProvider: AppIntentTimelineProvider, TodayProvidable 
 
   func timeline(for configuration: WeeklyProgressAppIntent, in context: Context) async -> Timeline<WeeklyProgressEntry> {
     @Dependency(\.dayUpdater) var dayUpdater
+    guard PremiumAccess.hasAccess() else {
+      return Timeline(
+        entries: [
+          WeeklyProgressEntry(
+            days: [],
+            date: .now,
+            configuration: configuration,
+            hasPremiumAccess: false
+          )
+        ],
+        policy: .after(Date.now.addingTimeInterval(15 * 60))
+      )
+    }
     let periodDateRangeCreator = PeriodDateRangeCreator()
     guard let range = periodDateRangeCreator.prepareClosedRange(for: .week, periodShift: .zero) else {
       return Timeline(
@@ -86,6 +100,7 @@ struct WeeklyProgressEntry: TimelineEntry {
   let days: [Day]
   let date: Date
   let configuration: WeeklyProgressAppIntent
+  var hasPremiumAccess = true
 }
 
 extension WeeklyProgressEntry {
@@ -135,15 +150,28 @@ struct WeeklyProgressEntryView : View {
   var entry: WeeklyProgressWidgetProvider.Entry
 
   var body: some View {
-    WeeklyProgressView(
-      store: Store(
-        initialState: WeeklyProgressFeature.State(
-          days: entry.days,
-          showTotalActivities: entry.configuration.showTotalActivities,
-          showTotalSpentTime: entry.configuration.showTotalSpentTime
-        ),
-        reducer: { WeeklyProgressFeature() }
-      )
+    Group {
+      if entry.hasPremiumAccess {
+        WeeklyProgressView(
+          store: Store(
+            initialState: WeeklyProgressFeature.State(
+              days: entry.days,
+              showTotalActivities: entry.configuration.showTotalActivities,
+              showTotalSpentTime: entry.configuration.showTotalSpentTime
+            ),
+            reducer: { WeeklyProgressFeature() }
+          )
+        )
+      } else {
+        PremiumLockedWidgetView(title: "Weekly progress")
+      }
+    }
+    .widgetURL(
+      entry.hasPremiumAccess
+        ? nil
+        : DeeplinkService.premium(
+          PaywallEntryContext.weeklyProgressWidget.rawValue
+        )
     )
   }
 }
@@ -160,8 +188,8 @@ struct WeeklyProgressWidget: Widget {
       WeeklyProgressEntryView(entry: entry)
         .containerBackground(.fill.tertiary, for: .widget)
     }
-    .configurationDisplayName("Weekly progress")
-    .description("See your activity progress for the week.")
+    .configurationDisplayName("Weekly progress · Plus")
+    .description("Configure weekly progress with SnapDay Plus.")
     .contentMarginsDisabled()
     .supportedFamilies([.systemMedium])
   }

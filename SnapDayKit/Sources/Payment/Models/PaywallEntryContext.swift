@@ -1,12 +1,12 @@
 import Foundation
 
-public enum PaywallEntryContext: Equatable, Sendable {
+public enum PaywallEntryContext: String, Equatable, Sendable {
   case secondActivePlan
   case advancedRecurrence
   case extendedReports
   case aiAllowanceExhausted
   case planProgressWidget
-  case configurableWeeklyProgressWidget
+  case weeklyProgressWidget
   case collaborationInvitation
   case settings
 
@@ -22,8 +22,8 @@ public enum PaywallEntryContext: Equatable, Sendable {
       String(localized: "Keep planning with SnapDay AI", bundle: .module)
     case .planProgressWidget:
       String(localized: "Keep your Plan in sight", bundle: .module)
-    case .configurableWeeklyProgressWidget:
-      String(localized: "Make Weekly Progress yours", bundle: .module)
+    case .weeklyProgressWidget:
+      String(localized: "Keep your week in sight", bundle: .module)
     case .collaborationInvitation:
       String(localized: "Make progress together", bundle: .module)
     case .settings:
@@ -43,8 +43,8 @@ public enum PaywallEntryContext: Equatable, Sendable {
       String(localized: "Continue using AI assistance after your free allowance has been used.", bundle: .module)
     case .planProgressWidget:
       String(localized: "Follow a specific Plan from your Home Screen and see progress at a glance.", bundle: .module)
-    case .configurableWeeklyProgressWidget:
-      String(localized: "Choose what your Weekly Progress widget shows on your Home Screen.", bundle: .module)
+    case .weeklyProgressWidget:
+      String(localized: "Follow your weekly progress from your Home Screen and see the week at a glance.", bundle: .module)
     case .collaborationInvitation:
       String(localized: "Invite others and manage the people sharing your routines.", bundle: .module)
     case .settings:

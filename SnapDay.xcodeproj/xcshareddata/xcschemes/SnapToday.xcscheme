@@ -84,7 +84,7 @@
          </EnvironmentVariable>
       </EnvironmentVariables>
       <StoreKitConfigurationFileReference
-         identifier = "../../SnapDayKit/Tests/PaymentTests/Resources/SnapDayPlus.storekit">
+         identifier = "../SnapDayPlus.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction

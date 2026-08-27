@@ -59,10 +59,16 @@ public struct PaywallView: View {
         title: String(localized: "Run multiple Plans at the same time", bundle: .module)
       )
       benefit(
-        title: String(localized: "Understand long-term progress patterns", bundle: .module)
+        title: String(localized: "Schedule routines every two weeks or every month", bundle: .module)
       )
       benefit(
-        title: String(localized: "Keep progress visible on your Home Screen", bundle: .module)
+        title: String(localized: "Explore monthly, quarterly, and yearly reports", bundle: .module)
+      )
+      benefit(
+        title: String(localized: "Add Plan and Weekly Progress widgets", bundle: .module)
+      )
+      benefit(
+        title: String(localized: "Invite others to share routines", bundle: .module)
       )
     }
     .padding(.vertical, 5.0)

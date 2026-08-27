@@ -44,7 +44,10 @@ struct EntitlementSnapshotStoreTests {
     defer { userDefaults.removePersistentDomain(forName: suiteName) }
     let store = EntitlementSnapshotStore(userDefaults: userDefaults)
     let verificationDate = Date(timeIntervalSince1970: 1_700_000_000)
-    let entitlement = PremiumEntitlement.subscribed(expirationDate: verificationDate)
+    let expirationDate = verificationDate.addingTimeInterval(
+      EntitlementSnapshotStore.offlineAccessInterval
+    )
+    let entitlement = PremiumEntitlement.subscribed(expirationDate: expirationDate)
     try store.save(
       EntitlementSnapshot(entitlement: entitlement, updatedAt: verificationDate)
     )
@@ -54,6 +57,27 @@ struct EntitlementSnapshotStoreTests {
     )
 
     #expect(store.entitlementForOfflineUse(at: offlineDate) == entitlement)
+  }
+
+  @Test
+  func recentlyVerifiedSubscriptionDoesNotOutliveItsExpirationDate() throws {
+    let suiteName = "EntitlementSnapshotStoreTests.\(UUID().uuidString)"
+    let userDefaults = try #require(UserDefaults(suiteName: suiteName))
+    defer { userDefaults.removePersistentDomain(forName: suiteName) }
+    let store = EntitlementSnapshotStore(userDefaults: userDefaults)
+    let verificationDate = Date(timeIntervalSince1970: 1_700_000_000)
+    let expirationDate = verificationDate.addingTimeInterval(60)
+    try store.save(
+      EntitlementSnapshot(
+        entitlement: .subscribed(expirationDate: expirationDate),
+        updatedAt: verificationDate
+      )
+    )
+
+    #expect(
+      store.entitlementForOfflineUse(at: expirationDate)
+        == .expired(expirationDate: expirationDate)
+    )
   }
 
   @Test
