@@ -4,238 +4,6 @@
     "" : {
       "shouldTranslate" : false
     },
-    "Add Plan and Weekly Progress widgets" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أضف أدوات تقدم الخطة والتقدم الأسبوعي"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Füge Widgets für Plan- und Wochenfortschritt hinzu"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añade widgets de progreso del plan y semanal"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajoutez les widgets de progression du plan et de la semaine"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aggiungi i widget dei progressi del piano e settimanali"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プラン進捗と週間進捗のウィジェットを追加"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "플랜 진행 상황 및 주간 진행 상황 위젯 추가"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodawaj widżety postępu Planu i tygodnia"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicione widgets de progresso do Plano e semanal"
-          }
-        }
-      }
-    },
-    "Explore monthly, quarterly, and yearly reports" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "استكشف التقارير الشهرية وربع السنوية والسنوية"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entdecke Monats-, Quartals- und Jahresberichte"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Explora informes mensuales, trimestrales y anuales"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Explorez les rapports mensuels, trimestriels et annuels"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esplora report mensili, trimestrali e annuali"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月次・四半期・年次レポートを確認"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "월간, 분기별, 연간 리포트 살펴보기"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Przeglądaj raporty miesięczne, kwartalne i roczne"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Explore relatórios mensais, trimestrais e anuais"
-          }
-        }
-      }
-    },
-    "Invite others to share routines" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ادعُ الآخرين لمشاركة الروتين"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lade andere ein, Routinen zu teilen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invita a otras personas a compartir rutinas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invitez d’autres personnes à partager des routines"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invita altre persone a condividere le routine"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "他の人を招待してルーティンを共有"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다른 사람을 초대해 루틴 공유"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapraszaj innych do wspólnych rutyn"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Convide outras pessoas para compartilhar rotinas"
-          }
-        }
-      }
-    },
-    "Schedule routines every two weeks or every month" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "جدول الروتين كل أسبوعين أو كل شهر"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plane Routinen alle zwei Wochen oder jeden Monat"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Programa rutinas cada dos semanas o cada mes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Planifiez des routines toutes les deux semaines ou tous les mois"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pianifica routine ogni due settimane o ogni mese"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2週間ごと、または毎月のルーティンを設定"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2주 또는 매월 반복되는 루틴 예약"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Planuj rutyny co dwa tygodnie lub co miesiąc"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agende rotinas a cada duas semanas ou todo mês"
-          }
-        }
-      }
-    },
     "%@ %@. Renews automatically until canceled." : {
       "localizations" : {
         "ar" : {
@@ -1056,6 +824,64 @@
         }
       }
     },
+    "Add Plan and Weekly Progress widgets" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أضف أدوات تقدم الخطة والتقدم الأسبوعي"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge Widgets für Plan- und Wochenfortschritt hinzu"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade widgets de progreso del plan y semanal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez les widgets de progression du plan et de la semaine"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi i widget dei progressi del piano e settimanali"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プラン進捗と週間進捗のウィジェットを追加"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "플랜 진행 상황 및 주간 진행 상황 위젯 추가"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodawaj widżety postępu Planu i tygodnia"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicione widgets de progresso do Plano e semanal"
+          }
+        }
+      }
+    },
     "Annual" : {
       "localizations" : {
         "ar" : {
@@ -1578,6 +1404,64 @@
         }
       }
     },
+    "Explore monthly, quarterly, and yearly reports" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استكشف التقارير الشهرية وربع السنوية والسنوية"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entdecke Monats-, Quartals- und Jahresberichte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explora informes mensuales, trimestrales y anuales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorez les rapports mensuels, trimestriels et annuels"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esplora report mensili, trimestrali e annuali"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月次・四半期・年次レポートを確認"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "월간, 분기별, 연간 리포트 살펴보기"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeglądaj raporty miesięczne, kwartalne i roczne"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore relatórios mensais, trimestrais e anuais"
+          }
+        }
+      }
+    },
     "Explore more of your history and understand how your routines change over time." : {
       "localizations" : {
         "ar" : {
@@ -1874,6 +1758,64 @@
         }
       }
     },
+    "Invite others to share routines" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ادعُ الآخرين لمشاركة الروتين"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lade andere ein, Routinen zu teilen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invita a otras personas a compartir rutinas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invitez d’autres personnes à partager des routines"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invita altre persone a condividere le routine"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "他の人を招待してルーティンを共有"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다른 사람을 초대해 루틴 공유"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapraszaj innych do wspólnych rutyn"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convide outras pessoas para compartilhar rotinas"
+          }
+        }
+      }
+    },
     "Keep planning with SnapDay AI" : {
       "localizations" : {
         "ar" : {
@@ -1933,6 +1875,7 @@
       }
     },
     "Keep progress visible on your Home Screen" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3098,6 +3041,64 @@
         }
       }
     },
+    "Schedule routines every two weeks or every month" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جدول الروتين كل أسبوعين أو كل شهر"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plane Routinen alle zwei Wochen oder jeden Monat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programa rutinas cada dos semanas o cada mes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifiez des routines toutes les deux semaines ou tous les mois"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pianifica routine ogni due settimane o ogni mese"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2週間ごと、または毎月のルーティンを設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2주 또는 매월 반복되는 루틴 예약"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planuj rutyny co dwa tygodnie lub co miesiąc"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agende rotinas a cada duas semanas ou todo mês"
+          }
+        }
+      }
+    },
     "See the patterns behind your progress" : {
       "localizations" : {
         "ar" : {
@@ -3331,6 +3332,7 @@
       }
     },
     "Understand long-term progress patterns" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

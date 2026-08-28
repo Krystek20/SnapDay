@@ -78,7 +78,6 @@ public struct DashboardFeature: TodayProvidable {
       case increaseButtonTapped
       case decreaseButtonTapped
       case showFriendsTapped
-      case assistantButtonTapped
     }
 
     public enum InternalAction: Equatable {
@@ -231,9 +230,6 @@ public struct DashboardFeature: TodayProvidable {
       return .send(.internal(.load))
     case .showFriendsTapped:
       state.friends = FriendsFeature.State(hasPremiumAccess: state.hasPremiumAccess)
-      return .none
-    case .assistantButtonTapped:
-      state.manageActivity = ManageActivityFeature.State()
       return .none
     }
   }
