@@ -266,26 +266,7 @@ public struct ApplicationFeature {
         state.isOnboardingPlanSaveErrorPresented = false
         return .none
       case .premiumEntitlementUpdated(let entitlement):
-        let accessChanged = state.premiumEntitlement.hasAccess != entitlement.hasAccess
-        state.premiumEntitlement = entitlement
-        let updateReports = Effect<Action>.send(
-          .reports(.reports(.premiumEntitlementUpdated(entitlement.hasAccess)))
-        )
-        let updateDashboard = Effect<Action>.send(
-          .dashboard(.premiumEntitlementUpdated(entitlement.hasAccess))
-        )
-        let reloadWidgets: Effect<Action> = accessChanged
-          ? .run { _ in await widgetReloader.requestReload(delay: .zero) }
-          : .none
-        guard state.paywall != nil else {
-          return .merge(updateReports, updateDashboard, reloadWidgets)
-        }
-        return .merge(
-          updateReports,
-          updateDashboard,
-          reloadWidgets,
-          .send(.paywall(.presented(.internal(.entitlementUpdated(entitlement)))))
-        )
+        return applyPremiumEntitlement(entitlement, state: &state)
       case .requestPremiumAccess(let context):
         guard !state.premiumEntitlement.hasAccess else {
           return .send(.premiumAccessGranted(context))
@@ -311,15 +292,14 @@ public struct ApplicationFeature {
         return .none
       case .paywall(.presented(.delegate(.purchaseCompleted(let entitlement)))):
         let pendingAction = state.pendingPremiumAction
-        state.premiumEntitlement = entitlement
         state.pendingPremiumAction = nil
         state.paywall = nil
         let continuePendingAction = pendingAction.map {
           Effect<Action>.send(.premiumAccessGranted($0))
         } ?? .none
         return .merge(
-          continuePendingAction,
-          .run { _ in await widgetReloader.requestReload(delay: .zero) }
+          applyPremiumEntitlement(entitlement, state: &state),
+          continuePendingAction
         )
       case .paywall(.presented(.delegate(.legalLinkRequested(let link)))):
         return .run { _ in
@@ -373,5 +353,29 @@ public struct ApplicationFeature {
     case nil:
       []
     }
+  }
+
+  private func applyPremiumEntitlement(
+    _ entitlement: PremiumEntitlement,
+    state: inout State
+  ) -> Effect<Action> {
+    let accessChanged = state.premiumEntitlement.hasAccess != entitlement.hasAccess
+    state.premiumEntitlement = entitlement
+
+    var effects: [Effect<Action>] = [
+      .send(.reports(.reports(.premiumEntitlementUpdated(entitlement.hasAccess)))),
+      .send(.dashboard(.premiumEntitlementUpdated(entitlement.hasAccess)))
+    ]
+    if accessChanged {
+      effects.append(
+        .run { _ in await widgetReloader.requestReload(delay: .zero) }
+      )
+    }
+    if state.paywall != nil {
+      effects.append(
+        .send(.paywall(.presented(.internal(.entitlementUpdated(entitlement)))))
+      )
+    }
+    return .merge(effects)
   }
 }

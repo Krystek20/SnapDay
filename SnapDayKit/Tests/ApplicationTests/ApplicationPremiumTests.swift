@@ -55,11 +55,23 @@ struct ApplicationPremiumTests {
       $0.pendingPremiumAction = nil
       $0.paywall = nil
     }
+    await store.receive(.reports(.reports(.premiumEntitlementUpdated(true)))) {
+      $0.reports.reports.hasPremiumAccess = true
+    }
+    await store.receive(.dashboard(.premiumEntitlementUpdated(true)))
     await store.receive(.premiumAccessGranted(.collaborationInvitation))
-    await store.receive(.dashboard(.premiumAccessGranted(.collaborationInvitation)))
-    await store.receive(.dashboard(.dashboard(.premiumAccessGranted(.collaborationInvitation)))) {
+    await store.receive(.dashboard(.dashboard(.premiumEntitlementUpdated(true)))) {
       $0.dashboard.dashboard.hasPremiumAccess = true
     }
+    await store.receive(.dashboard(.premiumAccessGranted(.collaborationInvitation)))
+    await store.receive(.dashboard(.dashboard(.day(.premiumEntitlementUpdated(true))))) {
+      $0.dashboard.dashboard.day.hasPremiumAccess = true
+    }
+    await store.receive(.dashboard(.dashboard(.premiumAccessGranted(.collaborationInvitation))))
+
+    #expect(store.state.reports.reports.hasPremiumAccess)
+    #expect(store.state.dashboard.dashboard.hasPremiumAccess)
+    #expect(store.state.dashboard.dashboard.day.hasPremiumAccess)
   }
 
   @Test
@@ -99,8 +111,59 @@ struct ApplicationPremiumTests {
       $0.premiumEntitlement = entitlement
       $0.paywall = nil
     }
+    await store.receive(.reports(.reports(.premiumEntitlementUpdated(true)))) {
+      $0.reports.reports.hasPremiumAccess = true
+    }
+    await store.receive(.dashboard(.premiumEntitlementUpdated(true)))
+    await store.receive(.dashboard(.dashboard(.premiumEntitlementUpdated(true)))) {
+      $0.dashboard.dashboard.hasPremiumAccess = true
+    }
+    await store.receive(.dashboard(.dashboard(.day(.premiumEntitlementUpdated(true))))) {
+      $0.dashboard.dashboard.day.hasPremiumAccess = true
+    }
     await store.finish()
 
+    #expect(reloadRecorder.count == 1)
+  }
+
+  @Test
+  func losingPremiumAccessUpdatesMountedFeaturesWithoutChangingNavigation() async throws {
+    let userDefaults = try makeUserDefaults()
+    var state = makeState(userDefaults: userDefaults)
+    state.selectedTab = .reports
+    state.premiumEntitlement = .subscribed(expirationDate: nil)
+    state.reports.reports.hasPremiumAccess = true
+    state.dashboard.dashboard.hasPremiumAccess = true
+    state.dashboard.dashboard.day.hasPremiumAccess = true
+    state.dashboard.path.append(.plans(PlansFeature.State()))
+    let navigationPath = state.dashboard.path
+    let reloadRecorder = ReloadRecorder()
+    let store = makeStore(
+      initialState: state,
+      userDefaults: userDefaults,
+      widgetReloader: WidgetReloader {
+        reloadRecorder.record()
+      }
+    )
+    let entitlement = PremiumEntitlement.billingRetry(expirationDate: nil)
+
+    await store.send(.premiumEntitlementUpdated(entitlement)) {
+      $0.premiumEntitlement = entitlement
+    }
+    await store.receive(.reports(.reports(.premiumEntitlementUpdated(false)))) {
+      $0.reports.reports.hasPremiumAccess = false
+    }
+    await store.receive(.dashboard(.premiumEntitlementUpdated(false)))
+    await store.receive(.dashboard(.dashboard(.premiumEntitlementUpdated(false)))) {
+      $0.dashboard.dashboard.hasPremiumAccess = false
+    }
+    await store.receive(.dashboard(.dashboard(.day(.premiumEntitlementUpdated(false))))) {
+      $0.dashboard.dashboard.day.hasPremiumAccess = false
+    }
+    await store.finish()
+
+    #expect(store.state.selectedTab == .reports)
+    #expect(store.state.dashboard.path == navigationPath)
     #expect(reloadRecorder.count == 1)
   }
 
