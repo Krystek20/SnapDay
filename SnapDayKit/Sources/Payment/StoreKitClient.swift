@@ -94,11 +94,17 @@ extension StoreKitClient {
           let transaction = try status.transaction.verifiedValue
           guard productIDs.contains(transaction.productID) else { continue }
           guard !transaction.isUpgraded else { continue }
+          let expirationDate: Date?
+          if status.state == .inGracePeriod {
+            expirationDate = try status.renewalInfo.verifiedValue.gracePeriodExpirationDate
+          } else {
+            expirationDate = transaction.expirationDate
+          }
           candidates.append(
             EntitlementCandidate(
               productID: transaction.productID,
               state: status.state,
-              expirationDate: transaction.expirationDate,
+              expirationDate: expirationDate,
               revocationDate: transaction.revocationDate,
               isIntroductoryOffer: transaction.offerType == .introductory
             )

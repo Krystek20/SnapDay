@@ -6,6 +6,7 @@ public enum PremiumEntitlement: Codable, Equatable, Sendable {
   case trial(expirationDate: Date?)
   case subscribed(expirationDate: Date?)
   case gracePeriod(expirationDate: Date?)
+  case billingRetry(expirationDate: Date?)
   case expired(expirationDate: Date?)
   case revoked(revocationDate: Date?)
 
@@ -13,7 +14,7 @@ public enum PremiumEntitlement: Codable, Equatable, Sendable {
     switch self {
     case .trial, .subscribed, .gracePeriod:
       true
-    case .unknown, .free, .expired, .revoked:
+    case .unknown, .free, .billingRetry, .expired, .revoked:
       false
     }
   }

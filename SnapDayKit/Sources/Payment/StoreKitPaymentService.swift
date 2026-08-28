@@ -191,7 +191,9 @@ extension PremiumEntitlement {
         : .subscribed(expirationDate: candidate.expirationDate)
     case .inGracePeriod:
       return .gracePeriod(expirationDate: candidate.expirationDate)
-    case .expired, .inBillingRetryPeriod:
+    case .inBillingRetryPeriod:
+      return .billingRetry(expirationDate: candidate.expirationDate)
+    case .expired:
       return .expired(expirationDate: candidate.expirationDate)
     case .revoked:
       return .revoked(revocationDate: candidate.revocationDate)
@@ -231,6 +233,8 @@ private extension PremiumEntitlement {
       (6, expirationDate ?? .distantFuture)
     case .gracePeriod(let expirationDate):
       (5, expirationDate ?? .distantFuture)
+    case .billingRetry(let expirationDate):
+      (4, expirationDate ?? .distantPast)
     case .expired(let expirationDate):
       (3, expirationDate ?? .distantPast)
     case .revoked(let revocationDate):

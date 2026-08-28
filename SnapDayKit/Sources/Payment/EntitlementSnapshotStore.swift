@@ -74,10 +74,12 @@ public struct EntitlementSnapshotStore: @unchecked Sendable {
 private extension PremiumEntitlement {
   func validated(at date: Date) -> PremiumEntitlement {
     switch self {
-    case .trial(let expirationDate), .subscribed(let expirationDate):
+    case .trial(let expirationDate),
+         .subscribed(let expirationDate),
+         .gracePeriod(let expirationDate):
       guard let expirationDate, expirationDate <= date else { return self }
       return .expired(expirationDate: expirationDate)
-    case .unknown, .free, .gracePeriod, .expired, .revoked:
+    case .unknown, .free, .billingRetry, .expired, .revoked:
       return self
     }
   }

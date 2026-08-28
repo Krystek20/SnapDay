@@ -71,6 +71,27 @@ struct PremiumEntitlementTests {
   }
 
   @Test
+  func billingRetryDoesNotKeepPremiumAccess() {
+    let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
+
+    let entitlement = PremiumEntitlement.resolve(
+      candidates: [
+        EntitlementCandidate(
+          productID: SnapDayPlusProduct.monthly.rawValue,
+          state: .inBillingRetryPeriod,
+          expirationDate: expirationDate,
+          revocationDate: nil,
+          isIntroductoryOffer: false
+        )
+      ]
+    )
+
+    #expect(entitlement == .billingRetry(expirationDate: expirationDate))
+    #expect(!entitlement.hasAccess)
+    #expect(entitlement.restoreOutcome == .noActiveEntitlement)
+  }
+
+  @Test
   func noSubscriptionStatusMapsToFree() {
     #expect(PremiumEntitlement.resolve(candidates: []) == .free)
   }
