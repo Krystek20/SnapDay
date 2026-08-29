@@ -2,26 +2,6 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      },
       "shouldTranslate" : false
     },
     "Cancel" : {
@@ -29,7 +9,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إلغاءإلغاء"
+            "value" : "إلغاء"
           }
         },
         "de" : {

@@ -9,9 +9,9 @@ extension ActivityFrequency: Optionable, CaseIterable {
     case .weekly:
       String(localized: "Weekly", bundle: .module)
     case .biweekly:
-      String(localized: "Biweekly", bundle: .module)
+      String(localized: "Biweekly · Plus", bundle: .module)
     case .monthly:
-      String(localized: "Monthly", bundle: .module)
+      String(localized: "Monthly · Plus", bundle: .module)
     }
   }
 

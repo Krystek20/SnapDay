@@ -60,6 +60,9 @@ public struct DeveloperToolsView: View {
         Button("Show onboarding again") {
           store.send(.view(.showOnboardingAgainButtonTapped))
         }
+        Button("Show SnapDay Plus paywall") {
+          store.send(.view(.showPaywallButtonTapped))
+        }
         Text("Send notifications")
           .font(.title2)
         Button("Day Activity") {

@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import Models
 import Plans
+import Repositories
 import Testing
 @testable import Application
 
@@ -56,16 +57,60 @@ struct DashboardCoordinatorFeatureTests {
     #expect(store.state.path.count == 1)
   }
 
+  @Test
+  func planDetailsPremiumActionContinuesWhenThereIsNoActivePlan() async throws {
+    let plan = makePlan()
+    var state = withTestDependencies { DashboardCoordinatorFeature.State() }
+    state.path.append(
+      .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
+    )
+    let pathID = try #require(state.path.ids.last)
+    let store = makeStore(state: state, activePlans: [])
+
+    await store.send(
+      .path(.element(
+        id: pathID,
+        action: .planDetails(.delegate(.premiumAccessRequested))
+      ))
+    )
+    await store.receive(.planLimitResolved(pathID, false))
+    await store.receive(
+      .path(.element(id: pathID, action: .planDetails(.premiumAccessGranted)))
+    )
+  }
+
+  @Test
+  func planDetailsPremiumActionRequestsPaywallWhenAnotherPlanIsActive() async throws {
+    let plan = makePlan()
+    var state = withTestDependencies { DashboardCoordinatorFeature.State() }
+    state.path.append(
+      .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
+    )
+    let pathID = try #require(state.path.ids.last)
+    let store = makeStore(state: state, activePlans: [plan])
+
+    await store.send(
+      .path(.element(
+        id: pathID,
+        action: .planDetails(.delegate(.premiumAccessRequested))
+      ))
+    )
+    await store.receive(.planLimitResolved(pathID, true))
+    await store.receive(.delegate(.premiumAccessRequested(.secondActivePlan)))
+  }
+
   private func makePlan() -> Plan {
     let startDate = Date(timeIntervalSinceReferenceDate: 800_000_000)
-    return Plan(
-      id: UUID(),
-      name: "Learn Spanish",
-      startDate: startDate,
-      endDate: startDate,
-      duration: .custom,
-      schedule: []
-    )
+    return withTestDependencies {
+      Plan(
+        id: UUID(),
+        name: "Learn Spanish",
+        startDate: startDate,
+        endDate: startDate,
+        duration: .custom,
+        schedule: []
+      )
+    }
   }
 
   private func withTestDependencies<T>(_ operation: () -> T) -> T {
@@ -74,6 +119,19 @@ struct DashboardCoordinatorFeatureTests {
       $0.date.now = Date(timeIntervalSinceReferenceDate: 800_000_000)
     } operation: {
       operation()
+    }
+  }
+
+  private func makeStore(
+    state: DashboardCoordinatorFeature.State,
+    activePlans: [Plan]
+  ) -> TestStoreOf<DashboardCoordinatorFeature> {
+    TestStore(initialState: state) {
+      DashboardCoordinatorFeature()
+    } withDependencies: {
+      $0.utcCalendar = Calendar(identifier: .gregorian)
+      $0.date.now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+      $0.planRepository.loadActivePlans = { _ in activePlans }
     }
   }
 }

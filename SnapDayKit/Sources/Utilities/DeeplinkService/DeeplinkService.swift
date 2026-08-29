@@ -9,6 +9,7 @@ enum Schema: String {
 enum Host: String {
   case dashboard
   case plans
+  case premium
 }
 
 enum Path: String {
@@ -47,6 +48,14 @@ public extension DeeplinkService {
     components.path = "/" + Path.dictate.rawValue
     return components.url ?? URL(filePath: "")
   }
+
+  static func premium(_ context: String) -> URL {
+    var components = URLComponents()
+    components.scheme = Schema.widget.rawValue
+    components.host = Host.premium.rawValue
+    components.path = "/" + context
+    return components.url ?? URL(filePath: "")
+  }
 }
 
 public final class DeeplinkService {
@@ -54,6 +63,7 @@ public final class DeeplinkService {
   public enum Scene {
     case dashboard(DashboardAction?)
     case plans(UUID?)
+    case premium(String)
   }
 
   public enum DashboardAction {
@@ -86,13 +96,17 @@ public final class DeeplinkService {
           case .addActivity:
             deeplinkSubject.send(.dashboard(.addActivity))
           case .dictate:
+            #if DEBUG
             deeplinkSubject.send(.dashboard(.dictate))
+            #endif
           }
         } else {
           deeplinkSubject.send(.dashboard(nil))
         }
       case .plans:
         deeplinkSubject.send(.plans(UUID(uuidString: url.lastPathComponent)))
+      case .premium:
+        deeplinkSubject.send(.premium(url.lastPathComponent))
       }
     }
   }

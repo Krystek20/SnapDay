@@ -5,6 +5,17 @@ public enum ActivityFrequency: Equatable, Hashable, Codable {
   case monthly(monthlySchedule: MonthlySchedule)
 }
 
+public extension ActivityFrequency {
+  var requiresPremiumAccess: Bool {
+    switch self {
+    case .daily, .weekly:
+      false
+    case .biweekly, .monthly:
+      true
+    }
+  }
+}
+
 public enum BiweeklyStartWeek: Equatable, Hashable, Codable {
   case current
   case next

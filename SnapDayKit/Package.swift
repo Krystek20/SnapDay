@@ -27,6 +27,7 @@ private var products: [Product] {
   Module.widgetPlanProgress
   Module.plans
   Module.onboarding
+  Module.payment
 }
 
 @PackageDependenciesBuilder
@@ -38,7 +39,7 @@ private var packageDependencies: [Package.Dependency] {
 @TargetsBuilder
 private var targets: [Target] {
   TargetParamenters(module: .application, dependencies: sceneDependecies + [
-    .dashboard, .reports, .plans, .activityDetails, .developerTools, .onboarding
+    .dashboard, .reports, .plans, .activityDetails, .developerTools, .onboarding, .payment
   ])
   TargetParamenters(module: .dashboard, dependencies: sceneDependecies + [.activityList, .dayActivityForm, .calendarPicker, .friends, .manageActivity])
   TargetParamenters(module: .activityList, dependencies: sceneDependecies + [.dayActivityForm])
@@ -53,9 +54,10 @@ private var targets: [Target] {
   TargetParamenters(module: .dayActivityReminder, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetActivityList, dependencies: sceneDependecies)
   TargetParamenters(module: .widgetStreak, dependencies: sceneDependecies)
-  TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies)
-  TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies)
+  TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies + [.payment])
+  TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies + [.payment])
   TargetParamenters(module: .onboarding, dependencies: [.composableArchitecture, .uiComponents, .resources, .plans])
+  TargetParamenters(module: .payment, dependencies: [.composableArchitecture, .uiComponents, .resources])
   TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
@@ -101,6 +103,7 @@ private enum Module: String {
   case widgetPlanProgress
   case dayActivityReminder
   case onboarding
+  case payment
   case manageActivity
   case developerTools
   case utilities
@@ -158,8 +161,14 @@ private enum Module: String {
   }
 
   var resources: [Resource] {
-    []
+    switch self {
+    case .payment:
+      [.process("Resources")]
+    default:
+      []
+    }
   }
+
 }
 
 // MARK: - Product

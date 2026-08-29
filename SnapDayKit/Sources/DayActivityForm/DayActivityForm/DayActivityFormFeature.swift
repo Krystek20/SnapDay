@@ -32,6 +32,11 @@ public struct DayActivityFormFeature {
   @ObservableState
   public struct State: Equatable, TodayProvidable {
 
+    enum PendingPremiumAction: Equatable {
+      case selectFrequency(ActivityFrequency?)
+      case save
+    }
+
     public enum DayActivityFormType {
       case edit
     }
@@ -43,6 +48,10 @@ public struct DayActivityFormFeature {
     }
 
     var form: DayActivityForm
+    let initialFrequency: ActivityFrequency?
+    let initialIsFrequentEnabled: Bool
+    var hasPremiumAccess: Bool
+    var pendingPremiumAction: PendingPremiumAction?
     var focus: Field?
 
     var newField: DayNewField?
@@ -92,11 +101,23 @@ public struct DayActivityFormFeature {
     public init(
       form: DayActivityForm,
       type: DayActivityFormType,
-      editDate: Date
+      editDate: Date,
+      hasPremiumAccess: Bool = false
     ) {
       self.form = form
+      self.initialFrequency = form.frequency
+      self.initialIsFrequentEnabled = form.isFrequentEnabled
       self.type = type
       self.editDate = editDate
+      self.hasPremiumAccess = hasPremiumAccess
+    }
+
+    var requiresPremiumAccessToSave: Bool {
+      guard
+        form.isFrequentEnabled,
+        form.frequency?.requiresPremiumAccess == true
+      else { return false }
+      return form.frequency != initialFrequency || !initialIsFrequentEnabled
     }
   }
 
@@ -137,6 +158,7 @@ public struct DayActivityFormFeature {
       case remindToggeled(Bool)
       case dueTimeToggeled(Bool)
       case turnNotificationTapped
+      case frequencySelected(ActivityFrequency?)
     }
     public enum InternalAction: Equatable {
       case setExistingTags([Tag])
@@ -152,6 +174,7 @@ public struct DayActivityFormFeature {
     public enum DelegateAction: Equatable {
       case activityDeleted(DayActivityForm)
       case activityUpdated(DayActivityForm)
+      case premiumAccessRequested
     }
 
     case emojiPicker(PresentationAction<EmojiPickerFeature.Action>)
@@ -163,6 +186,8 @@ public struct DayActivityFormFeature {
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
+    case premiumAccessGranted
+    case premiumEntitlementUpdated(Bool)
   }
 
   // MARK: - Initialization
@@ -189,6 +214,10 @@ public struct DayActivityFormFeature {
         handleCompleted(state: &state)
       case .delegate:
         .none
+      case .premiumAccessGranted:
+        handlePremiumAccessGranted(state: &state)
+      case .premiumEntitlementUpdated(let hasAccess):
+        handlePremiumEntitlementUpdated(hasAccess, state: &state)
       case .binding:
         .none
       }
@@ -202,6 +231,19 @@ public struct DayActivityFormFeature {
     .ifLet(\.$dayActivityTaskForm, action: \.dayActivityTaskForm) {
       DayActivityFormFeature()
     }
+  }
+
+  private func handlePremiumAccessGranted(state: inout State) -> Effect<Action> {
+    state.hasPremiumAccess = true
+    return resumePendingPremiumAction(state: &state)
+  }
+
+  private func handlePremiumEntitlementUpdated(
+    _ hasAccess: Bool,
+    state: inout State
+  ) -> Effect<Action> {
+    state.hasPremiumAccess = hasAccess
+    return .none
   }
 
   func handleCompleted(state: inout State) -> Effect<Action> {
@@ -226,13 +268,11 @@ public struct DayActivityFormFeature {
         }
       )
     case .saveButtonTapped:
-      return .run { [form = state.form, type = state.type] send in
-        switch type {
-        case .edit:
-          await send(.delegate(.activityUpdated(form)))
-        }
-        await dismiss()
+      guard state.hasPremiumAccess || !state.requiresPremiumAccessToSave else {
+        state.pendingPremiumAction = .save
+        return .send(.delegate(.premiumAccessRequested))
       }
+      return save(state: state)
     case .deleteButtonTapped:
       return .run { [form = state.form] send in
         await send(.delegate(.activityDeleted(form)))
@@ -290,6 +330,36 @@ public struct DayActivityFormFeature {
           return
         }
       }
+    case .frequencySelected(let frequency):
+      guard frequency?.requiresPremiumAccess == true, !state.hasPremiumAccess else {
+        state.pendingPremiumAction = nil
+        state.form.frequency = frequency
+        return .none
+      }
+      state.pendingPremiumAction = .selectFrequency(frequency)
+      return .send(.delegate(.premiumAccessRequested))
+    }
+  }
+
+  private func resumePendingPremiumAction(state: inout State) -> Effect<Action> {
+    guard let pendingAction = state.pendingPremiumAction else { return .none }
+    state.pendingPremiumAction = nil
+    switch pendingAction {
+    case .selectFrequency(let frequency):
+      state.form.frequency = frequency
+      return .none
+    case .save:
+      return save(state: state)
+    }
+  }
+
+  private func save(state: State) -> Effect<Action> {
+    .run { [form = state.form, type = state.type] send in
+      switch type {
+      case .edit:
+        await send(.delegate(.activityUpdated(form)))
+      }
+      await dismiss()
     }
   }
 
@@ -352,7 +422,8 @@ public struct DayActivityFormFeature {
         state.dayActivityTaskForm = DayActivityFormFeature.State(
           form: form,
           type: .edit,
-          editDate: state.editDate
+          editDate: state.editDate,
+          hasPremiumAccess: state.hasPremiumAccess
         )
         return .none
       case .newItemForm(.cancelled):
@@ -388,7 +459,8 @@ public struct DayActivityFormFeature {
           state.dayActivityTaskForm = DayActivityFormFeature.State(
             form: form,
             type: .edit,
-            editDate: state.editDate
+            editDate: state.editDate,
+            hasPremiumAccess: state.hasPremiumAccess
           )
           return .none
         case .remove:

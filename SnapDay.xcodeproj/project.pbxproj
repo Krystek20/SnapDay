@@ -10,9 +10,13 @@
 		080EA92D2EB936610095AF50 /* WeeklyProgressWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA92A2EB936610095AF50 /* WeeklyProgressWidget.swift */; };
 		080EA92E2EB936610095AF50 /* WeeklyProgressAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA92B2EB936610095AF50 /* WeeklyProgressAppIntent.swift */; };
 		080EA9312EB936B70095AF50 /* ActivityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 080EA9302EB936B70095AF50 /* ActivityProvider.swift */; };
+		C0DE00012F20000100000001 /* PremiumLockedWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00022F20000100000002 /* PremiumLockedWidgetView.swift */; };
 		080EA9332EBA839D0095AF50 /* WidgetWeeklyProgress in Frameworks */ = {isa = PBXBuildFile; productRef = 080EA9322EBA839D0095AF50 /* WidgetWeeklyProgress */; };
-		A19A00042F10000100000004 /* WidgetPlanProgress in Frameworks */ = {isa = PBXBuildFile; productRef = A19A00052F10000100000005 /* WidgetPlanProgress */; };
 		087462262EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087462252EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift */; };
+		A19A00012F10000100000001 /* PlanProgressWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19A00022F10000100000002 /* PlanProgressWidget.swift */; };
+		A19A00042F10000100000004 /* WidgetPlanProgress in Frameworks */ = {isa = PBXBuildFile; productRef = A19A00052F10000100000005 /* WidgetPlanProgress */; };
+		A19A00062F10000100000006 /* PlanProgressAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19A00072F10000100000007 /* PlanProgressAppIntent.swift */; };
+		A19A00082F10000100000008 /* Resources/Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A19A00092F10000100000009 /* Resources/Localizable.xcstrings */; };
 		D423ACCC2CAD274700591A0D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D423ACCB2CAD274700591A0D /* LaunchScreen.xib */; };
 		D423ACD32CB5A39E00591A0D /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACCE2CB5A04200591A0D /* StreakWidget.swift */; };
 		D423ACD42CB5A3A400591A0D /* StreakAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */; };
@@ -22,9 +26,6 @@
 		D46418342C50D34A005920E1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418332C50D34A005920E1 /* WidgetKit.framework */; };
 		D46418362C50D34A005920E1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D46418352C50D34A005920E1 /* SwiftUI.framework */; };
 		D46418392C50D34A005920E1 /* ActivityWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */; };
-		A19A00012F10000100000001 /* PlanProgressWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19A00022F10000100000002 /* PlanProgressWidget.swift */; };
-		A19A00062F10000100000006 /* PlanProgressAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19A00072F10000100000007 /* PlanProgressAppIntent.swift */; };
-		A19A00082F10000100000008 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A19A00092F10000100000009 /* Localizable.xcstrings */; };
 		D464183D2C50D34A005920E1 /* ActivityListWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183C2C50D34A005920E1 /* ActivityListWidget.swift */; };
 		D464183F2C50D34A005920E1 /* ActivityListAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D464183E2C50D34A005920E1 /* ActivityListAppIntent.swift */; };
 		D46418412C50D34B005920E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D46418402C50D34B005920E1 /* Assets.xcassets */; };
@@ -102,12 +103,17 @@
 		080EA92A2EB936610095AF50 /* WeeklyProgressWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressWidget.swift; sourceTree = "<group>"; };
 		080EA92B2EB936610095AF50 /* WeeklyProgressAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyProgressAppIntent.swift; sourceTree = "<group>"; };
 		080EA9302EB936B70095AF50 /* ActivityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityProvider.swift; sourceTree = "<group>"; };
+		C0DE00022F20000100000002 /* PremiumLockedWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumLockedWidgetView.swift; sourceTree = "<group>"; };
 		084CACB62E20397F0060281E /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		084CACB72E203B880060281E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		084CACB82E203B950060281E /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		087462252EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictateAccessoryCircularWidget.swift; sourceTree = "<group>"; };
 		08A7E3A92E203BAE00EF4AFB /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		08A7E3AA2E203BB000EF4AFB /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A19A00022F10000100000002 /* PlanProgressWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanProgressWidget.swift; sourceTree = "<group>"; };
+		A19A00072F10000100000007 /* PlanProgressAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanProgressAppIntent.swift; sourceTree = "<group>"; };
+		A19A00092F10000100000009 /* Resources/Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Resources/Localizable.xcstrings; sourceTree = "<group>"; };
+		A19A00102F10000100000010 /* SnapDayPlus.storekit */ = {isa = PBXFileReference; lastKnownFileType = com.apple.dt.storekit; path = SnapDayPlus.storekit; sourceTree = "<group>"; };
 		D423ACCB2CAD274700591A0D /* LaunchScreen.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		D423ACCE2CB5A04200591A0D /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
 		D423ACD12CB5A25700591A0D /* StreakAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakAppIntent.swift; sourceTree = "<group>"; };
@@ -118,9 +124,6 @@
 		D46418332C50D34A005920E1 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D46418352C50D34A005920E1 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		D46418382C50D34A005920E1 /* ActivityWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidgetBundle.swift; sourceTree = "<group>"; };
-		A19A00022F10000100000002 /* PlanProgressWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanProgressWidget.swift; sourceTree = "<group>"; };
-		A19A00072F10000100000007 /* PlanProgressAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanProgressAppIntent.swift; sourceTree = "<group>"; };
-		A19A00092F10000100000009 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Resources/Localizable.xcstrings; sourceTree = "<group>"; };
 		D464183C2C50D34A005920E1 /* ActivityListWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListWidget.swift; sourceTree = "<group>"; };
 		D464183E2C50D34A005920E1 /* ActivityListAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListAppIntent.swift; sourceTree = "<group>"; };
 		D46418402C50D34B005920E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -190,15 +193,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A19A00032F10000100000003 /* PlanProgressWidget */ = {
-			isa = PBXGroup;
-			children = (
-				A19A00022F10000100000002 /* PlanProgressWidget.swift */,
-				A19A00072F10000100000007 /* PlanProgressAppIntent.swift */,
-			);
-			path = PlanProgressWidget;
-			sourceTree = "<group>";
-		};
 		080EA92C2EB936610095AF50 /* WeeklyProgressWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -212,6 +206,7 @@
 			isa = PBXGroup;
 			children = (
 				080EA9302EB936B70095AF50 /* ActivityProvider.swift */,
+				C0DE00022F20000100000002 /* PremiumLockedWidgetView.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -222,6 +217,15 @@
 				087462252EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift */,
 			);
 			path = DictateWidget;
+			sourceTree = "<group>";
+		};
+		A19A00032F10000100000003 /* PlanProgressWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A19A00022F10000100000002 /* PlanProgressWidget.swift */,
+				A19A00072F10000100000007 /* PlanProgressAppIntent.swift */,
+			);
+			path = PlanProgressWidget;
 			sourceTree = "<group>";
 		};
 		D423ACCD2CB5A03C00591A0D /* StreakWidget */ = {
@@ -259,6 +263,7 @@
 			isa = PBXGroup;
 			children = (
 				D4779ABD2B6043270067E3AC /* SnapDayKit */,
+				A19A00102F10000100000010 /* SnapDayPlus.storekit */,
 				D4779AC12B6043280067E3AC /* SnapDay */,
 				D4779ABE2B6043270067E3AC /* SnapDayUITests */,
 				D4CCE6282BC7B4BB00C198C5 /* Notification Content */,
@@ -290,7 +295,7 @@
 		D46418372C50D34A005920E1 /* ActivityWidget */ = {
 			isa = PBXGroup;
 			children = (
-				A19A00092F10000100000009 /* Localizable.xcstrings */,
+				A19A00092F10000100000009 /* Resources/Localizable.xcstrings */,
 				080EA92F2EB936B50095AF50 /* Helpers */,
 				087462242EB00A980002AA21 /* DictateWidget */,
 				D423ACD02CB5A14000591A0D /* ActivityList */,
@@ -514,7 +519,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A19A00082F10000100000008 /* Localizable.xcstrings in Resources */,
+				A19A00082F10000100000008 /* Resources/Localizable.xcstrings in Resources */,
 				D46418412C50D34B005920E1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -563,6 +568,7 @@
 				A19A00012F10000100000001 /* PlanProgressWidget.swift in Sources */,
 				A19A00062F10000100000006 /* PlanProgressAppIntent.swift in Sources */,
 				080EA9312EB936B70095AF50 /* ActivityProvider.swift in Sources */,
+				C0DE00012F20000100000001 /* PremiumLockedWidgetView.swift in Sources */,
 				087462262EB00AD00002AA21 /* DictateAccessoryCircularWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -760,7 +766,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Krystian Solarz (592BXD7V67)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -779,7 +785,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -803,7 +809,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Krystian Solarz (62J877TJR3)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -822,7 +828,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -883,7 +889,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -896,7 +902,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -916,7 +922,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -929,7 +935,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilove.snapday.ActivityWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -947,7 +953,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -960,7 +966,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -978,7 +984,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -991,7 +997,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mobilove.snapday.notification-content";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1054,13 +1060,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A19A00052F10000100000005 /* WidgetPlanProgress */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = WidgetPlanProgress;
-		};
 		080EA9322EBA839D0095AF50 /* WidgetWeeklyProgress */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = WidgetWeeklyProgress;
+		};
+		A19A00052F10000100000005 /* WidgetPlanProgress */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WidgetPlanProgress;
 		};
 		D423ACD52CB6559E00591A0D /* WidgetStreak */ = {
 			isa = XCSwiftPackageProductDependency;

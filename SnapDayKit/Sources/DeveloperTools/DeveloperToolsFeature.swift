@@ -65,6 +65,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
       case invite2
       case cleanImages
       case showOnboardingAgainButtonTapped
+      case showPaywallButtonTapped
       case sendDayActivityReminderNotificationButtonTapped
       case sendDayActivityTaskReminderNotificationButtonTapped
       case sendEveningSummaryReminderNotificationButtonTapped
@@ -80,6 +81,7 @@ public struct DeveloperToolsFeature: TodayProvidable {
     }
     public enum DelegateAction: Equatable {
       case showOnboardingAgain
+      case showPaywall
     }
 
     case binding(BindingAction<State>)
@@ -162,6 +164,8 @@ public struct DeveloperToolsFeature: TodayProvidable {
       }
     case .showOnboardingAgainButtonTapped:
       return .send(.delegate(.showOnboardingAgain))
+    case .showPaywallButtonTapped:
+      return .send(.delegate(.showPaywall))
     case .cleanZones:
       return .run { send in
         @Dependency(\.cloudService) var cloudService

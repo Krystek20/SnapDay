@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Onboarding
+import Payment
 import SwiftUI
 import UIKit.UIDevice
 #if DEBUG
@@ -35,6 +36,12 @@ public struct ApplicationView: View {
         }
       } message: {
         Text("Your plan is still open. Please try saving again.", bundle: .module)
+      }
+      .sheet(item: $store.scope(state: \.paywall, action: \.paywall)) { store in
+        NavigationStack {
+          PaywallView(store: store)
+        }
+        .interactiveDismissDisabled(store.isOperationInProgress)
       }
       #if DEBUG
       .sheet(item: $store.scope(state: \.developerTools, action: \.developerTools)) { store in
