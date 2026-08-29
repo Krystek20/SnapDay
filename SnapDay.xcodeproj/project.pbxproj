@@ -766,7 +766,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Krystian Solarz (592BXD7V67)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -809,7 +809,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Krystian Solarz (62J877TJR3)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -889,7 +889,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -922,7 +922,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -953,7 +953,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -984,7 +984,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;

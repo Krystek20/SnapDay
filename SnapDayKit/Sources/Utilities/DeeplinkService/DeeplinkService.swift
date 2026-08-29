@@ -96,7 +96,9 @@ public final class DeeplinkService {
           case .addActivity:
             deeplinkSubject.send(.dashboard(.addActivity))
           case .dictate:
+            #if DEBUG
             deeplinkSubject.send(.dashboard(.dictate))
+            #endif
           }
         } else {
           deeplinkSubject.send(.dashboard(nil))
