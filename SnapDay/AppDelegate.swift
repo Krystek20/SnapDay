@@ -17,6 +17,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
   ) -> Bool {
+    Telemetry.start()
     registerNotifications()
     application.registerForRemoteNotifications()
     registerBackgroundTask()
@@ -80,11 +81,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   @Dependency(\.cloudService) private var cloudService
 
   func windowScene(_ windowScene: UIWindowScene, userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
+    Telemetry.breadcrumb("link_opened", category: "collaboration.acceptance")
     Task {
       do {
         try await cloudService.accept(invitation: Invitation(cloudKitShareMetadata: cloudKitShareMetadata))
       } catch {
-        print("acceptance invitation error: \(error)")
+        Telemetry.capture(error, stage: "acceptance_scene")
       }
     }
   }

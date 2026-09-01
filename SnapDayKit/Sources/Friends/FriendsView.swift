@@ -44,6 +44,14 @@ public struct FriendsView: View {
           }
         )
       })
+      .alert(
+        String(localized: "Invitation Couldn't Be Prepared", bundle: .module),
+        isPresented: $store.showInvitationError
+      ) {
+        Button(String(localized: "OK", bundle: .module), role: .cancel) { }
+      } message: {
+        Text(String(localized: "Please check your iCloud connection and try again.", bundle: .module))
+      }
       .navigationTitle(String(localized: "Friends", bundle: .module))
       .navigationBarTitleDisplayMode(.inline)
       .bind($store.focus, to: $focus)
@@ -66,6 +74,7 @@ public struct FriendsView: View {
                   .foregroundStyle(Color.actionBlue)
               }
             )
+            .disabled(store.isGeneratingInvitiation)
             Button(
               action: {
                 store.send(.view(.newButtonTapped))
@@ -75,6 +84,7 @@ public struct FriendsView: View {
                   .foregroundStyle(Color.actionBlue)
               }
             )
+            .disabled(store.isGeneratingInvitiation)
           }
         }
       }
@@ -177,6 +187,7 @@ public struct FriendsView: View {
       Color.clear
         .frame(width: 30.0, height: 30.0)
     }
+    .disabled(store.isGeneratingInvitiation)
   }
 
   private func reinviteButton(collaboration: Collaboration) -> some View {
@@ -221,6 +232,7 @@ public struct FriendsView: View {
           })
           .font(.system(size: 12.0, weight: .bold))
           .foregroundStyle(Color.actionBlue)
+          .disabled(store.isGeneratingInvitiation)
         }
 
         Button(String(localized: "Cancel", bundle: .module), action: {

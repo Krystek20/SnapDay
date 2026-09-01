@@ -34,6 +34,7 @@ private var products: [Product] {
 private var packageDependencies: [Package.Dependency] {
   Module.composableArchitecture
   Module.snapDayCore
+  Module.sentry
 }
 
 @TargetsBuilder
@@ -64,9 +65,9 @@ private var targets: [Target] {
   TargetParamenters(module: .calendarPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .utilities, dependencies: [.common, .models, .repositories, .composableArchitecture])
   TargetParamenters(module: .repositories, dependencies: [.common, .models, .composableArchitecture])
-  TargetParamenters(module: .common, dependencies: [.composableArchitecture])
+  TargetParamenters(module: .common, dependencies: [.composableArchitecture, .sentry])
   TargetParamenters(module: .models, dependencies: [.common])
-  TargetParamenters(module: .uiComponents, dependencies: [.resources, .composableArchitecture, .utilities])
+  TargetParamenters(module: .uiComponents, dependencies: [.common, .resources, .composableArchitecture, .utilities])
   TargetParamenters(module: .resources)
 }
 
@@ -114,6 +115,7 @@ private enum Module: String {
   case resources
   case composableArchitecture
   case snapDayCore
+  case sentry
 
   var name: String {
     rawValue.capitalizingFirstLetter
@@ -125,6 +127,8 @@ private enum Module: String {
       .product(name: name, package: "swift-composable-architecture")
     case .snapDayCore:
       .product(name: "AIModule", package: "snapday-core")
+    case .sentry:
+      .product(name: "SentrySPM", package: "sentry-cocoa")
     default:
       .byName(name: name)
     }
@@ -144,6 +148,8 @@ private enum Module: String {
       [.package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.9.2")]
     case .snapDayCore:
       [.package(path: "../../snapday-core")]
+    case .sentry:
+      [.package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "9.24.0")]
     default:
       nil
     }
@@ -151,7 +157,7 @@ private enum Module: String {
 
   var targetConfiguration: [ModuleTargetConfiguration] {
     switch self {
-    case .composableArchitecture, .snapDayCore:
+    case .composableArchitecture, .snapDayCore, .sentry:
       []
     case .uiComponents, .resources, .developerTools:
       [.source]
