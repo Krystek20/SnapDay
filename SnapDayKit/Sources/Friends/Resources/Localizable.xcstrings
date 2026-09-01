@@ -349,6 +349,9 @@
         }
       }
     },
+    "Invitation Couldn't Be Prepared" : {
+
+    },
     "Invitation sent to %@" : {
       "localizations" : {
         "ar" : {
@@ -522,6 +525,12 @@
           }
         }
       }
+    },
+    "OK" : {
+
+    },
+    "Please check your iCloud connection and try again." : {
+
     },
     "Preparing your invite link…" : {
       "localizations" : {

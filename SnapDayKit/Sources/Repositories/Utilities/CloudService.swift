@@ -36,6 +36,7 @@ public actor CloudService {
     case serviceNotAvailable
     case shareEntityNotAvailable
     case shareNotAvailable
+    case participantNotFound
 
     public var errorDescription: String? {
       switch self {
@@ -45,6 +46,8 @@ public actor CloudService {
         "The local sharing record is not available. Please try again."
       case .shareNotAvailable:
         "The iCloud share is not available. Please try again."
+      case .participantNotFound:
+        "No active iCloud account could be found for this invitation."
       }
     }
   }
@@ -208,7 +211,7 @@ public actor CloudService {
 
     for ckParticipant in ckShare.participants where participantIds.contains(ckParticipant.participantID) {
       ckShare.removeParticipant(ckParticipant)
-      try await coreDataStack.persistUpdatedShare(share: ckShare)
+      try coreDataStack.persistUpdatedShare(share: ckShare)
     }
   }
 
@@ -248,7 +251,14 @@ public actor CloudService {
   }
 
   public func accept(invitation: Invitation) async throws {
-    try await coreDataStack.accept(invitation: invitation)
+    Telemetry.breadcrumb("received", category: "collaboration.acceptance")
+    do {
+      try await coreDataStack.accept(invitation: invitation)
+      Telemetry.breadcrumb("accepted", category: "collaboration.acceptance")
+    } catch {
+      Telemetry.capture(error, stage: "acceptance")
+      throw error
+    }
 
     let ckShare = invitation.cloudKitShareMetadata.share
     let owner = Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant)
@@ -264,45 +274,72 @@ public actor CloudService {
   // MARK: - Private
 
   private func addParticipant(lookupInfo: CKUserIdentity.LookupInfo) async throws -> ShareResult? {
-    try await initializeIfNeeded()
+    let lookupKind = lookupInfo.emailAddress == nil ? "phone" : "email"
+    Telemetry.breadcrumb("started", data: ["lookup_kind": lookupKind])
 
-    guard let shareEntity = try await shareEntity else {
-      throw CloudError.shareEntityNotAvailable
+    let existingShareResult: ShareResult
+    do {
+      Telemetry.breadcrumb("local_share_lookup")
+      if let localShareResult = try await locallyAvailableOwnedShareResult() {
+        existingShareResult = localShareResult
+      } else {
+        Telemetry.breadcrumb("share_initialization")
+        try await initializeIfNeeded()
+
+        guard let initializedShareResult = try await locallyAvailableOwnedShareResult() else {
+          throw CloudError.shareNotAvailable
+        }
+        existingShareResult = initializedShareResult
+      }
+    } catch {
+      Telemetry.capture(error, stage: "share_initialization", tags: ["lookup_kind": lookupKind])
+      throw error
     }
 
-    let (share, container) = try coreDataStack.fetchShare(matching: shareEntity)
-    guard let share else {
-      throw CloudError.shareNotAvailable
-    }
-
-    let existingShareResult = ShareResult(ckShare: share, container: container)
+    let share = existingShareResult.ckShare
 
     let participant: CKShare.Participant
     do {
+      Telemetry.breadcrumb("participant_lookup")
       guard let fetchedParticipant = try await coreDataStack.fetchParticipants(matching: [lookupInfo]).first else {
-        NSLog("[CloudService] CloudKit returned no participant; presenting the system share sheet instead")
-        return existingShareResult
+        throw CloudError.participantNotFound
       }
       participant = fetchedParticipant
     } catch {
-      NSLog("[CloudService] Participant lookup failed; presenting the system share sheet instead: \(error)")
-      return existingShareResult
+      Telemetry.capture(error, stage: "participant_lookup", tags: ["lookup_kind": lookupKind])
+      throw error
     }
 
     participant.permission = .readWrite
     participant.role = .privateUser
     if share.participants.contains(where: { $0.participantID == participant.participantID }) {
+      Telemetry.breadcrumb("participant_already_present")
       return existingShareResult
     }
     share.addParticipant(participant)
     do {
-      let updatedShare = try await coreDataStack.persistUpdatedShare(share: share)
-      return ShareResult(ckShare: updatedShare, container: container)
+      Telemetry.breadcrumb("participant_persist")
+      let updatedShare = try coreDataStack.persistUpdatedShare(share: share)
+      Telemetry.breadcrumb("participant_persist_scheduled")
+      return ShareResult(ckShare: updatedShare, container: existingShareResult.container)
     } catch {
-      share.removeParticipant(participant)
-      NSLog("[CloudService] Participant persistence failed; presenting the system share sheet instead: \(error)")
-      return existingShareResult
+      Telemetry.capture(error, stage: "participant_persist", tags: ["lookup_kind": lookupKind])
+      throw error
     }
+  }
+
+  private func locallyAvailableOwnedShareResult() async throws -> ShareResult? {
+    let context = coreDataStack.backgroundContext
+    for share in try await shareRepository.fetchAll() {
+      let shareEntity = try share.managedObject(context)
+      let result = try coreDataStack.fetchShare(matching: shareEntity)
+      guard let ckShare = result.share,
+            ckShare.currentUserParticipant?.role == .owner else {
+        continue
+      }
+      return ShareResult(ckShare: ckShare, container: result.container)
+    }
+    return nil
   }
 
   private func setShareEntityGenerated() {
