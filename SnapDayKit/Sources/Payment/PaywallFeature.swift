@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Common
 import Foundation
 import OSLog
 
@@ -104,6 +105,7 @@ public struct PaywallFeature {
   }
 
   @Dependency(\.paymentClient) private var paymentClient
+  @Dependency(\.analyticsClient) private var analyticsClient
 
   public init() {}
 
@@ -112,6 +114,7 @@ public struct PaywallFeature {
       switch action {
       case .view(.appeared):
         guard state.loadState == .idle else { return .none }
+        analyticsClient.track(.paywallViewed(context: state.context.rawValue))
         return loadProducts(state: &state)
 
       case .view(.closeButtonTapped):
@@ -121,6 +124,12 @@ public struct PaywallFeature {
         guard state.products.contains(where: { $0.id == productID }) else { return .none }
         state.selectedProductID = productID
         state.feedback = nil
+        analyticsClient.track(
+          .subscriptionProductSelected(
+            productID: productID,
+            context: state.context.rawValue
+          )
+        )
         return .none
 
       case .view(.purchaseButtonTapped):
@@ -131,6 +140,12 @@ public struct PaywallFeature {
 
         state.operation = .purchasing
         state.feedback = nil
+        analyticsClient.track(
+          .subscriptionPurchaseStarted(
+            productID: productID,
+            context: state.context.rawValue
+          )
+        )
         return .run { send in
           do {
             let outcome = try await paymentClient.purchase(productID)
@@ -181,36 +196,58 @@ public struct PaywallFeature {
 
       case .internal(.purchaseFinished(.purchased(let entitlement))):
         guard !state.didCompletePurchase else { return .none }
+        trackPurchaseFinished("purchased", state: state)
         state.didCompletePurchase = true
         state.operation = .idle
         return .send(.delegate(.purchaseCompleted(entitlement)))
 
       case .internal(.purchaseFinished(.pending)):
+        trackPurchaseFinished("pending", state: state)
         state.operation = .pending
         return .none
 
       case .internal(.purchaseFinished(.cancelled)):
+        trackPurchaseFinished("cancelled", state: state)
         state.operation = .idle
         state.feedback = .purchaseCancelled
         return .none
 
       case .internal(.purchaseFailed):
+        trackPurchaseFinished("failed", state: state)
         state.operation = .idle
         state.feedback = .purchaseFailed
         return .none
 
       case .internal(.restoreFinished(.restored(let entitlement))):
         guard !state.didCompletePurchase else { return .none }
+        analyticsClient.track(
+          .subscriptionRestoreFinished(
+            outcome: "restored",
+            context: state.context.rawValue
+          )
+        )
         state.didCompletePurchase = true
         state.operation = .idle
         return .send(.delegate(.purchaseCompleted(entitlement)))
 
       case .internal(.restoreFinished(.noActiveEntitlement)):
+        analyticsClient.track(
+          .subscriptionRestoreFinished(
+            outcome: "not_found",
+            context: state.context.rawValue
+          )
+        )
         state.operation = .idle
         state.feedback = .noPurchasesFound
         return .none
 
       case .internal(.restoreFailed):
+        analyticsClient.track(
+          .subscriptionRestoreFinished(
+            outcome: "failed",
+            context: state.context.rawValue
+          )
+        )
         state.operation = .idle
         state.feedback = .restoreFailed
         return .none
@@ -244,6 +281,17 @@ public struct PaywallFeature {
         await send(.internal(.productsFailed))
       }
     }
+  }
+
+  private func trackPurchaseFinished(_ outcome: String, state: State) {
+    guard let productID = state.selectedProductID else { return }
+    analyticsClient.track(
+      .subscriptionPurchaseFinished(
+        outcome: outcome,
+        productID: productID,
+        context: state.context.rawValue
+      )
+    )
   }
 }
 

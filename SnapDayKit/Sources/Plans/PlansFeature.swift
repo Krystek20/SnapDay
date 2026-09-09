@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Common
 import Foundation
 import Models
 import Repositories
@@ -12,6 +13,7 @@ public struct PlansFeature {
   @Dependency(\.calendar) private var calendar
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
   @Dependency(\.planRepository) private var planRepository
+  @Dependency(\.analyticsClient) private var analyticsClient
 
   // MARK: - State & Action
 
@@ -127,6 +129,7 @@ public struct PlansFeature {
       case .view(.retryButtonTapped):
         return .send(.internal(.loadPlans))
       case .view(.createPlanButtonTapped):
+        analyticsClient.track(.planCreationStarted(source: "plans"))
         state.pendingPremiumAction = .presentCreatePlan
         return resolveActivePlanLimit()
       case .view(.planTapped(let id)):
@@ -278,10 +281,18 @@ public struct PlansFeature {
 
   private func savePlan(_ draft: NewPlanDraft) -> EffectOf<Self> {
     let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
+    let plannedActivityCount = draft.plannedActivityCount(calendar: calendar)
     return .run { send in
       do {
         try await planRepository.savePlan(plan)
         _ = try await planRepository.synchronizeOccurrences(plan, plan.startDate)
+        analyticsClient.track(
+          .planCreated(
+            source: "plans",
+            duration: plan.duration.rawValue,
+            plannedActivityCount: plannedActivityCount
+          )
+        )
         await send(.internal(.planSaved))
       } catch {
         await send(.internal(.planSaveFailed))

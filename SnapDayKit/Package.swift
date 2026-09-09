@@ -35,6 +35,7 @@ private var packageDependencies: [Package.Dependency] {
   Module.composableArchitecture
   Module.snapDayCore
   Module.sentry
+  Module.telemetryDeck
 }
 
 @TargetsBuilder
@@ -58,14 +59,14 @@ private var targets: [Target] {
   TargetParamenters(module: .widgetWeeklyProgress, dependencies: sceneDependecies + [.payment])
   TargetParamenters(module: .widgetPlanProgress, dependencies: sceneDependecies + [.payment])
   TargetParamenters(module: .onboarding, dependencies: [.composableArchitecture, .uiComponents, .resources, .plans])
-  TargetParamenters(module: .payment, dependencies: [.composableArchitecture, .uiComponents, .resources])
+  TargetParamenters(module: .payment, dependencies: [.common, .composableArchitecture, .uiComponents, .resources])
   TargetParamenters(module: .manageActivity, dependencies: sceneDependecies + [.snapDayCore])
   TargetParamenters(module: .developerTools, dependencies: sceneDependecies)
   TargetParamenters(module: .emojiPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .calendarPicker, dependencies: [.common, .uiComponents, .resources])
   TargetParamenters(module: .utilities, dependencies: [.common, .models, .repositories, .composableArchitecture])
   TargetParamenters(module: .repositories, dependencies: [.common, .models, .composableArchitecture])
-  TargetParamenters(module: .common, dependencies: [.composableArchitecture, .sentry])
+  TargetParamenters(module: .common, dependencies: [.composableArchitecture, .sentry, .telemetryDeck])
   TargetParamenters(module: .models, dependencies: [.common])
   TargetParamenters(module: .uiComponents, dependencies: [.common, .resources, .composableArchitecture, .utilities])
   TargetParamenters(module: .resources)
@@ -116,6 +117,7 @@ private enum Module: String {
   case composableArchitecture
   case snapDayCore
   case sentry
+  case telemetryDeck
 
   var name: String {
     rawValue.capitalizingFirstLetter
@@ -129,6 +131,8 @@ private enum Module: String {
       .product(name: "AIModule", package: "snapday-core")
     case .sentry:
       .product(name: "SentrySPM", package: "sentry-cocoa")
+    case .telemetryDeck:
+      .product(name: "TelemetryDeck", package: "SwiftSDK")
     default:
       .byName(name: name)
     }
@@ -150,6 +154,8 @@ private enum Module: String {
       [.package(path: "../../snapday-core")]
     case .sentry:
       [.package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "9.24.0")]
+    case .telemetryDeck:
+      [.package(url: "https://github.com/TelemetryDeck/SwiftSDK.git", from: "2.14.2")]
     default:
       nil
     }
@@ -157,9 +163,9 @@ private enum Module: String {
 
   var targetConfiguration: [ModuleTargetConfiguration] {
     switch self {
-    case .composableArchitecture, .snapDayCore, .sentry:
+    case .composableArchitecture, .snapDayCore, .sentry, .telemetryDeck:
       []
-    case .uiComponents, .resources, .developerTools:
+    case .uiComponents, .resources, .developerTools, .widgetWeeklyProgress:
       [.source]
     default:
       [.source, .tests]

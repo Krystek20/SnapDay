@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Common
 import Foundation
 import Models
 import Onboarding
@@ -29,6 +30,7 @@ public struct ApplicationFeature {
   @Dependency(\.paymentClient) private var paymentClient
   @Dependency(\.openURL) private var openURL
   @Dependency(\.widgetReloader) private var widgetReloader
+  @Dependency(\.analyticsClient) private var analyticsClient
   private static let isOnboardingShownKey = "isOnboardingShown"
   private let userDefaults: UserDefaults
 
@@ -187,18 +189,21 @@ public struct ApplicationFeature {
       case .reports:
         return .none
       case .onboarding(.delegate(.completed)):
+        analyticsClient.track(.onboardingCompleted(outcome: "dashboard"))
         state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
         state.selectedTab = .dashboard
         userDefaults.set(true, forKey: Self.isOnboardingShownKey)
         return .none
       case .onboarding(.delegate(.skipped)):
+        analyticsClient.track(.onboardingCompleted(outcome: "skipped"))
         state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
         state.selectedTab = .dashboard
         userDefaults.set(true, forKey: Self.isOnboardingShownKey)
         return .none
       case .onboarding(.delegate(.createPlanRequested(let request))):
+        analyticsClient.track(.planCreationStarted(source: "onboarding"))
         let startDate = calendar.startOfDay(for: now)
         let activity = request.activityTitle.map {
           Activity(
@@ -244,6 +249,13 @@ public struct ApplicationFeature {
               generatedActivities,
               occurrences
             )
+            analyticsClient.track(
+              .planCreated(
+                source: "onboarding",
+                duration: plan.duration.rawValue,
+                plannedActivityCount: occurrences.count
+              )
+            )
             await send(.onboardingPlanSaved)
           } catch {
             await send(.onboardingPlanSaveFailed)
@@ -253,6 +265,7 @@ public struct ApplicationFeature {
       case .onboarding:
         return .none
       case .onboardingPlanSaved:
+        analyticsClient.track(.onboardingCompleted(outcome: "plan_created"))
         state.onboardingGeneratedActivityIDs = []
         state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
@@ -268,10 +281,16 @@ public struct ApplicationFeature {
       case .premiumEntitlementUpdated(let entitlement):
         return applyPremiumEntitlement(entitlement, state: &state)
       case .requestPremiumAccess(let context):
+        guard state.paywall?.context != context else { return .none }
+        analyticsClient.track(
+          .premiumAccessRequested(
+            context: context.rawValue,
+            hasAccess: state.premiumEntitlement.hasAccess
+          )
+        )
         guard !state.premiumEntitlement.hasAccess else {
           return .send(.premiumAccessGranted(context))
         }
-        guard state.paywall?.context != context else { return .none }
         state.pendingPremiumAction = context
         state.paywall = PaywallFeature.State(context: context)
         return .none
@@ -287,6 +306,9 @@ public struct ApplicationFeature {
           return .send(.dashboard(.premiumAccessGranted(context)))
         }
       case .paywall(.presented(.delegate(.closeRequested))):
+        if let context = state.paywall?.context {
+          analyticsClient.track(.paywallDismissed(context: context.rawValue))
+        }
         state.pendingPremiumAction = nil
         state.paywall = nil
         return .none
@@ -306,6 +328,9 @@ public struct ApplicationFeature {
           await openURL(link.url)
         }
       case .paywall(.dismiss):
+        if let context = state.pendingPremiumAction {
+          analyticsClient.track(.paywallDismissed(context: context.rawValue))
+        }
         state.pendingPremiumAction = nil
         return .none
       case .paywall:
