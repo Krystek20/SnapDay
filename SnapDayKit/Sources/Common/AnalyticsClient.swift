@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import Foundation
-import OSLog
 import TelemetryDeck
 
 public struct AnalyticsClient: Sendable {
@@ -28,7 +27,6 @@ public extension DependencyValues {
 
 public enum ProductAnalytics {
   private static let appIDKey = "TelemetryDeckAppID"
-  private static let logger = Logger(subsystem: "SnapDay", category: "ProductAnalytics")
   private static let state = ProductAnalyticsState()
 
   public static func start(bundle: Bundle = .main) {
@@ -43,17 +41,8 @@ public enum ProductAnalytics {
       return
     }
 
-    let configuration = TelemetryDeck.Config(appID: appID)
-    #if DEBUG
-    configuration.logHandler = LogHandler(logLevel: .debug) { level, message in
-      logger.info("[TelemetryDeck: \(level.description, privacy: .public)] \(message, privacy: .public)")
-    }
-    #endif
-    TelemetryDeck.initialize(config: configuration)
+    TelemetryDeck.initialize(config: TelemetryDeck.Config(appID: appID))
     state.markStarted()
-    #if DEBUG
-    logger.info("TelemetryDeck initialized with app ID \(appID, privacy: .public); test mode: \(configuration.testMode)")
-    #endif
   }
 
   fileprivate static func track(_ event: AnalyticsEvent) {
