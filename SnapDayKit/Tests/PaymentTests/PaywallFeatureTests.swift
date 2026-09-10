@@ -62,6 +62,7 @@ struct PaywallFeatureTests {
 
   @Test
   func successfulPurchaseDelegatesExactlyOnce() async {
+    let analytics = AnalyticsRecorder()
     let entitlement = PremiumEntitlement.subscribed(expirationDate: nil)
     let annual = SubscriptionProduct.paywallTestProducts[1]
     var state = PaywallFeature.State(context: .secondActivePlan)
@@ -71,6 +72,7 @@ struct PaywallFeatureTests {
     let store = TestStore(initialState: state) {
       PaywallFeature()
     } withDependencies: {
+      $0.analyticsClient.track = { event in analytics.record(event) }
       $0.paymentClient.purchase = { _ in .purchased(entitlement) }
     }
 
@@ -84,6 +86,15 @@ struct PaywallFeatureTests {
     await store.receive(.delegate(.purchaseCompleted(entitlement)))
 
     await store.send(.internal(.purchaseFinished(.purchased(entitlement))))
+
+    #expect(
+      analytics.events == [
+        .subscriptionPurchased(
+          productID: annual.id,
+          context: PaywallEntryContext.secondActivePlan.rawValue
+        )
+      ]
+    )
   }
 
   @Test
@@ -150,17 +161,7 @@ struct PaywallFeatureTests {
     }
 
     #expect(
-      analytics.events == [
-        .subscriptionPurchaseStarted(
-          productID: annual.id,
-          context: PaywallEntryContext.settings.rawValue
-        ),
-        .subscriptionPurchaseFinished(
-          outcome: "cancelled",
-          productID: annual.id,
-          context: PaywallEntryContext.settings.rawValue
-        )
-      ]
+      analytics.events.isEmpty
     )
   }
 
