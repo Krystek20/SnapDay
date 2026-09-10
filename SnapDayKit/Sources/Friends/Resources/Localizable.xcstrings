@@ -302,7 +302,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bleib dran! Wir generieren deinen privaten Kollaborationslink. Sobald er fertig ist, sende ihn an deinen Eingeladenen, um loszulegen."
+            "value" : "Einen Moment! Wir erstellen deinen privaten Link für die Zusammenarbeit. Sobald er fertig ist, sende ihn an die eingeladene Person."
           }
         },
         "es" : {
@@ -320,19 +320,19 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aspetta! Stiamo generando il tuo link di collaborazione privato. Una volta pronto, invialo al tuo invitato per iniziare."
+            "value" : "Attendi un momento! Stiamo generando il tuo link privato per la collaborazione. Quando sarà pronto, invialo alla persona che vuoi invitare."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "お待ちください！プライベートコラボレーションリンクを生成しています。準備ができたら、招待者に送信して開始してください。"
+            "value" : "少々お待ちください。非公開の共同作業リンクを作成しています。準備ができたら、招待する相手に送信してください。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "잠깐만요! 개인 협업 링크를 생성하고 있습니다. 준비되면 초대자에게 보내서 시작하세요."
+            "value" : "잠시만 기다려 주세요. 비공개 협업 링크를 만들고 있습니다. 준비되면 초대할 사람에게 보내 주세요."
           }
         },
         "pl" : {
@@ -350,7 +350,62 @@
       }
     },
     "Invitation Couldn't Be Prepared" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر إعداد الدعوة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einladung konnte nicht vorbereitet werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo preparar la invitación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de préparer l’invitation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile preparare l’invito"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "招待を準備できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "초대를 준비할 수 없습니다"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się przygotować zaproszenia"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível preparar o convite"
+          }
+        }
+      }
     },
     "Invitation sent to %@" : {
       "localizations" : {
@@ -439,13 +494,13 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invita amici a collaborare sui tuoi tabelloni e condividere attività."
+            "value" : "Invita gli amici a collaborare sulle tue bacheche e a condividere attività."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "友達をボードでコラボレーションし、アクティビティを共有するよう招待します。"
+            "value" : "友達を招待して、ボードで共同作業したり、アクティビティを共有したりしましょう。"
           }
         },
         "ko" : {
@@ -479,7 +534,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch keine Mitarbeiter"
+            "value" : "Noch keine Mitwirkenden"
           }
         },
         "es" : {
@@ -527,10 +582,120 @@
       }
     },
     "OK" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "موافق"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
     },
     "Please check your iCloud connection and try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى التحقق من اتصالك بـ iCloud والمحاولة مرة أخرى."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte überprüfe deine iCloud-Verbindung und versuche es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba tu conexión a iCloud e inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez votre connexion à iCloud et réessayez."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controlla la connessione a iCloud e riprova."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudへの接続を確認して、もう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 연결을 확인하고 다시 시도해 주세요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprawdź połączenie z iCloud i spróbuj ponownie."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifique sua conexão com o iCloud e tente novamente."
+          }
+        }
+      }
     },
     "Preparing your invite link…" : {
       "localizations" : {
@@ -543,7 +708,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bereite deinen Einladungslink vor…"
+            "value" : "Dein Einladungslink wird vorbereitet…"
           }
         },
         "es" : {
@@ -735,7 +900,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hanno accettato il tuo tabellone, ma non hanno ancora condiviso il loro."
+            "value" : "Hanno accettato la tua bacheca, ma non hanno ancora condiviso la loro."
           }
         },
         "ja" : {
@@ -845,7 +1010,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En attente qu'ils acceptent votre invitation."
+            "value" : "En attente de l’acceptation de votre invitation."
           }
         },
         "it" : {
@@ -985,7 +1150,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Udostępniłeś %@"
+            "value" : "Udostępniasz tablicę użytkownikowi %@"
           }
         },
         "pt-BR" : {
@@ -1025,7 +1190,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entrambi state condividendo tabelloni tra di voi."
+            "value" : "State condividendo reciprocamente le vostre bacheche."
           }
         },
         "ja" : {
