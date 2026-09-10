@@ -15,6 +15,11 @@ public enum FriendsField: Hashable {
 @Reducer
 public struct FriendsFeature: TodayProvidable {
 
+  private enum CancelID: Hashable {
+    case invitation
+    case invitationTimeout
+  }
+
   public enum ViewContent: Hashable, Equatable {
     case noCollaboration
     case form
@@ -51,6 +56,8 @@ public struct FriendsFeature: TodayProvidable {
     var removing = [Collaboration]()
     var showContactList = false
     var isGeneratingInvitiation = false
+    var invitationAttemptID: UUID?
+    var showInvitationError = false
     var hasPremiumAccess: Bool
     var pendingInvitation: [InvitationRecipient]?
 
@@ -76,8 +83,9 @@ public struct FriendsFeature: TodayProvidable {
       case loadContactsIfAllowed
       case updateParticipantsWithContants(contacts: [Contact])
       case invite(String, String)
-      case shareUrl(ShareResult)
-      case invitationFailed
+      case shareUrl(ShareResult, UUID)
+      case invitationFailed(UUID)
+      case invitationTimedOut(UUID)
       case closeForm
       case setViewContent(ViewContent)
       case setRemoving(Collaboration, Bool)
@@ -176,7 +184,6 @@ public struct FriendsFeature: TodayProvidable {
       state.collaborations = collaborations
         .filter { !state.removing.contains($0) }
 
-      state.isGeneratingInvitiation = false
       if state.content == .form {
         return .none
       } else {
@@ -220,14 +227,34 @@ public struct FriendsFeature: TodayProvidable {
         recipients: [State.InvitationRecipient(email: email, phoneNumber: phoneNumber)],
         state: &state
       )
-    case .shareUrl(let shareResult):
+    case .shareUrl(let shareResult, let attemptID):
+      guard state.invitationAttemptID == attemptID else { return .none }
+      state.invitationAttemptID = nil
       state.shareResult = shareResult
-      state.isSharing = true
-      return .none
-    case .invitationFailed:
       state.isGeneratingInvitiation = false
       state.content = state.collaborations.isEmpty ? .noCollaboration : .list
-      return .none
+      state.isSharing = true
+      return .cancel(id: CancelID.invitationTimeout)
+    case .invitationFailed(let attemptID):
+      guard state.invitationAttemptID == attemptID else { return .none }
+      state.invitationAttemptID = nil
+      state.isGeneratingInvitiation = false
+      state.content = state.collaborations.isEmpty ? .noCollaboration : .list
+      state.showInvitationError = true
+      return .cancel(id: CancelID.invitationTimeout)
+    case .invitationTimedOut(let attemptID):
+      guard state.invitationAttemptID == attemptID else { return .none }
+      let error = NSError(
+        domain: "SnapDay.Invitation",
+        code: 1,
+        userInfo: [NSLocalizedDescriptionKey: "Invitation preparation timed out"]
+      )
+      Telemetry.capture(error, stage: "timeout")
+      state.invitationAttemptID = nil
+      state.isGeneratingInvitiation = false
+      state.content = state.collaborations.isEmpty ? .noCollaboration : .list
+      state.showInvitationError = true
+      return .cancel(id: CancelID.invitation)
     case .setViewContent(let value):
       state.content = value
       return .none
@@ -320,8 +347,18 @@ public struct FriendsFeature: TodayProvidable {
     recipients: [State.InvitationRecipient],
     state: inout State
   ) -> Effect<Action> {
+    guard state.invitationAttemptID == nil else {
+      Telemetry.breadcrumb("duplicate_attempt_ignored")
+      return .none
+    }
+
+    let attemptID = UUID()
+    state.invitationAttemptID = attemptID
     state.isGeneratingInvitiation = true
-    return .run { send in
+    state.showInvitationError = false
+    Telemetry.breadcrumb("ui_started", data: ["recipient_count": recipients.count])
+
+    let invitation = Effect<Action>.run { send in
       await send(.internal(.closeForm))
 
       do {
@@ -337,15 +374,24 @@ public struct FriendsFeature: TodayProvidable {
         }
 
         guard let shareResult else {
-          return await send(.internal(.invitationFailed))
+          return await send(.internal(.invitationFailed(attemptID)))
         }
-        await send(.internal(.shareUrl(shareResult)))
+        await send(.internal(.shareUrl(shareResult, attemptID)))
         await send(.internal(.loadParticipants))
       } catch {
         NSLog("[FriendsFeature] Invitation creation failed: \(error)")
-        await send(.internal(.invitationFailed))
+        await send(.internal(.invitationFailed(attemptID)))
       }
     }
+    .cancellable(id: CancelID.invitation, cancelInFlight: true)
+
+    let timeout = Effect<Action>.run { send in
+      try await Task.sleep(for: .seconds(30))
+      await send(.internal(.invitationTimedOut(attemptID)))
+    }
+    .cancellable(id: CancelID.invitationTimeout, cancelInFlight: true)
+
+    return .merge(invitation, timeout)
   }
 
   private func inviteButtonTapped(state: inout State) -> Effect<Action> {

@@ -163,8 +163,20 @@ final class CoreDataStack {
   }
 
   @discardableResult
-  func persistUpdatedShare(share: CKShare) async throws -> CKShare {
-    try await persistentContainer.persistUpdatedShare(share, in: privatePersistentStore)
+  func persistUpdatedShare(share: CKShare) throws -> CKShare {
+    let persistentStore = try privatePersistentStore
+    persistentContainer.persistUpdatedShare(share, in: persistentStore) { _, error in
+      if let error {
+        Telemetry.capture(error, stage: "share_export")
+        Telemetry.breadcrumb("share_export_failed")
+      } else {
+        Telemetry.breadcrumb("share_export_completed")
+      }
+    }
+
+    // Core Data saves the CKShare into the persistent store before this method
+    // returns. The callback reports completion of the later CloudKit export.
+    return share
   }
 
   @discardableResult
