@@ -86,7 +86,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       do {
         try await cloudService.accept(invitation: Invitation(cloudKitShareMetadata: cloudKitShareMetadata))
       } catch {
-        Telemetry.capture(error, stage: "acceptance_scene")
+        Telemetry.capture(error, stage: "acceptance")
       }
     }
   }

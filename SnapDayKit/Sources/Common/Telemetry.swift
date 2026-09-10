@@ -15,7 +15,7 @@ public enum Telemetry {
     SentrySDK.start { options in
       options.dsn = dsn
       options.sendDefaultPii = false
-      options.enableAutoSessionTracking = true
+      options.enableAutoSessionTracking = false
       options.environment = configurationName
     }
   }
@@ -41,7 +41,8 @@ public enum Telemetry {
     guard !(error is CancellationError) else { return }
 
     let nsError = error as NSError
-    SentrySDK.capture(error: nsError) { scope in
+    let diagnosticError = NSError(domain: nsError.domain, code: nsError.code)
+    SentrySDK.capture(error: diagnosticError) { scope in
       scope.setTag(value: "collaboration_invitation", key: "feature")
       scope.setTag(value: stage, key: "invitation_stage")
       scope.setTag(value: nsError.domain, key: "error_domain")

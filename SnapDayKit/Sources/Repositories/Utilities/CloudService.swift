@@ -252,13 +252,8 @@ public actor CloudService {
 
   public func accept(invitation: Invitation) async throws {
     Telemetry.breadcrumb("received", category: "collaboration.acceptance")
-    do {
-      try await coreDataStack.accept(invitation: invitation)
-      Telemetry.breadcrumb("accepted", category: "collaboration.acceptance")
-    } catch {
-      Telemetry.capture(error, stage: "acceptance")
-      throw error
-    }
+    try await coreDataStack.accept(invitation: invitation)
+    Telemetry.breadcrumb("accepted", category: "collaboration.acceptance")
 
     let ckShare = invitation.cloudKitShareMetadata.share
     let owner = Participant(ckShare.owner, currentUser: ckShare.currentUserParticipant)

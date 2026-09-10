@@ -364,6 +364,7 @@
 				D443ECEB2AD0771C002225CF /* Frameworks */,
 				D443ECEC2AD0771C002225CF /* Resources */,
 				D4CCE6322BC7B4BB00C198C5 /* Embed Foundation Extensions */,
+				A19A00112F70000100000001 /* Upload Sentry Symbols */,
 			);
 			buildRules = (
 			);
@@ -533,6 +534,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A19A00112F70000100000001 /* Upload Sentry Symbols */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/upload-sentry-symbols.sh",
+			);
+			name = "Upload Sentry Symbols";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/scripts/upload-sentry-symbols.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D443ECEA2AD0771C002225CF /* Sources */ = {
