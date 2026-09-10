@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import Models
 import Onboarding
+import Payment
 import Plans
 import Repositories
 import Utilities
@@ -15,6 +16,7 @@ public struct ApplicationFeature {
 
   private enum CancelID {
     case onboardingPlanCreation
+    case premiumEntitlementUpdates
   }
 
   @Dependency(\.deeplinkService) private var deeplinkService
@@ -24,6 +26,9 @@ public struct ApplicationFeature {
   @Dependency(\.calendar) private var calendar
   @Dependency(\.date.now) private var now
   @Dependency(\.uuid) private var uuid
+  @Dependency(\.paymentClient) private var paymentClient
+  @Dependency(\.openURL) private var openURL
+  @Dependency(\.widgetReloader) private var widgetReloader
   private static let isOnboardingShownKey = "isOnboardingShown"
   private let userDefaults: UserDefaults
 
@@ -39,6 +44,9 @@ public struct ApplicationFeature {
     var onboarding = OnboardingFeature.State()
     var onboardingGeneratedActivityIDs: Set<Activity.ID> = []
     var isOnboardingPlanSaveErrorPresented = false
+    var premiumEntitlement = PremiumEntitlement.unknown
+    var pendingPremiumAction: PaywallEntryContext?
+    @Presents var paywall: PaywallFeature.State?
 
     #if DEBUG
     @Presents var developerTools: DeveloperToolsFeature.State?
@@ -63,6 +71,10 @@ public struct ApplicationFeature {
     case onboardingPlanSaved
     case onboardingPlanSaveFailed
     case onboardingPlanSaveErrorDismissed
+    case premiumEntitlementUpdated(PremiumEntitlement)
+    case requestPremiumAccess(PaywallEntryContext)
+    case premiumAccessGranted(PaywallEntryContext)
+    case paywall(PresentationAction<PaywallFeature.Action>)
     #if DEBUG
     case developerTools(PresentationAction<DeveloperToolsFeature.Action>)
     #endif
@@ -115,6 +127,11 @@ public struct ApplicationFeature {
                 } else {
                   await send(.openDashboardRoute(.plans))
                 }
+              case .premium(let rawContext):
+                deeplinkService.consume()
+                if let context = PaywallEntryContext(rawValue: rawContext) {
+                  await send(.requestPremiumAccess(context))
+                }
               case .none:
                 break
               }
@@ -125,7 +142,13 @@ public struct ApplicationFeature {
               await send(.setupCloud)
               await send(.cleanIcons)
             }
+          },
+          .run { send in
+            for await entitlement in paymentClient.entitlementUpdates() {
+              await send(.premiumEntitlementUpdated(entitlement))
+            }
           }
+          .cancellable(id: CancelID.premiumEntitlementUpdates, cancelInFlight: true)
         )
       case .cleanIcons:
         return .run { _ in
@@ -155,8 +178,12 @@ public struct ApplicationFeature {
         guard state.selectedTab != tab else { return .none }
         state.selectedTab = tab
         return .none
+      case .dashboard(.delegate(.premiumAccessRequested(let context))):
+        return .send(.requestPremiumAccess(context))
       case .dashboard:
         return .none
+      case .reports(.delegate(.premiumAccessRequested(let context))):
+        return .send(.requestPremiumAccess(context))
       case .reports:
         return .none
       case .onboarding(.delegate(.completed)):
@@ -238,6 +265,51 @@ public struct ApplicationFeature {
       case .onboardingPlanSaveErrorDismissed:
         state.isOnboardingPlanSaveErrorPresented = false
         return .none
+      case .premiumEntitlementUpdated(let entitlement):
+        return applyPremiumEntitlement(entitlement, state: &state)
+      case .requestPremiumAccess(let context):
+        guard !state.premiumEntitlement.hasAccess else {
+          return .send(.premiumAccessGranted(context))
+        }
+        guard state.paywall?.context != context else { return .none }
+        state.pendingPremiumAction = context
+        state.paywall = PaywallFeature.State(context: context)
+        return .none
+      case .premiumAccessGranted(let context):
+        switch context {
+        case .extendedReports:
+          return .send(.reports(.reports(.premiumAccessGranted)))
+        case .planProgressWidget:
+          return .send(.openDashboardRoute(.plans))
+        case .weeklyProgressWidget:
+          return .send(.setTab(.dashboard))
+        default:
+          return .send(.dashboard(.premiumAccessGranted(context)))
+        }
+      case .paywall(.presented(.delegate(.closeRequested))):
+        state.pendingPremiumAction = nil
+        state.paywall = nil
+        return .none
+      case .paywall(.presented(.delegate(.purchaseCompleted(let entitlement)))):
+        let pendingAction = state.pendingPremiumAction
+        state.pendingPremiumAction = nil
+        state.paywall = nil
+        let continuePendingAction = pendingAction.map {
+          Effect<Action>.send(.premiumAccessGranted($0))
+        } ?? .none
+        return .merge(
+          applyPremiumEntitlement(entitlement, state: &state),
+          continuePendingAction
+        )
+      case .paywall(.presented(.delegate(.legalLinkRequested(let link)))):
+        return .run { _ in
+          await openURL(link.url)
+        }
+      case .paywall(.dismiss):
+        state.pendingPremiumAction = nil
+        return .none
+      case .paywall:
+        return .none
       #if DEBUG
       case .developerTools(.presented(.delegate(.showOnboardingAgain))):
         userDefaults.removeObject(forKey: Self.isOnboardingShownKey)
@@ -245,12 +317,18 @@ public struct ApplicationFeature {
         state.showOnboarding = true
         state.developerTools = nil
         return .none
+      case .developerTools(.presented(.delegate(.showPaywall))):
+        state.developerTools = nil
+        return .send(.requestPremiumAccess(.settings))
       case .developerTools:
         return .none
       #endif
       case .binding:
         return .none
       }
+    }
+    .ifLet(\.$paywall, action: \.paywall) {
+      PaywallFeature()
     }
     #if DEBUG
     .ifLet(\.$developerTools, action: \.developerTools) {
@@ -275,5 +353,29 @@ public struct ApplicationFeature {
     case nil:
       []
     }
+  }
+
+  private func applyPremiumEntitlement(
+    _ entitlement: PremiumEntitlement,
+    state: inout State
+  ) -> Effect<Action> {
+    let accessChanged = state.premiumEntitlement.hasAccess != entitlement.hasAccess
+    state.premiumEntitlement = entitlement
+
+    var effects: [Effect<Action>] = [
+      .send(.reports(.reports(.premiumEntitlementUpdated(entitlement.hasAccess)))),
+      .send(.dashboard(.premiumEntitlementUpdated(entitlement.hasAccess)))
+    ]
+    if accessChanged {
+      effects.append(
+        .run { _ in await widgetReloader.requestReload(delay: .zero) }
+      )
+    }
+    if state.paywall != nil {
+      effects.append(
+        .send(.paywall(.presented(.internal(.entitlementUpdated(entitlement)))))
+      )
+    }
+    return .merge(effects)
   }
 }

@@ -4,8 +4,8 @@ import Repositories
 import WidgetKit
 
 struct PlanProgressAppIntent: WidgetConfigurationIntent {
-  static var title: LocalizedStringResource = "Plan progress"
-  static var description = IntentDescription("Track progress for an active plan.")
+  static var title: LocalizedStringResource = "Plan progress · Plus"
+  static var description = IntentDescription("Track a specific Plan with SnapDay Plus.")
 
   @Parameter(title: "Plan")
   var plan: PlanWidgetEntity?

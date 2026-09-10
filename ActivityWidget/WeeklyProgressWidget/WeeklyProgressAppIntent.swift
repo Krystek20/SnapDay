@@ -2,8 +2,8 @@ import WidgetKit
 import AppIntents
 
 struct WeeklyProgressAppIntent: WidgetConfigurationIntent {
-  static var title: LocalizedStringResource = "Weekly progress"
-  static var description = IntentDescription("See your activity progress for the week.")
+  static var title: LocalizedStringResource = "Weekly progress · Plus"
+  static var description = IntentDescription("Configure weekly progress with SnapDay Plus.")
 
   @Parameter(
     title: "Activities",

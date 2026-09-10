@@ -2,7 +2,7 @@ import Dependencies
 import Foundation
 import Models
 
-public struct PlanRepository {
+public struct PlanRepository: Sendable {
   public var loadPlans: @Sendable () async throws -> [Plan]
   public var loadActivePlans: @Sendable (_ date: Date) async throws -> [Plan]
   public var loadHistoricalPlans: @Sendable (_ date: Date) async throws -> [Plan]

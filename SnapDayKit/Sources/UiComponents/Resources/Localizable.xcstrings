@@ -1,2501 +1,2501 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "": {
-      "shouldTranslate": false
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+      "shouldTranslate" : false
     },
-    "(%lld%%)": {
-      "shouldTranslate": false
+    "(%lld%%)" : {
+      "shouldTranslate" : false
     },
-    "%lf": {
-      "shouldTranslate": false
+    "%lf" : {
+      "shouldTranslate" : false
     },
-    "%lld": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+    "%lld" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         }
       },
-      "shouldTranslate": false
+      "shouldTranslate" : false
     },
-    "%lld / %lld": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+    "%lld / %lld" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld / %2$lld"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld / %2$lld"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
           }
         }
       },
-      "shouldTranslate": false
+      "shouldTranslate" : false
     },
-    "%lld day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Tag"
+    "%lld day" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld يوم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld day"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Tag"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld día"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld day"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld dzień"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld día"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld jour"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld jour"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld dia"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld giorno"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld giorno"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 日"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 日"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 일"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld يوم"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld dzień"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 일"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld dia"
           }
         }
       }
     },
-    "%lld days": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Tage"
+    "%lld days" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld أيام"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld days"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Tage"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld días"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld dni"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld días"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld jours"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld jours"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld dias"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld giorni"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld giorni"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 日"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 日"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 일"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld أيام"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld dni"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 일"
-          }
-        }
-      }
-    },
-    "%lld hours": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Stunden"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld hours"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld horas"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld godziny"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld heures"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld horas"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld ore"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 時間"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld ساعات"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 시간"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld dias"
           }
         }
       }
     },
-    "%lld min": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld min"
+    "%lld hours" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld ساعات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld min"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Stunden"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld min"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld hours"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld min"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld horas"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld min"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld heures"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld min"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld ore"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld min"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 時間"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 分"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 시간"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld دقيقة"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld godziny"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 분"
-          }
-        }
-      }
-    },
-    "%lld%%": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld horas"
           }
         }
       }
     },
-    "Biweekly": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zweiwöchentlich"
+    "%lld min" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld دقيقة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Biweekly"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quincenal"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dwutygodniowa"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bimensuel"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quinzenal"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bimestrale"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 分"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "隔週"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 분"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "كل أسبوعين"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "격주"
-          }
-        }
-      }
-    },
-    "Cancel": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abbrechen"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancelar"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anuluj"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Annuler"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancelar"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Annullare"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "キャンセル"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إلغاء"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "취소"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         }
       }
     },
-    "Completed activities": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abgeschlossene Aktivitäten"
+    "%lld%%" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Completed activities"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actividades completadas"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ukończone aktywności"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activités complétées"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Atividades completas"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Attività completate"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "完了したアクティビティ"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الأنشطة المكتملة"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "완료된 활동"
-          }
-        }
-      }
-    },
-    "Daily": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Täglich"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Daily"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diario"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Codzienna"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quotidien"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diário"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Giornaliero"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "毎日"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يومي"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "매일"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
           }
         }
       }
     },
-    "Day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tag"
+    "Biweekly · Plus" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كل أسبوعين · Plus"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Day"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweiwöchentlich · Plus"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biweekly · Plus"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dzień"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quincenal · Plus"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jour"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bimensuel · Plus"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dia"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bimestrale · Plus"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Giorno"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隔週 · Plus"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "격주 · Plus"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يوم"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dwutygodniowa · Plus"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일"
-          }
-        }
-      }
-    },
-    "First": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erster"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "First"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primero"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pierwszy"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Premier"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primeiro"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primo"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最初"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الأول"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "첫 번째"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quinzenal · Plus"
           }
         }
       }
     },
-    "First day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erster Tag"
+    "Cancel" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "First day"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primer día"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pierwszy dzień"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Premier jour"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primeiro dia"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annullare"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primo giorno"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最初の日"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اليوم الأول"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "첫 번째 날"
-          }
-        }
-      }
-    },
-    "Fourth": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vierter"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fourth"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cuarto"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Czwarty"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quatrième"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quarto"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quarto"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "第四"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الرابع"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "넷째"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         }
       }
     },
-    "Last": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Letzter"
+    "Completed activities" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأنشطة المكتملة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgeschlossene Aktivitäten"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Último"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed activities"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ostatni"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actividades completadas"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dernier"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activités complétées"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Último"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attività completate"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ultimo"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了したアクティビティ"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最後"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료된 활동"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الأخير"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukończone aktywności"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마지막"
-          }
-        }
-      }
-    },
-    "Last day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Letzter Tag"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last day"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Último día"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ostatni dzień"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dernier jour"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Último dia"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ultimo giorno"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最後の日"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اليوم الأخير"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마지막 날"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atividades completas"
           }
         }
       }
     },
-    "Mid month": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mitte des Monats"
+    "Daily" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يومي"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mid month"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Täglich"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mitad de mes"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Środek miesiąca"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diario"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Milieu de mois"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quotidien"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Meio do mês"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giornaliero"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Metà mese"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "毎日"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "月の真ん中"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "매일"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "منتصف الشهر"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codzienna"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "월 중"
-          }
-        }
-      }
-    },
-    "Month": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monat"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Month"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mes"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Miesiąc"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mois"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mês"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mese"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "月"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "شهر"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "달"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diário"
           }
         }
       }
     },
-    "Monthly": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monatlich"
+    "Day" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يوم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monthly"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mensual"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Miesięczna"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mensuel"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jour"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mensal"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giorno"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mensile"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "毎月"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "شهري"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzień"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "매월"
-          }
-        }
-      }
-    },
-    "Monthly specific date": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monatlich spezifisches Datum"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monthly specific date"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fecha específica mensual"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dzień miesiąca"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Date spécifique mensuelle"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Data específica mensal"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Data specifica mensile"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "月の特定の日"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تاريخ محدد شهري"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "월별 특정 날짜"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dia"
           }
         }
       }
     },
-    "Quarter": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quartal"
+    "First" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأول"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quarter"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erster"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trimestre"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kwartał"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primero"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trimestre"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premier"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trimestre"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primo"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trimestre"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最初"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "四半期"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첫 번째"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ربع السنة"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pierwszy"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "분기"
-          }
-        }
-      }
-    },
-    "Remaining Time": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verbleibende Zeit"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remaining Time"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tiempo restante"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pozostały czas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temps restant"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo restante"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo rimanente"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "残り時間"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الوقت المتبقي"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "남은 시간"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primeiro"
           }
         }
       }
     },
-    "Remove": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Entfernen"
+    "First day" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم الأول"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erster Tag"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eliminar"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First day"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usuń"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primer día"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retirer"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premier jour"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remover"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primo giorno"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rimuovere"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最初の日"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "削除"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첫 번째 날"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إزالة"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pierwszy dzień"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "삭제"
-          }
-        }
-      }
-    },
-    "Second": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zweiter"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Second"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Segundo"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Drugi"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deuxième"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Segundo"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Secondo"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "第二"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ثاني"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "둘째"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primeiro dia"
           }
         }
       }
     },
-    "Second day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zweiter Tag"
+    "Fourth" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرابع"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Second day"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vierter"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Segundo día"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fourth"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Drugi dzień"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuarto"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deuxième jour"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quatrième"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Segundo dia"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quarto"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Secondo giorno"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第四"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "第2日"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "넷째"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اليوم الثاني"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czwarty"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "둘째 날"
-          }
-        }
-      }
-    },
-    "Second to last": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vorletzter"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Second to last"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Penúltimo"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Przedostatni"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Avant-dernier"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Penúltimo"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Penultimo"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "第二最終"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قبل الأخير"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "둘째 마지막"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quarto"
           }
         }
       }
     },
-    "Second to last day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vorletzter Tag"
+    "Last" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الأخير"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Second to last day"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzter"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Penúltimo día"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Przedostatni dzień"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Avant-dernier jour"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernier"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Penúltimo dia"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultimo"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Penultimo giorno"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "第二最終日"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마지막"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اليوم قبل الأخير"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatni"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "둘째 마지막 날"
-          }
-        }
-      }
-    },
-    "SnapDay Invitation": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SnapDay-Einladung"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invitación de SnapDay"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zaproszenie SnapDay"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invitation SnapDay"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Convite SnapDay"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invito SnapDay"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SnapDayの招待状"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "دعوة SnapDay"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SnapDay 초대장"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último"
           }
         }
       }
     },
-    "Specific weekday": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bestimmter Wochentag"
+    "Last day" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم الأخير"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Specific weekday"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzter Tag"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Día específico de la semana"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last day"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dzień tygodnia"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último día"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jour de la semaine spécifique"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernier jour"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dia da semana específico"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultimo giorno"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Giorno specifico della settimana"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後の日"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "特定の曜日"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마지막 날"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يوم محدد من الأسبوع"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatni dzień"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "특정 요일"
-          }
-        }
-      }
-    },
-    "Third": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dritter"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Third"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tercero"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trzeci"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Troisième"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Terceiro"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Terzo"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "第三"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ثالث"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "셋째"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último dia"
           }
         }
       }
     },
-    "Total Available Time": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gesamt verfügbare Zeit"
+    "Mid month" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "منتصف الشهر"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total Available Time"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitte des Monats"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tiempo total disponible"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mid month"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Łączny dostępny czas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitad de mes"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temps total disponible"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Milieu de mois"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo total disponível"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metà mese"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo totale disponibile"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月の真ん中"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "利用可能な合計時間"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "월 중"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إجمالي الوقت المتاح"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Środek miesiąca"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용 가능한 총 시간"
-          }
-        }
-      }
-    },
-    "Total Completed Time": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gesamt abgeschlossene Zeit"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total Completed Time"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tiempo total completado"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Łączny ukończony czas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temps total complété"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo total concluído"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo totale completato"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "完了した合計時間"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إجمالي الوقت المكتمل"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "총 완료 시간"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meio do mês"
           }
         }
       }
     },
-    "Total Planned Time": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gesamt geplante Zeit"
+    "Month" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "شهر"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total Planned Time"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monat"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tiempo total planificado"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Month"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Łączny zaplanowany czas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mes"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temps total planifié"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mois"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo total planejado"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mese"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo totale pianificato"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "総計画時間"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "달"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إجمالي الوقت المخطط"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miesiąc"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "총 계획 시간"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mês"
           }
         }
       }
     },
-    "Total Task Time": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gesamtaufgabenzeit"
+    "Monthly · Plus" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "شهري · Plus"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total Task Time"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monatlich · Plus"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tiempo total de tarea"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly · Plus"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Czas całkowity"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensual · Plus"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temps total de tâche"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensuel · Plus"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo total da tarefa"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensile · Plus"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tempo totale del compito"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "毎月 · Plus"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "合計タスク時間"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "매월 · Plus"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إجمالي وقت المهمة"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miesięczna · Plus"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "총 작업 시간"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensal · Plus"
           }
         }
       }
     },
-    "Total: %lld": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gesamt: %lld"
+    "Monthly specific date" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تاريخ محدد شهري"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total: %lld"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monatlich spezifisches Datum"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total: %lld"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly specific date"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Razem: %lld"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fecha específica mensual"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total : %lld"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date spécifique mensuelle"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Total: %lld"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data specifica mensile"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Totale: %lld"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月の特定の日"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "合計: %lld"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "월별 특정 날짜"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الإجمالي: %lld"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzień miesiąca"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "총계: %lld"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data específica mensal"
           }
         }
       }
     },
-    "Week": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Woche"
+    "Quarter" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ربع السنة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Week"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quartal"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semana"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quarter"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tydzień"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trimestre"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semaine"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trimestre"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semana"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trimestre"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settimana"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "四半期"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "週"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "분기"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أسبوع"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kwartał"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "주"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trimestre"
           }
         }
       }
     },
-    "Weekly": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wöchentlich"
+    "Remaining Time" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوقت المتبقي"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weekly"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbleibende Zeit"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semanal"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remaining Time"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tygodniowa"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo restante"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hebdomadaire"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps restant"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semanal"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo rimanente"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settimanale"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "残り時間"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "毎週"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "남은 시간"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أسبوعي"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pozostały czas"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "주간"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo restante"
           }
         }
       }
     },
-    "Year": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jahr"
+    "Remove" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إزالة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Year"
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Año"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
           }
         },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rok"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Année"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ano"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovere"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anno"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "年"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "سنة"
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "년"
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover"
+          }
+        }
+      }
+    },
+    "Second" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ثاني"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweiter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segundo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deuxième"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secondo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第二"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "둘째"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugi"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segundo"
+          }
+        }
+      }
+    },
+    "Second day" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم الثاني"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweiter Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segundo día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deuxième jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secondo giorno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第2日"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "둘째 날"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugi dzień"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segundo dia"
+          }
+        }
+      }
+    },
+    "Second to last" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قبل الأخير"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorletzter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second to last"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penúltimo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avant-dernier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penultimo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第二最終"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "둘째 마지막"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przedostatni"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penúltimo"
+          }
+        }
+      }
+    },
+    "Second to last day" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم قبل الأخير"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorletzter Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Second to last day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penúltimo día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avant-dernier jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penultimo giorno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第二最終日"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "둘째 마지막 날"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przedostatni dzień"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penúltimo dia"
+          }
+        }
+      }
+    },
+    "SnapDay Invitation" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دعوة SnapDay"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SnapDay-Einladung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invitación de SnapDay"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invitation SnapDay"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invito SnapDay"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SnapDayの招待状"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SnapDay 초대장"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaproszenie SnapDay"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convite SnapDay"
+          }
+        }
+      }
+    },
+    "Specific weekday" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يوم محدد من الأسبوع"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestimmter Wochentag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specific weekday"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día específico de la semana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jour de la semaine spécifique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giorno specifico della settimana"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "特定の曜日"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "특정 요일"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzień tygodnia"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dia da semana específico"
+          }
+        }
+      }
+    },
+    "Third" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ثالث"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dritter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Third"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tercero"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troisième"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terzo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第三"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "셋째"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzeci"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terceiro"
+          }
+        }
+      }
+    },
+    "Total Available Time" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجمالي الوقت المتاح"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamt verfügbare Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Available Time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo total disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps total disponible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo totale disponibile"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用可能な合計時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용 가능한 총 시간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Łączny dostępny czas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo total disponível"
+          }
+        }
+      }
+    },
+    "Total Completed Time" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجمالي الوقت المكتمل"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamt abgeschlossene Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Completed Time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo total completado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps total complété"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo totale completato"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了した合計時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "총 완료 시간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Łączny ukończony czas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo total concluído"
+          }
+        }
+      }
+    },
+    "Total Planned Time" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجمالي الوقت المخطط"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamt geplante Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Planned Time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo total planificado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps total planifié"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo totale pianificato"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "総計画時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "총 계획 시간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Łączny zaplanowany czas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo total planejado"
+          }
+        }
+      }
+    },
+    "Total Task Time" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجمالي وقت المهمة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtaufgabenzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Task Time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo total de tarea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps total de tâche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo totale del compito"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合計タスク時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "총 작업 시간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czas całkowity"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo total da tarefa"
+          }
+        }
+      }
+    },
+    "Total: %lld" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإجمالي: %lld"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamt: %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total: %lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total : %lld"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Totale: %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合計: %lld"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "총계: %lld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Razem: %lld"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total: %lld"
+          }
+        }
+      }
+    },
+    "Week" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أسبوع"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Woche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semaine"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settimana"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tydzień"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semana"
+          }
+        }
+      }
+    },
+    "Weekly" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أسبوعي"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wöchentlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semanal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hebdomadaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settimanale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "毎週"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tygodniowa"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semanal"
+          }
+        }
+      }
+    },
+    "Year" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سنة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jahr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Year"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Año"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Année"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "년"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rok"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ano"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

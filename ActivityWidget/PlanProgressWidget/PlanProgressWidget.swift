@@ -1,4 +1,5 @@
 import Repositories
+import Payment
 import SwiftUI
 import Utilities
 import WidgetKit
@@ -24,7 +25,8 @@ struct PlanProgressWidgetProvider: AppIntentTimelineProvider, TodayProvidable {
         nextSessionDate: nil,
         referenceDate: Date.now
       ),
-      configuration: PlanProgressAppIntent()
+      configuration: PlanProgressAppIntent(),
+      hasPremiumAccess: true
     )
   }
 
@@ -48,6 +50,15 @@ struct PlanProgressWidgetProvider: AppIntentTimelineProvider, TodayProvidable {
   }
 
   private func entry(for configuration: PlanProgressAppIntent) async -> PlanProgressWidgetEntry {
+    let hasPremiumAccess = PremiumAccess.hasAccess()
+    guard hasPremiumAccess else {
+      return PlanProgressWidgetEntry(
+        date: .now,
+        content: .noActivePlan(referenceDate: today),
+        configuration: configuration,
+        hasPremiumAccess: false
+      )
+    }
     do {
       let referenceDate = today
       let activePlans = try await planRepository.loadActivePlans(referenceDate)
@@ -62,13 +73,15 @@ struct PlanProgressWidgetProvider: AppIntentTimelineProvider, TodayProvidable {
           referenceDate: referenceDate,
           calendar: .autoupdatingCurrent.utcCalendar
         ),
-        configuration: configuration
+        configuration: configuration,
+        hasPremiumAccess: true
       )
     } catch {
       return PlanProgressWidgetEntry(
         date: Date.now,
         content: .noActivePlan(referenceDate: today),
-        configuration: configuration
+        configuration: configuration,
+        hasPremiumAccess: true
       )
     }
   }
@@ -78,9 +91,13 @@ struct PlanProgressWidgetEntry: TimelineEntry {
   let date: Date
   let content: PlanProgressWidgetContent
   let configuration: PlanProgressAppIntent
+  let hasPremiumAccess: Bool
 
   var deepLinkURL: URL {
-    content.planID.map(DeeplinkService.plan) ?? DeeplinkService.plans
+    guard hasPremiumAccess else {
+      return DeeplinkService.premium(PaywallEntryContext.planProgressWidget.rawValue)
+    }
+    return content.planID.map(DeeplinkService.plan) ?? DeeplinkService.plans
   }
 }
 
@@ -88,10 +105,16 @@ struct PlanProgressWidgetEntryView: View {
   let entry: PlanProgressWidgetEntry
 
   var body: some View {
-    PlanProgressWidgetView(
-      content: entry.content,
-      calendar: .autoupdatingCurrent.utcCalendar
-    )
+    Group {
+      if entry.hasPremiumAccess {
+        PlanProgressWidgetView(
+          content: entry.content,
+          calendar: .autoupdatingCurrent.utcCalendar
+        )
+      } else {
+        PremiumLockedWidgetView(title: "Plan progress")
+      }
+    }
     .widgetURL(entry.deepLinkURL)
   }
 }
@@ -108,8 +131,8 @@ struct PlanProgressWidget: Widget {
       PlanProgressWidgetEntryView(entry: entry)
         .containerBackground(.fill.tertiary, for: .widget)
     }
-    .configurationDisplayName("Plan progress")
-    .description("Track progress for an active plan.")
+    .configurationDisplayName("Plan progress · Plus")
+    .description("Track a specific Plan with SnapDay Plus.")
     .contentMarginsDisabled()
     .supportedFamilies([.systemSmall])
   }

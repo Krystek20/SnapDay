@@ -108,7 +108,16 @@ struct PlanDetailsFeatureTests {
       )
     }
 
-    await store.send(.view(.restoreButtonTapped))
+    await store.send(.view(.restoreButtonTapped)) {
+      $0.pendingPremiumAction = .restore(
+        restoredPlan,
+        synchronizationDate: calendar.startOfDay(for: now)
+      )
+    }
+    await store.receive(.delegate(.premiumAccessRequested))
+    await store.send(.premiumAccessGranted) {
+      $0.pendingPremiumAction = nil
+    }
     await store.receive(.internal(.lifecyclePlanSaved(restoredPlan))) {
       $0.plan = restoredPlan
     }
@@ -128,6 +137,63 @@ struct PlanDetailsFeatureTests {
 
     #expect(await recorder.savedPlans == [restoredPlan])
     #expect(await recorder.synchronizationDates == [calendar.startOfDay(for: now)])
+  }
+
+  @Test
+  func restoreWaitsForPremiumAccessAndResumesOnlyOnce() async throws {
+    let calendar = testCalendar()
+    let now = try testDate(day: 15, calendar: calendar)
+    let activity = Activity(id: UUID(1), name: "Read")
+    var archivedPlan = try plan(
+      startDate: try testDate(day: 1, calendar: calendar),
+      endDate: try testDate(day: 31, calendar: calendar),
+      activity: activity
+    )
+    archivedPlan.isArchived = true
+    var restoredPlan = archivedPlan
+    restoredPlan.isArchived = false
+    let recorder = PlanRecorder()
+    let store = withDependencies {
+      $0.activityRepository = activityRepository(activities: [activity])
+      $0.calendar = calendar
+      $0.date.now = now
+      $0.planRepository = planRepository(recorder: recorder)
+    } operation: {
+      TestStore(
+        initialState: PlanDetailsFeature.State(plan: archivedPlan, allowsManagement: true),
+        reducer: { PlanDetailsFeature() }
+      )
+    }
+
+    await store.send(.view(.restoreButtonTapped)) {
+      $0.pendingPremiumAction = .restore(
+        restoredPlan,
+        synchronizationDate: calendar.startOfDay(for: now)
+      )
+    }
+    await store.receive(.delegate(.premiumAccessRequested))
+    await store.send(.premiumAccessGranted) {
+      $0.pendingPremiumAction = nil
+    }
+    await store.receive(.internal(.lifecyclePlanSaved(restoredPlan))) {
+      $0.plan = restoredPlan
+    }
+    await store.receive(.view(.task)) {
+      $0.isLoading = true
+      $0.referenceDate = now
+    }
+    await store.receive(.delegate(.planUpdated))
+    await store.receive(.internal(.detailsLoaded([activity], PlanProgressSnapshot(
+      plan: restoredPlan,
+      occurrences: [],
+      dayActivities: []
+    )))) {
+      $0.activities = [activity]
+      $0.isLoading = false
+    }
+    await store.send(.premiumAccessGranted)
+
+    #expect(await recorder.savedPlans == [restoredPlan])
   }
 
   @Test

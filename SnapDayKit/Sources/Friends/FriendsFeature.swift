@@ -34,6 +34,11 @@ public struct FriendsFeature: TodayProvidable {
   @ObservableState
   public struct State: Equatable, TodayProvidable {
 
+    struct InvitationRecipient: Equatable {
+      let email: String
+      let phoneNumber: String
+    }
+
     var contact: String = ""
     var isAddCollaboratorInviteEnabled: Bool {
       contact.isValidEmail || contact.isValidPhone
@@ -46,8 +51,12 @@ public struct FriendsFeature: TodayProvidable {
     var removing = [Collaboration]()
     var showContactList = false
     var isGeneratingInvitiation = false
+    var hasPremiumAccess: Bool
+    var pendingInvitation: [InvitationRecipient]?
 
-    public init() { }
+    public init(hasPremiumAccess: Bool = false) {
+      self.hasPremiumAccess = hasPremiumAccess
+    }
   }
 
   public enum Action: BindableAction, Equatable {
@@ -73,13 +82,17 @@ public struct FriendsFeature: TodayProvidable {
       case setViewContent(ViewContent)
       case setRemoving(Collaboration, Bool)
     }
-    public enum DelegateAction: Equatable { }
+    public enum DelegateAction: Equatable {
+      case premiumAccessRequested
+    }
 
     case binding(BindingAction<State>)
 
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
+    case premiumAccessGranted
+    case premiumEntitlementUpdated(Bool)
   }
 
   // MARK: - Body
@@ -95,6 +108,14 @@ public struct FriendsFeature: TodayProvidable {
       case .binding:
         return .none
       case .delegate:
+        return .none
+      case .premiumAccessGranted:
+        state.hasPremiumAccess = true
+        guard let recipients = state.pendingInvitation else { return .none }
+        state.pendingInvitation = nil
+        return invite(recipients: recipients, state: &state)
+      case .premiumEntitlementUpdated(let hasAccess):
+        state.hasPremiumAccess = hasAccess
         return .none
       }
     }
@@ -117,12 +138,12 @@ public struct FriendsFeature: TodayProvidable {
       state.showContactList = true
       return .none
     case .contactsSelected(let contacts):
-      let contactsForms = contacts.map { contant in
-        let email = String(contant.emailAddresses.first?.value ?? "")
-        let phoneNumber = contant.phoneNumbers.first?.value.stringValue ?? ""
-        return (email, phoneNumber)
+      let recipients = contacts.map { contact in
+        let email = String(contact.emailAddresses.first?.value ?? "")
+        let phoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
+        return State.InvitationRecipient(email: email, phoneNumber: phoneNumber)
       }
-      return invite(contacts: contactsForms, state: &state)
+      return requestInvitation(recipients: recipients, state: &state)
     case .newButtonTapped:
       state.content = .form
       state.focus = .addNew
@@ -135,7 +156,13 @@ public struct FriendsFeature: TodayProvidable {
         await dismiss()
       }
     case .reinviteButtonTapped(let participant):
-      return .send(.internal(.invite(participant.email, participant.phoneNumber)))
+      return requestInvitation(
+        recipients: [State.InvitationRecipient(
+          email: participant.email,
+          phoneNumber: participant.phoneNumber
+        )],
+        state: &state
+      )
     case .removeButtonTapped(let collaboration):
       return stopCollaborating(collaboration: collaboration, state: &state)
     }
@@ -189,7 +216,10 @@ public struct FriendsFeature: TodayProvidable {
       }
       return .none
     case .invite(let email, let phoneNumber):
-      return invite(contacts: [(email, phoneNumber)], state: &state)
+      return invite(
+        recipients: [State.InvitationRecipient(email: email, phoneNumber: phoneNumber)],
+        state: &state
+      )
     case .shareUrl(let shareResult):
       state.shareResult = shareResult
       state.isSharing = true
@@ -274,20 +304,35 @@ public struct FriendsFeature: TodayProvidable {
     }
   }
 
-  private func invite(contacts: [(email: String, phoneNumber: String)], state: inout State) -> Effect<Action> {
+  private func requestInvitation(
+    recipients: [State.InvitationRecipient],
+    state: inout State
+  ) -> Effect<Action> {
+    guard state.hasPremiumAccess else {
+      state.pendingInvitation = recipients
+      return .send(.delegate(.premiumAccessRequested))
+    }
+    state.pendingInvitation = nil
+    return invite(recipients: recipients, state: &state)
+  }
+
+  private func invite(
+    recipients: [State.InvitationRecipient],
+    state: inout State
+  ) -> Effect<Action> {
     state.isGeneratingInvitiation = true
     return .run { send in
       await send(.internal(.closeForm))
 
       do {
         var shareResult: ShareResult?
-        for contact in contacts {
-          let byEmail = !contact.email.isEmpty
-          let byPhone = !contact.phoneNumber.isEmpty
+        for recipient in recipients {
+          let byEmail = !recipient.email.isEmpty
+          let byPhone = !recipient.phoneNumber.isEmpty
           if byEmail {
-            shareResult = try await cloudService.addParticipant(toEmailAddress: contact.email)
+            shareResult = try await cloudService.addParticipant(toEmailAddress: recipient.email)
           } else if byPhone {
-            shareResult = try await cloudService.addParticipant(toPhoneNumber: contact.phoneNumber)
+            shareResult = try await cloudService.addParticipant(toPhoneNumber: recipient.phoneNumber)
           }
         }
 
@@ -308,7 +353,13 @@ public struct FriendsFeature: TodayProvidable {
     let byEmail = value.isValidEmail
     let byPhone = value.isValidPhone
     guard byEmail || byPhone else { return .none }
-    return .send(.internal(.invite(byEmail ? value : "", byPhone ? value : "")))
+    return requestInvitation(
+      recipients: [State.InvitationRecipient(
+        email: byEmail ? value : "",
+        phoneNumber: byPhone ? value : ""
+      )],
+      state: &state
+    )
   }
 
   private func stopCollaborating(collaboration: Collaboration, state: inout State) -> Effect<Action> {

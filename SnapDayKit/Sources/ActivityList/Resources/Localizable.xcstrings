@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-      "shouldTranslate" : false
-    },
     "Activity is used by a Plan" : {
       "localizations" : {
         "ar" : {

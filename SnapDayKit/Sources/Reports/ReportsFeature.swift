@@ -24,6 +24,8 @@ public struct ReportsFeature: TodayProvidable {
 
     var periods = Period.allCases.filter { $0 != .day }
     var selectedPeriod: Period
+    var hasPremiumAccess = false
+    var pendingPremiumPeriod: Period?
     var periodShift = Int.zero
     var periodRange: ClosedRange<Date>?
     var switcherTitle: String = ""
@@ -47,6 +49,7 @@ public struct ReportsFeature: TodayProvidable {
       case appeared
       case decreaseButtonTapped
       case increaseButtonTapped
+      case periodSelected(Period)
       case tagTapped(TimePeriodActivity)
       case activityTapped(TimePeriodActivity)
     }
@@ -60,11 +63,14 @@ public struct ReportsFeature: TodayProvidable {
     }
     public enum DelegateAction: Equatable {
       case activityTapped(Activity, [Activity], Period)
+      case premiumAccessRequested
       case tagTapped(Tag, [Tag], Period)
     }
 
     case binding(BindingAction<State>)
 
+    case premiumAccessGranted
+    case premiumEntitlementUpdated(Bool)
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
@@ -84,6 +90,12 @@ public struct ReportsFeature: TodayProvidable {
         return .send(.internal(.updateFilterDate))
       case .binding:
         return .none
+      case .premiumAccessGranted:
+        guard state.grantPremiumAccess() != nil else { return .none }
+        return .send(.internal(.updateFilterDate))
+      case .premiumEntitlementUpdated(let hasAccess):
+        guard state.updatePremiumAccess(hasAccess) else { return .none }
+        return .send(.internal(.updateFilterDate))
       case .delegate:
         return .none
       }
@@ -114,6 +126,15 @@ public struct ReportsFeature: TodayProvidable {
     case .increaseButtonTapped:
       state.periodShift += 1
       return .send(.internal(.updateFilterDate))
+    case .periodSelected(let period):
+      switch state.selectPeriod(period) {
+      case .noChange:
+        return .none
+      case .requiresPremiumAccess:
+        return .send(.delegate(.premiumAccessRequested))
+      case .selected:
+        return .send(.internal(.updateFilterDate))
+      }
     case .tagTapped(let timePeriodActivity):
       guard let tag = state.tags.first(where: { $0.id == timePeriodActivity.id }) else { return .none }
       return .send(.delegate(.tagTapped(tag, state.tags, state.selectedPeriod)))
@@ -213,5 +234,46 @@ public struct ReportsFeature: TodayProvidable {
 
       return .send(.internal(.loadDays))
     }
+  }
+}
+
+extension Period {
+  var requiresPremiumAccess: Bool {
+    self == .month || self == .quarter || self == .year
+  }
+}
+
+enum PeriodSelectionResult: Equatable {
+  case noChange
+  case requiresPremiumAccess
+  case selected
+}
+
+extension ReportsFeature.State {
+  mutating func selectPeriod(_ period: Period) -> PeriodSelectionResult {
+    guard period != selectedPeriod else { return .noChange }
+    guard hasPremiumAccess || !period.requiresPremiumAccess else {
+      pendingPremiumPeriod = period
+      return .requiresPremiumAccess
+    }
+    selectedPeriod = period
+    return .selected
+  }
+
+  @discardableResult
+  mutating func grantPremiumAccess() -> Period? {
+    hasPremiumAccess = true
+    guard let period = pendingPremiumPeriod else { return nil }
+    pendingPremiumPeriod = nil
+    selectedPeriod = period
+    return period
+  }
+
+  mutating func updatePremiumAccess(_ hasAccess: Bool) -> Bool {
+    hasPremiumAccess = hasAccess
+    guard !hasAccess, selectedPeriod.requiresPremiumAccess else { return false }
+    selectedPeriod = .week
+    periodShift = 0
+    return true
   }
 }

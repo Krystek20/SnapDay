@@ -26,6 +26,7 @@ public struct PlanDetailsFeature {
     var isDeleteConfirmationPresented = false
     var isRestoreUnavailableAlertPresented = false
     var isSaveErrorPresented = false
+    var pendingPremiumAction: PlanDetailsPendingPremiumAction?
     @Presents var newPlan: NewPlanFeature.State?
 
     public var id: Plan.ID { plan.id }
@@ -85,11 +86,13 @@ public struct PlanDetailsFeature {
       case archivePlanTapped(Plan.ID)
       case deletePlanTapped(Plan.ID)
       case planUpdated
+      case premiumAccessRequested
     }
 
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
+    case premiumAccessGranted
     case newPlan(PresentationAction<NewPlanFeature.Action>)
   }
 
@@ -194,7 +197,8 @@ public struct PlanDetailsFeature {
         }
         var restoredPlan = state.plan
         restoredPlan.isArchived = false
-        return saveLifecyclePlan(restoredPlan, synchronizingFrom: today)
+        state.pendingPremiumAction = .restore(restoredPlan, synchronizationDate: today)
+        return .send(.delegate(.premiumAccessRequested))
       case .view(.restoreUnavailableDismissed):
         state.isRestoreUnavailableAlertPresented = false
         return .none
@@ -251,8 +255,8 @@ public struct PlanDetailsFeature {
         state.newPlan = nil
         return .none
       case .newPlan(.presented(.delegate(.planCreated(let draft)))):
-        let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
-        return saveLifecyclePlan(plan, synchronizingFrom: plan.startDate)
+        state.pendingPremiumAction = .create(draft)
+        return .send(.delegate(.premiumAccessRequested))
       case .newPlan(.presented(.delegate(.planUpdated(let plan)))):
         let firstAffectedOccurrenceDate = calendar.date(
           byAdding: .day,
@@ -270,6 +274,16 @@ public struct PlanDetailsFeature {
         }
       case .newPlan:
         return .none
+      case .premiumAccessGranted:
+        guard let pendingAction = state.pendingPremiumAction else { return .none }
+        state.pendingPremiumAction = nil
+        switch pendingAction {
+        case .create(let draft):
+          let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
+          return saveLifecyclePlan(plan, synchronizingFrom: plan.startDate)
+        case .restore(let plan, let synchronizationDate):
+          return saveLifecyclePlan(plan, synchronizingFrom: synchronizationDate)
+        }
       case .delegate:
         return .none
       }
@@ -293,4 +307,9 @@ public struct PlanDetailsFeature {
       }
     }
   }
+}
+
+enum PlanDetailsPendingPremiumAction: Equatable {
+  case create(NewPlanDraft)
+  case restore(Plan, synchronizationDate: Date)
 }

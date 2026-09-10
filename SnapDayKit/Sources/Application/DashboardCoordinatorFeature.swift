@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Dashboard
 import Foundation
 import Models
+import Payment
 import Plans
 import Repositories
 import Utilities
@@ -24,7 +25,15 @@ public struct DashboardCoordinatorFeature {
     case dashboard(DashboardFeature.Action)
     case externalRoute(ExternalRoute)
     case externalPlanLoaded(Plan?)
+    case planLimitResolved(StackElementID, Bool)
+    case premiumAccessGranted(PaywallEntryContext)
+    case premiumEntitlementUpdated(Bool)
+    case delegate(DelegateAction)
     case path(StackAction<Path.State, Path.Action>)
+  }
+
+  public enum DelegateAction: Equatable {
+    case premiumAccessRequested(PaywallEntryContext)
   }
 
   public enum ExternalRoute: Equatable {
@@ -78,6 +87,8 @@ public struct DashboardCoordinatorFeature {
           .planDetails(PlanDetailsFeature.State(plan: plan, allowsManagement: true))
         )
         return .none
+      case .dashboard(.delegate(.premiumAccessRequested(let gate))):
+        return .send(.delegate(.premiumAccessRequested(gate.paywallContext)))
       case .dashboard:
         return .none
       case .externalRoute(.plans):
@@ -114,6 +125,52 @@ public struct DashboardCoordinatorFeature {
           state.path.removeAll()
           state.path.append(.plans(PlansFeature.State()))
         }
+        return .none
+      case .path(.element(
+        id: _,
+        action: .plans(.delegate(.premiumAccessRequested))
+      )):
+        return .send(.delegate(.premiumAccessRequested(.secondActivePlan)))
+      case .path(.element(
+        id: let pathID,
+        action: .planDetails(.delegate(.premiumAccessRequested))
+      )):
+        return .run { [now] send in
+          let hasActivePlan: Bool
+          do {
+            let activePlans = try await planRepository.loadActivePlans(now)
+            hasActivePlan = !activePlans.isEmpty
+          } catch {
+            hasActivePlan = true
+          }
+          await send(.planLimitResolved(pathID, hasActivePlan))
+        }
+      case .planLimitResolved(_, true):
+        return .send(.delegate(.premiumAccessRequested(.secondActivePlan)))
+      case .planLimitResolved(let pathID, false):
+        return .send(
+          .path(.element(id: pathID, action: .planDetails(.premiumAccessGranted)))
+        )
+      case .premiumAccessGranted(.secondActivePlan):
+        guard let pathID = state.path.ids.last,
+              let destination = state.path[id: pathID]
+        else { return .none }
+        switch destination {
+        case .planDetails:
+          return .send(
+            .path(.element(id: pathID, action: .planDetails(.premiumAccessGranted)))
+          )
+        case .plans:
+          return .send(
+            .path(.element(id: pathID, action: .plans(.premiumAccessGranted)))
+          )
+        }
+      case .premiumAccessGranted(let context):
+        guard let gate = DashboardFeature.PremiumGate(context: context) else { return .none }
+        return .send(.dashboard(.premiumAccessGranted(gate)))
+      case .premiumEntitlementUpdated(let hasAccess):
+        return .send(.dashboard(.premiumEntitlementUpdated(hasAccess)))
+      case .delegate:
         return .none
       case .path(.element(
         id: let pathID,
@@ -157,6 +214,25 @@ public struct DashboardCoordinatorFeature {
     }
     .forEach(\.path, action: \.path) {
       Path()
+    }
+  }
+}
+
+private extension DashboardFeature.PremiumGate {
+  var paywallContext: PaywallEntryContext {
+    switch self {
+    case .advancedRecurrence: .advancedRecurrence
+    case .aiAllowance: .aiAllowanceExhausted
+    case .collaborationInvitation: .collaborationInvitation
+    }
+  }
+
+  init?(context: PaywallEntryContext) {
+    switch context {
+    case .advancedRecurrence: self = .advancedRecurrence
+    case .aiAllowanceExhausted: self = .aiAllowance
+    case .collaborationInvitation: self = .collaborationInvitation
+    default: return nil
     }
   }
 }

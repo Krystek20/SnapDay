@@ -1,5 +1,6 @@
 import ActivityDetails
 import ComposableArchitecture
+import Payment
 import Reports
 
 @Reducer
@@ -14,8 +15,13 @@ public struct ReportsCoordinatorFeature {
   }
 
   public enum Action: Equatable {
+    case delegate(DelegateAction)
     case path(StackAction<Path.State, Path.Action>)
     case reports(ReportsFeature.Action)
+  }
+
+  public enum DelegateAction: Equatable {
+    case premiumAccessRequested(PaywallEntryContext)
   }
 
   @Reducer
@@ -47,6 +53,8 @@ public struct ReportsCoordinatorFeature {
 
     Reduce { state, action in
       switch action {
+      case .reports(.delegate(.premiumAccessRequested)):
+        return .send(.delegate(.premiumAccessRequested(.extendedReports)))
       case .reports(.delegate(.activityTapped(let activity, let activities, let period))):
         state.path.append(
           .activityDetails(
@@ -67,7 +75,7 @@ public struct ReportsCoordinatorFeature {
           )
         )
         return .none
-      case .reports, .path:
+      case .delegate, .reports, .path:
         return .none
       }
     }

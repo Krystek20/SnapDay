@@ -25,6 +25,7 @@ public struct PlansFeature {
     var archivedPlans: [PlanListItem] = []
     var archiveConfirmationPlanID: Plan.ID?
     var isSaveErrorPresented = false
+    var pendingPremiumAction: PendingPremiumAction?
     @Presents var planDetails: PlanDetailsFeature.State?
     @Presents var newPlan: NewPlanFeature.State?
 
@@ -71,6 +72,7 @@ public struct PlansFeature {
     public enum InternalAction: Equatable {
       case archivePlan(Plan.ID)
       case deletePlan(Plan.ID)
+      case activePlanLimitResolved(Bool)
       case loadPlans
       case plansLoaded(PlansSnapshot)
       case plansLoadFailed(String)
@@ -81,12 +83,14 @@ public struct PlansFeature {
 
     public enum DelegateAction: Equatable {
       case plansChanged
+      case premiumAccessRequested
     }
 
     case binding(BindingAction<State>)
     case view(ViewAction)
     case `internal`(InternalAction)
     case delegate(DelegateAction)
+    case premiumAccessGranted
     case planDetails(PresentationAction<PlanDetailsFeature.Action>)
     case newPlan(PresentationAction<NewPlanFeature.Action>)
   }
@@ -105,14 +109,26 @@ public struct PlansFeature {
         return .none
       case .delegate:
         return .none
+      case .premiumAccessGranted:
+        guard let pendingAction = state.pendingPremiumAction else { return .none }
+        state.pendingPremiumAction = nil
+        switch pendingAction {
+        case .presentCreatePlan:
+          state.newPlan = NewPlanFeature.State(startDate: now)
+          return .none
+        case .savePlan(let draft):
+          return savePlan(draft)
+        case .planDetails:
+          return .send(.planDetails(.presented(.premiumAccessGranted)))
+        }
       case .view(.appeared):
         guard state.loadState == .idle else { return .none }
         return .send(.internal(.loadPlans))
       case .view(.retryButtonTapped):
         return .send(.internal(.loadPlans))
       case .view(.createPlanButtonTapped):
-        state.newPlan = NewPlanFeature.State(startDate: now)
-        return .none
+        state.pendingPremiumAction = .presentCreatePlan
+        return resolveActivePlanLimit()
       case .view(.planTapped(let id)):
         guard let item = state.planItem(id: id) else { return .none }
         state.planDetails = PlanDetailsFeature.State(
@@ -158,6 +174,11 @@ public struct PlansFeature {
             await send(.internal(.plansLoadFailed(error.localizedDescription)))
           }
         }
+      case .internal(.activePlanLimitResolved(true)):
+        guard state.pendingPremiumAction != nil else { return .none }
+        return .send(.delegate(.premiumAccessRequested))
+      case .internal(.activePlanLimitResolved(false)):
+        return .send(.premiumAccessGranted)
       case .internal(.loadPlans):
         state.loadState = .loading
         return .run { [now] send in
@@ -211,16 +232,8 @@ public struct PlansFeature {
         state.newPlan = nil
         return .none
       case .newPlan(.presented(.delegate(.planCreated(let draft)))):
-        let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
-        return .run { send in
-          do {
-            try await planRepository.savePlan(plan)
-            _ = try await planRepository.synchronizeOccurrences(plan, plan.startDate)
-            await send(.internal(.planSaved))
-          } catch {
-            await send(.internal(.planSaveFailed))
-          }
-        }
+        state.pendingPremiumAction = .savePlan(draft)
+        return resolveActivePlanLimit()
       case .newPlan(.presented(.delegate(.planUpdated(let plan)))):
         let firstAffectedOccurrenceDate = calendar.date(
           byAdding: .day,
@@ -248,6 +261,9 @@ public struct PlansFeature {
           .send(.internal(.loadPlans)),
           .send(.delegate(.plansChanged))
         )
+      case .planDetails(.presented(.delegate(.premiumAccessRequested))):
+        state.pendingPremiumAction = .planDetails
+        return resolveActivePlanLimit()
       case .planDetails:
         return .none
       }
@@ -257,6 +273,32 @@ public struct PlansFeature {
     }
     .ifLet(\.$newPlan, action: \.newPlan) {
       NewPlanFeature()
+    }
+  }
+
+  private func savePlan(_ draft: NewPlanDraft) -> EffectOf<Self> {
+    let plan = draft.plan(id: uuid(), scheduleEntryID: { uuid() })
+    return .run { send in
+      do {
+        try await planRepository.savePlan(plan)
+        _ = try await planRepository.synchronizeOccurrences(plan, plan.startDate)
+        await send(.internal(.planSaved))
+      } catch {
+        await send(.internal(.planSaveFailed))
+      }
+    }
+  }
+
+  private func resolveActivePlanLimit() -> EffectOf<Self> {
+    .run { [now] send in
+      let hasActivePlan: Bool
+      do {
+        let activePlans = try await planRepository.loadActivePlans(now)
+        hasActivePlan = !activePlans.isEmpty
+      } catch {
+        hasActivePlan = true
+      }
+      await send(.internal(.activePlanLimitResolved(hasActivePlan)))
     }
   }
 
@@ -297,6 +339,12 @@ public struct PlansFeature {
     )
   }
 
+}
+
+enum PendingPremiumAction: Equatable {
+  case presentCreatePlan
+  case savePlan(NewPlanDraft)
+  case planDetails
 }
 
 private extension PlansFeature.State {

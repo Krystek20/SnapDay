@@ -8,6 +8,76 @@ import Testing
 struct DashboardTests {
 
   @Test
+  func dashboardDayBuildsListItemsWhenDayChanges() async throws {
+    let date = Date(timeIntervalSince1970: 1_752_364_800)
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+    let day = Day(
+      id: UUID(),
+      date: date,
+      activities: [
+        DayActivity(
+          id: UUID(),
+          date: date,
+          isGeneratedAutomatically: false
+        )
+      ]
+    )
+    let store = TestStore(
+      initialState: DashboardDayFeature.State(),
+      reducer: { DashboardDayFeature() }
+    )
+    store.dependencies.utcCalendar = calendar
+    let expectedItems = withDependencies {
+      $0.utcCalendar = calendar
+    } operation: {
+      ListItemsBuilder(
+        activities: day.activities,
+        newField: nil,
+        hideCompleted: false,
+        hideTasks: false
+      ).build()
+    }
+
+    await store.send(.setDay(day)) {
+      $0.selectedDay = day
+      $0.hideDayInformation = false
+    }
+    await store.receive(.setItems) {
+      $0.items = expectedItems
+    }
+  }
+
+  @Test
+  func dashboardDayPersistsCompletedActivityVisibility() async throws {
+    let suiteName = "DashboardTests.dayVisibility.\(UUID().uuidString)"
+    let userDefaults = try #require(UserDefaults(suiteName: suiteName))
+    defer { userDefaults.removePersistentDomain(forName: suiteName) }
+    let store = TestStore(
+      initialState: DashboardDayFeature.State(userDefaults: userDefaults),
+      reducer: { DashboardDayFeature(userDefaults: userDefaults) }
+    )
+
+    await store.send(.view(.toggleShowCompletedActivities)) {
+      $0.hideCompleted = true
+    }
+    await store.receive(.setItems)
+
+    #expect(userDefaults.bool(forKey: "hideCompleted"))
+  }
+
+  @Test
+  func dashboardForwardsDayPremiumRequest() async {
+    let store = TestStore(
+      initialState: DashboardFeature.State(date: Date()),
+      reducer: { DashboardFeature() }
+    )
+
+    await store.send(.day(.delegate(.premiumAccessRequested)))
+    await store.receive(.delegate(.premiumAccessRequested(.advancedRecurrence)))
+  }
+
+  @Test
   func dashboardTitleFormatsStoredDayInUTC() throws {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
@@ -213,12 +283,12 @@ struct DashboardTests {
       calendar: .current
     )
     let store = TestStore(
-      initialState: DashboardFeature.State(date: date),
-      reducer: { DashboardFeature() }
+      initialState: DashboardPlansFeature.State(),
+      reducer: { DashboardPlansFeature() }
     )
 
-    await store.send(.internal(.plansLoaded([summary]))) {
-      $0.planSummaries = [summary]
+    await store.send(.loaded([summary])) {
+      $0.summaries = [summary]
     }
   }
 
@@ -227,10 +297,10 @@ struct DashboardTests {
     let date = Date(timeIntervalSince1970: 1_752_364_800)
     var state = DashboardFeature.State(date: date)
 
-    state.canRequestNotificationAuthorization = true
+    state.notifications.canRequestAuthorization = true
     #expect(!state.shouldShowNotificationPrompt)
 
-    state.selectedDay = Day(
+    state.day.selectedDay = Day(
       id: UUID(),
       date: date,
       activities: [
@@ -251,14 +321,14 @@ struct DashboardTests {
     let userDefaults = try #require(UserDefaults(suiteName: suiteName))
     defer { userDefaults.removePersistentDomain(forName: suiteName) }
     var state = DashboardFeature.State(date: Date())
-    state.canRequestNotificationAuthorization = true
+    state.notifications.canRequestAuthorization = true
     let store = TestStore(
       initialState: state,
       reducer: { DashboardFeature(userDefaults: userDefaults) }
     )
 
-    await store.send(.view(.notificationPromptDismissed)) {
-      $0.canRequestNotificationAuthorization = false
+    await store.send(.notifications(.view(.promptDismissed))) {
+      $0.notifications.canRequestAuthorization = false
     }
 
     #expect(userDefaults.bool(forKey: "notificationPromptDismissed"))
@@ -274,8 +344,8 @@ struct DashboardTests {
       reducer: { DashboardFeature(userDefaults: userDefaults) }
     )
 
-    await store.send(.internal(.notificationAuthorizationRequestFailed)) {
-      $0.canRequestNotificationAuthorization = true
+    await store.send(.notifications(.authorizationRequestFailed)) {
+      $0.notifications.canRequestAuthorization = true
     }
 
     #expect(!userDefaults.bool(forKey: "notificationPromptDismissed"))
@@ -287,14 +357,14 @@ struct DashboardTests {
     let userDefaults = try #require(UserDefaults(suiteName: suiteName))
     defer { userDefaults.removePersistentDomain(forName: suiteName) }
     var state = DashboardFeature.State(date: Date())
-    state.canRequestNotificationAuthorization = true
+    state.notifications.canRequestAuthorization = true
     let store = TestStore(
       initialState: state,
       reducer: { DashboardFeature(userDefaults: userDefaults) }
     )
 
-    await store.send(.internal(.notificationAuthorizationRequestCompleted)) {
-      $0.canRequestNotificationAuthorization = false
+    await store.send(.notifications(.authorizationRequestCompleted)) {
+      $0.notifications.canRequestAuthorization = false
     }
 
     #expect(userDefaults.bool(forKey: "notificationPromptDismissed"))
@@ -316,7 +386,8 @@ struct DashboardTests {
       reducer: { DashboardFeature() }
     )
 
-    await store.send(.view(.planSummaryTapped(plan)))
+    await store.send(.plans(.view(.planTapped(plan))))
+    await store.receive(.plans(.delegate(.planTapped(plan))))
     await store.receive(.delegate(.planTapped(plan)))
   }
 

@@ -59,10 +59,15 @@ public struct ReportsView: View {
         ForEach(store.periods) { period in
           Button(
             action: {
-              store.selectedPeriod = period
+              store.send(.view(.periodSelected(period)))
             },
             label: {
-              Text(period.name)
+              HStack {
+                Text(period.name)
+                if period.requiresPremiumAccess, !store.hasPremiumAccess {
+                  Image(systemName: "lock.fill")
+                }
+              }
             }
           )
         }

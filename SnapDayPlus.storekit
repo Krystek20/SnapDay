@@ -1,0 +1,207 @@
+{
+  "identifier" : "3A64D1B7",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_compatibilityTimeRate" : {
+      "3" : 6
+    },
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : {
+          "index" : 2,
+          "type" : "generic"
+        },
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : {
+          "index" : 1,
+          "type" : "purchase"
+        },
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : {
+          "index" : 0,
+          "type" : "verification"
+        },
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : {
+          "index" : 2,
+          "type" : "generic"
+        },
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : {
+          "index" : 2,
+          "type" : "generic"
+        },
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : {
+          "index" : 3,
+          "type" : "generic"
+        },
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : {
+          "index" : 3,
+          "type" : "generic"
+        },
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : {
+          "index" : 0,
+          "type" : "refund request"
+        },
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : {
+          "index" : 4,
+          "type" : "generic"
+        },
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ],
+    "_timeRate" : 1003
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "6DB7926E",
+      "localizations" : [
+
+      ],
+      "name" : "SnapDay Plus",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "4.99",
+              "displayPrice" : "4.99",
+              "internalID" : "75399D91",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "F36971BD",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            { "description" : "Unlimited Plans, advanced insights, and every premium feature.", "displayName" : "SnapDay Plus Monthly", "locale" : "en_US" },
+            { "description" : "Nielimitowane Plany, zaawansowane statystyki i wszystkie funkcje premium.", "displayName" : "SnapDay Plus Miesięczny", "locale" : "pl_PL" },
+            { "description" : "Unbegrenzte Pläne, erweiterte Einblicke und alle Premium-Funktionen.", "displayName" : "SnapDay Plus Monatlich", "locale" : "de_DE" },
+            { "description" : "Planes ilimitados, estadísticas avanzadas y todas las funciones premium.", "displayName" : "SnapDay Plus Mensual", "locale" : "es_ES" },
+            { "description" : "Plans illimités, statistiques avancées et toutes les fonctionnalités premium.", "displayName" : "SnapDay Plus Mensuel", "locale" : "fr_FR" },
+            { "description" : "Planos ilimitados, estatísticas avançadas e todos os recursos premium.", "displayName" : "SnapDay Plus Mensal", "locale" : "pt_BR" },
+            { "description" : "Piani illimitati, statistiche avanzate e tutte le funzioni premium.", "displayName" : "SnapDay Plus Mensile", "locale" : "it_IT" },
+            { "description" : "無制限のプラン、高度な分析、すべてのプレミアム機能。", "displayName" : "SnapDay Plus 月間", "locale" : "ja_JP" },
+            { "description" : "خطط غير محدودة وإحصاءات متقدمة وجميع الميزات المميزة.", "displayName" : "SnapDay Plus شهري", "locale" : "ar_SA" },
+            { "description" : "무제한 플랜, 고급 인사이트 및 모든 프리미엄 기능.", "displayName" : "SnapDay Plus 월간", "locale" : "ko_KR" }
+          ],
+          "productID" : "com.mobilove.snapday.plus.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "SnapDay Plus Monthly",
+          "subscriptionGroupID" : "6DB7926E",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "29.99",
+              "displayPrice" : "29.99",
+              "internalID" : "376E52F8",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "48261652",
+          "introductoryOffers" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "displayPrice" : "0",
+              "duration" : "P2W",
+              "internalID" : "CB728D97",
+              "numberOfPeriods" : 1,
+              "paymentMode" : "free"
+            }
+          ],
+          "localizations" : [
+            { "description" : "Unlimited Plans, advanced insights, and every premium feature.", "displayName" : "SnapDay Plus Annual", "locale" : "en_US" },
+            { "description" : "Nielimitowane Plany, zaawansowane statystyki i wszystkie funkcje premium.", "displayName" : "SnapDay Plus Roczny", "locale" : "pl_PL" },
+            { "description" : "Unbegrenzte Pläne, erweiterte Einblicke und alle Premium-Funktionen.", "displayName" : "SnapDay Plus Jährlich", "locale" : "de_DE" },
+            { "description" : "Planes ilimitados, estadísticas avanzadas y todas las funciones premium.", "displayName" : "SnapDay Plus Anual", "locale" : "es_ES" },
+            { "description" : "Plans illimités, statistiques avancées et toutes les fonctionnalités premium.", "displayName" : "SnapDay Plus Annuel", "locale" : "fr_FR" },
+            { "description" : "Planos ilimitados, estatísticas avançadas e todos os recursos premium.", "displayName" : "SnapDay Plus Anual", "locale" : "pt_BR" },
+            { "description" : "Piani illimitati, statistiche avanzate e tutte le funzioni premium.", "displayName" : "SnapDay Plus Annuale", "locale" : "it_IT" },
+            { "description" : "無制限のプラン、高度な分析、すべてのプレミアム機能。", "displayName" : "SnapDay Plus 年間", "locale" : "ja_JP" },
+            { "description" : "خطط غير محدودة وإحصاءات متقدمة وجميع الميزات المميزة.", "displayName" : "SnapDay Plus سنوي", "locale" : "ar_SA" },
+            { "description" : "무제한 플랜, 고급 인사이트 및 모든 프리미엄 기능.", "displayName" : "SnapDay Plus 연간", "locale" : "ko_KR" }
+          ],
+          "productID" : "com.mobilove.snapday.plus.annual",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "SnapDay Plus Annual",
+          "subscriptionGroupID" : "6DB7926E",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 6,
+    "minor" : 3
+  }
+}

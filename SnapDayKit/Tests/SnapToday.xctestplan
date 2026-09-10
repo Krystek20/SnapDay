@@ -137,6 +137,13 @@
     {
       "target" : {
         "containerPath" : "container:SnapDayKit",
+        "identifier" : "PaymentTests",
+        "name" : "PaymentTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:SnapDayKit",
         "identifier" : "PlansTests",
         "name" : "PlansTests"
       }
