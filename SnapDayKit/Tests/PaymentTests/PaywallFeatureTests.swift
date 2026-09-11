@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Common
 import Foundation
 @testable import Payment
 import Testing
@@ -61,6 +62,7 @@ struct PaywallFeatureTests {
 
   @Test
   func successfulPurchaseDelegatesExactlyOnce() async {
+    let analytics = AnalyticsRecorder()
     let entitlement = PremiumEntitlement.subscribed(expirationDate: nil)
     let annual = SubscriptionProduct.paywallTestProducts[1]
     var state = PaywallFeature.State(context: .secondActivePlan)
@@ -70,6 +72,7 @@ struct PaywallFeatureTests {
     let store = TestStore(initialState: state) {
       PaywallFeature()
     } withDependencies: {
+      $0.analyticsClient.track = { event in analytics.record(event) }
       $0.paymentClient.purchase = { _ in .purchased(entitlement) }
     }
 
@@ -83,6 +86,15 @@ struct PaywallFeatureTests {
     await store.receive(.delegate(.purchaseCompleted(entitlement)))
 
     await store.send(.internal(.purchaseFinished(.purchased(entitlement))))
+
+    #expect(
+      analytics.events == [
+        .subscriptionPurchased(
+          productID: annual.id,
+          context: PaywallEntryContext.secondActivePlan.rawValue
+        )
+      ]
+    )
   }
 
   @Test
@@ -127,6 +139,7 @@ struct PaywallFeatureTests {
 
   @Test
   func cancellationKeepsPaywallReadyForAnotherAttempt() async {
+    let analytics = AnalyticsRecorder()
     let annual = SubscriptionProduct.paywallTestProducts[1]
     var state = PaywallFeature.State(context: .settings)
     state.products = [annual]
@@ -135,6 +148,7 @@ struct PaywallFeatureTests {
     let store = TestStore(initialState: state) {
       PaywallFeature()
     } withDependencies: {
+      $0.analyticsClient.track = { event in analytics.record(event) }
       $0.paymentClient.purchase = { _ in .cancelled }
     }
 
@@ -145,6 +159,10 @@ struct PaywallFeatureTests {
       $0.operation = .idle
       $0.feedback = .purchaseCancelled
     }
+
+    #expect(
+      analytics.events.isEmpty
+    )
   }
 
   @Test
@@ -217,6 +235,19 @@ private actor AttemptCounter {
   func next() -> Int {
     count += 1
     return count
+  }
+}
+
+private final class AnalyticsRecorder: @unchecked Sendable {
+  private let lock = NSLock()
+  private var recordedEvents: [AnalyticsEvent] = []
+
+  var events: [AnalyticsEvent] {
+    lock.withLock { recordedEvents }
+  }
+
+  func record(_ event: AnalyticsEvent) {
+    lock.withLock { recordedEvents.append(event) }
   }
 }
 

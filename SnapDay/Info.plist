@@ -4,6 +4,8 @@
 <dict>
 	<key>SentryDSN</key>
 	<string>$(SENTRY_DSN)</string>
+	<key>TelemetryDeckAppID</key>
+	<string>$(TELEMETRYDECK_APP_ID)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

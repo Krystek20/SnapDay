@@ -16,6 +16,10 @@ extension CloudService: DependencyKey {
   public static var liveValue: CloudService {
     CloudService()
   }
+
+  public static var testValue: CloudService {
+    CloudService(container: nil)
+  }
 }
 
 public actor CloudService {
@@ -67,6 +71,7 @@ public actor CloudService {
 
   public var userRecordName: String? {
     get async {
+      guard let container else { return nil }
       do {
         return try await container.userRecordID().recordName
       } catch {
@@ -77,7 +82,8 @@ public actor CloudService {
 
   private var cloudState: CloudState {
     get async throws {
-      switch try await container.accountStatus() {
+      guard let container else { return .deactive }
+      return switch try await container.accountStatus() {
       case .available:
           .active
       case .couldNotDetermine:
@@ -122,8 +128,16 @@ public actor CloudService {
     }
   }
 
-  private let container = CKContainer(identifier: "iCloud.com.mobilove.snapday")
+  private let container: CKContainer?
   private let initializationIdentifier = UUID()
+
+  public init() {
+    container = CKContainer(identifier: "iCloud.com.mobilove.snapday")
+  }
+
+  private init(container: CKContainer?) {
+    self.container = container
+  }
 
   // MARK: - Public
 
@@ -408,6 +422,9 @@ extension CloudService {
   }
 
   public func zones() async throws -> [String] {
+    guard let container else {
+      throw CloudError.serviceNotAvailable
+    }
     let privateDB = container.privateCloudDatabase
     let sharedDB = container.sharedCloudDatabase
 
@@ -427,6 +444,9 @@ extension CloudService {
   }
 
   public func cleanPrivateZones() async throws {
+    guard let container else {
+      throw CloudError.serviceNotAvailable
+    }
     let privateDB = container.privateCloudDatabase
 
     let privateZones = try await privateDB.allRecordZones()
