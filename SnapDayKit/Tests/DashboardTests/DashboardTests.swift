@@ -187,7 +187,7 @@ struct DashboardTests {
     )
 
     #expect(summary.nextSessionDate == sunday)
-    #expect(configuration.metadata?.leadingText == "Next session: Tomorrow")
+    #expect(configuration.metadata?.leadingText == localizedNextSession("Tomorrow"))
   }
 
   @Test
@@ -223,7 +223,7 @@ struct DashboardTests {
     )
 
     #expect(summary.nextSessionDate == today)
-    #expect(configuration.metadata?.leadingText == "Next session: Today")
+    #expect(configuration.metadata?.leadingText == localizedNextSession("Today"))
   }
 
   @Test
@@ -423,6 +423,16 @@ struct DashboardTests {
       locale: Locale(identifier: "en_US")
     )
 
-    #expect(configuration.metadata?.leadingText == "Next session: Tomorrow")
+    #expect(configuration.metadata?.leadingText == localizedNextSession("Tomorrow"))
+  }
+
+  private func localizedNextSession(_ session: String.LocalizationValue) -> String {
+    let locale = Locale(identifier: "en_US")
+    let localizedSession = String(localized: session, bundle: .module, locale: locale)
+    return String(
+      localized: "Next session: \(localizedSession)",
+      bundle: .module,
+      locale: locale
+    )
   }
 }

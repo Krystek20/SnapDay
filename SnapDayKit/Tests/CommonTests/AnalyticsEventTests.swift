@@ -3,6 +3,12 @@ import Testing
 
 struct AnalyticsEventTests {
   @Test
+  func onboardingOutcomeEventsAreDistinct() {
+    #expect(AnalyticsEvent.onboardingCompleted.name == "Onboarding.completed")
+    #expect(AnalyticsEvent.onboardingSkipped.name == "Onboarding.skipped")
+  }
+
+  @Test
   func planCreatedDoesNotContainBehavioralMetadata() {
     #expect(AnalyticsEvent.planCreated.name == "Plan.created")
     #expect(AnalyticsEvent.planCreated.parameters.isEmpty)

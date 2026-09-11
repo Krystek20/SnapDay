@@ -8,7 +8,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
   // MARK: - Properties
 
   private var sut: ActivityDatesCreator!
-  private let calendar = Calendar.autoupdatingCurrent
+  private let calendar = Calendar(identifier: .gregorian).utcCalendar
   private var quarter: ClosedRange<Date>!
 
   // MARK: - Setup
@@ -19,11 +19,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
       lowerBound: DateComponents(year: 2023, month: 10, day: 1),
       upperBound: DateComponents(year: 2023, month: 12, day: 31)
     )
-    sut = withDependencies {
-      $0.calendar = calendar
-    } operation: {
-      ActivityDatesCreator()
-    }
+    sut = ActivityDatesCreator()
   }
 
   override func tearDown() {
@@ -35,14 +31,14 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testDaily() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .daily)
+    let activity = Activity(id: UUID(1), name: "name", frequency: .daily, isFrequentEnabled: true)
     let days = try XCTUnwrap(calendar.dateComponents([.day], from: quarter.lowerBound, to: quarter.upperBound).day)
     let expected = (0...days).compactMap { day in
       calendar.date(byAdding: .day, value: day, to: quarter.lowerBound)
     }
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -50,7 +46,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testWeekly() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .weekly(days: [1, 3, 5, 7]))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .weekly(days: [1, 3, 5, 7]), isFrequentEnabled: true)
     let sundays = try everyWeek(from: 1, weekCount: 14)
     let tuesdays = try everyWeek(from: 3, weekCount: 13)
     let thursdays = try everyWeek(from: 5, weekCount: 13)
@@ -58,7 +54,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     let expected = sundays + tuesdays + thursdays + saturdays
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -66,7 +62,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testWeeklyBiweeklyCurrent() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .biweekly(days: [1, 3, 5, 7], startWeek: .current))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .biweekly(days: [1, 3, 5, 7], startWeek: .current), isFrequentEnabled: true)
     let sundays = try everyTwoWeeks(from: 1, weekCount: 7, startWeek: .current)
     let tuesdays = try everyTwoWeeks(from: 3, weekCount: 7, startWeek: .current)
     let thursdays = try everyTwoWeeks(from: 5, weekCount: 7, startWeek: .current)
@@ -74,7 +70,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     let expected = sundays + tuesdays + thursdays + saturdays
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -82,7 +78,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testWeeklyBiweeklyNext() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .biweekly(days: [1, 3, 5, 7], startWeek: .next))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .biweekly(days: [1, 3, 5, 7], startWeek: .next), isFrequentEnabled: true)
     let sundays = try everyTwoWeeks(from: 1, weekCount: 7, startWeek: .next)
     let tuesdays = try everyTwoWeeks(from: 3, weekCount: 6, startWeek: .next)
     let thursdays = try everyTwoWeeks(from: 5, weekCount: 6, startWeek: .next)
@@ -90,7 +86,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     let expected = sundays + tuesdays + thursdays + saturdays
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -98,7 +94,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testMonthlyFirstDay() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .firstDay))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .firstDay), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 1)),
       try date(from: DateComponents(year: 2023, month: 11, day: 1)),
@@ -106,7 +102,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -114,7 +110,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testMonthlyLastDay() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .lastDay))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .lastDay), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 31)),
       try date(from: DateComponents(year: 2023, month: 11, day: 30)),
@@ -122,7 +118,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -130,7 +126,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testMonthlyMidMonth() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .midMonth))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .midMonth), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 15)),
       try date(from: DateComponents(year: 2023, month: 11, day: 15)),
@@ -138,7 +134,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -146,7 +142,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testMonthlySecondDay() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .secondDay))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .secondDay), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 2)),
       try date(from: DateComponents(year: 2023, month: 11, day: 2)),
@@ -154,7 +150,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -162,7 +158,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testMonthlyMonthlySpecificDate() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .monthlySpecificDate([1, 15, 31])))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .monthlySpecificDate([1, 15, 31])), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 1)),
       try date(from: DateComponents(year: 2023, month: 11, day: 1)),
@@ -175,7 +171,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -183,7 +179,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
 
   func testMonthlySecondToLastDay() throws {
     // given
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .secondToLastDay))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .secondToLastDay), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 30)),
       try date(from: DateComponents(year: 2023, month: 11, day: 29)),
@@ -191,7 +187,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -200,7 +196,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
   func testMonthlyWeekdayOrdinalFirst() throws {
     // given
     let weekdayOrdinal = WeekdayOrdinal(position: .first, weekdays: [1, 4, 7])
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 1)),
       try date(from: DateComponents(year: 2023, month: 11, day: 5)),
@@ -214,7 +210,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -223,7 +219,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
   func testMonthlyWeekdayOrdinalSecond() throws {
     // given
     let weekdayOrdinal = WeekdayOrdinal(position: .second, weekdays: [1, 4, 7])
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 8)),
       try date(from: DateComponents(year: 2023, month: 11, day: 12)),
@@ -237,7 +233,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -246,7 +242,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
   func testMonthlyWeekdayOrdinalThird() throws {
     // given
     let weekdayOrdinal = WeekdayOrdinal(position: .third, weekdays: [1, 4, 7])
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 15)),
       try date(from: DateComponents(year: 2023, month: 11, day: 19)),
@@ -260,7 +256,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -269,7 +265,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
   func testMonthlyWeekdayOrdinalFourth() throws {
     // given
     let weekdayOrdinal = WeekdayOrdinal(position: .fourth, weekdays: [1, 4, 7])
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 22)),
       try date(from: DateComponents(year: 2023, month: 11, day: 26)),
@@ -283,7 +279,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -292,7 +288,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
   func testMonthlyWeekdayOrdinalSecondToLastDay() throws {
     // given
     let weekdayOrdinal = WeekdayOrdinal(position: .secondToLastDay, weekdays: [1, 4, 7])
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 22)),
       try date(from: DateComponents(year: 2023, month: 11, day: 19)),
@@ -306,7 +302,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
@@ -315,7 +311,7 @@ final class ActivityDatesCreatorTest: XCTestCase {
   func testMonthlyWeekdayOrdinalLast() throws {
     // given
     let weekdayOrdinal = WeekdayOrdinal(position: .last, weekdays: [1, 4, 7])
-    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])))
+    let activity = Activity(id: UUID(1), name: "name", frequency: .monthly(monthlySchedule: .weekdayOrdinal([weekdayOrdinal])), isFrequentEnabled: true)
     let expected = [
       try date(from: DateComponents(year: 2023, month: 10, day: 29)),
       try date(from: DateComponents(year: 2023, month: 11, day: 26)),
@@ -329,13 +325,21 @@ final class ActivityDatesCreatorTest: XCTestCase {
     ]
 
     // when
-    let dates = try sut.createsDates(for: activity, dateRange: quarter)
+    let dates = try createDates(for: activity)
 
     // then
     XCTAssertEqual(dates, expected)
   }
 
   // MARK: - Helpers
+
+  private func createDates(for activity: Activity) throws -> [Date] {
+    try withDependencies {
+      $0.utcCalendar = calendar
+    } operation: {
+      try sut.createsDates(for: activity, dateRange: quarter)
+    }
+  }
 
   private func prepareRange(lowerBound: DateComponents, upperBound: DateComponents) throws -> ClosedRange<Date> {
     try date(from: lowerBound)...date(from: upperBound)

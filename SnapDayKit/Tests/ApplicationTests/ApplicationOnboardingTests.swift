@@ -1,10 +1,11 @@
 import ComposableArchitecture
+import Common
 #if DEBUG
 import DeveloperTools
 #endif
 import Foundation
 import Models
-import Repositories
+@testable import Repositories
 import Testing
 import Utilities
 @testable import Application
@@ -17,7 +18,8 @@ struct ApplicationOnboardingTests {
   @Test
   func organizeMyDayCompletesOnboarding() async throws {
     let userDefaults = try makeUserDefaults()
-    let store = makeStore(userDefaults: userDefaults)
+    let analytics = AnalyticsRecorder()
+    let store = makeStore(userDefaults: userDefaults, analytics: analytics)
 
     await store.send(.onboarding(.delegate(.completed))) {
       $0.onboarding = OnboardingFeature.State()
@@ -25,6 +27,7 @@ struct ApplicationOnboardingTests {
     }
 
     #expect(userDefaults.bool(forKey: "isOnboardingShown"))
+    #expect(analytics.events == [.onboardingCompleted])
   }
 
   @Test
@@ -73,7 +76,7 @@ struct ApplicationOnboardingTests {
   @Test
   func cancellingNewPlanReturnsToOnboardingWithoutSaving() async throws {
     let userDefaults = try makeUserDefaults()
-    var state = ApplicationFeature.State(userDefaults: userDefaults)
+    var state = makeState(userDefaults: userDefaults)
     state.onboarding = OnboardingFeature.State(selectedGoal: .readMore)
     state.onboardingGeneratedActivityIDs = [UUID()]
     let store = makeStore(initialState: state, userDefaults: userDefaults)
@@ -132,7 +135,8 @@ struct ApplicationOnboardingTests {
   @Test
   func skippedOnboardingCompletesOnboarding() async throws {
     let userDefaults = try makeUserDefaults()
-    let store = makeStore(userDefaults: userDefaults)
+    let analytics = AnalyticsRecorder()
+    let store = makeStore(userDefaults: userDefaults, analytics: analytics)
 
     await store.send(.onboarding(.delegate(.skipped))) {
       $0.onboarding = OnboardingFeature.State()
@@ -140,13 +144,14 @@ struct ApplicationOnboardingTests {
     }
 
     #expect(userDefaults.bool(forKey: "isOnboardingShown"))
+    #expect(analytics.events == [.onboardingSkipped])
   }
 
   @Test
   func creatingOnboardingPlanUsesOnePersistenceTransaction() async throws {
     let userDefaults = try makeUserDefaults()
     let recorder = PlanCreationRecorder()
-    var state = ApplicationFeature.State(userDefaults: userDefaults)
+    var state = makeState(userDefaults: userDefaults)
     let calendar = Calendar(identifier: .gregorian).utcCalendar
     let startDate = try #require(
       calendar.date(from: DateComponents(year: 2026, month: 8, day: 10))
@@ -202,7 +207,7 @@ struct ApplicationOnboardingTests {
     )
     planState.step = .review
     planState.isSubmitting = true
-    var state = ApplicationFeature.State(userDefaults: userDefaults)
+    var state = makeState(userDefaults: userDefaults)
     state.onboarding.newPlan = planState
     let draft = NewPlanDraft(
       name: planState.name,
@@ -258,11 +263,7 @@ struct ApplicationOnboardingTests {
     return try #require(UserDefaults(suiteName: suiteName))
   }
 
-  private func makeStore(
-    initialState: ApplicationFeature.State? = nil,
-    userDefaults: UserDefaults,
-    createPlan: @escaping PlanCreationRepository.Create = { _, _, _ in }
-  ) -> TestStoreOf<ApplicationFeature> {
+  private func makeState(userDefaults: UserDefaults) -> ApplicationFeature.State {
     let calendar = Calendar(identifier: .gregorian).utcCalendar
     return withDependencies {
       $0.calendar = calendar
@@ -270,18 +271,59 @@ struct ApplicationOnboardingTests {
       $0.date.now = Date(timeIntervalSinceReferenceDate: 800_000_000)
       $0.uuid = .incrementing
       $0.deeplinkService = DeeplinkService()
-      $0.planCreationRepository = PlanCreationRepository(create: createPlan)
     } operation: {
-      TestStore(
-        initialState: initialState ?? ApplicationFeature.State(userDefaults: userDefaults),
-        reducer: { ApplicationFeature(userDefaults: userDefaults) }
-      )
+      ApplicationFeature.State(userDefaults: userDefaults)
+    }
+  }
+
+  private func makeStore(
+    initialState: ApplicationFeature.State? = nil,
+    userDefaults: UserDefaults,
+    createPlan: @escaping PlanCreationRepository.Create = { _, _, _ in },
+    analytics: AnalyticsRecorder? = nil
+  ) -> TestStoreOf<ApplicationFeature> {
+    let calendar = Calendar(identifier: .gregorian).utcCalendar
+    let updateDependencies: (inout DependencyValues) -> Void = {
+      $0.calendar = calendar
+      $0.utcCalendar = calendar
+      $0.date.now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+      $0.uuid = .incrementing
+      $0.deeplinkService = DeeplinkService()
+      $0.planCreationRepository = PlanCreationRepository(create: createPlan)
+      $0.coreDataStack = .applicationTestValue
+      $0.activityRepository = .liveValue
+      $0.dayActivityRepository = .liveValue
+      $0.planRepository = .liveValue
+      $0.dayUpdater = .liveValue
+      $0.widgetReloader = WidgetReloader(reloadAction: { })
+      $0.analyticsClient.track = { event in analytics?.record(event) }
+    }
+    let state = withDependencies(updateDependencies) {
+      initialState ?? ApplicationFeature.State(userDefaults: userDefaults)
+    }
+    return TestStore(initialState: state) {
+      ApplicationFeature(userDefaults: userDefaults)
+    } withDependencies: {
+      updateDependencies(&$0)
     }
   }
 }
 
 private enum PersistenceError: Error {
   case failed
+}
+
+private final class AnalyticsRecorder: @unchecked Sendable {
+  private let lock = NSLock()
+  private var recordedEvents: [AnalyticsEvent] = []
+
+  var events: [AnalyticsEvent] {
+    lock.withLock { recordedEvents }
+  }
+
+  func record(_ event: AnalyticsEvent) {
+    lock.withLock { recordedEvents.append(event) }
+  }
 }
 
 private actor PlanCreationRecorder {

@@ -10,6 +10,7 @@ public struct AnalyticsEvent: Equatable, Sendable {
 
 public extension AnalyticsEvent {
   static let onboardingCompleted = Self(name: "Onboarding.completed")
+  static let onboardingSkipped = Self(name: "Onboarding.skipped")
   static let planCreated = Self(name: "Plan.created")
 
   static func paywallViewed(context: String) -> Self {

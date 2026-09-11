@@ -196,7 +196,7 @@ public struct ApplicationFeature {
         userDefaults.set(true, forKey: Self.isOnboardingShownKey)
         return .none
       case .onboarding(.delegate(.skipped)):
-        analyticsClient.track(.onboardingCompleted)
+        analyticsClient.track(.onboardingSkipped)
         state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
         state.selectedTab = .dashboard
