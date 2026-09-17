@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Common
 import Foundation
 import OSLog
 
@@ -104,6 +105,7 @@ public struct PaywallFeature {
   }
 
   @Dependency(\.paymentClient) private var paymentClient
+  @Dependency(\.analyticsClient) private var analyticsClient
 
   public init() {}
 
@@ -112,6 +114,7 @@ public struct PaywallFeature {
       switch action {
       case .view(.appeared):
         guard state.loadState == .idle else { return .none }
+        analyticsClient.track(.paywallViewed(context: state.context.rawValue))
         return loadProducts(state: &state)
 
       case .view(.closeButtonTapped):
@@ -181,6 +184,7 @@ public struct PaywallFeature {
 
       case .internal(.purchaseFinished(.purchased(let entitlement))):
         guard !state.didCompletePurchase else { return .none }
+        trackSubscriptionPurchased(state: state)
         state.didCompletePurchase = true
         state.operation = .idle
         return .send(.delegate(.purchaseCompleted(entitlement)))
@@ -221,6 +225,7 @@ public struct PaywallFeature {
           entitlement.hasAccess,
           !state.didCompletePurchase
         else { return .none }
+        trackSubscriptionPurchased(state: state)
         state.didCompletePurchase = true
         state.operation = .idle
         return .send(.delegate(.purchaseCompleted(entitlement)))
@@ -244,6 +249,16 @@ public struct PaywallFeature {
         await send(.internal(.productsFailed))
       }
     }
+  }
+
+  private func trackSubscriptionPurchased(state: State) {
+    guard let productID = state.selectedProductID else { return }
+    analyticsClient.track(
+      .subscriptionPurchased(
+        productID: productID,
+        context: state.context.rawValue
+      )
+    )
   }
 }
 

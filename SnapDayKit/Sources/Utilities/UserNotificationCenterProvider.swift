@@ -35,6 +35,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
 
   public var status: Status {
     get async {
+      guard let userNotificationCenter else { return .denied }
       let authorizationStatus = await userNotificationCenter.notificationSettings().authorizationStatus
       return switch authorizationStatus {
       case .notDetermined:
@@ -53,7 +54,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
     userActionSubject.eraseToAnyPublisher().values
   }
 
-  private var userNotificationCenter: UserNotificationCenter
+  private var userNotificationCenter: UserNotificationCenter?
   private let userActionSubject = PassthroughSubject<Void, Never>()
 
   @Dependency(\.userNotificationCenterProvider) private var userNotificationCenterProvider
@@ -69,13 +70,19 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   public init(userNotificationCenter: UserNotificationCenter = UNUserNotificationCenter.current()) {
     self.userNotificationCenter = userNotificationCenter
     super.init()
-    self.userNotificationCenter.delegate = self
+    self.userNotificationCenter?.delegate = self
+  }
+
+  private override init() {
+    userNotificationCenter = nil
+    super.init()
   }
 
   // MARK: - Public
 
   public func requestAuthorization() async throws -> Bool {
-    try await userNotificationCenter.requestAuthorization(options: [.alert, .badge, .sound])
+    guard let userNotificationCenter else { return false }
+    return try await userNotificationCenter.requestAuthorization(options: [.alert, .badge, .sound])
   }
 
   public func registerRemoteNotifications(deviceToken: String) async throws {
@@ -88,6 +95,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   }
 
   public func registerCategories() {
+    guard let userNotificationCenter else { return }
     let eveningSummaryCategory = UNNotificationCategory(
       identifier: UserNotificationCategoryIdentifier.eveningSummary.rawValue,
       actions: [],
@@ -125,6 +133,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   }
 
   public func schedule(userNotification: any UserNotification) async throws {
+    guard let userNotificationCenter else { return }
     let isNotificationScheduled = await userNotificationCenter.pendingNotificationRequests().contains(where: {
       $0.identifier == userNotification.identifier
     })
@@ -143,6 +152,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
   }
 
   public func remove(userNotification: any UserNotification) async {
+    guard let userNotificationCenter else { return }
     let isNotificationScheduled = await userNotificationCenter.pendingNotificationRequests().contains(where: {
       $0.identifier == userNotification.identifier
     })
@@ -153,6 +163,7 @@ public final class UserNotificationCenterProvider: NSObject, TodayProvidable {
 
 extension UserNotificationCenterProvider {
   public func reloadReminders() async throws {
+    guard let userNotificationCenter else { return }
     let pendingRequests = await userNotificationCenter.pendingNotificationRequests()
       .filter { $0.content.categoryIdentifier == UserNotificationCategoryIdentifier.dayActivityReminder.rawValue }
     userNotificationCenter.removePendingNotificationRequests(withIdentifiers: pendingRequests.map(\.identifier))
@@ -218,7 +229,8 @@ extension UserNotificationCenterProvider {
 extension UserNotificationCenterProvider {
   public var pendingRequests: [String] {
     get async {
-      await userNotificationCenter.pendingNotificationRequests()
+      guard let userNotificationCenter else { return [] }
+      return await userNotificationCenter.pendingNotificationRequests()
         .map { request in
           let identifier = request.identifier
           guard let trigger = request.trigger as? UNCalendarNotificationTrigger,
@@ -231,6 +243,7 @@ extension UserNotificationCenterProvider {
   }
 
   public func sendDeveloperMessage(_ message: String) async throws {
+    guard let userNotificationCenter else { return }
     guard UserDefaults.standard.bool(forKey: "backgroundUpdatedNotificationEnabled") else { return }
     let content = UNMutableNotificationContent()
     content.title = "Developer message"
@@ -331,6 +344,10 @@ extension DependencyValues {
 
 extension UserNotificationCenterProvider: DependencyKey {
   public static var liveValue: UserNotificationCenterProvider {
+    UserNotificationCenterProvider()
+  }
+
+  public static var testValue: UserNotificationCenterProvider {
     UserNotificationCenterProvider()
   }
 }

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Common
 import Foundation
 import Models
 import Onboarding
@@ -29,6 +30,7 @@ public struct ApplicationFeature {
   @Dependency(\.paymentClient) private var paymentClient
   @Dependency(\.openURL) private var openURL
   @Dependency(\.widgetReloader) private var widgetReloader
+  @Dependency(\.analyticsClient) private var analyticsClient
   private static let isOnboardingShownKey = "isOnboardingShown"
   private let userDefaults: UserDefaults
 
@@ -187,12 +189,14 @@ public struct ApplicationFeature {
       case .reports:
         return .none
       case .onboarding(.delegate(.completed)):
+        analyticsClient.track(.onboardingCompleted)
         state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
         state.selectedTab = .dashboard
         userDefaults.set(true, forKey: Self.isOnboardingShownKey)
         return .none
       case .onboarding(.delegate(.skipped)):
+        analyticsClient.track(.onboardingSkipped)
         state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
         state.selectedTab = .dashboard
@@ -244,6 +248,7 @@ public struct ApplicationFeature {
               generatedActivities,
               occurrences
             )
+            analyticsClient.track(.planCreated)
             await send(.onboardingPlanSaved)
           } catch {
             await send(.onboardingPlanSaveFailed)
@@ -253,6 +258,7 @@ public struct ApplicationFeature {
       case .onboarding:
         return .none
       case .onboardingPlanSaved:
+        analyticsClient.track(.onboardingCompleted)
         state.onboardingGeneratedActivityIDs = []
         state.onboarding = OnboardingFeature.State()
         state.showOnboarding = false
@@ -268,10 +274,10 @@ public struct ApplicationFeature {
       case .premiumEntitlementUpdated(let entitlement):
         return applyPremiumEntitlement(entitlement, state: &state)
       case .requestPremiumAccess(let context):
+        guard state.paywall?.context != context else { return .none }
         guard !state.premiumEntitlement.hasAccess else {
           return .send(.premiumAccessGranted(context))
         }
-        guard state.paywall?.context != context else { return .none }
         state.pendingPremiumAction = context
         state.paywall = PaywallFeature.State(context: context)
         return .none

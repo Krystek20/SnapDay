@@ -2,8 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>SentryDSN</key>
-	<string>$(SENTRY_DSN)</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.mobilove.snapday.create_day</string>
+	</array>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -17,12 +21,10 @@
 	</array>
 	<key>CKSharingSupported</key>
 	<true/>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.mobilove.snapday.create_day</string>
-	</array>
-	<key>CFBundleAllowMixedLocalizations</key>
-	<true/>
+	<key>SentryDSN</key>
+	<string>$(SENTRY_DSN)</string>
+	<key>TelemetryDeckAppID</key>
+	<string>$(TELEMETRYDECK_APP_ID)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -34,13 +36,5 @@
 		<key>UIImageName</key>
 		<string>LaunchScreen</string>
 	</dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>NSContactsUsageDescription</key>
-	<string>We need access to your contacts to help you invite others to collaborate. This allows you to easily select people from your address book and send them invitations to join your projects or teams. Your contacts will only be used for this purpose and will not be shared with anyone else.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This app needs access to the microphone so you can dictate your daily goals and notes.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>This app uses speech recognition to convert your spoken goals into text.</string>
 </dict>
 </plist>

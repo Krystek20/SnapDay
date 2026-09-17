@@ -160,24 +160,28 @@ struct OnboardingFeatureTests {
   @Test
   func planStepsUseOnboardingPathAndBackPreservesDraft() async throws {
     let calendar = Calendar(identifier: .gregorian).utcCalendar
-    var state = OnboardingFeature.State()
-    state.newPlan = NewPlanFeature.State(
-      onboardingName: "Reading plan",
-      startDate: Date(timeIntervalSinceReferenceDate: 800_000_000),
-      suggestedActivity: nil,
-      scheduledWeekdays: [],
-      calendar: calendar
-    )
-    state.path.append(.newPlanStep(.details))
-    let store = TestStore(initialState: state) {
-      OnboardingFeature()
+    let store = withDependencies {
+      $0.calendar = calendar
+    } operation: {
+      var state = OnboardingFeature.State()
+      state.newPlan = NewPlanFeature.State(
+        onboardingName: "Reading plan",
+        startDate: Date(timeIntervalSinceReferenceDate: 800_000_000),
+        suggestedActivity: nil,
+        scheduledWeekdays: [],
+        calendar: calendar
+      )
+      state.path.append(.newPlanStep(.details))
+      return TestStore(initialState: state) {
+        OnboardingFeature()
+      }
     }
 
     await store.send(.newPlan(.view(.continueButtonTapped))) {
       $0.newPlan?.step = .weeklySchedule
     }
     await store.receive(.newPlan(.delegate(.stepChanged(.weeklySchedule)))) {
-      $0.path.append(.newPlanStep(.weeklySchedule))
+      $0.path[id: 1] = .newPlanStep(.weeklySchedule)
     }
 
     let weeklyScheduleID = try #require(store.state.path.ids.last)
@@ -215,10 +219,6 @@ struct OnboardingFeatureTests {
   }
 
   private var readingRequest: OnboardingPlanRequest {
-    OnboardingPlanRequest(
-      name: "Read 15 minutes a day",
-      activityTitle: "Read for 15 minutes",
-      cadence: .daily
-    )
+    OnboardingTemplateCategory.reading.defaultTemplate.planRequest
   }
 }

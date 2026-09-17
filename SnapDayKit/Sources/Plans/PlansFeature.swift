@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Common
 import Foundation
 import Models
 import Repositories
@@ -12,6 +13,7 @@ public struct PlansFeature {
   @Dependency(\.calendar) private var calendar
   @Dependency(\.activityRepository.loadActivities) private var loadActivities
   @Dependency(\.planRepository) private var planRepository
+  @Dependency(\.analyticsClient) private var analyticsClient
 
   // MARK: - State & Action
 
@@ -282,6 +284,7 @@ public struct PlansFeature {
       do {
         try await planRepository.savePlan(plan)
         _ = try await planRepository.synchronizeOccurrences(plan, plan.startDate)
+        analyticsClient.track(.planCreated)
         await send(.internal(.planSaved))
       } catch {
         await send(.internal(.planSaveFailed))

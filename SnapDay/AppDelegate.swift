@@ -18,6 +18,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
   ) -> Bool {
     Telemetry.start()
+    ProductAnalytics.start()
     registerNotifications()
     application.registerForRemoteNotifications()
     registerBackgroundTask()
