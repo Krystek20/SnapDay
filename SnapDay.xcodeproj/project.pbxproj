@@ -790,7 +790,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Krystian Solarz (592BXD7V67)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -800,6 +800,8 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSContactsUsageDescription = "We need access to your contacts to help you invite others to collaborate. This allows you to easily select people from your address book and send them invitations to join your projects or teams. Your contacts will only be used for this purpose and will not be shared with anyone else.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to the microphone so you can dictate your daily goals and notes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to convert your spoken goals into text.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -815,6 +817,8 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Development";
 				SENTRY_DSN = "https://a6bc5947e48edbbc2cdc89946f6462a2@o4512004764860416.ingest.de.sentry.io/4512004772855888";
+				SENTRY_ORG = "mobilove-sp-z-oo";
+				SENTRY_PROJECT = "apple-ios";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -835,7 +839,7 @@
 				CODE_SIGN_ENTITLEMENTS = SnapDay/SnapDay.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Krystian Solarz (62J877TJR3)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"SnapDay/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
@@ -845,6 +849,8 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSContactsUsageDescription = "We need access to your contacts to help you invite others to collaborate. This allows you to easily select people from your address book and send them invitations to join your projects or teams. Your contacts will only be used for this purpose and will not be shared with anyone else.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to the microphone so you can dictate your daily goals and notes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to convert your spoken goals into text.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -860,6 +866,8 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "SnapDay - Distribution";
 				SENTRY_DSN = "https://a6bc5947e48edbbc2cdc89946f6462a2@o4512004764860416.ingest.de.sentry.io/4512004772855888";
+				SENTRY_ORG = "mobilove-sp-z-oo";
+				SENTRY_PROJECT = "apple-ios";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -917,7 +925,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -950,7 +958,7 @@
 				CODE_SIGN_ENTITLEMENTS = ActivityWidget/ActivityWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -981,7 +989,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1012,7 +1020,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Content/Notification Content.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 62J877TJR3;
 				GENERATE_INFOPLIST_FILE = YES;

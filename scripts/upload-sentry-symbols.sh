@@ -14,13 +14,19 @@ for variable in "${required_variables[@]}"; do
   fi
 done
 
-if ! command -v sentry-cli >/dev/null 2>&1; then
+if command -v sentry-cli >/dev/null 2>&1; then
+  sentry_cli="$(command -v sentry-cli)"
+elif [[ -x /opt/homebrew/bin/sentry-cli ]]; then
+  sentry_cli=/opt/homebrew/bin/sentry-cli
+elif [[ -x /usr/local/bin/sentry-cli ]]; then
+  sentry_cli=/usr/local/bin/sentry-cli
+else
   echo "error: sentry-cli is required to upload Sentry debug symbols" >&2
   echo "       Install it with: brew install getsentry/tools/sentry-cli" >&2
   exit 1
 fi
 
-sentry-cli debug-files upload \
+"${sentry_cli}" debug-files upload \
   --force-foreground \
   --include-sources \
   "${DWARF_DSYM_FOLDER_PATH}"
